@@ -1,0 +1,40 @@
+version: "3.4"
+
+services:
+
+  # Postgres DataBase
+  database:
+    build:
+      context: ..
+      dockerfile: dev_env/DatabasePOSTGIS.dockerfile
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=oilandrope
+    ports:
+      - "5432:5432"
+
+  # Web
+  web:
+    build:
+      context: ..
+      dockerfile: dev_env/OilAndRope.dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=database
+      - DB_NAME=oilandrope
+      - DB_PASSWORD=123456
+      - DB_PORT=5432
+      - DB_USER=docker
+      - DEBUG=True
+    ports:
+      # Web Port
+      - "8000:8000"
+      # Debug Port
+      - "9000:9000"
+      # Extra Port
+      - "5500:5500"
+    volumes:
+      - ../:/oilandrope/

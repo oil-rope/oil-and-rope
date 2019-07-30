@@ -5,7 +5,9 @@ django-ckeditor
 django-crispy-forms
 django-extensions
 django-formtools
+djangorestframework
 django-tables2
+markdown
 matplotlib
 numpy
 pandas
@@ -16,3 +18,4 @@ pylint-django
 pytest
 pytest-django
 scipy
+Sphinx
