@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True')
 
 ALLOWED_HOSTS = []
 
@@ -37,6 +37,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # DjangoPlus
+    'django_extensions',
+    # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
+    'crispy_forms',
+    # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
+    'formtools',
+    # Queryset-Bootstrap Tables (https://django-tables2.readthedocs.io/)
+    'django_tables2',
+    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
+    'ckeditor',
+    # API RestFramework (https://www.django-rest-framework.org/)
+    'rest_framework',
+    # Source
+    'core.apps.CoreConfig',
+    # Bot
+    'bot.apps.BotConfig',
+    # Registration System
+    'registration.apps.RegistrationConfig',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.language',
             ],
         },
     },
@@ -75,9 +94,16 @@ WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'oilandrope'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'TEST': {
+            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
+        },
+    },
 }
 
 
@@ -113,8 +139,56 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Translation files
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale')
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Media files
+# https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+# CKEditor
+# https://django-ckeditor.readthedocs.io/en/latest/#optional-customizing-ckeditor-editor
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
+             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source'],
+        ],
+    },
+}
+
+# Crispy Configuration
+# https://django-crispy-forms.readthedocs.io
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# RestFramwork Configuration
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
