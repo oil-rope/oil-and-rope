@@ -1,0 +1,16 @@
+// Color Palette
+$color-1: #1A202C;
+$color-2: #1F7872;
+$color-3: #72B095;
+$color-4: #DEDBA7;
+$color-5: #D13F31;
+
+$body-bg: $color-4;
+
+$theme-colors: ("primary": $color-1,
+    "secondary": $color-1,
+    "danger": $color-5,
+    "warning": $color-4);
+
+// Bootstrap and its default variables
+@import "../../bootstrap/scss/bootstrap";
