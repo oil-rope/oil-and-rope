@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -129,7 +130,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
+# Supported languages
+# https://docs.djangoproject.com/en/2.2/ref/settings/#languages
+
+LANGUAGES = [
+    ('en', _('English')),
+    ('es', _('Spanish')),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -148,7 +157,14 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+
+# Login System
+# https://docs.djangoproject.com/en/2.2/ref/settings/#auth
+
+LOGIN_REDIRECT_URL = 'core:home'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Media files
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root

@@ -63,8 +63,4 @@ styles-watch:
 
 # Execute tests
 tests:
-	docker exec oilandrope_web_1 python3 "pytest"
-
-tast:
-	@sleep 5
-	@echo "lol"
+	docker exec oilandrope_web_1 pytest

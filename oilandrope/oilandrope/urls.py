@@ -23,8 +23,12 @@ from django.urls import path, include
 urlpatterns = []
 
 urlpatterns += i18n_patterns(
+    # Main site
     path('', include('core.urls')),
+    # Admin site
     path('admin/', admin.site.urls),
+    # Auth system
+    path('accounts/', include('django.contrib.auth.urls')),
 )
 
 if settings.DEBUG:

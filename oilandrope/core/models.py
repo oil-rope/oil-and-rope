@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext as _
 
+
 class TracingMixin(models.Model):
     """
     This model makes a tracing for other models.
@@ -13,8 +14,8 @@ class TracingMixin(models.Model):
         Last time model was updated.
     """
 
-    created_at = models.DateTimeField(_("Created at"), auto_now=False, auto_now_add=True)
-    updated_at = models.DateTimeField(_("Updated at"), auto_now=True, auto_now_add=False)
+    entry_created_at = models.DateTimeField(_("Entry created at"), auto_now=False, auto_now_add=True)
+    entry_updated_at = models.DateTimeField(_("Entry updated at"), auto_now=True, auto_now_add=False)
 
     class Meta:
         abstract = True
