@@ -19,3 +19,4 @@ pytest
 pytest-django
 scipy
 Sphinx
+Werkzeug
