@@ -29,6 +29,9 @@ urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     # Auth system
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('registration.urls')),
+    # Bot
+    path('bot/', include('bot.urls')),
 )
 
 if settings.DEBUG:
