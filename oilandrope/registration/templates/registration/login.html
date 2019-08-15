@@ -1,0 +1,17 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %}{% endblock title %}
+
+{% block body_content %}
+<main class="container">
+  <h1 class="text-primary">{% trans "Welcome to Oil &amp; Rope" %}</h1>
+  <form action="" method="post" class="flex-row flex-column">
+    {% load crispy_forms_tags %}
+    {% csrf_token %}
+    {{ form.username|as_crispy_field }}
+    {{ form.password|as_crispy_field }}
+    <input type="submit" value="{% trans "Login" %}" class="btn btn-primary">
+  </form>
+</main>
+{% endblock body_content %}
