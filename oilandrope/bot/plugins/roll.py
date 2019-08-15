@@ -55,7 +55,7 @@ def all(message):
 
                     aux = 0
 
-            print(f"ndice: {ndice}\nszdice: {szdice}")
+            #print(f"ndice: {ndice}\nszdice: {szdice}")
 
             symbol = True
             aux = 0
@@ -93,7 +93,7 @@ def all(message):
             crit = 0
             pifia = 0
 
-            print(f'Resultado: {result}, szdice: {szdice}')
+            #print(f'Resultado: {result}, szdice: {szdice}')
 
             for i in range(ndice):
                 if(result[i] == szdice):
@@ -101,7 +101,7 @@ def all(message):
                 elif(result[i] == 1):
                     pifia += 1
 
-            print(f'ndice: {ndice}, crit: {crit}, pifia: {pifia}')
+            #print(f'ndice: {ndice}, crit: {crit}, pifia: {pifia}')
 
             if crit == ndice:
                 total_crit = True
