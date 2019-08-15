@@ -3,6 +3,8 @@ import logging
 import pathlib
 import shutil
 
+import os
+
 from django.utils.translation import ugettext as _
 
 from bot.bot.exceptions import OilAndRopeException
@@ -20,6 +22,9 @@ class Config:
 
     def __init__(self):
         self.configuration = self.get_configuration()
+        #import pdb; pdb.set_trace()
+        self.token = self.configuration.get("Credentials", "token")
+        self.bot_prefix = self.configuration.get("Credentials", "bot_prefix")
 
     def get_configuration(self) -> configparser.ConfigParser:
         """
@@ -50,3 +55,4 @@ class Config:
         parser.read(config_file, encoding='utf-8')
 
         return parser
+
