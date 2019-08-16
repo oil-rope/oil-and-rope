@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:stable
 
 # Updating container
 RUN apt-get update
