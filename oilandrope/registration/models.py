@@ -86,7 +86,7 @@ class Profile(TracingMixin):
         return 'Profile {}'.format(self.user.username)
 
 
-@receiver(post_save, sender=Profile)
+@receiver(post_save, sender=User)
 def create_profile_post_save_receiver(instance: User, **kwargs):
     """
     Creates a :class:`Profile` once a :class:`auth.User` is created.

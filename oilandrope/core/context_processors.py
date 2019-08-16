@@ -8,6 +8,6 @@ def language(request):
     """
 
     if request.user.is_authenticated:
-        profile = Profile.objects.get_or_create(user=request.user)[0]
+        profile = request.user.profile
         return {'lan': profile.language}
     return {'lan': settings.LANGUAGE_CODE}

@@ -7,11 +7,24 @@
   <div class="collapse navbar-collapse" id="navbarOilAndRopeMenu">
     <div class="navbar-nav">
       <a href="{% url 'core:home' %}" class="nav-item nav-link">{% trans "Home" %}</a>
+      {% if request.user.is_superuser %}
       <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:;" id="navbarOilAndRopeDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a href="javascript:;" class="nav-link dropdown-toggle" id="navbarAdminDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {% trans "Administration" %}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarAdminMenu">
+          <a href="{% url 'admin:index' %}" class="dropdown-item">
+            <i class="fas fa-cogs"></i>
+            {% trans "Admin Panel" %}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+      <div class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:;" id="navbarProfileDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{ request.user.username }}
         </a>
-        <div class="dropdown-menu" id="navbarOilAndRopeDropdownMenu">
+        <div class="dropdown-menu" aria-labelledby="navbarProfileDropdownMenu">
           <a href="javascript:;" class="dropdown-item">
             <i class="fas fa-user-alt"></i>
             {% trans "Profile" %}

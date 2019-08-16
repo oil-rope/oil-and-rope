@@ -5,13 +5,25 @@
 
 {% block body_content %}
 <main class="container">
-  <h1 class="text-primary">{% trans "Welcome to Oil &amp; Rope" %}</h1>
-  <form action="" method="post" class="flex-row flex-column">
-    {% load crispy_forms_tags %}
-    {% csrf_token %}
-    {{ form.username|as_crispy_field }}
-    {{ form.password|as_crispy_field }}
-    <input type="submit" value="{% trans "Login" %}" class="btn btn-primary">
-  </form>
+  <h1 class="text-primary text-center">{% trans "Welcome to Oil &amp; Rope" %}</h1>
+  <hr>
+  <div class="row flex-column align-content-lg-around py-3">
+    <form action="" method="post" class="col-lg-6">
+      {% load crispy_forms_tags %}
+      {% csrf_token %}
+      {{ form.username|as_crispy_field }}
+      {{ form.password|as_crispy_field }}
+      <input type="submit" value="{% trans "Login" %}" class="btn btn-primary">
+    </form>
+  </div>
+  {% if form.errors %}
+  <div class="row justify-content-center">
+    <div class="alert alert-danger col-lg-6">
+      <p>
+        {% blocktrans %}Please ensure you have written a correct User and Password.{% endblocktrans %}
+      </p>
+    </div>
+  </div>
+  {% endif %}
 </main>
 {% endblock body_content %}
