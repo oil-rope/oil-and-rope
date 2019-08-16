@@ -8,9 +8,9 @@ $color-5: #D13F31;
 $body-bg: $color-4;
 
 $theme-colors: ("primary": $color-1,
-    "secondary": $color-1,
-    "danger": $color-5,
-    "warning": $color-4);
+    "secondary": $color-2,
+    "info": $color-3,
+    "extra": $color-5);
 
 // Bootstrap and its default variables
 @import "../../bootstrap/scss/bootstrap";

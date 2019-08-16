@@ -13,7 +13,12 @@
       {% csrf_token %}
       {{ form.username|as_crispy_field }}
       {{ form.password|as_crispy_field }}
-      <input type="submit" value="{% trans "Login" %}" class="btn btn-primary">
+      <div class="text-center">
+        <input type="submit" value="{% trans "Sign in" %}" class="btn btn-block btn-primary text-uppercase font-weight-bold">
+      </div>
+      <div class="text-center">
+        <a href="javascript:;" class="small">{% trans "Join us!" %}</a>
+      </div>
     </form>
   </div>
   {% if form.errors %}
