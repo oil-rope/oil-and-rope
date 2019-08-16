@@ -1,3 +1,7 @@
+# Starts the Bot
+bot:
+	docker exec -ti oilandrope_web_1 python3 "run.py"
+
 # Creates containers
 containers:
 	@echo "Creating container for DataBase"
