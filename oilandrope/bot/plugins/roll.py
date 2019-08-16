@@ -1,7 +1,6 @@
 import random
 
 
-
 def all(message):
     if message.content.startswith('..'):
         if message.content[2] == 'd' or message.content[2] == 'D' or message.content[2].isdigit():
@@ -17,13 +16,9 @@ def all(message):
                 half = contexto.find('+')
                 adding = contexto[half:]
                 contexto = contexto[0:half]
-                #print("Se ha encontrado bonus")
                 add = True
             else:
-                #print("No se ha encontrado bonus")
                 add = False
-
-            #print(f"Dados: {contexto}\nBonus: {adding}")
 
             mode_n = True
             mode_d = False
@@ -34,7 +29,7 @@ def all(message):
             if contexto[2] == 'd' or contexto[2] == 'D':
                 ndice = 1
 
-            for i in range (len(contexto)):
+            for i in range(len(contexto)):
                 if contexto[i] == 'd' or contexto[i] == 'D':
                     mode_n = False
                     mode_d = True
@@ -55,8 +50,6 @@ def all(message):
 
                     aux = 0
 
-            #print(f"ndice: {ndice}\nszdice: {szdice}")
-
             symbol = True
             aux = 0
             bonus = []
@@ -66,18 +59,12 @@ def all(message):
                     if adding[i].isdigit():
                         aux += int(adding[i])
                         if adding[i-1].isdigit():
-                            #print(f'Posiciones en Adding: {adding[i-1]}, {adding[i]}')
-                            #print(f'Iterador: {j}')
-                            #print(f'Posiciones en Bonus: {bonus}')
                             bonus[j-1] *= 10
                             bonus[j-1] += aux
                         else:
-                            #print('Append por primera vez')
                             bonus.append(aux)
                             j += 1
-                        aux=0
-
-            #print(f'Bonus: {bonus}')
+                        aux = 0
             szdice = int(szdice)
             ndice = int(ndice)
             for i in range(ndice):
@@ -93,15 +80,11 @@ def all(message):
             crit = 0
             pifia = 0
 
-            #print(f'Resultado: {result}, szdice: {szdice}')
-
             for i in range(ndice):
                 if(result[i] == szdice):
                     crit += 1
                 elif(result[i] == 1):
                     pifia += 1
-
-            #print(f'ndice: {ndice}, crit: {crit}, pifia: {pifia}')
 
             if crit == ndice:
                 total_crit = True
@@ -113,23 +96,22 @@ def all(message):
                 total_crit = False
                 total_pifia = False
 
-
-            to_send = f'El resultado es: **[{total}]** =>'
+            to_send = 'El resultado es: **[{total}]** =>'.format(total=total)
 
             to_send += (' ([ *')
             for i in range(len(result)):
                 if result[i] == szdice:
-                    to_send += (f'**{result[i]}**')
+                    to_send += '**{result}**'.format(result=result[i])
                 elif result[i] == 1:
-                    to_send += f'__{result[i]}__'
+                    to_send += '__{result}__'.format(result=result[i])
                 else:
-                    to_send += f'{result[i]}'
+                    to_send += '{result}'.format(result=result[i])
                 if i != len(result) - 1:
                     to_send += ' + '
             to_send += '* ] '
 
             for i in range(len(bonus)):
-                to_send += f' + [{bonus[i]}]'
+                to_send += ' + [{bonus}]'.format(bonus=bonus[i])
 
             to_send += ')'
 
@@ -138,10 +120,7 @@ def all(message):
             elif total_pifia:
                 to_send += '\n F'
 
-
-            #import pdb; pdb.set_trace()
             return to_send
 
         else:
-            #import pdb; pdb.set_trace()
             return None

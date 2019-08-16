@@ -1,11 +1,8 @@
 import configparser
 import logging
+import os
 import pathlib
 import shutil
-
-import os
-
-from django.utils.translation import ugettext as _
 
 from bot.bot.exceptions import OilAndRopeException
 
@@ -13,6 +10,7 @@ LOG = logging.getLogger(__name__)
 CONFIG_DIR = pathlib.Path('bot/config/')
 EXAMPLE_CONFIG_DIR = 'example_configuration.ini'
 CONFIG_FILE = 'configuration.ini'
+CONF_SECTIONS = {'Credentials', 'Bot', 'Embed'}  # Obligatory sections
 
 
 class Config:
@@ -21,10 +19,19 @@ class Config:
     """
 
     def __init__(self):
-        self.configuration = self.get_configuration()
-        #import pdb; pdb.set_trace()
-        self.token = self.configuration.get("Credentials", "token")
-        self.bot_prefix = self.configuration.get("Credentials", "bot_prefix")
+        self.config_file = self.get_configuration()
+        self.configuration = {section: {} for section in self.config_file.sections()}
+
+        for section in self.config_file.sections():
+            for option in self.config_file[section]:
+                # Getting the value
+                value = self.config_file.get(section, option)
+                self.configuration[section].update({option: value})
+
+        # Checking for sensitive crendentials
+        if not 'token' in self.configuration['Credentials']:
+            LOG.warning("\nToken not found in 'Credentials'\nLooking in environment variables 'BOT_TOKEN'\n")
+            self.configuration['Credentials'].update({'token': os.getenv('BOT_TOKEN', '')})
 
     def get_configuration(self) -> configparser.ConfigParser:
         """
@@ -35,24 +42,27 @@ class Config:
 
         # Checks if example configuration file was moved or removed
         if not example_config.exists():
-            LOG.error(_("File '%(example_config)s' not found!\nDid you removed it?" % {'example_config': example_config}))
-            raise OilAndRopeException(_("Example Config file is needed in order to start the bot."))
+            LOG.error("File '%(example_config)s' not found!\nDid you removed it?", {'example_config': example_config})
+            raise OilAndRopeException("Example Config file is needed in order to start the bot.")
 
         config_file = CONFIG_DIR / CONFIG_FILE
 
         # Checks if configuration file doesn't exists
         if not config_file.exists():
             try:
-                example_config = str(example_config.absolute())
-                config_file = str(config_file.absolute())
-                shutil.copy(example_config, config_file)
+                shutil.copy(str(example_config), str(config_file))
             except IOError:
-                LOG.error(_("Couldn't copy configuration file!\nDo you have read and write permissions?"))
-                OilAndRopeException(_("You need permissions to copy the configuration file."))
+                LOG.error("Couldn't copy configuration file!\nDo you have read and write permissions?")
+                OilAndRopeException("You need permissions to copy the configuration file.")
 
         # Creating the parser
         parser = configparser.ConfigParser(interpolation=None)
-        parser.read(config_file, encoding='utf-8')
+        parser.read(str(config_file), encoding='utf-8')
+
+        missing_sections = CONF_SECTIONS.difference(parser.sections())
+        if missing_sections:
+            raise OilAndRopeException(
+                "There are missing sections: %(sections)s" % {'sections': ', '.join(missing_sections)}
+            )
 
         return parser
-

@@ -14,14 +14,13 @@ from bot.plugins import roll
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
 django.setup()
 
-#token = os.environ.get("DISCORD_BOT_SECRET")
-# print(token)
-
 configuration = config.Config()
+prefix = configuration.configuration['Bot']['bot_prefix']
+token = configuration.configuration['Credentials']['token']
 
-client = commands.Bot(command_prefix=configuration.bot_prefix, self_bot=False)
-roll_pattern = re.compile(
-    '^(?P<dice>\d*[Dd]\d+)(?P<modifier>[\+\-]((\d*[dD])?\d+))*')
+client = commands.Bot(command_prefix=prefix)
+roll_pattern = r'^(?P<dice>\d*[Dd]\d+)(?P<modifier>[\+\-]((\d*[dD])?\d+))*'
+roll_pattern = re.compile(roll_pattern)
 
 
 @client.event
@@ -31,17 +30,18 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    print(f'{member} has joined the server.')
+    print('{member} has joined the server.'.format(member=member))
 
 
 @client.event
 async def on_member_remove(member):
-    print(f'{member} has left the server.')
+    print('{member} has left the server.'.format(member=member))
 
 
 @client.event
 async def on_message(message: discord.Message):
     from bot import models
+
     author = message.author
     channel = message.channel
     content = message.content
@@ -59,13 +59,10 @@ async def on_message(message: discord.Message):
                 created_at=timezone.make_aware(author.created_at)
             )
             user.save()
-        if user.user:
-            print(user.user)
-            import pdb; pdb.set_trace()
 
-        roll_mesage = content.strip().replace(configuration.bot_prefix, '', 1)
+        roll_mesage = content.strip().replace(prefix, '', 1)
         if roll_pattern.match(roll_mesage):
             await channel.send(roll.all(message))
 
 
-client.run(configuration.token)
+client.run(token)
