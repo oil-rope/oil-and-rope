@@ -3,41 +3,41 @@ from rest_framework import serializers
 from .models import DiscordUser, DiscordServer, DiscordTextChannel, DiscordVoiceChannel
 
 
-class DiscordUserSerializer(serializers.HyperlinkedModelSerializer):
+class DiscordUserSerializer(serializers.ModelSerializer):
     """
     API serializer for model :class:`DiscordUser`.
     """
 
     class Meta:
         model = DiscordUser
-        fields = '__all__'
+        exclude = ('code', 'entry_created_at', 'entry_updated_at')
 
 
-class DiscordServerSerializer(serializers.HyperlinkedModelSerializer):
+class DiscordServerSerializer(serializers.ModelSerializer):
     """
     API serializer for model :class:`DiscordServer`.
     """
 
     class Meta:
         model = DiscordServer
-        fields = '__all__'
+        exclude = ('entry_created_at', 'entry_updated_at')
 
 
-class DiscordTextChannelSerializer(serializers.HyperlinkedModelSerializer):
+class DiscordTextChannelSerializer(serializers.ModelSerializer):
     """
     API serializer for model :class:`DiscordTextChannel`.
     """
 
     class Meta:
         model = DiscordTextChannel
-        fields = '__all__'
+        exclude = ('entry_created_at', 'entry_updated_at')
 
 
-class DiscordVoiceChannelSerializer(serializers.HyperlinkedModelSerializer):
+class DiscordVoiceChannelSerializer(serializers.ModelSerializer):
     """
     API serializer for model :class:`DiscordVoiceChannel`.
     """
 
     class Meta:
         model = DiscordVoiceChannel
-        fields = '__all__'
+        exclude = ('entry_created_at', 'entry_updated_at')
