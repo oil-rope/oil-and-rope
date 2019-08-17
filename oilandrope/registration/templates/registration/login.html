@@ -1,34 +1,57 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Login" %}{% endblock title %}
+{% block title %}{% trans "Home" %}{% endblock title %}
 
 {% block body_content %}
-<main class="container">
-  <h1 class="text-primary text-center">{% trans "Welcome to Oil &amp; Rope" %}</h1>
-  <hr>
-  <div class="row flex-column align-content-lg-around py-3">
-    <form action="" method="post" class="col-lg-6">
-      {% load crispy_forms_tags %}
-      {% csrf_token %}
-      {{ form.username|as_crispy_field }}
-      {{ form.password|as_crispy_field }}
-      <div class="text-center">
-        <input type="submit" value="{% trans "Sign in" %}" class="btn btn-block btn-primary text-uppercase font-weight-bold">
+<header>
+  <div class="container-fluid h-100vh full-background" style="background-image: url({% static 'img/oil-and-rope.jpg' %});">
+    <div class="row flex-row h-100 align-items-center justify-content-lg-center">
+      {% if request.user.is_authenticated %}
+      <div class="text-white">
+        <h1 class="display-2">Oil &amp; Rope</h1>
+        <p class="lead mb-0">{% blocktrans %}The brand-new system for managing Roleplay Games!{% endblocktrans %}</p>
       </div>
-      <div class="text-center">
-        <a href="javascript:;" class="small">{% trans "Join us!" %}</a>
+      {% else %}
+      <div class="col-lg-5">
+        <h2 class=" text-center text-white display-3">
+          {% blocktrans %}Welcome to Oil &amp; Rope!{% endblocktrans %}
+        </h2>
+        <div class="card my-5 text-primary">
+          <div class="card-body">
+            <h5 class="card-title text-center">{% trans "Sign In" %}</h5>
+            <form action="{% url 'login' %}" method="post">
+              {% load crispy_forms_tags %}
+              {% csrf_token %}
+              {{ form.username|as_crispy_field }}
+              {{ form.password|as_crispy_field }}
+
+              <hr class="my-4">
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">{% trans "Sign in" %}</button>
+            </form>
+            {% if form.errors %}
+            <div class="alert alert-danger my-4">
+              <p>
+                {% blocktrans %}Make sure your Username and Password are correct.{% endblocktrans %}
+              </p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </form>
-  </div>
-  {% if form.errors %}
-  <div class="row justify-content-center">
-    <div class="alert alert-danger col-lg-6">
-      <p>
-        {% blocktrans %}Please ensure you have written a correct User and Password.{% endblocktrans %}
-      </p>
+      {% endif %}
     </div>
   </div>
-  {% endif %}
+</header>
+<div class="my-2"></div>
+<main class="container">
+  <h2 class="display-4 text-center text-uppercase">{% trans "About" %}</h2>
+  <hr>
+  <p>
+    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit doloremque molestiae quaerat optio accusamus. A accusamus sint laborum vel aperiam voluptas soluta beatae! Eius itaque similique voluptatum impedit a animi!
+    Eius a reprehenderit nulla quo ut minus possimus aliquid alias numquam ipsam. Expedita, eligendi! Enim voluptatem debitis nobis sapiente natus est ipsam eius dolor laudantium nihil. Ipsam odit deserunt ex?
+    Molestias qui incidunt amet dolores non. Aliquam, porro expedita vitae aliquid dolore aperiam architecto laboriosam qui hic quas ullam totam voluptatibus ut sunt explicabo dolores suscipit alias minima, voluptatem commodi.
+  </p>
 </main>
 {% endblock body_content %}
