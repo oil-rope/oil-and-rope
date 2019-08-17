@@ -48,7 +48,7 @@ class UpdateProfileForm(forms.ModelForm):
             Field('alias'),
             Field('laboral_category'),
         )
-        self.helper.add_input(Submit('actualizar', _('Actualizar')))
+        self.helper.add_input(Submit('submit', _('Update')))
 
     def clean_birthday(self):
         """
@@ -58,7 +58,7 @@ class UpdateProfileForm(forms.ModelForm):
         if self.cleaned_data['birthday']:
             data = self.cleaned_data['birthday']
             if data > timezone.datetime.today().date():
-                raise forms.ValidationError(_('La fecha de nacimiento no puede ser mayor que hoy.'))
+                raise forms.ValidationError(_('Birthday cannot be after today.'))
             return data
 
 
@@ -70,8 +70,8 @@ class UpdateProfileImageForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(UpdateProfileImageForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.add_input(Submit('submit', _('Añadir')))
-        self.helper.add_input(Reset('reset', _('Limpiar'), css_class='btn btn-secondary'))
+        self.helper.add_input(Submit('submit', _('Add')))
+        self.helper.add_input(Reset('reset', _('Reset'), css_class='btn btn-secondary'))
 
     image = forms.ImageField(
         label='',

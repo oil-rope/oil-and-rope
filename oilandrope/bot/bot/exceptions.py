@@ -5,8 +5,6 @@ Bot Exceptions
 Exceptions handled by the bot.
 """
 
-from django.utils.translation import ugettext as _
-
 
 class OilAndRopeException(Exception):
     """
@@ -40,7 +38,7 @@ class PermissionsError(OilAndRopeException):
 
     @property
     def message(self):
-        return _("You don't have permission to use that command.\nMore info: %(message)s" % {'message': self._message})
+        return "You don't have permission to use that command.\nMore info: %(message)s" % {'message': self._message}
 
 
 class HelpfulError(OilAndRopeException):
@@ -61,8 +59,8 @@ class HelpfulError(OilAndRopeException):
     def message(self):
         return self._message_fmt.format(
             preface=self.preface,
-            problem=_("\tProblem: %(problem)s" % {'problem': self.issue}),
-            solution=_("\tSolution: %(solution)s" % {'solution': self.solution}),
+            problem="\tProblem: %(problem)s" % {'problem': self.issue},
+            solution="\tSolution: %(solution)s" % {'solution': self.solution},
             footnote=self.footnote
         )
 

@@ -1,4 +1,9 @@
 @charset "UTF-8";
+.full-background {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 /*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors
@@ -27,6 +32,7 @@
   --danger: #dc3545;
   --light: #f8f9fa;
   --dark: #343a40;
+  --palid: #DEDBA7;
   --extra: #D13F31;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
@@ -1714,6 +1720,26 @@ pre code {
   background-color: #b9bbbe;
 }
 
+.table-palid,
+.table-palid > th,
+.table-palid > td {
+  background-color: #f6f5e6;
+}
+.table-palid th,
+.table-palid td,
+.table-palid thead th,
+.table-palid tbody + tbody {
+  border-color: #eeecd1;
+}
+
+.table-hover .table-palid:hover {
+  background-color: #efeed3;
+}
+.table-hover .table-palid:hover > td,
+.table-hover .table-palid:hover > th {
+  background-color: #efeed3;
+}
+
 .table-extra,
 .table-extra > th,
 .table-extra > td {
@@ -2531,6 +2557,33 @@ fieldset:disabled a.btn {
   box-shadow: 0 0 0 0.2rem rgba(82, 88, 93, 0.5);
 }
 
+.btn-palid {
+  color: #212529;
+  background-color: #DEDBA7;
+  border-color: #DEDBA7;
+}
+.btn-palid:hover {
+  color: #212529;
+  background-color: #d4d08b;
+  border-color: #d0cc82;
+}
+.btn-palid:focus, .btn-palid.focus {
+  box-shadow: 0 0 0 0.2rem rgba(194, 192, 148, 0.5);
+}
+.btn-palid.disabled, .btn-palid:disabled {
+  color: #212529;
+  background-color: #DEDBA7;
+  border-color: #DEDBA7;
+}
+.btn-palid:not(:disabled):not(.disabled):active, .btn-palid:not(:disabled):not(.disabled).active, .show > .btn-palid.dropdown-toggle {
+  color: #212529;
+  background-color: #d0cc82;
+  border-color: #cdc879;
+}
+.btn-palid:not(:disabled):not(.disabled):active:focus, .btn-palid:not(:disabled):not(.disabled).active:focus, .show > .btn-palid.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(194, 192, 148, 0.5);
+}
+
 .btn-extra {
   color: #fff;
   background-color: #D13F31;
@@ -2756,6 +2809,31 @@ fieldset:disabled a.btn {
 }
 .btn-outline-dark:not(:disabled):not(.disabled):active:focus, .btn-outline-dark:not(:disabled):not(.disabled).active:focus, .show > .btn-outline-dark.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5);
+}
+
+.btn-outline-palid {
+  color: #DEDBA7;
+  border-color: #DEDBA7;
+}
+.btn-outline-palid:hover {
+  color: #212529;
+  background-color: #DEDBA7;
+  border-color: #DEDBA7;
+}
+.btn-outline-palid:focus, .btn-outline-palid.focus {
+  box-shadow: 0 0 0 0.2rem rgba(222, 219, 167, 0.5);
+}
+.btn-outline-palid.disabled, .btn-outline-palid:disabled {
+  color: #DEDBA7;
+  background-color: transparent;
+}
+.btn-outline-palid:not(:disabled):not(.disabled):active, .btn-outline-palid:not(:disabled):not(.disabled).active, .show > .btn-outline-palid.dropdown-toggle {
+  color: #212529;
+  background-color: #DEDBA7;
+  border-color: #DEDBA7;
+}
+.btn-outline-palid:not(:disabled):not(.disabled):active:focus, .btn-outline-palid:not(:disabled):not(.disabled).active:focus, .show > .btn-outline-palid.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(222, 219, 167, 0.5);
 }
 
 .btn-outline-extra {
@@ -4620,6 +4698,19 @@ a.badge-dark:focus, a.badge-dark.focus {
   box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5);
 }
 
+.badge-palid {
+  color: #212529;
+  background-color: #DEDBA7;
+}
+a.badge-palid:hover, a.badge-palid:focus {
+  color: #212529;
+  background-color: #d0cc82;
+}
+a.badge-palid:focus, a.badge-palid.focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(222, 219, 167, 0.5);
+}
+
 .badge-extra {
   color: #fff;
   background-color: #D13F31;
@@ -4772,6 +4863,18 @@ a.badge-extra:focus, a.badge-extra.focus {
 }
 .alert-dark .alert-link {
   color: #040505;
+}
+
+.alert-palid {
+  color: #737257;
+  background-color: #f8f8ed;
+  border-color: #f6f5e6;
+}
+.alert-palid hr {
+  border-top-color: #efeed3;
+}
+.alert-palid .alert-link {
+  color: #565541;
 }
 
 .alert-extra {
@@ -5119,6 +5222,20 @@ a.badge-extra:focus, a.badge-extra.focus {
   color: #fff;
   background-color: #1b1e21;
   border-color: #1b1e21;
+}
+
+.list-group-item-palid {
+  color: #737257;
+  background-color: #f6f5e6;
+}
+.list-group-item-palid.list-group-item-action:hover, .list-group-item-palid.list-group-item-action:focus {
+  color: #737257;
+  background-color: #efeed3;
+}
+.list-group-item-palid.list-group-item-action.active {
+  color: #fff;
+  background-color: #737257;
+  border-color: #737257;
 }
 
 .list-group-item-extra {
@@ -5966,6 +6083,16 @@ button.bg-dark:focus {
   background-color: #1d2124 !important;
 }
 
+.bg-palid {
+  background-color: #DEDBA7 !important;
+}
+
+a.bg-palid:hover, a.bg-palid:focus,
+button.bg-palid:hover,
+button.bg-palid:focus {
+  background-color: #d0cc82 !important;
+}
+
 .bg-extra {
   background-color: #D13F31 !important;
 }
@@ -6054,6 +6181,10 @@ button.bg-extra:focus {
 
 .border-dark {
   border-color: #343a40 !important;
+}
+
+.border-palid {
+  border-color: #DEDBA7 !important;
 }
 
 .border-extra {
@@ -7232,6 +7363,102 @@ button.bg-extra:focus {
   width: auto !important;
 }
 
+.w-10vh {
+  width: 10vh !important;
+}
+
+.w-20vh {
+  width: 20vh !important;
+}
+
+.w-25vh {
+  width: 25vh !important;
+}
+
+.w-30vh {
+  width: 30vh !important;
+}
+
+.w-40vh {
+  width: 40vh !important;
+}
+
+.w-50vh {
+  width: 50vh !important;
+}
+
+.w-60vh {
+  width: 60vh !important;
+}
+
+.w-70vh {
+  width: 70vh !important;
+}
+
+.w-75vh {
+  width: 75vh !important;
+}
+
+.w-80vh {
+  width: 80vh !important;
+}
+
+.w-90vh {
+  width: 90vh !important;
+}
+
+.w-100vh {
+  width: 100vh !important;
+}
+
+.w-10vw {
+  width: 10vw !important;
+}
+
+.w-20vw {
+  width: 20vw !important;
+}
+
+.w-25vw {
+  width: 25vw !important;
+}
+
+.w-30vw {
+  width: 30vw !important;
+}
+
+.w-40vw {
+  width: 40vw !important;
+}
+
+.w-50vw {
+  width: 50vw !important;
+}
+
+.w-60vw {
+  width: 60vw !important;
+}
+
+.w-70vw {
+  width: 70vw !important;
+}
+
+.w-75vw {
+  width: 75vw !important;
+}
+
+.w-80vw {
+  width: 80vw !important;
+}
+
+.w-90vw {
+  width: 90vw !important;
+}
+
+.w-100vw {
+  width: 100vw !important;
+}
+
 .h-25 {
   height: 25% !important;
 }
@@ -7250,6 +7477,102 @@ button.bg-extra:focus {
 
 .h-auto {
   height: auto !important;
+}
+
+.h-10vh {
+  height: 10vh !important;
+}
+
+.h-20vh {
+  height: 20vh !important;
+}
+
+.h-25vh {
+  height: 25vh !important;
+}
+
+.h-30vh {
+  height: 30vh !important;
+}
+
+.h-40vh {
+  height: 40vh !important;
+}
+
+.h-50vh {
+  height: 50vh !important;
+}
+
+.h-60vh {
+  height: 60vh !important;
+}
+
+.h-70vh {
+  height: 70vh !important;
+}
+
+.h-75vh {
+  height: 75vh !important;
+}
+
+.h-80vh {
+  height: 80vh !important;
+}
+
+.h-90vh {
+  height: 90vh !important;
+}
+
+.h-100vh {
+  height: 100vh !important;
+}
+
+.h-10vw {
+  height: 10vw !important;
+}
+
+.h-20vw {
+  height: 20vw !important;
+}
+
+.h-25vw {
+  height: 25vw !important;
+}
+
+.h-30vw {
+  height: 30vw !important;
+}
+
+.h-40vw {
+  height: 40vw !important;
+}
+
+.h-50vw {
+  height: 50vw !important;
+}
+
+.h-60vw {
+  height: 60vw !important;
+}
+
+.h-70vw {
+  height: 70vw !important;
+}
+
+.h-75vw {
+  height: 75vw !important;
+}
+
+.h-80vw {
+  height: 80vw !important;
+}
+
+.h-90vw {
+  height: 90vw !important;
+}
+
+.h-100vw {
+  height: 100vw !important;
 }
 
 .mw-100 {
@@ -9640,6 +9963,14 @@ a.text-light:hover, a.text-light:focus {
 
 a.text-dark:hover, a.text-dark:focus {
   color: #121416 !important;
+}
+
+.text-palid {
+  color: #DEDBA7 !important;
+}
+
+a.text-palid:hover, a.text-palid:focus {
+  color: #c9c46f !important;
 }
 
 .text-extra {
