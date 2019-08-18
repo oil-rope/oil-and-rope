@@ -1,14 +1,13 @@
 {% load i18n %}
-<navbar class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+<nav id="OilAndRopeMenu" class="navbar navbar-expand-lg navbar-dark fixed-top">
   <a href="{% url 'core:home' %}" class="navbar-brand">Oil &amp; Rope</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRopeMenu" aria-controls="navbarOilAndRopeMenu" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarOilAndRopeMenu">
-    <div class="navbar-nav">
-      <a href="{% url 'core:home' %}" class="nav-item nav-link">{% trans "Home" %}</a>
+    <ul class="navbar-nav ml-auto">
       {% if request.user.is_superuser %}
-      <div class="nav-item dropdown">
+      <li class="nav-item dropdown">
         <a href="javascript:;" class="nav-link dropdown-toggle" id="navbarAdminDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {% trans "Administration" %}
         </a>
@@ -18,9 +17,10 @@
             {% trans "Admin Panel" %}
           </a>
         </div>
-      </div>
+      </li>
       {% endif %}
-      <div class="nav-item dropdown">
+      {% if request.user.is_authenticated %}
+      <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="javascript:;" id="navbarProfileDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{ request.user.username }}
         </a>
@@ -34,7 +34,14 @@
             {% trans "Logout" %}
           </a>
         </div>
-      </div>
-    </div>
+      </li>
+      {% endif %}
+      <li class="nav-item">
+        <a href="{% url 'core:home' %}" class="nav-link">{% trans "Home" %}</a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'login' %}#about" class="nav-link">{% trans "About" %}</a>
+      </li>
+    </ul>
   </div>
-</navbar>
+</nav>

@@ -14,21 +14,21 @@
         <p class="lead mb-0">{% blocktrans %}The brand-new system for managing Roleplay Games!{% endblocktrans %}</p>
       </div>
       {% else %}
-      <div class="col-lg-5">
-        <h2 class=" text-center text-white display-3">
-          {% blocktrans %}Welcome to Oil &amp; Rope!{% endblocktrans %}
+      <div class="col-xl-5">
+        <h2 class="text-center text-white display-3">
+          {% blocktrans %}Welcome <br>to <br>Oil &amp; Rope!{% endblocktrans %}
         </h2>
-        <div class="card my-5 text-primary">
+        <div class="card p-3 my-5 text-primary">
           <div class="card-body">
             <h5 class="card-title text-center">{% trans "Sign In" %}</h5>
+            <hr class="w-50 bg-extra">
             <form action="{% url 'login' %}" method="post">
               {% load crispy_forms_tags %}
               {% csrf_token %}
               {{ form.username|as_crispy_field }}
               {{ form.password|as_crispy_field }}
 
-              <hr class="my-4">
-              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">{% trans "Sign in" %}</button>
+              <button class="btn btn-lg btn-extra btn-block text-uppercase" type="submit">{% trans "Sign In" %}</button>
             </form>
             {% if form.errors %}
             <div class="alert alert-danger my-4">
@@ -45,13 +45,17 @@
   </div>
 </header>
 <div class="my-2"></div>
-<main class="container">
-  <h2 class="display-4 text-center text-uppercase">{% trans "About" %}</h2>
-  <hr>
-  <p>
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit doloremque molestiae quaerat optio accusamus. A accusamus sint laborum vel aperiam voluptas soluta beatae! Eius itaque similique voluptatum impedit a animi!
-    Eius a reprehenderit nulla quo ut minus possimus aliquid alias numquam ipsam. Expedita, eligendi! Enim voluptatem debitis nobis sapiente natus est ipsam eius dolor laudantium nihil. Ipsam odit deserunt ex?
-    Molestias qui incidunt amet dolores non. Aliquam, porro expedita vitae aliquid dolore aperiam architecto laboriosam qui hic quas ullam totam voluptatibus ut sunt explicabo dolores suscipit alias minima, voluptatem commodi.
-  </p>
+<main class="container" data-spy="scroll" data-target="#OilAndRopeMenu" data-offset="0">
+  <section id="about" class="py-5">
+    <h2 class="display-4 text-center text-uppercase">{% trans "About" %}</h2>
+    <hr class="bg-secondary w-50vw">
+    <div class="row flex-row h-100vh">
+      <p>
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit doloremque molestiae quaerat optio accusamus. A accusamus sint laborum vel aperiam voluptas soluta beatae! Eius itaque similique voluptatum impedit a animi!
+        Eius a reprehenderit nulla quo ut minus possimus aliquid alias numquam ipsam. Expedita, eligendi! Enim voluptatem debitis nobis sapiente natus est ipsam eius dolor laudantium nihil. Ipsam odit deserunt ex?
+        Molestias qui incidunt amet dolores non. Aliquam, porro expedita vitae aliquid dolore aperiam architecto laboriosam qui hic quas ullam totam voluptatibus ut sunt explicabo dolores suscipit alias minima, voluptatem commodi.
+      </p>
+    </div>
+  </section>
 </main>
 {% endblock body_content %}
