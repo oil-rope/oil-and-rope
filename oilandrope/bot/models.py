@@ -145,6 +145,8 @@ class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
         Declares is channel is New.
     created_at: :class:`datetime.datetime`
         Declares when the server was created.
+    server: :class:`bot.DiscordServer`
+        The serve where this text channel is hosted.
     discord_users: List[:class:`DiscordUser`]
         List with all Discord Users in this text channel.
     """
@@ -152,6 +154,8 @@ class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
     nsfw = models.BooleanField(_('NSFW'), default=False, blank=True)
     topic = models.CharField(_('Topic'), max_length=100, null=True, blank=True)
     news = models.BooleanField(_('News'), default=False, blank=True)
+    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
+                               on_delete=models.CASCADE, related_name='discord_text_channels')
     discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
                                            related_name='discord_text_channels')
 
@@ -183,11 +187,15 @@ class DiscordVoiceChannel(TracingMixin, DiscordChannelMixin):
         Declares the bitrate of the channel.
     created_at: :class:`datetime.datetime`
         Declares when the server was created.
+    server: :class:`bot.DiscordServer`
+        The serve where this voice channel is hosted.
     discord_users: List[:class:`DiscordUser`]
         List with all Discord Users in this voice channel.
     """
 
     bitrate = models.PositiveSmallIntegerField(_('Bitrate'))
+    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
+                               on_delete=models.CASCADE, related_name='discord_voice_channels')
     discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
                                            related_name='discord_voice_channels')
 
