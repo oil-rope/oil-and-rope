@@ -106,3 +106,6 @@ venv.bak/
 # IDE stuff
 .vscode/
 .idea/
+
+# Configuration
+configuration.ini
