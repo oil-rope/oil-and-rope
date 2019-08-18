@@ -12,8 +12,8 @@ def all(message):
             result = []
             adding = []
 
-            if '+' in contexto:
-                half = contexto.find('+')
+            if '+' or '-' in contexto:
+                half = contexto.find('+') or contexto.find('-')
                 adding = contexto[half:]
                 contexto = contexto[0:half]
                 add = True
