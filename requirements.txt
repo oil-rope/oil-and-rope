@@ -1,4 +1,5 @@
 autopep8
+channels
 discord.py
 django==2.2.2
 django-ckeditor
