@@ -1,47 +1,45 @@
 {% load i18n %}
-<nav id="OilAndRopeMenu" class="navbar navbar-expand-lg navbar-dark fixed-top">
-  <a href="{% url 'core:home' %}" class="navbar-brand">Oil &amp; Rope</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRopeMenu" aria-controls="navbarOilAndRopeMenu" aria-expanded="false" aria-label="Toggle navigation">
+{% load static %}
+
+<div class="nav navbar-expand-lg sticky-top navbar-dark bg-dark p-2 p-lg-1">
+
+  <!-- Button for NavBar -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRope" aria-controls="navbarOilAndRope" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarOilAndRopeMenu">
-    <ul class="navbar-nav ml-auto">
-      {% if request.user.is_superuser %}
-      <li class="nav-item dropdown">
-        <a href="javascript:;" class="nav-link dropdown-toggle" id="navbarAdminDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {% trans "Administration" %}
+
+  <!-- Navbar Menu -->
+  <div class="collapse navbar-collapse" id="navbarOilAndRope">
+    <!-- Logo -->
+    <a href="{% url 'core:home' %}" class="navbar-brand">
+      <img width="60" height="60" class="d-inline-block border border-left-0 border-right-0 border-white p-1" src="{% static 'img/oil-and-rope.jpg' %}" alt="{% trans "Logo" %}">
+      Oil &amp; Rope
+    </a>
+    <!-- Options -->
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item active">
+        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
+          {% trans "Home" %}
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarAdminMenu">
-          <a href="{% url 'admin:index' %}" class="dropdown-item">
-            <i class="fas fa-cogs"></i>
-            {% trans "Admin Panel" %}
-          </a>
-        </div>
-      </li>
-      {% endif %}
-      {% if request.user.is_authenticated %}
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:;" id="navbarProfileDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{ request.user.username }}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarProfileDropdownMenu">
-          <a href="javascript:;" class="dropdown-item">
-            <i class="fas fa-user-alt"></i>
-            {% trans "Profile" %}
-          </a>
-          <a href="{% url 'logout' %}" class="dropdown-item">
-            <i class="fas fa-sign-out-alt"></i>
-            {% trans "Logout" %}
-          </a>
-        </div>
-      </li>
-      {% endif %}
-      <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link">{% trans "Home" %}</a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'login' %}#about" class="nav-link">{% trans "About" %}</a>
+        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
+          {% trans "GameMasters" %}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
+          {% trans "Roleplayers" %}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'core:home' %}" class="nav-link text-uppercase"></a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'core:home' %}" class="nav-link text-uppercase disabled" tabindex="-1" aria-disabled="true">
+          {% trans "Pricing" %}
+        </a>
       </li>
     </ul>
   </div>
-</nav>
+</div>
