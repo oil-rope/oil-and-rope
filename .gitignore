@@ -106,6 +106,7 @@ venv.bak/
 # IDE stuff
 .vscode/
 .idea/
+*.code-workspace
 
 # Configuration
 configuration.ini

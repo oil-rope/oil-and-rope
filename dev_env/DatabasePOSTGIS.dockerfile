@@ -1,7 +1,7 @@
-FROM postgres:9.6
+FROM postgres:10
 
 # Updating
 RUN apt-get update
 
 # Installing PostGis
-RUN apt-get install --assume-yes postgresql-9.6-postgis postgresql-contrib-9.6
+RUN apt-get install --assume-yes postgresql-10*-postgis postgresql-contrib-10*

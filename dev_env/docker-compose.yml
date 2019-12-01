@@ -19,7 +19,7 @@ services:
     build:
       context: ..
       dockerfile: dev_env/OilAndRope.dockerfile
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: bash start.sh
     depends_on:
       - database
     environment:
