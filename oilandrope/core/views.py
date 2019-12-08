@@ -7,4 +7,4 @@ class IndexView(TemplateView):
     It just displays the index page.
     """
 
-    template_name = 'registration/login.html'
+    template_name = 'core/index.html'

@@ -67,4 +67,4 @@ styles-watch:
 
 # Execute tests
 tests:
-	docker exec oilandrope_web_1 pytest
+	docker exec oilandrope_web_1 pytest -n auto
