@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'rest_framework',
     # Source
     'core.apps.CoreConfig',
+    # Dynamic Menu
+    'dynamic_menu.apps.DynamicMenuConfig',
     # Bot
     'bot.apps.BotConfig',
     # Registration System
