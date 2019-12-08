@@ -16,7 +16,7 @@ install:
     - pip install $DJANGO
 
 script:
-    - pytest
+    - cd oilandrope/ && pytest
 
 after_success:
     - coveralls
