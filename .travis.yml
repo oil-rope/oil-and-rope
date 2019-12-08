@@ -1,5 +1,3 @@
-sudo: false
-
 language: python
 
 python:
@@ -13,9 +11,9 @@ env:
     - DJANGO="Django==2.2.*"
 
 install:
-    - pip install virtualenv coveralls pytest markdown2
+    - pip install -r requirements.txt
+    - pip install virtualenv coveralls pytest
     - pip install $DJANGO
-    - pip install pytest-django
 
 script:
     - pytest
