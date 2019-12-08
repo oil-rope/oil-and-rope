@@ -13,9 +13,11 @@
   <link rel="shortcut icon" href="{% static 'img/oil-and-rope.jpg' %}" type="image/x-icon">
 
   <!-- Bootstrap Styles -->
-  <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
   <!-- Fontawesome -->
   <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+  <!-- Oil & Rope Styles -->
+  <link rel="stylesheet" href="{% static 'core/css/oilandrope-theme.css' %}">
 
   <title>{% block title %}{% endblock title %} | Oil &amp; Rope</title>
 
@@ -41,7 +43,7 @@
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
   <!-- Bootstrap -->
-  <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
   {% block javascript %}
   {% endblock javascript %}
