@@ -11,8 +11,8 @@ env:
     - DJANGO="Django==2.2.*"
 
 install:
-    - pip install -r requirements.txt
-    - pip install virtualenv coveralls pytest
+    - pip install virtualenv coveralls
+    - pip install pytest pytest-django model_bakery
     - pip install $DJANGO
 
 script:
