@@ -24,9 +24,6 @@ def user_directory_path(instance, filename: str) -> str:
         The filename to store.
     """
 
-    import pdb
-    pdb.set_trace()
-
     # File will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'user_{0}/{1}'.format(instance.profile.user.pk, filename)
 
@@ -64,12 +61,15 @@ class Profile(TracingMixin):
     birthday = models.DateField(_('Birthday'), null=True, blank=True,)
 
     # Translating languages and sorting
-    T_LANGUAGES = sorted([(code, _(language)) for code, language in LANGUAGES], key=lambda x: x[1])
+    T_LANGUAGES = sorted([(code, _(language))
+                          for code, language in LANGUAGES], key=lambda x: x[1])
 
-    language = models.CharField(_('Language'), choices=T_LANGUAGES, default=settings.LANGUAGE_CODE, max_length=30,)
+    language = models.CharField(_('Language'), choices=T_LANGUAGES,
+                                default=settings.LANGUAGE_CODE, max_length=30,)
     alias = models.CharField(_('Alias'), max_length=30, blank=True, null=True,)
     web = models.URLField(_('Website'), max_length=200, blank=True, null=True)
-    image = models.ImageField(_('Avatar'), upload_to=user_directory_path, blank=True, null=True)
+    image = models.ImageField(_('Avatar'), upload_to=user_directory_path,
+                              blank=True, null=True)
 
     @property
     def age(self):
@@ -80,7 +80,7 @@ class Profile(TracingMixin):
     class Meta:
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
-        ordering = ['user__first_name']
+        ordering = ['user__username', 'user__first_name']
 
     def __str__(self):
         return 'Profile {}'.format(self.user.username)
