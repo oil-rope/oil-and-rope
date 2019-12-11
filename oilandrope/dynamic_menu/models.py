@@ -105,7 +105,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
     superuser_required = models.BooleanField(_('SuperUser Required'),
                                              default=False)
     icon = models.FileField(_('Icon'), upload_to=dynamic_menu_path,
-                            max_length=254)
+                            max_length=254, blank=True, null=True)
     related_model = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_("Related Model"),
                                            related_name='menus', blank=True)
 
