@@ -32,6 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Dynamic translation (https://django-modeltranslation.readthedocs.io)
+    # Must be setted before 'django.contrib.admin' to work correctly on admin
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
