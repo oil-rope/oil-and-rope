@@ -16,7 +16,8 @@
       <img width="60" height="60" class="d-inline-block border border-left-0 border-right-0 border-white p-1" src="{% static 'img/oil-and-rope.jpg' %}" alt="{% trans "Logo" %}">
       Oil &amp; Rope
     </a>
-    <!-- Options -->
+
+    <!-- Menu -->
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       {% recursetree menus %}
 
@@ -41,6 +42,16 @@
       {% endif %}
 
       {% endrecursetree %}
+    </ul>
+
+    <!-- Login and Register -->
+    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <a href="{% url 'login' %}" class="nav-link text-uppercase">{% trans "Login" %}</a>
+      </li>
+      <li class="nav-item">
+        <a href="#no-url" class="nav-link text-uppercase text-extra">{% trans "Create your account" %}</a>
+      </li>
     </ul>
   </div>
 
