@@ -11,9 +11,13 @@ env:
     - DJANGO="Django==2.2.*"
 
 install:
-    - pip install virtualenv coveralls
-    - pip install pytest pytest-django model_bakery
+    - pip install -r requirements.txt
+    # Removing Django
+    - pip uninstall Django
+    # Installing actual version of Django
     - pip install $DJANGO
+    # Extra
+    - pip install virtualenv coveralls
 
 script:
     - cd oilandrope/ && pytest

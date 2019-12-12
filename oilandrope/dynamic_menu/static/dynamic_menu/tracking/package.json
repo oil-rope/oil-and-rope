@@ -1,0 +1,13 @@
+{
+  "name": "dynamic_menu_tracking",
+  "version": "0.0.1",
+  "description": "Tracking for the menu.",
+  "main": "tracking.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "author": "LeCuay (Oil & Rope Team)",
+  "license": "MIT"
+}

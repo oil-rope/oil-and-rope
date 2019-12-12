@@ -22,16 +22,16 @@
 
       {% comment %} Leaf Node inside a Dropdown {% endcomment %}
       {% if node.get_ancestors and node.is_leaf_node %}
-      <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="dropdown-item dynamic-menu-track text-uppercase">{{ node.name }}</a>
+      <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="dropdown-item dynamic-menu-track text-uppercase">{{ node.name }}</a>
       {% comment %} Leaf Node outside a Dropdown {% endcomment %}
       {% elif not node.get_ancestors and node.is_leaf_node %}
       <li class="nav-item">
-        <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="nav-link dynamic-menu-track text-uppercase">{{ node.name }}</a>
+        <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="nav-link dynamic-menu-track text-uppercase">{{ node.name }}</a>
       </li>
       {% comment %} A Dropdown {% endcomment %}
       {% else %}
       <li class="nav-item dropdown">
-        <a data-menu-referrer="{{ node.pk }}" class="nav-link dynamic-menu-track dropdown-toggle text-uppercase" href="javascript:;" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" class="nav-link dynamic-menu-track dropdown-toggle text-uppercase" href="javascript:;" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {{ node.name }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown_{{ node.pk }}">
