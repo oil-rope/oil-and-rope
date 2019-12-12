@@ -28,9 +28,6 @@ pygraphviz
 pylint
 pylint-django
 pyOpenSSL
-pytest
-pytest-django
-pytest-xdist
 scipy
 Sphinx
 xlrd

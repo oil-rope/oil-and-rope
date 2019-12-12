@@ -16,6 +16,8 @@ install:
     - pip uninstall -y Django
     # Installing actual version of Django
     - pip install $DJANGO
+    # Tester
+    - pip install pytest pytest-django
     # Extra
     - pip install virtualenv coveralls
 
