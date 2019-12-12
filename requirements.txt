@@ -16,6 +16,7 @@ django-phonenumber-field
 django-simple-history
 django-tables2
 djangorestframework
+ipdb
 markdown
 matplotlib
 model_bakery

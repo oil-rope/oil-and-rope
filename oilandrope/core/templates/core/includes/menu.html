@@ -1,7 +1,8 @@
 {% load i18n %}
 {% load static %}
+{% load mptt_tags %}
 
-<div class="nav navbar-expand-lg sticky-top navbar-dark bg-dark p-2 p-lg-1">
+<nav class="nav navbar-expand-lg sticky-top navbar-dark bg-dark p-2 p-lg-1" role="navigation">
 
   <!-- Button for NavBar -->
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRope" aria-controls="navbarOilAndRope" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
@@ -17,29 +18,30 @@
     </a>
     <!-- Options -->
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-      <li class="nav-item active">
-        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
-          {% trans "Home" %}
-        </a>
-      </li>
+      {% recursetree menus %}
+
+      {% comment %} Leaf Node inside a Dropdown {% endcomment %}
+      {% if node.get_ancestors and node.is_leaf_node %}
+      <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="dropdown-item dynamic-menu-track text-uppercase">{{ node.name }}</a>
+      {% comment %} Leaf Node outside a Dropdown {% endcomment %}
+      {% elif not node.get_ancestors and node.is_leaf_node %}
       <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
-          {% trans "GameMasters" %}
+        <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="nav-link dynamic-menu-track text-uppercase">{{ node.name }}</a>
+      </li>
+      {% comment %} A Dropdown {% endcomment %}
+      {% else %}
+      <li class="nav-item dropdown">
+        <a data-menu-referrer="{{ node.pk }}" class="nav-link dynamic-menu-track dropdown-toggle text-uppercase" href="javascript:;" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ node.name }}
         </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown_{{ node.pk }}">
+          {{ children }}
+        </div>
       </li>
-      <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link text-uppercase">
-          {% trans "Roleplayers" %}
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link text-uppercase"></a>
-      </li>
-      <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link text-uppercase disabled" tabindex="-1" aria-disabled="true">
-          {% trans "Pricing" %}
-        </a>
-      </li>
+      {% endif %}
+
+      {% endrecursetree %}
     </ul>
   </div>
-</div>
+
+</nav>
