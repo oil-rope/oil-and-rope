@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # Dynamic translation (https://django-modeltranslation.readthedocs.io)
+    # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
     # Must be setted before 'django.contrib.admin' to work correctly on admin
     'modeltranslation',
     'django.contrib.admin',
@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
+    # DjangoMptt (https://django-mptt.readthedocs.io/)
+    'mptt',
     # Source
     'core.apps.CoreConfig',
     # Dynamic Menu
@@ -72,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dynamic_menu.middleware.DynamicMenuMiddleware',
 ]
 
 ROOT_URLCONF = 'oilandrope.urls'
@@ -88,6 +91,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.language',
+                'dynamic_menu.context_processors.menus',
             ],
         },
     },
