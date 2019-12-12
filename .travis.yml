@@ -13,7 +13,7 @@ env:
 install:
     - pip install -r requirements.txt
     # Removing Django
-    - pip uninstall Django
+    - pip uninstall -y Django
     # Installing actual version of Django
     - pip install $DJANGO
     # Extra
