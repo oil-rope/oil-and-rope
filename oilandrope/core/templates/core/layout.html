@@ -48,6 +48,16 @@
   <script type="module" src="{% static 'dynamic_menu/external_libs/js_cookie/js_cookie.min.js' %}"></script>
   <!-- Dynamic Menu -->
   <script src="{% static 'dynamic_menu/tracking/js/tracking.js' %}"></script>
+  <!-- Tracking -->
+  <script>
+  $(() => {
+      // Checking menu
+      $('.dynamic-menu-track').click((e) => {
+          let referrer = Number($(e.target).data("menu-referrer"));
+          setMenuReferrer(referrer);
+      });
+  });
+  </script>
 
   {% block javascript %}
   {% endblock javascript %}
