@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG', 'True'))
+DEBUG = bool(os.getenv('DEBUG', 'False'))
 
 ALLOWED_HOSTS = []
 
@@ -117,9 +117,9 @@ DATABASES = {
     },
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.getenv('DB_NAME', 'oilandrope'),
+        'NAME': os.getenv('DB_NAME', 'oilandrope.sqlite3'),
         'TEST': {
-            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
+            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope.sqlite3')))
         },
     },
 }
