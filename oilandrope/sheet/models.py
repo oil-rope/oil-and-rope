@@ -106,7 +106,7 @@ class SheetDetail(models.Model):
     """
 
     name = models.CharField(_("Name"), max_length=50)
-    start_value = models.SmallIntegerField(_("Start Value"))
+    start_value = models.SmallIntegerField(_("Start Value"), default=0)
     rollable = models.BooleanField(_("Rollable"), default=True)
 
     D3 = 0
@@ -135,33 +135,33 @@ class SheetDetail(models.Model):
     dice_number = models.PositiveSmallIntegerField(_("Dice Number"), default=1)
     # Inherited bonus
     misc_bonus = models.SmallIntegerField(_("Miscelaneous Bonus"), default=0)
-    extra_bonus_1 = models.SmallIntegerField(_("Miscelaneous Bonus"), default=0)
-    extra_bonus_2 = models.SmallIntegerField(_("Miscelaneous Bonus"), default=0)
+    extra_bonus_1 = models.SmallIntegerField(_("Extra Bonus 1"), default=0)
+    extra_bonus_2 = models.SmallIntegerField(_("Extra Bonus 2"), default=0)
     sheet = models.ForeignKey("sheet.SheetHeader", verbose_name=_("Sheet Header"), 
                               on_delete=models.CASCADE, related_name="sheet_details")
 
     @property
-    def get_total_bonus(self) -> int:
+    def get_total_bonus(self):
         return self.misc_bonus + self.extra_bonus_1 + self.extra_bonus_2
 
     @property
-    def roll(self) -> int:
+    def roll(self):
 
         if self.rollable:
 
             random.seed()
-            roll = 0
+            roll = self.start_value
 
             for i in range(self.dice_number):
                 roll += random.randrange(1, self.dice_class)
 
-            roll = roll + self.get_total_bonus(self)
+            roll = roll + self.get_total_bonus
 
             return roll
 
         else:
-
-            return False
+            value = self.start_value + self.get_total_bonus
+            return value
 
 
     class Meta:
