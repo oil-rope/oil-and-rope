@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'bot.apps.BotConfig',
     # Registration System
     'registration.apps.RegistrationConfig',
+    # Chat
+    'chat.apps.ChatConfig'
 ]
 
 MIDDLEWARE = [

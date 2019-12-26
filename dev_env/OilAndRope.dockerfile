@@ -1,7 +1,7 @@
 FROM debian:stable
 
 # Updating container
-RUN apt-get update
+RUN apt-get update --fix-missing
 
 # Installing configuration stuff
 RUN apt-get install --assume-yes pkg-config apt-utils
