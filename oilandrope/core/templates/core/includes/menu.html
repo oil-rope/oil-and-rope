@@ -1,47 +1,47 @@
 {% load i18n %}
-<nav id="OilAndRopeMenu" class="navbar navbar-expand-lg navbar-dark fixed-top">
-  <a href="{% url 'core:home' %}" class="navbar-brand">Oil &amp; Rope</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRopeMenu" aria-controls="navbarOilAndRopeMenu" aria-expanded="false" aria-label="Toggle navigation">
+{% load static %}
+{% load mptt_tags %}
+
+<nav class="nav navbar-expand-lg sticky-top navbar-dark bg-dark p-2 p-lg-1" role="navigation">
+
+  <!-- Button for NavBar -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRope" aria-controls="navbarOilAndRope" aria-expanded="false" aria-label="{% trans "Toggle navigation" %}">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarOilAndRopeMenu">
-    <ul class="navbar-nav ml-auto">
-      {% if request.user.is_superuser %}
+
+  <!-- Navbar Menu -->
+  <div class="collapse navbar-collapse" id="navbarOilAndRope">
+    <!-- Logo -->
+    <a href="{% url 'core:home' %}" class="navbar-brand">
+      <img width="60" height="60" class="d-inline-block border border-left-0 border-right-0 border-white p-1" src="{% static 'img/oil-and-rope.jpg' %}" alt="{% trans "Logo" %}">
+      Oil &amp; Rope
+    </a>
+    <!-- Options -->
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      {% recursetree menus %}
+
+      {% comment %} Leaf Node inside a Dropdown {% endcomment %}
+      {% if node.get_ancestors and node.is_leaf_node %}
+      <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="dropdown-item dynamic-menu-track text-uppercase">{{ node.name }}</a>
+      {% comment %} Leaf Node outside a Dropdown {% endcomment %}
+      {% elif not node.get_ancestors and node.is_leaf_node %}
+      <li class="nav-item">
+        <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" href="{{ node.url }}" class="nav-link dynamic-menu-track text-uppercase">{{ node.name }}</a>
+      </li>
+      {% comment %} A Dropdown {% endcomment %}
+      {% else %}
       <li class="nav-item dropdown">
-        <a href="javascript:;" class="nav-link dropdown-toggle" id="navbarAdminDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {% trans "Administration" %}
+        <a onclick="setMenuReferrer({{ node.pk }})" data-menu-referrer="{{ node.pk }}" class="nav-link dynamic-menu-track dropdown-toggle text-uppercase" href="javascript:;" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ node.name }}
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarAdminMenu">
-          <a href="{% url 'admin:index' %}" class="dropdown-item">
-            <i class="fas fa-cogs"></i>
-            {% trans "Admin Panel" %}
-          </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown_{{ node.pk }}">
+          {{ children }}
         </div>
       </li>
       {% endif %}
-      {% if request.user.is_authenticated %}
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:;" id="navbarProfileDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          {{ request.user.username }}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarProfileDropdownMenu">
-          <a href="javascript:;" class="dropdown-item">
-            <i class="fas fa-user-alt"></i>
-            {% trans "Profile" %}
-          </a>
-          <a href="{% url 'logout' %}" class="dropdown-item">
-            <i class="fas fa-sign-out-alt"></i>
-            {% trans "Logout" %}
-          </a>
-        </div>
-      </li>
-      {% endif %}
-      <li class="nav-item">
-        <a href="{% url 'core:home' %}" class="nav-link">{% trans "Home" %}</a>
-      </li>
-      <li class="nav-item">
-        <a href="{% url 'login' %}#about" class="nav-link">{% trans "About" %}</a>
-      </li>
+
+      {% endrecursetree %}
     </ul>
   </div>
+
 </nav>

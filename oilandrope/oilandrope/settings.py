@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True')
+DEBUG = bool(os.getenv('DEBUG', 'True'))
 
 ALLOWED_HOSTS = []
 
@@ -32,6 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
+    # Must be setted before 'django.contrib.admin' to work correctly on admin
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,8 +53,12 @@ INSTALLED_APPS = [
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
+    # DjangoMptt (https://django-mptt.readthedocs.io/)
+    'mptt',
     # Source
     'core.apps.CoreConfig',
+    # Dynamic Menu
+    'dynamic_menu.apps.DynamicMenuConfig',
     # Bot
     'bot.apps.BotConfig',
     # Registration System
@@ -67,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dynamic_menu.middleware.DynamicMenuMiddleware',
 ]
 
 ROOT_URLCONF = 'oilandrope.urls'
@@ -83,6 +91,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.language',
+                'dynamic_menu.context_processors.menus',
             ],
         },
     },
@@ -102,6 +111,13 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '5432'),
+        'TEST': {
+            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
+        },
+    },
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.getenv('DB_NAME', 'oilandrope'),
         'TEST': {
             'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
         },

@@ -16,6 +16,7 @@ eggs/
 .eggs/
 lib/
 lib64/
+node_modules/
 parts/
 sdist/
 var/
@@ -106,6 +107,7 @@ venv.bak/
 # IDE stuff
 .vscode/
 .idea/
+*.code-workspace
 
 # Configuration
 configuration.ini

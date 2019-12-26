@@ -1,4 +1,5 @@
 autopep8
+beautifulsoup4
 channels
 discord.py
 django==2.2.2
@@ -7,12 +8,18 @@ django-crispy-forms
 django-extensions
 django-filter
 django-formtools
+django-modeltranslation
 django-mptt
-djangorestframework
+django-mptt-admin
+django-pdb
+django-phonenumber-field
+django-simple-history
 django-tables2
-Faker
+djangorestframework
+ipdb
 markdown
 matplotlib
+model_bakery
 numpy
 pandas
 Pillow
@@ -21,8 +28,7 @@ pygraphviz
 pylint
 pylint-django
 pyOpenSSL
-pytest
-pytest-django
 scipy
 Sphinx
+xlrd
 Werkzeug
