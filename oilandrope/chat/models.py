@@ -49,7 +49,7 @@ class ChatMessage(models.Model):
     user: :class:`User`
     """
 
-    chat = models.ForeignKey(Chat, verbose_name=_(
+    chat = models.ForeignKey("chat.Chat", verbose_name=_(
         "Chat"), on_delete=models.CASCADE, related_name='messages')
     message = models.CharField(_("Message"), max_length=150)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),

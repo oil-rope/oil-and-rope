@@ -64,7 +64,9 @@ INSTALLED_APPS = [
     # Registration System
     'registration.apps.RegistrationConfig',
     # Chat
-    'chat.apps.ChatConfig'
+    'chat.apps.ChatConfig',
+    # Sheet
+    'sheet.apps.SheetConfig',
 ]
 
 MIDDLEWARE = [
