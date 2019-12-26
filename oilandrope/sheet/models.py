@@ -26,8 +26,8 @@ class SheetHeader(models.Model):
     character_info = models.OneToOneField("sheet.CharacterInfo", verbose_name=_("Character Info"), on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = _("sheetheader")
-        verbose_name_plural = _("sheetheaders")
+        verbose_name = _("Sheet Header")
+        verbose_name_plural = _("Sheet Headers")
 
     def __str__(self):
         return self.name
@@ -75,8 +75,8 @@ class CharacterInfo(models.Model):
 
 
     class Meta:
-        verbose_name = _("CharacterInfo")
-        verbose_name_plural = _("Charac terInfos")
+        verbose_name = _("Character Info")
+        verbose_name_plural = _("Character Infos")
 
     def __str__(self):
         return self.name
@@ -165,8 +165,8 @@ class SheetDetail(models.Model):
 
 
     class Meta:
-        verbose_name = _("sheetdetail")
-        verbose_name_plural = _("sheetdetails")
+        verbose_name = _("Sheet Detail")
+        verbose_name_plural = _("Sheet Details")
 
     def __str__(self):
         return self.name

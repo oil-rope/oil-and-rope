@@ -61,8 +61,8 @@ class ChatMessage(models.Model):
     )
 
     class Meta:
-        verbose_name = _("chatmessage")
-        verbose_name_plural = _("chatmessages")
+        verbose_name = _("chat Message")
+        verbose_name_plural = _("chat Messages")
 
     def __str__(self):
         return self.message
