@@ -32,6 +32,8 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),
+    # Chat
+    path('chat/', include('chat.urls')),
 )
 
 if settings.DEBUG:
