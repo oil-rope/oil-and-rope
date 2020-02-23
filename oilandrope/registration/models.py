@@ -1,4 +1,5 @@
 from ckeditor.fields import RichTextField
+from core.models import TracingMixin
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.conf.global_settings import LANGUAGES
@@ -8,8 +9,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
-from core.models import TracingMixin
 
 
 def user_directory_path(instance, filename: str) -> str:
@@ -25,7 +24,7 @@ def user_directory_path(instance, filename: str) -> str:
     """
 
     # File will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user_{0}/{1}'.format(instance.profile.user.pk, filename)
+    return 'user_{0}/{1}'.format(instance.user.pk, filename)
 
 
 class Profile(TracingMixin):

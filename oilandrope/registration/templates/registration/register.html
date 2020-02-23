@@ -1,0 +1,15 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Register" %}{% endblock title %}
+
+{% block body_content %}
+<main class="container py-5">
+<h2 class="text-center">{% trans "Create your account. Your world awaits!" %}</h2>
+<hr>
+<div class="row justify-content-lg-center">
+{% crispy form %}
+</div>
+</main>
+{% endblock body_content %}
