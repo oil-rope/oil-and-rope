@@ -1,8 +1,9 @@
 from django.urls import reverse_lazy
+from django.contrib.auth import views as auth_views
 from django.views.generic import CreateView
 from oilandrope.settings import LANGUAGE_CODE
 
-from .forms import SignUpForm
+from . import forms
 
 
 class SignUpView(CreateView):
@@ -10,7 +11,7 @@ class SignUpView(CreateView):
     View that handles the creation for a :class:`User`.
     """
 
-    form_class = SignUpForm
+    form_class = forms.SignUpForm
     success_url = reverse_lazy('login')
     template_name = 'registration/register.html'
 
@@ -28,3 +29,10 @@ class SignUpView(CreateView):
         profile.image = data.get('avatar', None)
         profile.save()
         return response
+
+class LoginView(auth_views.LoginView):
+    """
+    Custom LoginView.
+    """
+
+    form_class = forms.LoginForm

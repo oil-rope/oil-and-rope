@@ -46,12 +46,27 @@
 
     <!-- Login and Register -->
     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+      {% if user.is_authenticated %}
+      <li class="nav-item dropdown">
+        <a href="javascript:;" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-user" aria-hidden="true"></i>
+          {{ user.username }}
+        </a>
+        <div class="dropdown-menu">
+          <div class="dropdown-divider"></div>
+          <a href="{% url 'logout' %}" class="dropdown-item">
+            <i class="fa fa-sign-out" aria-hidden="true"></i>{% trans "Logout" %}
+          </a>
+        </div>
+      </li>
+      {% else %}
       <li class="nav-item">
-        <a href="{% url 'login' %}" class="nav-link text-uppercase">{% trans "Login" %}</a>
+        <a href="{% url 'registration:login' %}" class="nav-link text-uppercase">{% trans "Login" %}</a>
       </li>
       <li class="nav-item">
         <a href="{% url 'registration:register' %}" class="nav-link text-uppercase text-extra">{% trans "Create your account" %}</a>
       </li>
+      {% endif %}
     </ul>
   </div>
 

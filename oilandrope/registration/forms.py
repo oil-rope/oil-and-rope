@@ -2,7 +2,7 @@ from core.forms import DateHTML5Field
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout, Submit
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -71,3 +71,19 @@ class SignUpForm(UserCreationForm):
         if not data:
             self.add_error('terms_check', _('You must accept Terms of Service & Etiquette in order to continue.'))
         return data
+
+class LoginForm(AuthenticationForm):
+    """
+    Custom form for Login.
+    """
+
+    def __init__(self, request=None, *args, **kwargs):
+        super(LoginForm, self).__init__(request=request, *args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'col-12 col-lg-8 row justify-content-start justify-content-lg-center'
+        self.helper.form_id = 'loginForm'
+        self.helper.layout = Layout(
+            Field('username', wrapper_class='col-12 col-lg-8'),
+            Field('password', wrapper_class='col-12 col-lg-8'),
+            Submit('login', _('Log in'), css_class='btn btn-extra col-12 col-lg-6')
+        )

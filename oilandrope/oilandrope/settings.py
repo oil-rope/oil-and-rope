@@ -185,7 +185,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth
 
 LOGIN_REDIRECT_URL = 'core:home'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'registration:login'
 
 # Media files
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
