@@ -1,0 +1,12 @@
+discord.py
+django>=2, <3
+django-crispy-forms
+django-modeltranslation
+django-mptt
+django-mptt-admin
+django-simple-history
+django-tables2
+djangorestframework
+Pillow
+psycopg2-binary
+xlrd

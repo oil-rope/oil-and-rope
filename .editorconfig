@@ -18,7 +18,6 @@ max_line_length = 125
 [*.html]
 indent_size = 2
 
-
 # The JSON files contain newlines inconsistently
 [*.json, *.yml]
 indent_size = 2

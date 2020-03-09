@@ -41,16 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # DjangoPlus
-    'django_extensions',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
     'formtools',
     # Queryset-Bootstrap Tables (https://django-tables2.readthedocs.io/)
     'django_tables2',
-    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
-    'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
@@ -117,13 +113,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432'),
         'TEST': {
             'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
-        },
-    },
-    'sqlite': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.getenv('DB_NAME', 'oilandrope.sqlite3'),
-        'TEST': {
-            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope.sqlite3')))
         },
     },
 }
