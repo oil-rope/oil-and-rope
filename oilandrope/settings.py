@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
     'django_tables2',
+    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
+    'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
