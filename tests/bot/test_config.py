@@ -42,4 +42,4 @@ class ConfigFileTest(TestCase):
 
         with self.assertRaises(exceptions.OilAndRopeException):
             self.assertTrue(self.config_file.exists(), 'Config file does not exist.')
-            config_parser = config.Config(config_file=self.config_file)
+            config.Config(config_file=self.config_file)
