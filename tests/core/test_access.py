@@ -1,5 +1,5 @@
-from django.test import Client, TestCase
 from django.shortcuts import reverse
+from django.test import Client, TestCase
 
 
 class AccessRouteTest(TestCase):

@@ -2,8 +2,7 @@ from django.contrib import admin
 
 from core.admin import TracingMixinAdmin
 
-from .models import (DiscordServer, DiscordTextChannel, DiscordUser,
-                     DiscordVoiceChannel)
+from .models import DiscordServer, DiscordTextChannel, DiscordUser, DiscordVoiceChannel
 
 
 @admin.register(DiscordUser)

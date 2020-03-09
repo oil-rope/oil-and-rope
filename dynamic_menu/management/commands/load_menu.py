@@ -1,8 +1,7 @@
 import json
 import pathlib
 
-from django.core.management.base import (BaseCommand, CommandError,
-                                         CommandParser)
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from dynamic_menu import models, utils
 

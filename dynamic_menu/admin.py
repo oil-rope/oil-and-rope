@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-
 from modeltranslation.admin import TranslationAdmin
+
 from .models import DynamicMenu
 
 

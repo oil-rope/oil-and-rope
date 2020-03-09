@@ -2,9 +2,8 @@ import os
 import re
 
 import discord
-from discord.ext import commands
-
 import django
+from discord.ext import commands
 from django.conf import settings
 from django.utils import timezone
 

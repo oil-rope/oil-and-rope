@@ -1,9 +1,7 @@
 from rest_framework import viewsets
 
-from .models import (DiscordServer, DiscordTextChannel, DiscordUser,
-                     DiscordVoiceChannel)
-from .serializers import (DiscordServerSerializer,
-                          DiscordTextChannelSerializer, DiscordUserSerializer,
+from .models import DiscordServer, DiscordTextChannel, DiscordUser, DiscordVoiceChannel
+from .serializers import (DiscordServerSerializer, DiscordTextChannelSerializer, DiscordUserSerializer,
                           DiscordVoiceChannelSerializer)
 
 

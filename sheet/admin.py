@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import SheetHeader, CharacterInfo, SheetDetail
+from .models import CharacterInfo, SheetDetail, SheetHeader
 
 
 @admin.register(SheetHeader)
