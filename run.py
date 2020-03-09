@@ -39,19 +39,6 @@ async def on_member_remove(member: discord.Member):
 
 
 @bot.event
-async def on_guild_join(self, ctx, *, guild_id):
-    from bot import models
-    guild = discord.utils.get(self.bot.guilds, id=guild_id)
-    try:
-        actual_guild = models.DiscordServer.objects.get(pk=guild.id)
-    except models.DiscordServer.DoesNotExist:
-        actual_guild = models.DiscordServer(
-            id=guild.id
-        )
-    print("Hi! I'm a lorem ipsum")
-
-
-@bot.event
 async def on_message(message: discord.Message):
     # Separating variables
     author = message.author
