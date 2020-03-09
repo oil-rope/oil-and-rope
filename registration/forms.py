@@ -1,7 +1,8 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Layout, Div, HTML, Submit
+from crispy_forms.layout import HTML, Div, Field, Layout, Submit
 from django.contrib.auth.forms import AuthenticationForm
-from django.utils.translation import ugettext_lazy as _, gettext
+from django.utils.translation import gettext
+from django.utils.translation import ugettext_lazy as _
 
 
 class LoginForm(AuthenticationForm):
