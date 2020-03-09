@@ -1,78 +1,49 @@
-
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Field, Layout, Reset, Submit
-from django import forms
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-
-from .models import Profile
+from crispy_forms.layout import Field, Layout, Div, HTML, Submit
+from django.contrib.auth.forms import AuthenticationForm
+from django.utils.translation import ugettext_lazy as _, gettext
 
 
-class UpdateProfileForm(forms.ModelForm):
+class LoginForm(AuthenticationForm):
     """
-    Formulario que gestiona la actualización de un usuario.
+    Custom form to render with Crispy.
     """
 
-    class Meta:
-        model = Profile
-        fields = ('bio', 'birthday', 'language', 'alias', 'laboral_category')
-        widgets = {
-            'birthday': forms.DateInput(
-                format='%Y-%m-%d',
-                attrs={
-                    'type': 'date'
-                }
-            )
-        }
+    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
 
-    def __init__(self, *args, **kwargs):
-        super(UpdateProfileForm, self).__init__(*args, **kwargs)
+    def __init__(self, request=None, *args, **kwargs):
+        super(LoginForm, self).__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
+        self.helper.id = 'loginForm'
+        self.helper.form_class = 'container-fluid'
         self.helper.layout = Layout(
-            # Imagen de perfil
-            HTML(
-                '{% if profile.images.all %} \
-                <h5>Imagen</h5> \
-                <img src="{{ profile.images.first.image.url }}" alt="Imagen de perfil" class="w-25vh img-thumbnail"> \
-                {% endif %}'),
-            # Botón para añadir imágenes
-            HTML(
-                '<div class="w-100 my-2"></div> \
-                <a target="_blank" href="{% url \'registration:profile_image_update\' %}" class="btn btn-info"> \
-                    Añadir imagen \
-                </a>'
-            ),
-            Field('bio'),
-            Field('birthday'),
-            Field('language'),
-            Field('alias'),
-            Field('laboral_category'),
+            Div(
+                Field(
+                    'username',
+                    placeholder=_('Username'),
+                    css_class=self.custom_classes,
+                ),
+                Field(
+                    'password',
+                    placeholder=_('Password'),
+                    css_class=self.custom_classes,
+                ),
+                Div(
+                    Div(
+                        HTML(
+                            '<a class="col-lg-8 btn-link" href="#no-url">' + gettext('Forgot password?') + '</a>'
+                        ),
+                        Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
+                        css_class='row align-items-lg-center justify-content-lg-between'
+                    ),
+                    css_class='container-fluid'
+                ),
+                css_class='row flex-column'
+            )
         )
-        self.helper.add_input(Submit('submit', _('Update')))
 
-    def clean_birthday(self):
-        """
-        La fecha de nacimiento no puede ser mayor que la fecha de hoy.
-        """
+        self._clean_labels()
 
-        if self.cleaned_data['birthday']:
-            data = self.cleaned_data['birthday']
-            if data > timezone.datetime.today().date():
-                raise forms.ValidationError(_('Birthday cannot be after today.'))
-            return data
-
-
-class UpdateProfileImageForm(forms.Form):
-    """
-    Formulario que gestiona las imágenes asociadas a un perfil.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(UpdateProfileImageForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.add_input(Submit('submit', _('Add')))
-        self.helper.add_input(Reset('reset', _('Reset'), css_class='btn btn-secondary'))
-
-    image = forms.ImageField(
-        label='',
-    )
+    def _clean_labels(self):
+        for field in self.fields:
+            self.fields[field].label = ''
