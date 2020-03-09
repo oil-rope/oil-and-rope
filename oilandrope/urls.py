@@ -28,7 +28,6 @@ urlpatterns += i18n_patterns(
     # Admin site
     path('admin/', admin.site.urls),
     # Auth system
-    path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),

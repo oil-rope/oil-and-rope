@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import argparse
-import os
 import subprocess
 import sys
 
@@ -14,14 +13,10 @@ PYTEST_ARGS = {
     'fast': ['-q']
 }
 
-MAX_LINE_LENGTH = 120
 EXCLUDE_PATTERNS = ['./**/migrations/*.py']
-FLAKE8_ARGS = ['--exclude'] + EXCLUDE_PATTERNS + \
-    ['--max-line-length', MAX_LINE_LENGTH]
+FLAKE8_ARGS = ['--exclude'] + EXCLUDE_PATTERNS
 
 ISORT_ARGS = ['--recursive', '--check-only', '--diff']
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.local_settings')
 
 
 def exit_on_failure(ret, message=None):
