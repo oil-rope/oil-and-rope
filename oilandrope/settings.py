@@ -44,8 +44,6 @@ INSTALLED_APPS = [
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
-    'formtools',
-    # Queryset-Bootstrap Tables (https://django-tables2.readthedocs.io/)
     'django_tables2',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
