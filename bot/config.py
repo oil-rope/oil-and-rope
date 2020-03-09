@@ -4,10 +4,10 @@ import os
 import pathlib
 import shutil
 
-from bot.bot.exceptions import OilAndRopeException
+from .exceptions import OilAndRopeException
 
 LOG = logging.getLogger(__name__)
-CONFIG_DIR = pathlib.Path('bot/config/')
+CONFIG_DIR = pathlib.Path(__file__).parent / 'config/'
 EXAMPLE_CONFIG_DIR = 'example_configuration.ini'
 CONFIG_FILE = 'configuration.ini'
 CONF_SECTIONS = {'Credentials', 'Bot', 'Embed'}  # Obligatory sections
@@ -29,7 +29,7 @@ class Config:
                 self.configuration[section].update({option: value})
 
         # Checking for sensitive crendentials
-        if not 'token' in self.configuration['Credentials']:
+        if 'token' not in self.configuration['Credentials']:
             LOG.warning("\nToken not found in 'Credentials'\nLooking in environment variables 'BOT_TOKEN'\n")
             self.configuration['Credentials'].update({'token': os.getenv('BOT_TOKEN', '')})
 

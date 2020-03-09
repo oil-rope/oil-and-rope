@@ -1,6 +1,11 @@
 """
-Bot
-~~~
+Oil & Rope
+~~~~~~~~~~
 
-Discord Bot created to manage roleplay games.
+A bot connected to Oil & Rope web to make Roleplay Games more interactive.
 """
+
+
+from . import config
+
+CONFIG = config.Config()

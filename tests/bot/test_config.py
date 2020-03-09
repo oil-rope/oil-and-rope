@@ -2,7 +2,7 @@ import pytest
 
 from django.test import TestCase
 
-from bot.bot import config
+from bot import config
 
 
 @pytest.fixture(scope='module', autouse=True)
