@@ -138,6 +138,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
         except Exception as ex:
             logging.warning('Resolver for \'%s\' may not exists.',
                             self.url_resolver)
+            logging.error('%s', ex)
         finally:
             return url
 

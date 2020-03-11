@@ -2,9 +2,8 @@ import os
 import re
 
 import discord
-from discord.ext import commands
-
 import django
+from discord.ext import commands
 from django.conf import settings
 from django.utils import timezone
 
@@ -36,19 +35,6 @@ async def on_member_join(member: discord.Member):
 @bot.event
 async def on_member_remove(member: discord.Member):
     print(f'{member} has left the server.')
-
-
-@bot.event
-async def on_guild_join(self, ctx, *, guild_id):
-    from bot import models
-    guild = discord.utils.get(self.bot.guilds, id=guild_id)
-    try:
-        actual_guild = models.DiscordServer.objects.get(pk=guild.id)
-    except models.DiscordServer.DoesNotExist:
-        actual_guild = models.DiscordServer(
-            id=guild.id
-        )
-    print("Hi! I'm a lorem ipsum")
 
 
 @bot.event

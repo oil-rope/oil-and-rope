@@ -1,7 +1,6 @@
 import random
 
 from django.conf import settings
-from django.conf.global_settings import LANGUAGES
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -23,7 +22,8 @@ class SheetHeader(models.Model):
     # Game
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"), on_delete=models.CASCADE)
-    character_info = models.OneToOneField("sheet.CharacterInfo", verbose_name=_("Character Info"), on_delete=models.CASCADE)
+    character_info = models.OneToOneField("sheet.CharacterInfo", verbose_name=_("Character Info"),
+                                          on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Sheet Header")
@@ -69,10 +69,9 @@ class CharacterInfo(models.Model):
     )
 
     height_measurement_system = models.PositiveSmallIntegerField(_("Height Measurement System"),
-                                choices=MEASUREMENT_SYSTEM, default=0)
+                                                                 choices=MEASUREMENT_SYSTEM, default=0)
     WEIGHT_MEASUREMENT_SYSTEM = models.PositiveSmallIntegerField(_("Weight Measurement System"),
-                                choices=MEASUREMENT_SYSTEM, default=0)
-
+                                                                 choices=MEASUREMENT_SYSTEM, default=0)
 
     class Meta:
         verbose_name = _("Character Info")
@@ -93,7 +92,7 @@ class SheetDetail(models.Model):
     ----------
     name: :class:`str`
     start_value: :class:`int`
-        Ex: the start value of str is 10 in pathfinder, but 0 
+        Ex: the start value of str is 10 in pathfinder, but 0
     rollable: :class:`bool`
     dice_class: :class:`int`
     dice_number: :class:`int`
@@ -137,7 +136,7 @@ class SheetDetail(models.Model):
     misc_bonus = models.SmallIntegerField(_("Miscelaneous Bonus"), default=0)
     extra_bonus_1 = models.SmallIntegerField(_("Extra Bonus 1"), default=0)
     extra_bonus_2 = models.SmallIntegerField(_("Extra Bonus 2"), default=0)
-    sheet = models.ForeignKey("sheet.SheetHeader", verbose_name=_("Sheet Header"), 
+    sheet = models.ForeignKey("sheet.SheetHeader", verbose_name=_("Sheet Header"),
                               on_delete=models.CASCADE, related_name="sheet_details")
 
     @property
@@ -162,7 +161,6 @@ class SheetDetail(models.Model):
         else:
             value = self.start_value + self.get_total_bonus
             return value
-
 
     class Meta:
         verbose_name = _("Sheet Detail")

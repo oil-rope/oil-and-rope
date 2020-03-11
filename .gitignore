@@ -110,4 +110,4 @@ venv.bak/
 *.code-workspace
 
 # Configuration
-configuration.ini
+bot/config/configuration.ini

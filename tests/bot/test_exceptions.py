@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from bot.bot.exceptions import HelpfulError
+from bot.exceptions import HelpfulError
 
 
 class HelpfulErrorTest(TestCase):

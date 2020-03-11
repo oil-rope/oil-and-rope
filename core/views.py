@@ -1,4 +1,3 @@
-from django.shortcuts import redirect, reverse
 from django.views.generic import TemplateView
 
 

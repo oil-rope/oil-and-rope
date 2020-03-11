@@ -1,11 +1,7 @@
 from django.conf import settings
-from django.conf.global_settings import LANGUAGES
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-
-# Create your models here.
-
 
 
 class Chat(models.Model):
@@ -25,7 +21,6 @@ class Chat(models.Model):
     name = models.CharField(_("Chat name"), max_length=50)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name=_("Usuarios"), related_name='chats')
-
 
     class Meta:
         verbose_name = _("Chat")
@@ -49,8 +44,8 @@ class ChatMessage(models.Model):
     user: :class:`User`
     """
 
-    chat = models.ForeignKey("chat.Chat", verbose_name=_(
-        "Chat"), on_delete=models.CASCADE, related_name='messages')
+    chat = models.ForeignKey("chat.Chat", verbose_name=_("Chat"),
+                             on_delete=models.CASCADE, related_name='messages')
     message = models.CharField(_("Message"), max_length=150)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),
                              on_delete=models.CASCADE, related_name='messages')

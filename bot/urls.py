@@ -1,10 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
+
 from . import viewsets
-
-
-#tet
-
 
 router = routers.DefaultRouter()
 router.register(r'discord_user', viewsets.DiscordUserViewSet)

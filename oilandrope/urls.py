@@ -15,10 +15,10 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
-from django.urls import path, include
+from django.contrib import admin
+from django.urls import include, path
 
 urlpatterns = []
 
@@ -28,7 +28,6 @@ urlpatterns += i18n_patterns(
     # Admin site
     path('admin/', admin.site.urls),
     # Auth system
-    path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),

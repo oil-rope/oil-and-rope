@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import DiscordUser, DiscordServer, DiscordTextChannel, DiscordVoiceChannel
+from .models import DiscordServer, DiscordTextChannel, DiscordUser, DiscordVoiceChannel
 
 
 class DiscordUserSerializer(serializers.ModelSerializer):
