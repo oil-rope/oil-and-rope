@@ -10,8 +10,9 @@ parser = argparse.ArgumentParser(description='Run Tests and Linting.')
 
 PYTEST_ARGS = {
     'default': ['tests'],
-    'fast': ['-q']
+    'fast': ['tests', '-q']
 }
+COVERAGE_ARGS = ['--cov', './', '--cov-report', 'xml']
 
 EXCLUDE_PATTERNS = ['./**/migrations/*.py']
 FLAKE8_ARGS = ['--exclude'] + EXCLUDE_PATTERNS
@@ -48,6 +49,7 @@ parser.add_argument('--no-lint', action='store_true',
 parser.add_argument('--lint-only', action='store_true',
                     help='Runs only linting tests.')
 parser.add_argument('--fast', action='store_true', help='Run pytest quiet.')
+parser.add_argument('--coverage', action='store_true', help='Run coverage.')
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -65,6 +67,8 @@ if __name__ == '__main__':
         pytest_args = PYTEST_ARGS['fast']
     else:
         pytest_args = PYTEST_ARGS['default']
+    if args.coverage:
+        pytest_args.extend(COVERAGE_ARGS)
 
     if run_pytest:
         exit_on_failure(pytest.main(pytest_args))
