@@ -26,4 +26,5 @@ script:
   - python runtests.py
 
 after_success:
-  - coveralls
+  - pip install codecov
+  - codecov -e DJANGO_SETTINGS_MODULE
