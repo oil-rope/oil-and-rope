@@ -15,7 +15,7 @@ env:
 install:
   - pip install -r requirements/requirements-develop.txt
   # Extra
-  - pip install coveralls
+  - pip install codecov pytest-cov
 
 before_script:
   - psql -c 'create database oilandrope;' -U postgres
@@ -26,5 +26,4 @@ script:
   - python runtests.py --coverage
 
 after_success:
-  - pip install codecov pytest-cov
   - codecov -e DJANGO_SETTINGS_MODULE
