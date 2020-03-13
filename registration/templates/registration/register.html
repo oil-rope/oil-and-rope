@@ -1,0 +1,11 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Create your account" %}{% endblock title %}
+
+{% block body_content %}
+<main class="container py-5">
+  {% crispy form %}
+</main>
+{% endblock body_content %}

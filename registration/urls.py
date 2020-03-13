@@ -12,4 +12,5 @@ app_name = 'registration'
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('register/', views.SignUpView.as_view(), name='register')
 ]
