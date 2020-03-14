@@ -28,6 +28,11 @@
 
   {% include 'core/includes/menu.html' %}
 
+  <header>
+    {% comment %} Messages System {% endcomment %}
+    {% include 'core/includes/messages.html' %}
+  </header>
+
   {% comment %} HTML Content {% endcomment %}
   {% block body_content %}
   {% endblock body_content %}
@@ -43,7 +48,9 @@
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
   <!-- Bootstrap -->
-  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
   <!-- JS Cookie -->
   <script type="module" src="{% static 'dynamic_menu/external_libs/js_cookie/js_cookie.min.js' %}"></script>
   <!-- Dynamic Menu -->

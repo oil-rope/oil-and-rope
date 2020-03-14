@@ -3,17 +3,13 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Home" %}{% endblock title %}
+{% block title %}{% trans "Login" %}{% endblock title %}
 
 {% block body_content %}
 <main class="container p-5">
   <div class="row align-items-lg-center shadow-lg">
 
-    <div class="col-lg-4 p-5">
-      {% crispy form %}
-    </div>
-
-    <div class="col-lg-8 bg-extra p-4">
+    <div class="col-lg-8 bg-extra p-4 order-lg-last">
       <h2 class="display-4 text-center text-white">{% trans "Welcome to Oil &amp; Rope!" %}</h2>
       <hr>
       <p>
@@ -22,6 +18,10 @@
         Pariatur repellendus maxime quaerat, omnis minima delectus adipisci accusamus voluptatibus ex quasi, numquam dolores ratione natus? Explicabo, voluptatum ullam ea neque quidem assumenda ipsum debitis deleniti ut ipsam odio vero!
         Inventore, esse ab illo, modi mollitia vero adipisci repellat eveniet quos distinctio maiores laborum blanditiis, necessitatibus molestias enim iure odit natus voluptatem possimus repellendus facilis expedita! Eius laboriosam corporis fugit.
       </p>
+    </div>
+
+    <div class="col-lg-4 p-5">
+      {% crispy form %}
     </div>
 
   </div>

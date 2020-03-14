@@ -46,12 +46,23 @@
 
     <!-- Login and Register -->
     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-      <li class="nav-item">
-        <a href="{% url 'registration:login' %}" class="nav-link text-uppercase">{% trans "Login" %}</a>
+      {% if not user.is_authenticated %}
+        <li class="nav-item">
+          <a href="{% url 'registration:login' %}" class="nav-link text-uppercase">{% trans "Login" %}</a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'registration:register' %}" class="nav-link text-uppercase text-extra">{% trans "Create your account" %}</a>
+        </li>
+      {% else %}
+      <li class="nav-item dropdown">
+        <a href="javascript:;" id="navbarDropdown_userMenu" class="nav-link dropdown-toggle text-uppercase" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ user.username }}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown_userMenu">
+          <a href="{% url 'registration:logout' %}" class="dropdown-item text-uppercase">{% trans "Logout" %}</a>
+        </div>
       </li>
-      <li class="nav-item">
-        <a href="{% url 'registration:register' %}" class="nav-link text-uppercase text-extra">{% trans "Create your account" %}</a>
-      </li>
+      {% endif %}
     </ul>
   </div>
 
