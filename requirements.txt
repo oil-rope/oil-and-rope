@@ -1,0 +1,5 @@
+# This requirements are just for Heroku and shouldn't be use on develop
+-r requirements/requirements-base.txt
+
+django-heroku
+gunicorn

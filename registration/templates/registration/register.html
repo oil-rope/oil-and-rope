@@ -1,17 +1,28 @@
 {% extends 'core/layout.html' %}
-{% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Login" %}{% endblock title %}
+{% block title %}{% trans "Create your account" %}{% endblock title %}
 
 {% block body_content %}
-<main class="container p-5">
-  <div class="row align-items-lg-center shadow-lg">
+<header class="container">
+  <h2 class="display-2 text-center">
+    {% trans "Start your adventure" %}!
+  </h2>
+  <hr>
+  <p class="lead text-center">
+    {% trans "Take the first step" %}. {% trans "Create your account" %}.
+    <br>
+    {% trans "Your world awaits" %}!
+  </p>
+</header>
+<main class="container">
+  <div class="row">
+    <div class="col-md-8">
+      {% crispy form %}
+    </div>
 
-    <div class="col-lg-8 bg-extra p-4 order-lg-last">
-      <h2 class="display-4 text-center text-white">{% trans "Welcome to Oil &amp; Rope!" %}</h2>
-      <hr>
+    <div class="col-md-4 d-none d-md-block">
       <p>
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda deleniti quidem mollitia tenetur sunt sint ab commodi nihil sed? Molestiae porro reiciendis enim, dicta consequuntur asperiores accusantium eligendi neque quod?
         Ab laudantium eius doloremque saepe culpa et similique ipsa obcaecati, reiciendis eveniet veritatis dolore sed sint maxime inventore eaque corrupti, perferendis ea placeat, provident cum minus id omnis vitae. Hic.
@@ -19,11 +30,6 @@
         Inventore, esse ab illo, modi mollitia vero adipisci repellat eveniet quos distinctio maiores laborum blanditiis, necessitatibus molestias enim iure odit natus voluptatem possimus repellendus facilis expedita! Eius laboriosam corporis fugit.
       </p>
     </div>
-
-    <div class="col-lg-4 p-5">
-      {% crispy form %}
-    </div>
-
   </div>
 </main>
 {% endblock body_content %}
