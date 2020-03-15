@@ -11,6 +11,7 @@ python:
 
 env:
   - DJANGO_SETTINGS_MODULE="oilandrope.settings"
+  - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo"
 
 install:
   - pip install -r requirements/requirements-develop.txt
