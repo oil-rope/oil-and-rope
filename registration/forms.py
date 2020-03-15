@@ -1,3 +1,5 @@
+from concurrent.futures.thread import ThreadPoolExecutor
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
@@ -166,7 +168,9 @@ class SignUpForm(UserCreationForm):
         instance.is_active = False
         if commit:
             instance.save()
-            self._send_email_confirmation(instance)
+            # User shouldn't wait for the email to be sent
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                executor.submit(self._send_email_confirmation, instance)
         return instance
 
     class Meta:

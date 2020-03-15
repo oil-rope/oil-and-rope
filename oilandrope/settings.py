@@ -240,7 +240,9 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#email-host
 
 DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
+EMAIL_SUBJECT_PREFIX = '[Oil & Rope] '
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-EMAIL_PORT = os.getenv('EMAIL_PORT', '')
+EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
+EMAIL_USE_TLS = True
