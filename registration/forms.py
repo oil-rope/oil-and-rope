@@ -151,7 +151,8 @@ class SignUpForm(UserCreationForm):
         """
 
         msg_html = render_to_string('email_templates/confirm_email.html', {
-            'domain': self.request.META['HTTP_HOST'],
+            # We declare localhost as default for tests purposes
+            'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
             'token': self._generate_token(user),
             'object': user
         })
