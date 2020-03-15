@@ -1,0 +1,13 @@
+-r ./requirements-base.txt
+
+autopep8
+django-extensions
+django-pdb
+faker
+flake8
+ipdb
+isort
+model_bakery
+pytest
+pytest-django
+werkzeug

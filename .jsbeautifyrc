@@ -1,0 +1,6 @@
+{
+    "html": {
+        "indent_size": 2,
+        "unformatted": ["script"]
+    }
+}

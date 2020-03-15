@@ -1,0 +1,22 @@
+{% extends 'email_templates/email_layout.html' %}
+{% load i18n %}
+
+{% block content %}
+<header class="container">
+  <h2 class="display-2 text-center">{% trans "Welcome to Oil &amp; Rope traveller!" %}</h2>
+</header>
+<main class="container p-5">
+  <div class="row">
+    <div class="col-8">
+      <p class="text-center">
+      {% blocktrans %}
+        Before you start, please make sure to activate your account by clickcking in the link below.
+      {% endblocktrans %}
+      </p>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <a href="{% url 'registration:activate' token object.pk %}" class="btn btn-extra">{% trans "Activate account" %}</a>
+  </div>
+</main>
+{% endblock content %}

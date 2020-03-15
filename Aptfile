@@ -1,0 +1,5 @@
+# Graph libraries
+graphviz libgraphviz-dev
+
+# Translation libraries
+locales locales-all gettext

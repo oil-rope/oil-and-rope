@@ -1,0 +1,30 @@
+[{
+        "name": "Home",
+        "name_en": "Home",
+        "name_es": "Inicio",
+        "description": "Homepage.",
+        "description_en": "Homepage.",
+        "description_es": "Página principal.",
+        "url_resolver": "core:home",
+        "order": 0,
+        "menu_type": 0
+    },
+    {
+        "name": "GameMaster",
+        "description": "GameMaster section.",
+        "description_en": "GameMaster section.",
+        "description_es": "Sección para el GameMaster.",
+        "order": 1,
+        "menu_type": 0
+    },
+    {
+        "name": "RolePlayers",
+        "name_en": "RolePlayers",
+        "name_es": "Jugadores",
+        "description": "RolePlayers section.",
+        "description_en": "RolePlayers section.",
+        "description_es": "Sección para los Jugadores.",
+        "order": 2,
+        "menu_type": 0
+    }
+]

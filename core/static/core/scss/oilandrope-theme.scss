@@ -1,0 +1,16 @@
+.full-background {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+// Modules
+@import "variables";
+@import "forms";
+
+// Bootstrap and its default variables
+@import "../../bootstrap/scss/bootstrap";
