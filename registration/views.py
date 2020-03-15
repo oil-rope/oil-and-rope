@@ -38,6 +38,13 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         )
         return succes_message
 
+    def get_form_kwargs(self):
+        kwargs = super(SignUpView, self).get_form_kwargs()
+        kwargs.update({
+            'request': self.request
+        })
+        return kwargs
+
     def form_valid(self, form):
         response = super(SignUpView, self).form_valid(form)
         messages.success(self.request, self.get_success_message())

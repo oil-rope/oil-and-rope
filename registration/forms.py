@@ -1,10 +1,12 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import (HTML, Button, ButtonHolder, Column, Div,
+                                 Field, Layout, Row, Submit)
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
+from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
+                                       UsernameField)
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
@@ -73,8 +75,9 @@ class SignUpForm(UserCreationForm):
         help_text=_('If you have a Discord Account you want to link with just give us your ID!')
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
+        self.request = request
         self.setup()
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
@@ -148,6 +151,7 @@ class SignUpForm(UserCreationForm):
         """
 
         msg_html = render_to_string('email_templates/confirm_email.html', {
+            'domain': self.request.META['HTTP_HOST'],
             'token': self._generate_token(user),
             'object': user
         })
