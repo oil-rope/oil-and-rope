@@ -1,12 +1,15 @@
 from unittest import mock
 
-from django.core import mail
 from django.contrib.auth import get_user, get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from faker import Faker
 from model_bakery import baker
+
+from registration.views import ActivateAccountView
 
 
 class TestLoginView(TestCase):
@@ -121,3 +124,34 @@ class TestSignUpView(TestCase):
         self.client.force_login(user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302, 'User is not redirected.')
+
+
+class TestActivateAccountView(TestCase):
+    """
+    Checks correct behaviour for ActivateAccountView.
+
+    We don't validate `access_ok` since a 200 code is not expected from this view.
+    """
+
+    def setUp(self):
+        self.faker = Faker()
+        token_generator = PasswordResetTokenGenerator()
+        self.user = baker.make(get_user_model())
+        self.user.is_active = False
+        self.user.save()
+        self.token = token_generator.make_token(self.user)
+
+    @mock.patch('registration.views.messages')
+    def test_validates_ok(self, mock_call: mock.MagicMock):
+        url = reverse('registration:activate', kwargs={
+            'token': self.token,
+            'pk': self.user.pk
+        })
+        response = self.client.get(url)
+        self.assertRedirects(response, ActivateAccountView.url)
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            _('Your email has been confirmed!')
+        )
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active, 'User is not active.')
