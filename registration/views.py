@@ -3,10 +3,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, RedirectView
 
 from . import forms
+from .mixins import RedirectAuthenticatedUserMixin
 
 
 class LoginView(auth_views.LoginView):
@@ -17,7 +19,7 @@ class LoginView(auth_views.LoginView):
     authentication_form = forms.LoginForm
 
 
-class SignUpView(CreateView):
+class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     """
     View for registering a new user.
     """
@@ -43,7 +45,7 @@ class SignUpView(CreateView):
         return response
 
 
-class ActivateAccountView(RedirectView):
+class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
     """
     Gets token and redirects user after activating it.
     """

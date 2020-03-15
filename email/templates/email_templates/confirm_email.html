@@ -5,7 +5,7 @@
 <header class="container">
   <h2 class="display-2 text-center">{% trans "Welcome to Oil &amp; Rope traveller!" %}</h2>
 </header>
-<main class="container">
+<main class="container p-5">
   <div class="row">
     <div class="col-8">
       <p class="text-center">
@@ -16,9 +16,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <div class="col-8">
-      <a href="{% url 'registration:activate' token object.pk %}" class="btn btn-extra">{% trans "Activate account" %}</a>
-    </div>
+    <a href="{% url 'registration:activate' token object.pk %}" class="btn btn-extra">{% trans "Activate account" %}</a>
   </div>
 </main>
 {% endblock content %}

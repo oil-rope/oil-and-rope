@@ -14,6 +14,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('register/', views.SignUpView.as_view(), name='register'),
-    path('activate/<token>/<int:pk>/', views.ActivateAccountView.as_view(), name='activate')
+    path('register/', views.SignUpView.as_view(redirect_authenticated_user=True), name='register'),
+    path('activate/<token>/<int:pk>/', views.ActivateAccountView.as_view(redirect_authenticated_user=True), name='activate'),
 ]

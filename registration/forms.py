@@ -61,7 +61,9 @@ class SignUpForm(UserCreationForm):
     User registration form.
     """
 
-    button_class = 'btn btn-info'
+    button_classes = 'btn btn-info'
+    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes = 'btn btn-extra btn-lg'
 
     discord_id = forms.CharField(
         label=_('Discord Identifier'),
@@ -79,29 +81,29 @@ class SignUpForm(UserCreationForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field('username'),
+                    Field('username', css_class=self.custom_classes),
                     css_class='col-12'
                 ),
                 Column(
-                    Field('email'),
+                    Field('email', css_class=self.custom_classes),
                     css_class='col-12'
                 ),
                 Column(
-                    Field('password1'),
+                    Field('password1', css_class=self.custom_classes),
                     css_class='col-12'
                 ),
                 Column(
-                    Field('password2'),
+                    Field('password2', css_class=self.custom_classes),
                     css_class='col-12'
                 )
             ),
             Row(
-                Field('discord_id'),
-                Button('search', _('Send invitation!'), css_class=self.button_class + ' align-self-center'),
+                Field('discord_id', css_class=self.custom_classes),
+                Button('search', _('Send invitation!'), css_class=self.button_classes + ' align-self-center'),
                 css_class='justify-content-between'
             ),
             ButtonHolder(
-                Submit('submit', _('Register'))
+                Submit('submit', _('Register'), css_class=self.submit_classes)
             )
         )
 

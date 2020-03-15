@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import Client, TestCase
 from faker import Faker
 from model_bakery import baker
@@ -29,7 +30,49 @@ class TestSingUpForm(TestCase):
             errors=', '.join([str(k) + ':' + str(v) for k, v in form.errors])
         ))
 
+        # Adding Discord ID
+        data_discord = self.data_ok.copy()
+        data_discord['discord_id'] = self.faker.random_int()
+        form = forms.SignUpForm(data=data_discord)
+        self.assertTrue(form.is_valid(), 'Form is invalid.\nErrors: {errors}'.format(
+            errors=', '.join([str(k) + ':' + str(v) for k, v in form.errors])
+        ))
+
+    def test_form_wrong_confirm_password_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['password2'] = self.faker.word()
+        form = forms.SignUpForm(data=data_ko)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+    def test_required_fields_not_supplied_ko(self):
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        form = forms.SignUpForm(data=data_without_email)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+        data_without_username = self.data_ok.copy()
+        del data_without_username['username']
+        form = forms.SignUpForm(data=data_without_username)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+        data_without_password1 = self.data_ok.copy()
+        del data_without_password1['password1']
+        form = forms.SignUpForm(data=data_without_password1)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+        data_without_password2 = self.data_ok.copy()
+        del data_without_password2['password2']
+        form = forms.SignUpForm(data=data_without_password2)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
     def test_save_ok(self):
         form = forms.SignUpForm(data=self.data_ok)
-        instance = form.save()
-        self.assertFalse(instance.is_active, 'User is active before activating email.')
+        user = form.save()
+        self.assertFalse(user.is_active, 'User is active before activating email.')
+
+    def test_email_sent_ok(self):
+        # Changing Django Settings to get email sent
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            form = forms.SignUpForm(data=self.data_ok)
+            user = form.save()
+            self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')

@@ -28,10 +28,8 @@
 
   {% include 'core/includes/menu.html' %}
 
-  <header>
-    {% comment %} Messages System {% endcomment %}
-    {% include 'core/includes/messages.html' %}
-  </header>
+  {% comment %} Messages System {% endcomment %}
+  {% include 'core/includes/messages.html' %}
 
   {% comment %} HTML Content {% endcomment %}
   {% block body_content %}

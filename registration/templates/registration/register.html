@@ -5,7 +5,18 @@
 {% block title %}{% trans "Create your account" %}{% endblock title %}
 
 {% block body_content %}
-<main class="container py-5">
+<header class="container">
+  <h2 class="display-2 text-center">
+    {% trans "Start your adventure" %}!
+  </h2>
+  <hr>
+  <p class="lead text-center">
+    {% trans "Take the first step" %}. {% trans "Create your account" %}.
+    <br>
+    {% trans "Your world awaits" %}!
+  </p>
+</header>
+<main class="container">
   {% crispy form %}
 </main>
 {% endblock body_content %}
