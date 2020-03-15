@@ -14,7 +14,7 @@ PYTEST_ARGS = {
 }
 COVERAGE_ARGS = ['--cov', './', '--cov-report', 'xml']
 
-EXCLUDE_PATTERNS = ['./**/migrations/*.py', 'heroku_settings.py']
+EXCLUDE_PATTERNS = ['**/migrations/**', 'heroku_settings.py']
 FLAKE8_ARGS = ['--exclude'] + EXCLUDE_PATTERNS
 
 ISORT_ARGS = ['--recursive', '--check-only', '--diff']
