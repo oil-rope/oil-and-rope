@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'https://oil-and-rope.herokuapp.com/'
+    'oil-and-rope.herokuapp.com',
 ]
 
 # Defines Admins
