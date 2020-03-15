@@ -22,13 +22,27 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG', 'False'))
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'https://oil-and-rope.herokuapp.com/'
+]
 
+# Defines Admins
+# https://docs.djangoproject.com/en/2.2/ref/settings/#admins
+
+ADMINS = [
+    ('LeCuay', 'suso.becerra98@gmail.com'),
+    ('Daniel', 'danielpaz4c@gmail.com'),
+]
+
+# Defines Manager
+# https://docs.djangoproject.com/en/2.2/ref/settings/#managers
+
+MANAGERS = ADMINS
 
 # Application definition
 
@@ -221,3 +235,12 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
+
+# Email System
+# https://docs.djangoproject.com/en/2.2/ref/settings/#email-host
+
+DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = os.getenv('EMAIL_PORT', '')
