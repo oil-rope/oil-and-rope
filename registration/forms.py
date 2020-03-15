@@ -81,19 +81,19 @@ class SignUpForm(UserCreationForm):
             Row(
                 Column(
                     Field('username', css_class=self.custom_classes),
-                    css_class='col-12'
+                    css_class='col-12 col-md-6'
                 ),
                 Column(
                     Field('email', css_class=self.custom_classes),
-                    css_class='col-12'
+                    css_class='col-12 col-md-6'
                 ),
                 Column(
                     Field('password1', css_class=self.custom_classes),
-                    css_class='col-12'
+                    css_class='col-12 col-md-6'
                 ),
                 Column(
                     Field('password2', css_class=self.custom_classes),
-                    css_class='col-12'
+                    css_class='col-12 col-md-6'
                 )
             ),
             Row(
