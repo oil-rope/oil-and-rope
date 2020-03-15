@@ -1,13 +1,10 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import (HTML, Button, ButtonHolder, Column, Div,
-                                 Field, Layout, Row, Submit)
+from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
-                                       UsernameField)
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
-from django.utils.translation import gettext
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -38,7 +35,9 @@ class LoginForm(AuthenticationForm):
                 Div(
                     Div(
                         HTML(
-                            '<a class="col-lg-8 btn-link" href="#no-url">' + gettext('Forgot password?') + '</a>'
+                            '<a class="col-lg-8 btn-link" href="#no-url">{text}</a>'.format(
+                                text=_('Forgot password?')
+                            )
                         ),
                         Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
                         css_class='row align-items-lg-center justify-content-lg-between'

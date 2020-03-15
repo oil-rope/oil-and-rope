@@ -1,10 +1,40 @@
 from django.contrib.auth import get_user_model
 from django.core import mail
-from django.test import Client, TestCase
+from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
 from registration import forms
+
+
+class TestLoginForm(TestCase):
+    """
+    Checks if LoginForm's validations work correctly.
+    """
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model())
+        # Reset password so we can control input
+        password = ''.join(self.faker.words(3))
+        self.user.set_password(password)
+        self.user.save()
+        self.data_ok = {
+            'username': self.user.username,
+            'password': password
+        }
+
+    def test_form_ok(self):
+        form = forms.LoginForm(data=self.data_ok)
+        self.assertTrue(form.is_valid(), 'Form is invalid.\nErrors: {errors}'.format(
+            errors=', '.join([str(k) + ':' + str(v) for k, v in form.errors])
+        ))
+
+    def test_form_invalid_password_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['password'] = self.faker.word()
+        form = forms.SignUpForm(data=data_ko)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
 
 class TestSingUpForm(TestCase):
@@ -74,5 +104,5 @@ class TestSingUpForm(TestCase):
         # Changing Django Settings to get email sent
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             form = forms.SignUpForm(data=self.data_ok)
-            user = form.save()
+            form.save()
             self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')

@@ -1,7 +1,6 @@
-import pytest
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
-from django.test import Client, TestCase
+from django.test import TestCase
 from model_bakery import baker
 
 
