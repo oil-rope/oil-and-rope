@@ -1,13 +1,19 @@
+import logging
 from concurrent.futures.thread import ThreadPoolExecutor
+from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import (HTML, Button, ButtonHolder, Column, Div,
+                                 Field, Layout, Row, Submit)
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
+from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
+                                       UsernameField)
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+
+LOGGER = logging.getLogger(__name__)
 
 
 class LoginForm(AuthenticationForm):
@@ -154,7 +160,11 @@ class SignUpForm(UserCreationForm):
             'token': self._generate_token(user),
             'object': user
         })
-        user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+
+        try:
+            user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+        except SMTPAuthenticationError:
+            LOGGER.exception('Unable to logging email server with given credentials.')
 
     def save(self, commit=True):
         """
