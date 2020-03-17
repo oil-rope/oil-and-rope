@@ -138,7 +138,7 @@ class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
         The position of the channel.
     nsfw: :class:`bool`
         Declares if the channel is NSFW.
-    topic: :class:`str`
+    topic: Optional[:class:`str`]
         Topic of the channel.
     news: :class:`bool`
         Declares is channel is New.

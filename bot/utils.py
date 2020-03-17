@@ -25,8 +25,15 @@ def get_or_create_discord_user(member: abc.User):
     """
     Searches in database for the given user or creates one if not found.
 
+    Parameters
+    ----------
     member: :class:`abc.User`
         Discord API abstract user.
+
+    Returns
+    -------
+    user: :class:`models.DiscordUser`
+        The user fetched.
     """
 
     # Importing DiscordUser inside a function to avoid 'Apps not ready'
@@ -54,8 +61,15 @@ def get_or_create_discord_server(guild: discord.Guild):
     """
     Searches in database for the given server or creates one if not found.
 
-    guild: :class:`discord.Guildl`
+    Parameters
+    ----------
+    guild: :class:`discord.Guild`
         Discord API Guild.
+
+    Returns
+    -------
+    server: :class:`models.DiscordServer`
+        The server fetched.
     """
 
     # Importing DiscordServer inside a function to avoid 'Apps not ready'
@@ -78,3 +92,42 @@ def get_or_create_discord_server(guild: discord.Guild):
         logging.info('Server %s created', server)
 
     return server
+
+
+def get_or_create_discord_text_channel(channel: discord.channel.TextChannel, guild: discord.Guild):
+    """
+    Searches in database for the given text channel or creates one if not found.
+
+    Parameters
+    ----------
+    channel: :class:`discord.channel.TextChannel`
+        Discord API TextChannel.
+    guild: :class:`discord.Guild`
+        Discord API Guild.
+
+    Returns
+    -------
+    text_channel: :class:`models.DiscordTextChannel`
+        The text channel fetched.
+    """
+
+    # Importing DiscordTextChannel inside a function to avoid 'Apps not ready'
+    from .models import DiscordTextChannel
+
+    text_channel, created = DiscordTextChannel.objects.get_or_create(
+        id=channel.id,
+        defaults={
+            'name': channel.name,
+            'position': channel.position,
+            'nsfw': channel.is_nsfw(),
+            'topic': channel.topic or None,
+            'news': channel.is_news(),
+            'created_at': make_aware(channel.created_at),
+            'server_id': guild.id
+        }
+    )
+
+    if created:
+        logging.info('Text Channel %s created', text_channel)
+
+    return text_channel
