@@ -32,8 +32,9 @@ async def on_message(message: discord.Message):
         server.discord_users.add(owner)
 
     user = utils.get_or_create_discord_user(message.author)
-    if not server.discord_users.filter(id=user.id).exists():
-        server.discord_users.add(user)
+    if user.id != owner.id:
+        if not server.discord_users.filter(id=user.id).exists():
+            server.discord_users.add(user)
 
     breakpoint()
     await bot.logout()
