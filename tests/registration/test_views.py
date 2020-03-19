@@ -41,6 +41,46 @@ class TestLoginView(TestCase):
         self.client.post(self.url, data=data)
         self.assertTrue(get_user(self.client).is_authenticated, 'User is not logged.')
 
+    @mock.patch('registration.views.messages')
+    def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
+        # Change password so we can control input
+        password = ''.join(self.faker.words(4))
+        self.user.set_password(password)
+        # Set user as inactive
+        self.user.is_active = False
+        self.user.save()
+        data = {
+            'username': self.user.username,
+            'password': password
+        }
+
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
+        response = self.client.post(self.url, data=data)
+        self.assertFalse(get_user(self.client).is_authenticated, 'Inactive user is logged.')
+
+        warn_message = '{}. {}'.format(
+            _('Seems like this user is inactive'),
+            _('Have you confirmed your email?')
+        )
+        mock_call.warning.assert_called_with(
+            response.wsgi_request,
+            warn_message
+        )
+
+    def test_invalid_credentials(self):
+        """
+        Since we access user on LoginView, invalid credentials should be captured by an Exception to avoid 500.
+        """
+
+        data = {
+            'username': self.faker.word(),
+            'password': self.faker.word()
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200, 'Request gives {status}.'.format(
+            status=response.status_code
+        ))
+
     def test_cannot_access_if_user_is_logged(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)

@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -9,6 +11,8 @@ from django.views.generic import CreateView, RedirectView
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
 
+LOGGER = logging.getLogger(__name__)
+
 
 class LoginView(auth_views.LoginView):
     """
@@ -16,6 +20,22 @@ class LoginView(auth_views.LoginView):
     """
 
     authentication_form = forms.LoginForm
+
+    def form_invalid(self, form):
+        response = super(LoginView, self).form_invalid(form)
+        cleaned_data = form.cleaned_data
+        try:
+            user = get_user_model().objects.get(username=cleaned_data['username'])
+            if not user.is_active:
+                warn_message = '{}. {}'.format(
+                    _('Seems like this user is inactive'),
+                    _('Have you confirmed your email?')
+                )
+                messages.warning(self.request, warn_message)
+        except get_user_model().DoesNotExist:
+            LOGGER.warning('Attemp to access an inexistent user, we assume username is just incorrect.')
+        finally:
+            return response
 
 
 class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
@@ -37,6 +57,13 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
             _('Please confirm your email')
         )
         return succes_message
+
+    def get_form_kwargs(self):
+        kwargs = super(SignUpView, self).get_form_kwargs()
+        kwargs.update({
+            'request': self.request
+        })
+        return kwargs
 
     def form_valid(self, form):
         response = super(SignUpView, self).form_valid(form)

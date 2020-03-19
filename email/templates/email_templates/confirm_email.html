@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <a href="{% url 'registration:activate' token object.pk %}" class="btn btn-extra">{% trans "Activate account" %}</a>
+    <a href="{{ domain }}{% url 'registration:activate' token object.pk %}" class="btn btn-extra">{% trans "Activate account" %}</a>
   </div>
 </main>
 {% endblock content %}

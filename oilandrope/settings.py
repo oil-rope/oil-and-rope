@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
+    'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -91,6 +93,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'dynamic_menu.middleware.DynamicMenuMiddleware',
 ]
+
+# SITE_ID = 1 is for declaring page ID
+# (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/#enabling-the-sites-framework)
+
+SITE_ID = 1
 
 ROOT_URLCONF = 'oilandrope.urls'
 
