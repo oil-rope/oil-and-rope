@@ -15,7 +15,7 @@ from discord.ext import commands
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 
-from .exceptions import OilAndRopeException, HelpfulError
+from .exceptions import HelpfulError, OilAndRopeException
 
 LOGGER = logging.getLogger(__name__)
 
