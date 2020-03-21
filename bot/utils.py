@@ -41,12 +41,6 @@ def get_or_create_discord_user(member: abc.User):
     if not member:
         raise exceptions.OilAndRopeException('Discord User cannot be None.')
 
-    # Adding timezone to avoid Naive Datetime
-    if hasattr(member.created_at, 'tzinfo'):
-        created_at = member.created_at
-    else:
-        created_at = make_aware(member.created_at)
-
     # Importing DiscordUser inside a function to avoid 'Apps not ready'
     from .models import DiscordUser
 
@@ -58,7 +52,7 @@ def get_or_create_discord_user(member: abc.User):
             'avatar_url': member.avatar_url or None,
             'locale': settings.LANGUAGE_CODE or None,
             'premium': True if member.premium_since else False,
-            'created_at': created_at
+            'created_at': make_aware(member.created_at)
         }
     )
 

@@ -2,8 +2,7 @@ import os
 import pathlib
 
 from discord.ext import commands
-from django.core.management.base import (BaseCommand, CommandError,
-                                         CommandParser)
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 
