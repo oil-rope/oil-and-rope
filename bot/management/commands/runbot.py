@@ -3,7 +3,7 @@ import pathlib
 from django.core.management.base import BaseCommand, CommandParser
 
 from bot import OilAndRopeBot
-from bot.exceptions import OilAndRopeException, HelpfulError
+from bot.exceptions import HelpfulError, OilAndRopeException
 
 
 class Command(BaseCommand):
