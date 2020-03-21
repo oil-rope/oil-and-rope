@@ -6,6 +6,8 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 
+from bot import OilAndRopeBot
+
 
 class Command(BaseCommand):
 
@@ -15,7 +17,7 @@ class Command(BaseCommand):
         command_prefix = os.getenv('BOT_COMMAND_PREFIX', '..')
         description = os.getenv('BOT_DESCRIPTION', '')
         token = os.getenv('BOT_TOKEN')
-        self.bot = commands.Bot(command_prefix=command_prefix, description=description)
+        self.bot = OilAndRopeBot(command_prefix=command_prefix, description=description)
 
         self.load_commands()
         self.bot.run(token)
