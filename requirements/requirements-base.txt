@@ -11,4 +11,5 @@ djangorestframework
 Pillow
 psycopg2-binary
 python-dateutil
+python-dotenv
 xlrd
