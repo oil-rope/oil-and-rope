@@ -12,6 +12,7 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import errors
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 
@@ -63,15 +64,17 @@ class OilAndRopeBot(commands.Bot):
 
         print('\nLoading commands ', end='')
 
-        from bot.commands import shutdown
+        from bot.commands import MiscellaneousCog, RoleplayCog
 
-        commands = [shutdown]
-        commands_to_load = [c.name for c in commands]
-        LOGGER.info('Commands to load: %s', ', '.join(commands_to_load))
+        # List of categories
+        cogs = [MiscellaneousCog, RoleplayCog]
+        commands = []
 
-        for command in commands:
-            self.add_command(command)
-            print('.', end='')
+        for cog in cogs:
+            cog = cog()
+            self.add_cog(cog)
+            commands.extend(cog.get_commands())
+            [print('.', end='') for c in commands]
 
         # Linebreak to clean up
         print('\n')
@@ -86,13 +89,19 @@ class OilAndRopeBot(commands.Bot):
         print(init_message)
 
     async def on_message(self, message: discord.Message):
-        log_message = '{author} ({id}): {message}'.format(
-            author=message.author.name,
-            id=message.author.id,
-            message=message.content
-        )
-        print(log_message)
+        if not message.author.bot and message.content.startswith(self.command_prefix):
+            log_message = '{author} ({id}): {message}'.format(
+                author=message.author.name,
+                id=message.author.id,
+                message=message.content
+            )
+            print(log_message)
         await super(OilAndRopeBot, self).on_message(message)
+
+    async def on_command_error(self, context, exception):
+        if isinstance(exception, errors.MissingRequiredArgument):
+            await context.send('Incorrect format.')
+            await context.send_help(context.command)
 
     def run(self, *args, **kwargs):
         super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
