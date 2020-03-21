@@ -1,16 +1,16 @@
+import logging
+
 from discord.ext.commands import command, context
 
-
-def test():
-    pass
+LOGGER = logging.getLogger(__name__)
 
 
 @command()
-async def logout(ctx: context.Context):
-    await ctx.send('Hello!')
-    await ctx.bot.logout()
-
-
-@command()
-async def not_test(ctx: context.Context):
-    pass
+async def shutdown(ctx: context.Context):
+    is_owner = await ctx.bot.is_owner(ctx.author)
+    if is_owner:
+        msg = 'Shutting down {}...'.format(ctx.bot.user.name)
+        print(msg)
+        LOGGER.info(msg)
+        await ctx.channel.send('Shutting down...')
+        await ctx.bot.logout()

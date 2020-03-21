@@ -63,9 +63,9 @@ class OilAndRopeBot(commands.Bot):
 
         print('\nLoading commands ', end='')
 
-        from bot.commands import logout
+        from bot.commands import shutdown
 
-        commands = [logout]
+        commands = [shutdown]
         commands_to_load = [c.name for c in commands]
         LOGGER.info('Commands to load: %s', ', '.join(commands_to_load))
 
