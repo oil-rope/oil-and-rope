@@ -1,1 +1,1 @@
-web: gunicorn oilandrope.wsgi
+web: gunicorn --access-log - oilandrope.wsgi
