@@ -59,6 +59,9 @@ class OilAndRopeBot(commands.Bot):
         Looks for the given .env file and sets up Environment Variables.
         """
 
+        if not isinstance(env_file, pathlib.Path):
+            env_file = pathlib.Path(str(env_file))
+
         if not env_file.exists():
             raise OilAndRopeException(_('Env file doesn\'t exist.'))
         load_dotenv(env_file.as_posix())

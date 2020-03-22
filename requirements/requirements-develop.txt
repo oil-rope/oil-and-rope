@@ -10,5 +10,7 @@ ipdb
 isort
 model_bakery
 pytest
+pytest-asyncio
 pytest-django
+selenium
 werkzeug
