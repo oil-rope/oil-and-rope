@@ -28,7 +28,7 @@ class DiscordUser(TracingMixin):
     """
 
     id = models.CharField(_('Identifier'), max_length=254, primary_key=True)
-    user = models.OneToOneField("auth.User", verbose_name=_('User'), on_delete=models.CASCADE,
+    user = models.OneToOneField('auth.User', verbose_name=_('User'), on_delete=models.CASCADE,
                                 related_name='discord_user', blank=True, null=True)
     nick = models.CharField(_('Nick'), max_length=50)
     code = models.PositiveSmallIntegerField(_('Code'))
