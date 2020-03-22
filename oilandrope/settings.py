@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -115,6 +117,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
+
+# DjangoChannels ASGI Router
+ASGI_APPLICATION = 'oilandrope.routing.application'
 
 
 # Database
