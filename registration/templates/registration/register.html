@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
 
@@ -33,3 +34,7 @@
   </div>
 </main>
 {% endblock body_content %}
+
+{% block javascript %}
+<script src="{% static 'websockets/botConsumer.js' %}" consumer-url="{% url 'bot:bot_consumer' %}"></script>
+{% endblock javascript %}
