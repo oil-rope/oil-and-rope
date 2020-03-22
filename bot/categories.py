@@ -103,6 +103,10 @@ class RoleplayCog(Cog, name='Roleplay'):
         )
         await ctx.send(message)
 
+    @command()
+    async def register_user(self, ctx, user_id):
+        await ctx.bot.confirm_user(int(user_id))
+
 
 class MiscellaneousCog(Cog, name='Miscellaneous'):
     """

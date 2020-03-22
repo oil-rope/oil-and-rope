@@ -41,6 +41,11 @@ def get_or_create_discord_user(member: abc.User):
     if not member:
         raise exceptions.OilAndRopeException('Discord User cannot be None.')
 
+    if not hasattr(member, 'premium_since'):
+        premium_since = None
+    else:
+        premium_since = member.premium_since
+
     # Importing DiscordUser inside a function to avoid 'Apps not ready'
     from .models import DiscordUser
 
@@ -51,7 +56,7 @@ def get_or_create_discord_user(member: abc.User):
             'code': member.discriminator,
             'avatar_url': member.avatar_url or None,
             'locale': settings.LANGUAGE_CODE or None,
-            'premium': True if member.premium_since else False,
+            'premium': True if premium_since else False,
             'created_at': make_aware(member.created_at)
         }
     )

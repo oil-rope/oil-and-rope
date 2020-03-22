@@ -5,6 +5,7 @@ Oil & Rope
 A bot connected to Oil & Rope web to make Roleplay Games more interactive.
 """
 
+import asyncio
 import logging
 import os
 import pathlib
@@ -15,12 +16,15 @@ from discord.ext import commands
 from discord.ext.commands import errors
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
+from faker import Faker
 
 from bot.categories import MiscellaneousCog, RoleplayCog
 
+from . import utils
 from .exceptions import HelpfulError, OilAndRopeException
 
 LOGGER = logging.getLogger(__name__)
+fake = Faker()  # To generate tokens and stuff
 
 
 class OilAndRopeBot(commands.Bot):
@@ -105,3 +109,34 @@ class OilAndRopeBot(commands.Bot):
 
     def run(self, *args, **kwargs):
         super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
+
+    async def confirm_user(self, user_id):
+        """
+        Gets given ID and DMs user for confirming identity.
+
+        Parameters
+        ----------
+        user_id: :class:`int`
+            The user to confirm.
+        """
+
+        user = self.get_user(user_id)
+        token = fake.password(length=10, special_chars=False, digits=True, upper_case=True, lower_case=True)
+        await user.send('Hello traveller! To confirm your account please type `{token}`'.format(token=token))
+
+        def check(m):
+            """
+            This check looks for token in message and user.
+            """
+
+            token_confirm = m.content == token
+            user_confirm = m.author == user
+            return token_confirm and user_confirm
+
+        try:
+            await self.wait_for('message', check=check, timeout=60.0)
+        except asyncio.TimeoutError:
+            await user.send('Token has timed out!')
+        else:
+            await user.send('Your user has been confirmed!')
+            utils.get_or_create_discord_user(user)
