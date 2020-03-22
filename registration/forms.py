@@ -9,6 +9,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
+from bot.models import DiscordUser
+
 
 class LoginForm(AuthenticationForm):
     """
@@ -153,6 +155,30 @@ class SignUpForm(UserCreationForm):
         })
         user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
 
+    def clean_discord_id(self):
+        """
+        Checks if Discord User is created.
+        """
+
+        data = self.cleaned_data.get('discord_id')
+
+        if data:
+            if not DiscordUser.objects.filter(pk=data).exists():
+                msg = '{} {}'.format(_('User not found.'), _('Have you requested invitation?'))
+                self.add_error('discord_id', msg)
+        return data
+
+    def get_discord_user(self):
+        """
+        Looks for `discord_id` field and returns :class:`DiscordUser` instance or `None`.
+        """
+
+        discord_user = None
+        discord_id = self.cleaned_data.get('discord_id')
+        if discord_id:
+            discord_user = DiscordUser.objects.get(pk=discord_id)
+        return discord_user
+
     def save(self, commit=True):
         """
         Before saving the instance it sets it to inactive until the user confirms email.
@@ -166,8 +192,14 @@ class SignUpForm(UserCreationForm):
         instance = super(SignUpForm, self).save(commit=False)
         # Set active to False until user acitvates email
         instance.is_active = False
+        # Checks for DiscordUser
+        discord_user = self.get_discord_user()
         if commit:
             instance.save()
+            # Adds foreing key if exists
+            if discord_user:
+                discord_user.user = instance
+                discord_user.save()
             # User shouldn't wait for the email to be sent
             with ThreadPoolExecutor(max_workers=2) as executor:
                 executor.submit(self._send_email_confirmation, instance)

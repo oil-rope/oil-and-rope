@@ -64,6 +64,7 @@ class TestSignUpView(TestCase):
             'password2': password
         }
         self.url = reverse('registration:register')
+        self.discord_user = baker.make('bot.DiscordUser')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -82,10 +83,34 @@ class TestSignUpView(TestCase):
             succes_message
         )
 
+    @mock.patch('registration.views.messages')
+    def test_user_can_register_with_discord_user(self, mock_call: mock.MagicMock):
+        data_ok = self.data_ok.copy()
+        data_ok['discord_id'] = self.discord_user.id
+        response = self.client.post(self.url, data=data_ok)
+
+        succes_message = '{} {}.'.format(
+            _('User created!'),
+            _('Please confirm your email')
+        )
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            succes_message
+        )
+
     def test_user_is_created_ok(self):
         self.client.post(self.url, data=self.data_ok)
         user_exists = get_user_model().objects.filter(username=self.data_ok['username']).exists()
         self.assertTrue(user_exists, 'User is not created.')
+
+    def test_user_is_vinculed_to_discord_user(self):
+        data_ok = self.data_ok.copy()
+        data_ok['discord_id'] = self.discord_user.id
+        self.client.post(self.url, data=data_ok)
+
+        user = get_user_model().objects.get(username=data_ok['username'])
+        self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
+        self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
 
     def test_email_sent_ok(self):
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
@@ -97,6 +122,12 @@ class TestSignUpView(TestCase):
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'password2', 'The two password fields didn\'t match.')
+
+    def test_wrong_discord_id_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['discord_id'] = self.faker.random_int()
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'discord_id', 'User not found. Have you requested invitation?')
 
     def test_required_fields_not_given(self):
         data_without_email = self.data_ok.copy()

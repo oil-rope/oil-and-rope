@@ -2,9 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, RedirectView
+
+from bot.models import DiscordUser
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
@@ -39,9 +42,9 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return succes_message
 
     def form_valid(self, form):
-        response = super(SignUpView, self).form_valid(form)
+        self.object = form.save()
         messages.success(self.request, self.get_success_message())
-        return response
+        return redirect(self.success_url)
 
 
 class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
