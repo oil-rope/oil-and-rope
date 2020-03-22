@@ -16,6 +16,8 @@ from discord.ext.commands import errors
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 
+from bot.categories import MiscellaneousCog, RoleplayCog
+
 from .exceptions import HelpfulError, OilAndRopeException
 
 LOGGER = logging.getLogger(__name__)
@@ -63,8 +65,6 @@ class OilAndRopeBot(commands.Bot):
         """
 
         print('\nLoading commands ', end='')
-
-        from bot.commands import MiscellaneousCog, RoleplayCog
 
         # List of categories
         cogs = [MiscellaneousCog, RoleplayCog]
