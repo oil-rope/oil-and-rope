@@ -1,6 +1,7 @@
 -r ./requirements-base.txt
 
 autopep8
+channels_redis
 django-extensions
 django-pdb
 faker
