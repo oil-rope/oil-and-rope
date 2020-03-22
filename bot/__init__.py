@@ -9,6 +9,7 @@ import asyncio
 import logging
 import os
 import pathlib
+import threading
 from datetime import datetime
 
 import discord
@@ -109,6 +110,17 @@ class OilAndRopeBot(commands.Bot):
         if isinstance(exception, errors.MissingRequiredArgument):
             await context.send('Incorrect format.')
             await context.send_help(context.command)
+
+    def extra_listeners(self, *listeners):
+        """
+        Adds coroutine functions to the current listeners.
+
+        listenes:
+            Coroutines to listen.
+        """
+
+        for fn in listeners:
+            threading.Thread(target=asyncio.get_event_loop().run_until_complete, args=(fn, ), daemon=True).run()
 
     def run(self, *args, **kwargs):
         super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
