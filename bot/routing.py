@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import re_path
 
 from . import consumers
 
 urlpatterns = [
-    path('bot/', consumers.BotConsumer, name='bot_consumer')
+    re_path(r'register/', consumers.BotConnectionOnRegisterConsumer, name='ws_bot_register')
 ]
