@@ -66,7 +66,7 @@ class TestSingUpForm(TestCase):
         # Adding Discord ID
         data_discord = self.data_ok.copy()
         data_discord['discord_id'] = self.discord_user.pk
-        form = forms.SignUpForm(data=data_discord)
+        form = forms.SignUpForm(self.request, data=data_discord)
         form_valid = form.is_valid()
         self.assertTrue(form_valid, repr(form.errors))
 
@@ -79,7 +79,7 @@ class TestSingUpForm(TestCase):
     def test_form_wrong_discord_id(self):
         data_ko = self.data_ok.copy()
         data_ko['discord_id'] = self.faker.random_int()
-        form = forms.SignUpForm(data=data_ko)
+        form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
     def test_required_fields_not_supplied_ko(self):
@@ -111,7 +111,7 @@ class TestSingUpForm(TestCase):
     def test_save_with_discord_user_ok(self):
         data_ok = self.data_ok.copy()
         data_ok['discord_id'] = self.discord_user.id
-        form = forms.SignUpForm(data=data_ok)
+        form = forms.SignUpForm(self.request, data=data_ok)
         user = form.save()
         self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
         self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
