@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     # Sheet
     'sheet.apps.SheetConfig',
+    # FrontEnd
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [

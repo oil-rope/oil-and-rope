@@ -33,6 +33,8 @@ urlpatterns += i18n_patterns(
     path('bot/', include('bot.urls')),
     # Chat
     path('chat/', include('chat.urls')),
+    # React FrontEnd
+    path('frontend/', include('frontend.urls')),
 )
 
 if settings.DEBUG:
