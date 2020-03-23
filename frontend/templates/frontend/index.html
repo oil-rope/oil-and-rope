@@ -1,0 +1,20 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+
+{% block title %}Test React{% endblock title %}
+
+{% block body_content %}
+<div class="container">
+  <div id="reactApp"></div>
+  <div class="row justify-content-around">
+    <div class="bts-button">Test 1 Button</div>
+    <div class="bts-button">Test 2 Button</div>
+    <div class="bts-button">Test 3 Button</div>
+    <div class="bts-button">Test 4 Button</div>
+  </div>
+</div>
+{% endblock body_content %}
+
+{% block javascript %}
+<script src="{% static 'frontend/main.js' %}"></script>
+{% endblock javascript %}

@@ -1,4 +1,6 @@
+import logging
 from concurrent.futures.thread import ThreadPoolExecutor
+from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
@@ -10,6 +12,8 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from bot.models import DiscordUser
+
+LOGGER = logging.getLogger(__name__)
 
 
 class LoginForm(AuthenticationForm):
@@ -75,8 +79,9 @@ class SignUpForm(UserCreationForm):
         help_text=_('If you have a Discord Account you want to link with just give us your ID!')
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
+        self.request = request
         self.setup()
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
@@ -151,10 +156,16 @@ class SignUpForm(UserCreationForm):
         """
 
         msg_html = render_to_string('email_templates/confirm_email.html', {
+            # We declare localhost as default for tests purposes
+            'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
             'token': self._generate_token(user),
             'object': user
         })
-        user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+
+        try:
+            user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+        except SMTPAuthenticationError:
+            LOGGER.exception('Unable to logging email server with given credentials.')
 
     def clean_discord_id(self):
         """

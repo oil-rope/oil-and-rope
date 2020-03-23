@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
     'channels',
+    # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
+    'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -80,6 +82,8 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     # Sheet
     'sheet.apps.SheetConfig',
+    # FrontEnd
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
@@ -93,6 +97,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'dynamic_menu.middleware.DynamicMenuMiddleware',
 ]
+
+# SITE_ID = 1 is for declaring page ID
+# (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/#enabling-the-sites-framework)
+
+SITE_ID = 1
 
 ROOT_URLCONF = 'oilandrope.urls'
 
