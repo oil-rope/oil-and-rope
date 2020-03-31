@@ -45,10 +45,10 @@ def isort_main(args):
     return ret
 
 
-def django_check():
+def django_check(level='WARNING'):
     django.setup()
     print('Checking Django')
-    ret = subprocess.call('{} manage.py check'.format(sys.executable))
+    ret = subprocess.call('{} manage.py check --fail-level={}'.format(sys.executable, level))
 
     if ret:
         print('Django check failed.')
