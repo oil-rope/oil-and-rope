@@ -3,13 +3,13 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from .models import DiscordUser
 
 
-class BotConnectionOnRegisterConsumer(AsyncJsonWebsocketConsumer):
+class BotConsumer(AsyncJsonWebsocketConsumer):
     """
     WebSocket for Bot Actions.
     """
 
     async def connect(self):
-        await super(BotConnectionOnRegisterConsumer, self).connect()
+        await super(BotConsumer, self).connect()
 
     async def receive_json(self, content, **kwargs):
         discord_id = content['discord_id']

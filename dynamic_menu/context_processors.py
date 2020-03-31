@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib.auth.models import Permission
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 
 from . import models
 
@@ -11,6 +11,12 @@ def menus(request) -> dict:
     Checks for menus, their permissions and return a queryset filtered.
     """
 
+    # Initialize dicts
+    menus_dict = {
+        'menus': models.DynamicMenu.objects.none(),
+        'context_menus': models.DynamicMenu.objects.none()
+    }
+
     # Checking for user and its permissions
     user = request.user
     user_permissions = [per.split('.')[1]
@@ -19,6 +25,9 @@ def menus(request) -> dict:
 
     # Getting menus
     qs = models.DynamicMenu.objects.all()
+
+    if not qs.exists():
+        return menus_dict
 
     # Filtering by permissions
     qs = qs.filter(
@@ -43,12 +52,12 @@ def menus(request) -> dict:
             context_menus = context_menus.distinct()
         except models.DynamicMenu.DoesNotExist as ex:
             request.COOKIES['_auth_user_menu_referrer'] = None
-            context_menus = QuerySet(model=models.DynamicMenu)
+            context_menus = models.DynamicMenu.objects.none()
             logging.warning('Trying to access an non-existent menu.\n%s', ex)
     else:
-        context_menus = QuerySet(model=models.DynamicMenu)
+        context_menus = models.DynamicMenu.objects.none()
 
-    return {
-        'menus': qs,
-        'context_menus': context_menus
-    }
+    menus_dict['menus'] = qs
+    menus_dict['context_menus'] = context_menus
+
+    return menus_dict
