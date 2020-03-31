@@ -85,26 +85,26 @@ class DynamicMenu(MPTTModel, TracingMixin):
         Last time model was updated.
     """
 
-    name = models.CharField(_('Name'), max_length=100)
-    description = models.TextField(_('Description'), null=True, blank=True)
-    prepended_text = models.CharField(_('Prepended Text'), max_length=50,
+    name = models.CharField(verbose_name=_('Name'), max_length=100)
+    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    prepended_text = models.CharField(verbose_name=_('Prepended Text'), max_length=50,
                                       null=True, blank=True)
-    appended_text = models.CharField(_('Appended Text'), max_length=50,
+    appended_text = models.CharField(verbose_name=_('Appended Text'), max_length=50,
                                      null=True, blank=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='menus',
-                            null=True, blank=True)
-    url_resolver = models.CharField(_('URL Resolver'), max_length=50,
+                            null=True, blank=True, verbose_name=_('Parent Menu'))
+    url_resolver = models.CharField(verbose_name=_('URL Resolver'), max_length=50,
                                     null=True, blank=True)
-    extra_urls_args = models.CharField(_('Extra URL Parameters'), max_length=254,
+    extra_urls_args = models.CharField(verbose_name=_('Extra URL Parameters'), max_length=254,
                                        null=True, blank=True)
-    order = models.PositiveSmallIntegerField(_('Order'), default=0)
+    order = models.PositiveSmallIntegerField(verbose_name=_('Order'), default=0)
     permissions_required = models.ManyToManyField(PERMISSION_CLASS, blank=True,
                                                   related_name='menus',
                                                   verbose_name=_('Permissions required'))
-    staff_required = models.BooleanField(_('Staff Required'), default=False)
-    superuser_required = models.BooleanField(_('SuperUser Required'),
+    staff_required = models.BooleanField(verbose_name=_('Staff Required'), default=False)
+    superuser_required = models.BooleanField(verbose_name=_('SuperUser Required'),
                                              default=False)
-    icon = models.FileField(_('Icon'), upload_to=dynamic_menu_path,
+    icon = models.FileField(verbose_name=_('Icon'), upload_to=dynamic_menu_path,
                             max_length=254, blank=True, null=True)
     related_model = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_("Related Model"),
                                            related_name='menus', blank=True)
@@ -116,7 +116,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
         (CONTEXT_MENU, _('Context Menu')),
     )
 
-    menu_type = models.PositiveSmallIntegerField(_('Menu Type'), default=MAIN_MENU,
+    menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MAIN_MENU,
                                                  choices=MENU_CHOICES)
 
     @property
