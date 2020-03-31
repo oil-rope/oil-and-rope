@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import BootstrapButton from './BootstrapButton';
 
 class App extends Component {
     render() {
@@ -9,7 +8,3 @@ class App extends Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('reactApp'));
-
-document.querySelectorAll('.bts-button').forEach(element => {
-    ReactDOM.render(<BootstrapButton color="extra" />, element);
-});
