@@ -107,7 +107,7 @@ class SignUpForm(UserCreationForm):
             ),
             Row(
                 Field('discord_id', css_class=self.custom_classes),
-                Button('search', _('Send invitation!'),
+                Button('search', _('Look for user!'),
                        css_class=self.button_classes + ' align-self-center', css_id='btn_discord_invite'),
                 css_class='justify-content-between'
             ),
