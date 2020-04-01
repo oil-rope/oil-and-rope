@@ -49,13 +49,17 @@ def isort_main(args):
 
 def django_check(level='WARNING'):
     django.setup()
+    out = StringIO()
     print('Checking Django')
-    ret = subprocess.call('python manage.py check --fail-level={}'.format(level))
+    call_command('check', '--fail-leve=%s' % level, stdout=out)
+    output = out.getvalue()
 
-    if ret:
-        print('Django check failed.')
+    if 'System check identified no issues' not in output:
+        print('Django check failed.\n{}'.format(output))
+        ret = 1
     else:
         print('Django check passed.')
+        ret = 0
 
     return ret
 
