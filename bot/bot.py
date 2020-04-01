@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import pathlib
-import threading
 from datetime import datetime
 
 import discord
@@ -12,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 from faker import Faker
 
-from bot.categories import MiscellaneousCog, RoleplayCog
+from bot.categories import MiscellaneousCog, RoleplayCog, UserCog
 
 from . import utils
 from .exceptions import HelpfulError, OilAndRopeException
@@ -57,7 +56,7 @@ class OilAndRopeBot(commands.Bot):
             env_file = pathlib.Path(str(env_file))
 
         if not env_file.exists():
-            raise OilAndRopeException(_('Env file doesn\'t exist.'))
+            raise OilAndRopeException(_('Env file doesn\'t exist') + '.')
         load_dotenv(env_file.as_posix())
 
     def load_commands(self):
@@ -68,7 +67,7 @@ class OilAndRopeBot(commands.Bot):
         print('\nLoading commands ', end='')
 
         # List of categories
-        cogs = [MiscellaneousCog, RoleplayCog]
+        cogs = [MiscellaneousCog, RoleplayCog, UserCog]
         commands = []
 
         for cog in cogs:
@@ -101,19 +100,8 @@ class OilAndRopeBot(commands.Bot):
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, errors.MissingRequiredArgument):
-            await context.send('Incorrect format.')
+            await context.send(_('Incorrect format') + '.')
             await context.send_help(context.command)
-
-    def extra_listeners(self, *listeners):
-        """
-        Adds coroutine functions to the current listeners.
-
-        listenes:
-            Coroutines to listen.
-        """
-
-        for fn in listeners:
-            threading.Thread(target=asyncio.get_event_loop().run_until_complete, args=(fn, ), daemon=True).run()
 
     def run(self, *args, **kwargs):
         super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
@@ -130,7 +118,7 @@ class OilAndRopeBot(commands.Bot):
 
         user = self.get_user(user_id)
         token = fake.password(length=10, special_chars=False, digits=True, upper_case=True, lower_case=True)
-        await user.send('Hello traveller! To confirm your account please type `{token}`'.format(token=token))
+        await user.send(_('Hello traveller! To confirm your account please type `{token}`').format(token=token))
 
         def check(m):
             """
@@ -144,7 +132,7 @@ class OilAndRopeBot(commands.Bot):
         try:
             await self.wait_for('message', check=check, timeout=60.0)
         except asyncio.TimeoutError:
-            await user.send('Token has timed out!')
+            await user.send(_('Token has timed out' + '!'))
         else:
-            await user.send('Your user has been confirmed!')
+            await user.send(_('Your user has been confirmed') + '!')
             utils.get_or_create_discord_user(user)

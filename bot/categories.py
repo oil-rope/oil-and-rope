@@ -92,14 +92,14 @@ class RoleplayCog(Cog, name='Roleplay'):
 
         roll = roll.strip().replace(' ', '')
         if not self.roll_pattern.match(roll):
-            await ctx.send('The roll must follow the correct pattern.')
+            await ctx.send(_('The roll must follow the correct pattern.'))
             await ctx.send_help(self.roll)
             return
-        result, message = self._process_roll(roll)
-        message = '{user} rolled **{roll}** *({message})*.'.format(
-            user=ctx.author.name,
+        result, roll_message = self._process_roll(roll)
+        message = _('{user} rolled').format(user=ctx.author.name)
+        message += ' **{roll}** *({message})*.'.format(
             roll=result,
-            message=message
+            message=roll_message
         )
         await ctx.send(message)
 
@@ -122,5 +122,30 @@ class MiscellaneousCog(Cog, name='Miscellaneous'):
             msg = 'Shutting down {}...'.format(ctx.bot.user.name)
             print(msg)
             LOGGER.info(msg)
-            await ctx.send('Shutting down...')
+            await ctx.send(_('Shutting down') + '...')
             await ctx.bot.logout()
+
+
+class UserCog(Cog, name='User'):
+    """
+    Commands related to user interface and managing.
+    """
+
+    qualified_name = _('User')
+
+    @command()
+    async def invite(self, ctx):
+        """
+        Creates an invitation to join the full Oil & Rope experience!
+        """
+
+        from .models import DiscordUser
+
+        try:
+            author = ctx.author
+            DiscordUser.objects.get(id=author.id)
+        except DiscordUser.DoesNotExist:
+            bot = ctx.bot
+            await bot.confirm_user(author.id)
+        else:
+            await author.send(_('You are part of the full experience already' + '!'))
