@@ -3,9 +3,11 @@
 import argparse
 import subprocess
 import sys
+from io import StringIO
 
 import django
 import pytest
+from django.core.management import call_command
 
 parser = argparse.ArgumentParser(description='Run Tests and Linting.')
 
@@ -48,7 +50,7 @@ def isort_main(args):
 def django_check(level='WARNING'):
     django.setup()
     print('Checking Django')
-    ret = subprocess.call('{} manage.py check --fail-level={}'.format(sys.executable, level))
+    ret = subprocess.call('python manage.py check --fail-level={}'.format(level))
 
     if ret:
         print('Django check failed.')
