@@ -7,7 +7,6 @@ import faker
 import pytest
 from channels.testing import WebsocketCommunicator
 from django.shortcuts import reverse
-from django.utils.translation import ugettext_lazy as _
 
 from bot.consumers import BotConsumer
 
@@ -24,23 +23,6 @@ async def test_websocket_connect(url):
     communicator = WebsocketCommunicator(BotConsumer, url)
     connected, subprotocol = await communicator.connect()
     assert connected, 'WebSocket is not connected.'
-
-    # Disconnect WebSocket to avoid pending tasks
-    await communicator.disconnect()
-
-
-@pytest.mark.asyncio
-async def test_websocket_sends_error(url):
-    communicator = WebsocketCommunicator(BotConsumer, url)
-    data = {
-        'dump': 'dump'
-    }
-    error_response = {
-        'error': _('No type given') + '.'
-    }
-    await communicator.send_json_to(data)
-    response = await communicator.receive_json_from()
-    assert response == error_response, 'Incorrect response.'
 
     # Disconnect WebSocket to avoid pending tasks
     await communicator.disconnect()
