@@ -1,6 +1,7 @@
 let debug = document.currentScript.getAttribute('debug');
 let ws_prefix = debug === 'True' ? 'ws://' : 'wss://'
 let url = ws_prefix + window.location.host + document.currentScript.getAttribute('consumer-url');
+let invitationURL = document.currentScript.getAttribute('invitation-url');
 
 let socket = new WebSocket(url);
 let btn_discord = $('#btn_discord_invite');
@@ -38,6 +39,7 @@ socket.onmessage = function (e) {
         btn_discord.val(gettext('Found') + '! ✓');
     } else if (data.exists === false) {
         btn_discord.val(gettext('User not found') + '! ✗');
+        window.open(invitationURL, '_blank');
     }
 };
 

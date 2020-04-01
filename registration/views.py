@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -8,8 +9,6 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, RedirectView
-
-from bot.models import DiscordUser
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
@@ -51,6 +50,11 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     template_name = 'registration/register.html'
     succes_message = None
     success_url = reverse_lazy('registration:login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['BOT_INVITATION'] = settings.BOT_INVITATION
+        return context
 
     def get_success_message(self) -> str:
         if self.succes_message:
