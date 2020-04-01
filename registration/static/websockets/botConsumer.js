@@ -7,14 +7,25 @@ var socket = new WebSocket(url);
 $('#btn_discord_invite').click(function (e) {
     var input = $('#id_discord_id').val();
     data = JSON.stringify({
-        'discord_id': parseInt(input)
+        type: 'check_user',
+        discord_id: input
     });
 
     socket.send(data);
 });
 
 socket.onmessage = function (e) {
-    console.log(e.data);
+    data = JSON.parse(e.data);
+
+    if (data.error) {
+        console.error(data.error);
+    }
+
+    if (data.exists) {
+        console.log('User exists!');
+    } else {
+        console.log('User does not exist.');
+    }
 };
 
 socket.onclose = function (e) {
