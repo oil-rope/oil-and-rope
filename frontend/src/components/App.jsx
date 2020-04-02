@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import BootstrapButton from './BootstrapButton';
+// import Calendar from './Calendar';
 
 class App extends Component {
     render() {
@@ -9,7 +9,4 @@ class App extends Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('reactApp'));
-
-document.querySelectorAll('.bts-button').forEach(element => {
-    ReactDOM.render(<BootstrapButton color="extra" />, element);
-});
+// ReactDOM.render(<Calendar /> , document.getElementById('oarCalendar'));
