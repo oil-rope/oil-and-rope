@@ -31,6 +31,10 @@ after_success:
 jobs:
   include:
     - language: node_js
+      python:
+        - "3.6"
+        - "3.7"
+        - "3.8"
       node_js: 12
       script:
-      - node -e "console.log('Hi from NodeJS!')"
+      - npm test
