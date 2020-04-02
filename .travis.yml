@@ -31,6 +31,11 @@ after_success:
 jobs:
   include:
     - language: node_js
+    dist: "trusty"
+    addons:
+      apt:
+        packages:
+          - "python3"
       node_js: 12
       script:
       - npm test
