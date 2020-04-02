@@ -11,6 +11,11 @@
     "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
     "test": "jest"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|scss|sass|less)$": "identity-obj-proxy"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oil-rope/oil-and-rope.git"
@@ -32,6 +37,7 @@
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "css-loader": "^3.4.2",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^25.2.4",
     "node-sass": "^4.13.1",
     "react-test-renderer": "^16.13.1",

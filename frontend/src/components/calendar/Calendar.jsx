@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-import '../style/main.scss';
+import './main.scss';
 
 export class Calendar extends Component {
     render() {
         return (
-            <FullCalendar defaultView="dayGridMonth" plugins={[ dayGridPlugin ]} />
+            <FullCalendar data-testid="calendar" defaultView="dayGridMonth" plugins={[ dayGridPlugin ]} />
         )
     }
 }
