@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-// import Calendar from './Calendar';
+import Calendar from './Calendar';
 
 class App extends Component {
     render() {
@@ -9,4 +9,4 @@ class App extends Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('reactApp'));
-// ReactDOM.render(<Calendar /> , document.getElementById('oarCalendar'));
+ReactDOM.render(<Calendar /> , document.getElementById('oarCalendar'));
