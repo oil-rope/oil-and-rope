@@ -6,3 +6,55 @@
 [![codecov](https://codecov.io/gh/oil-rope/oil-and-rope/branch/develop/graph/badge.svg)](https://codecov.io/gh/oil-rope/oil-and-rope)
 
 Oil &amp; Rope is a Python project for managing Roleplay Games.
+
+
+## Setup for linux
+
+1. Clone the github repository
+
+    ```$git clone https://github.com/oil-rope/oil-and-rope.git```
+
+2. Install necessary tools
+    - Anaconda (recommended)
+    - Docker (needed)
+    - npm (needed for developers)
+    - nodejs (neeced for developers)
+
+2. Install necessary tools
+    - Anaconda (recommended)
+
+3. Install the requirements
+    - For developers: 
+
+        ```$pip install -r requirements/requirements_develop.txt```
+    - For testers:
+
+        ```$pip install -r requirements/requirements_base.txt```
+
+4. Create environment local settings and ask the developers for its content.
+
+    ```$touch oilandrope/local_settings.py```
+
+5. Create a docker container for redis
+
+    ```$docker run --rm -p 6739:6739 --name redis redis``` 
+
+6. For developers, It's needed to install npm
+
+    ```$npm install```
+
+7. Create and apply migrations
+
+    ```$python manage.py makemigrations```
+
+    ```$python manage.py migrate```
+
+7. Create and apply migrations
+
+    ```$python manage.py makemigrations```
+
+    ```$python manage.py migrate```
+
+7. Run server
+
+    ```$python manage.py runserver```
