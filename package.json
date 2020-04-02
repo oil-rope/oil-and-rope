@@ -8,7 +8,14 @@
   },
   "scripts": {
     "dev": "webpack --mode development ./frontend/src/index.js --output ./frontend/static/frontend/main.js --watch",
-    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js"
+    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "test": "jest",
+    "twatch": "jest --watch"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|scss|sass|less)$": "identity-obj-proxy"
+    }
   },
   "repository": {
     "type": "git",
@@ -24,13 +31,27 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
-    "@babel/preset-react": "^7.9.1",
+    "@babel/preset-react": "^7.9.4",
+    "@testing-library/jest-dom": "^5.3.0",
+    "@testing-library/react": "^10.0.2",
+    "babel-jest": "^25.2.4",
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "webpack": "^4.42.0",
+    "css-loader": "^3.4.2",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^25.2.4",
+    "node-sass": "^4.13.1",
+    "react-test-renderer": "^16.13.1",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@fullcalendar/core": "^4.4.0",
+    "@fullcalendar/daygrid": "^4.4.0",
+    "@fullcalendar/interaction": "^4.4.0",
+    "@fullcalendar/react": "^4.4.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
