@@ -34,6 +34,8 @@ jobs:
       before_install:
       - sudo apt-get update
       - sudo apt-get install python3 python3-pip
+      - pip install -U pip
+      - pip3 install -U pip
       node_js: 12
       script:
       - npm test
