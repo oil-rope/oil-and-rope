@@ -1,29 +1,23 @@
-language: python
-
-services:
-  - postgresql
-
-
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
-
-env:
-  - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
-
-install:
-  - pip install -r requirements/requirements-develop.txt
-  # Extra
-  - pip install codecov pytest-cov
-
-before_script:
-  - psql -c 'create database oilandrope;' -U postgres
-  # Fixing isort on migrations
-  - isort -sk ./**/migrations/*.py
-
-script:
-  - python runtests.py --coverage
-
-after_success:
-  - codecov -e DJANGO_SETTINGS_MODULE
+matrix:
+  include:
+    - language: python
+    python:
+      - "3.6"
+      - "3.7"
+      - "3.8"
+    services:
+      - postgresql
+    env:
+      - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
+    install:
+      - pip install -r requirements/requirements-develop.txt
+      # Extra
+      - pip install codecov pytest-cov
+    before_script:
+      - psql -c 'create database oilandrope;' -U postgres
+      # Fixing isort on migrations
+      - isort -sk ./**/migrations/*.py
+    script:
+      - python runtests.py --coverage
+    after_success:
+      - codecov -e DJANGO_SETTINGS_MODULE

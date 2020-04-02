@@ -7,7 +7,9 @@ import './main.scss';
 export class Calendar extends Component {
     render() {
         return (
-            <FullCalendar data-testid="calendar" defaultView="dayGridMonth" plugins={[ dayGridPlugin ]} />
+            <div data-testid="calendar">
+                <FullCalendar defaultView="dayGridMonth" plugins={[ dayGridPlugin ]} />
+            </div>
         )
     }
 }
