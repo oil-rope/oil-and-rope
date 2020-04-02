@@ -1,5 +1,4 @@
 language: python
-dist: "trusty"
 
 services:
   - postgresql
@@ -34,7 +33,7 @@ jobs:
     - language: node_js
       before_install:
       - sudo apt-get update
-      - sudo apt-get install python3
+      - sudo apt-get install python3 python3-pip
       node_js: 12
       script:
       - npm test
