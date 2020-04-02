@@ -37,6 +37,7 @@ jobs:
       - pip3 install -U pip setuptools --user
       install:
         - pip3 install -r requirements/requirements-develop.txt
+        - npm install
       node_js: 12
       script:
       - npm test
