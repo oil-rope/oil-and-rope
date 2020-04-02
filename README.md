@@ -20,9 +20,6 @@ Oil &amp; Rope is a Python project for managing Roleplay Games.
     - npm (needed for developers)
     - nodejs (needed for developers)
 
-2. Install necessary tools
-    - Anaconda (recommended)
-
 3. Install the requirements
     - For developers: 
 
