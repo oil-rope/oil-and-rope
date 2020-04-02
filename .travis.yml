@@ -26,3 +26,17 @@ script:
 
 after_success:
   - codecov -e DJANGO_SETTINGS_MODULE
+
+jobs:
+  include:
+    - language: node_js
+      before_install:
+      - sudo apt-get update
+      - sudo apt-get install python3 python3-pip
+      - pip3 install -U pip setuptools --user
+      install:
+        - pip3 install -r requirements/requirements-develop.txt
+        - npm install
+      node_js: 12
+      script:
+      - npm test
