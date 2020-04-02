@@ -31,10 +31,9 @@ after_success:
 jobs:
   include:
     - language: node_js
-      python:
-        - "3.6"
-        - "3.7"
-        - "3.8"
+      before_install:
+        - apt-get update
+        - apt-get install python3
       node_js: 12
       script:
       - npm test
