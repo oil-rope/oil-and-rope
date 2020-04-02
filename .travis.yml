@@ -13,9 +13,9 @@ env:
   - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
 
 install:
-  - pip3 install -r requirements/requirements-develop.txt
+  - pip install -r requirements/requirements-develop.txt
   # Extra
-  - pip3 install codecov pytest-cov
+  - pip install codecov pytest-cov
 
 before_script:
   - psql -c 'create database oilandrope;' -U postgres
@@ -34,8 +34,9 @@ jobs:
       before_install:
       - sudo apt-get update
       - sudo apt-get install python3 python3-pip
-      - pip install -U pip --user
-      - pip3 install -U pip --user
+      - pip3 install -U pip setuptools --user
+      install:
+        - pip3 install -r requirements/requirements-develop.txt
       node_js: 12
       script:
       - npm test
