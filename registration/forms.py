@@ -8,6 +8,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -41,8 +42,9 @@ class LoginForm(AuthenticationForm):
                 Div(
                     Div(
                         HTML(
-                            '<a class="col-lg-8 btn-link" href="#no-url">{text}</a>'.format(
-                                text=_('Forgot password?')
+                            '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
+                                url=reverse('registration:resend_email'),
+                                text=_('Send confirmation email')
                             )
                         ),
                         Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
@@ -198,6 +200,9 @@ class ResendEmailForm(forms.Form):
     Checks for given email in database.
     """
 
+    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes = 'btn btn-extra btn-lg'
+
     email = forms.EmailField(
         label=_('Email address'),
         help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
@@ -207,6 +212,17 @@ class ResendEmailForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
+        self.helper.form_class = 'container-fluid'
+        self.helper.layout = Layout(
+            Row(
+                Field('email', css_class=self.custom_classes),
+                css_class='justify-content-sm-center'
+            ),
+            ButtonHolder(
+                Submit('submit', _('Resend email'), css_class=self.submit_classes + ' col-12 col-sm-6'),
+                css_class='d-sm-flex justify-content-sm-center'
+            )
+        )
 
     def clean_email(self):
         data = self.cleaned_data.get('email')
