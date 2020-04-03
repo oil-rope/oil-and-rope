@@ -108,3 +108,32 @@ class TestSingUpForm(TestCase):
             form = forms.SignUpForm(self.request, data=self.data_ok)
             form.save()
             self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')
+
+
+class TestResendEmailForm(TestCase):
+    """
+    Checks if user's email exists and email is sent.
+    """
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.data_ok = {
+            'email': self.user.email
+        }
+
+    def test_form_ok(self):
+        form = forms.ResendEmailForm(data=self.data_ok)
+        self.assertTrue(form.is_valid(), 'Form is taken as invalid but it shouldn\'t.')
+
+    def test_form_required_fields_are_not_supplied(self):
+        self.data_ko = self.data_ok.copy()
+        del self.data_ko['email']
+        form = forms.ResendEmailForm(data=self.data_ko)
+        self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
+
+    def test_email_does_not_exist(self):
+        self.data_ko = self.data_ok.copy()
+        self.data_ko['email'] = self.faker.email()
+        form = forms.ResendEmailForm(data=self.data_ko)
+        self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')

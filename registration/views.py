@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import CreateView, RedirectView
+from django.views.generic import CreateView, RedirectView, FormView
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
@@ -127,3 +127,14 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
             self.user.save()
             messages.success(request, _('Your email has been confirmed') + '!')
         return super(ActivateAccountView, self).get(request, *args, **kwargs)
+
+
+class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
+    """
+    In case user needs the email to be resend we create this view.
+    """
+
+    template_name = 'registration/resend_email.html'
+    form_class = forms.ResendEmailForm
+    success_message = None
+    success_url = reverse_lazy('registration:login')

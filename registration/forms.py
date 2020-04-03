@@ -22,7 +22,7 @@ class LoginForm(AuthenticationForm):
     custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
 
     def __init__(self, request=None, *args, **kwargs):
-        super(LoginForm, self).__init__(request=request, *args, **kwargs)
+        super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.id = 'loginForm'
         self.helper.form_class = 'container-fluid'
@@ -78,7 +78,7 @@ class SignUpForm(UserCreationForm):
     )
 
     def __init__(self, request, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
         self.helper = FormHelper(self)
@@ -174,7 +174,7 @@ class SignUpForm(UserCreationForm):
             The user created.
         """
 
-        instance = super(SignUpForm, self).save(commit=False)
+        instance = super().save(commit=False)
         # Set active to False until user acitvates email
         instance.is_active = False
         if commit:
@@ -191,3 +191,26 @@ class SignUpForm(UserCreationForm):
         help_texts = {
             'email': _('We will send you an email to confirm your account') + '.'
         }
+
+
+class ResendEmailForm(forms.Form):
+    """
+    Checks for given email in database.
+    """
+
+    email = forms.EmailField(
+        label=_('Email address'),
+        help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+
+    def clean_email(self):
+        data = self.cleaned_data.get('email')
+        if not get_user_model().objects.filter(email=data).exists():
+            msg = _('This email doesn\'t belong to a user') + '.'
+            self.add_error('email', msg)
+        return data
