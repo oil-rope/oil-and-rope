@@ -53,7 +53,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         if self.succes_message:
             return self.succes_message
         succes_message = '{} {}.'.format(
-            _('User created!'),
+            _('User created') + '!',
             _('Please confirm your email')
         )
         return succes_message
@@ -125,5 +125,5 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
         if self.validate_token():
             self.user.is_active = True
             self.user.save()
-            messages.success(request, _('Your email has been confirmed!'))
+            messages.success(request, _('Your email has been confirmed') + '!')
         return super(ActivateAccountView, self).get(request, *args, **kwargs)
