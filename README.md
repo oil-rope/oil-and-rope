@@ -42,7 +42,7 @@ Oil &amp; Rope is a Python project for managing Roleplay Games.
 
 7. Apply migrations
 
-    `$ python manage.py migrate`
+    `$ python manage.py migrate --settings oilandrope.dev_settings`
 
 8. Run server pointing to the develop settings
 
