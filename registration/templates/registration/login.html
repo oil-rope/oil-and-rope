@@ -6,13 +6,13 @@
 {% block title %}{% trans "Login" %}{% endblock title %}
 
 {% block body_content %}
-<main class="container p-5">
+<main class="container p-sm-5 px-lg-2">
   <div class="row align-items-lg-center shadow-lg">
 
-    <div class="col-lg-8 bg-extra p-4 order-lg-last">
+    <div class="col-lg-7 col-xl-8 bg-extra p-4 order-lg-last">
       <h2 class="display-4 text-center text-white">{% trans "Welcome to Oil &amp; Rope!" %}</h2>
       <hr>
-      <p>
+      <p class="d-none d-md-block">
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda deleniti quidem mollitia tenetur sunt sint ab commodi nihil sed? Molestiae porro reiciendis enim, dicta consequuntur asperiores accusantium eligendi neque quod?
         Ab laudantium eius doloremque saepe culpa et similique ipsa obcaecati, reiciendis eveniet veritatis dolore sed sint maxime inventore eaque corrupti, perferendis ea placeat, provident cum minus id omnis vitae. Hic.
         Pariatur repellendus maxime quaerat, omnis minima delectus adipisci accusamus voluptatibus ex quasi, numquam dolores ratione natus? Explicabo, voluptatum ullam ea neque quidem assumenda ipsum debitis deleniti ut ipsam odio vero!
@@ -20,7 +20,7 @@
       </p>
     </div>
 
-    <div class="col-lg-4 p-5">
+    <div class="col-lg-5 col-xl-4 p-3">
       {% crispy form %}
     </div>
 
