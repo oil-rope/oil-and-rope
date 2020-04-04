@@ -3,7 +3,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, Button, Column, Field, Layout, Row, Submit
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
@@ -97,28 +97,42 @@ class SignUpForm(UserCreationForm):
             Row(
                 Column(
                     Field('username', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('email', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
+                css_class='justify-content-xl-between'
+            ),
+            Row(
                 Column(
                     Field('password1', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('password2', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
-                )
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                css_class='justify-content-xl-between'
             ),
             Row(
-                Field('discord_id', css_class=self.custom_classes),
-                Button('search', _('Send invitation!'), css_class=self.button_classes + ' align-self-center'),
-                css_class='justify-content-between'
+                Column(
+                    Field('discord_id', css_class=self.custom_classes),
+                    css_class='col-12 col-md-8 col-lg-6 col-xl-5'
+                ),
+                Column(
+                    Button('search', _('Send invitation') + '!', css_class=self.button_classes + ' w-100'),
+                    css_class='col-12 col-md-4 col-xl-5 align-self-center'
+                ),
+                css_class='justify-content-lg-between'
             ),
-            ButtonHolder(
-                Submit('submit', _('Register'), css_class=self.submit_classes)
+            Row(
+                Column(
+                    Submit('submit', _('Register'), css_class=self.submit_classes + ' w-100'),
+                    css_class='col-12 col-xl-6'
+                ),
+                css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
 
