@@ -1,12 +1,16 @@
 #! /usr/bin/env python3
 
 import argparse
+import os
 import subprocess
 import sys
 
 import pytest
 
 parser = argparse.ArgumentParser(description='Run Tests and Linting.')
+
+
+DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
 
 PYTEST_ARGS = {
     'default': ['tests'],
@@ -69,6 +73,9 @@ if __name__ == '__main__':
         pytest_args = PYTEST_ARGS['default']
     if args.coverage:
         pytest_args.extend(COVERAGE_ARGS)
+
+    if DJANGO_SETTINGS_MODULE:
+        pytest_args.extend(['--ds=%s' % DJANGO_SETTINGS_MODULE])
 
     if run_pytest:
         exit_on_failure(pytest.main(pytest_args))
