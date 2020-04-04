@@ -136,6 +136,17 @@ class SignUpForm(UserCreationForm):
             )
         )
 
+    def clean_email(self):
+        """
+        Checks if email already exists!
+        """
+
+        data = self.cleaned_data.get('email')
+        if get_user_model().objects.filter(email=data).exists():
+            msg = _('This email is already in use') + '.'
+            self.add_error('email', msg)
+        return data
+
     def setup(self, required_fields=None):
         """
         Modifies some attributtes before rendering the form.
