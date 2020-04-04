@@ -27,31 +27,40 @@ class LoginForm(AuthenticationForm):
         self.helper.id = 'loginForm'
         self.helper.form_class = 'container-fluid'
         self.helper.layout = Layout(
-            Div(
-                Field(
-                    'username',
-                    placeholder=_('Username'),
-                    css_class=self.custom_classes,
-                ),
-                Field(
-                    'password',
-                    placeholder=_('Password'),
-                    css_class=self.custom_classes,
-                ),
-                Div(
-                    Div(
-                        HTML(
-                            '<a class="col-lg-8 btn-link" href="#no-url">{text}</a>'.format(
-                                text=_('Forgot password?')
-                            )
-                        ),
-                        Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
-                        css_class='row align-items-lg-center justify-content-lg-between'
+            Row(
+                Column(
+                    Field(
+                        'username',
+                        placeholder=_('Username'),
+                        css_class=self.custom_classes,
                     ),
-                    css_class='container-fluid'
+                    css_class='col-12'
                 ),
-                css_class='row flex-column'
-            )
+            ),
+            Row(
+                Column(
+                    Field(
+                        'password',
+                        placeholder=_('Password'),
+                        css_class=self.custom_classes,
+                    ),
+                    css_class='col-12'
+                ),
+            ),
+            Row(
+                Column(
+                    Submit('login', _('Login'), css_class='btn-extra w-100'),
+                    css_class='col-12 col-lg-6'
+                ),
+                Column(
+                    HTML(
+                        '<a class="btn btn-link w-100" href="#no-url">{text}</a>'.format(
+                            text=_('Forgot password?')
+                        )
+                    ),
+                    css_class='col-12 col-lg-6'
+                ),
+            ),
         )
 
         self._clean_labels()
