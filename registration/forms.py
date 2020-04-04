@@ -3,7 +3,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, Button, Column, Field, Layout, Row, Submit
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
@@ -28,39 +28,47 @@ class LoginForm(AuthenticationForm):
         self.helper.id = 'loginForm'
         self.helper.form_class = 'container-fluid'
         self.helper.layout = Layout(
-            Div(
-                Field(
-                    'username',
-                    placeholder=_('Username'),
-                    css_class=self.custom_classes,
-                ),
-                Field(
-                    'password',
-                    placeholder=_('Password'),
-                    css_class=self.custom_classes,
-                ),
-                Div(
-                    Div(
-                        HTML(
-                            '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
-                                url=reverse('registration:resend_email'),
-                                text=_('Send confirmation email')
-                            )
-                        ),
-                        Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
-                        css_class='row align-items-lg-center justify-content-lg-between'
+            Row(
+                Column(
+                    Field(
+                        'username',
+                        placeholder=_('Username'),
+                        css_class=self.custom_classes,
                     ),
-                    css_class='container-fluid'
+                    css_class='col-12'
                 ),
-                css_class='row flex-column'
-            )
+            ),
+            Row(
+                Column(
+                    Field(
+                        'password',
+                        placeholder=_('Password'),
+                        css_class=self.custom_classes,
+                    ),
+                    css_class='col-12'
+                ),
+            ),
+            Row(
+                Column(
+                    Submit('login', _('Login'), css_class='btn-extra w-100'),
+                    css_class='col-12 col-lg-6'
+                ),
+                Column(
+                    HTML(
+                        '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
+                            url=reverse('registration:resend_email'),
+                            text=_('Send confirmation email')
+                        ),
+                    css_class='col-12 col-lg-6'
+                ),
+            ),
         )
 
         self._clean_labels()
 
     def _clean_labels(self):
         for field in self.fields:
-            self.fields[field].label = ''
+            self.fields[field].label=''
 
 
 class SignUpForm(UserCreationForm):
@@ -68,11 +76,11 @@ class SignUpForm(UserCreationForm):
     User registration form.
     """
 
-    button_classes = 'btn btn-info'
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-extra btn-lg'
+    button_classes='btn btn-info'
+    custom_classes='bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes='btn btn-extra btn-lg'
 
-    discord_id = forms.CharField(
+    discord_id=forms.CharField(
         label=_('Discord Identifier'),
         max_length=254,
         required=False,
@@ -81,39 +89,64 @@ class SignUpForm(UserCreationForm):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.request = request
+        self.request=request
         self.setup()
-        self.helper = FormHelper(self)
-        self.helper.id = 'registerForm'
-        self.helper.form_class = 'container-fluid'
-        self.helper.layout = Layout(
+        self.helper=FormHelper(self)
+        self.helper.id='registerForm'
+        self.helper.form_class='container-fluid'
+        self.helper.layout=Layout(
             Row(
                 Column(
                     Field('username', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('email', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
+                css_class='justify-content-xl-between'
+            ),
+            Row(
                 Column(
                     Field('password1', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('password2', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
-                )
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                css_class='justify-content-xl-between'
             ),
             Row(
-                Field('discord_id', css_class=self.custom_classes),
-                Button('search', _('Send invitation!'), css_class=self.button_classes + ' align-self-center'),
-                css_class='justify-content-between'
+                Column(
+                    Field('discord_id', css_class=self.custom_classes),
+                    css_class='col-12 col-md-8 col-lg-6 col-xl-5'
+                ),
+                Column(
+                    Button('search', _('Send invitation') + '!', css_class=self.button_classes + ' w-100'),
+                    css_class='col-12 col-md-4 col-xl-5 align-self-center'
+                ),
+                css_class='justify-content-lg-between'
             ),
-            ButtonHolder(
-                Submit('submit', _('Register'), css_class=self.submit_classes)
+            Row(
+                Column(
+                    Submit('submit', _('Register'), css_class=self.submit_classes + ' w-100'),
+                    css_class='col-12 col-xl-6'
+                ),
+                css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
+
+    def clean_email(self):
+        """
+        Checks if email already exists!
+        """
+
+        data=self.cleaned_data.get('email')
+        if get_user_model().objects.filter(email=data).exists():
+            msg=_('This email is already in use') + '.'
+            self.add_error('email', msg)
+        return data
 
     def setup(self, required_fields=None):
         """
@@ -126,9 +159,9 @@ class SignUpForm(UserCreationForm):
         """
 
         if not required_fields:
-            required_fields = ('email', )
+            required_fields=('email', )
         for field in required_fields:
-            self.fields[field].required = True
+            self.fields[field].required=True
 
     def _generate_token(self, user) -> str:
         """
@@ -145,8 +178,8 @@ class SignUpForm(UserCreationForm):
             The token generated.
         """
 
-        token = PasswordResetTokenGenerator()
-        token = token.make_token(user)
+        token=PasswordResetTokenGenerator()
+        token=token.make_token(user)
         return token
 
     def _send_email_confirmation(self, user):
@@ -154,7 +187,7 @@ class SignUpForm(UserCreationForm):
         Sends a confirmation email to the user.
         """
 
-        msg_html = render_to_string('email_templates/confirm_email.html', {
+        msg_html=render_to_string('email_templates/confirm_email.html', {
             # We declare localhost as default for tests purposes
             'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
             'token': self._generate_token(user),
@@ -176,9 +209,9 @@ class SignUpForm(UserCreationForm):
             The user created.
         """
 
-        instance = super().save(commit=False)
+        instance=super().save(commit=False)
         # Set active to False until user acitvates email
-        instance.is_active = False
+        instance.is_active=False
         if commit:
             instance.save()
             # User shouldn't wait for the email to be sent
@@ -187,10 +220,10 @@ class SignUpForm(UserCreationForm):
         return instance
 
     class Meta:
-        model = get_user_model()
-        fields = ('username', 'email')
-        field_classes = {'username': UsernameField}
-        help_texts = {
+        model=get_user_model()
+        fields=('username', 'email')
+        field_classes={'username': UsernameField}
+        help_texts={
             'email': _('We will send you an email to confirm your account') + '.'
         }
 
@@ -200,10 +233,10 @@ class ResendEmailForm(forms.Form):
     Checks for given email in database.
     """
 
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-extra btn-lg'
+    custom_classes='bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes='btn btn-extra btn-lg'
 
-    email = forms.EmailField(
+    email=forms.EmailField(
         label=_('Email address'),
         help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
         required=True
@@ -211,9 +244,9 @@ class ResendEmailForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.form_class = 'container-fluid'
-        self.helper.layout = Layout(
+        self.helper=FormHelper(self)
+        self.helper.form_class='container-fluid'
+        self.helper.layout=Layout(
             Row(
                 Field('email', css_class=self.custom_classes),
                 css_class='justify-content-sm-center'
@@ -225,8 +258,8 @@ class ResendEmailForm(forms.Form):
         )
 
     def clean_email(self):
-        data = self.cleaned_data.get('email')
+        data=self.cleaned_data.get('email')
         if not get_user_model().objects.filter(email=data).exists():
-            msg = _('This email doesn\'t belong to a user') + '.'
+            msg=_('This email doesn\'t belong to a user') + '.'
             self.add_error('email', msg)
         return data

@@ -76,6 +76,14 @@ class TestSingUpForm(TestCase):
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
+    def test_form_token_email_ko(self):
+        # First we create a user
+        user = baker.make(get_user_model(), email=self.faker.email())
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = user.email
+        form = forms.SignUpForm(self.request, data=data_ko)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
     def test_required_fields_not_supplied_ko(self):
         data_without_email = self.data_ok.copy()
         del data_without_email['email']

@@ -138,6 +138,14 @@ class TestSignUpView(TestCase):
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'password2', 'The two password fields didn\'t match.')
 
+    def test_email_already_in_use(self):
+        # First we create a user
+        user = baker.make(get_user_model(), email=self.faker.email())
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = user.email
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'email', 'This email is already in use.')
+
     def test_required_fields_not_given(self):
         data_without_email = self.data_ok.copy()
         del data_without_email['email']
