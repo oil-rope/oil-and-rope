@@ -1,0 +1,12 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block title %}{% trans "Resend confirmation email" %}{% endblock title %}
+
+{% block body_content %}
+<div class="container p-5">
+  <h2 class="display-5 text-center">{% trans "Resend email" %}</h2>
+  <hr>
+  {% crispy form %}
+</div>
+{% endblock body_content %}
