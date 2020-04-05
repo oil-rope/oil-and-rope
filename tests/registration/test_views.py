@@ -73,7 +73,7 @@ class TestLoginView(TestCase):
         """
 
         data = {
-            'username': self.faker.word(),
+            'username': self.faker.user_name(),
             'password': self.faker.word()
         }
         response = self.client.post(self.url, data=data)
@@ -94,11 +94,10 @@ class TestSignUpView(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        profile = self.faker.simple_profile()
         email = self.faker.safe_email()
         password = ''.join(self.faker.words(3))
         self.data_ok = {
-            'username': profile['username'],
+            'username': self.faker.user_name(),
             'email': email,
             'password1': password,
             'password2': password

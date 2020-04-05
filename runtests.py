@@ -55,7 +55,7 @@ def django_check(level='WARNING'):
     django.setup()
     out = StringIO()
     print('Checking Django')
-    call_command('check', '--fail-leve=%s' % level, stdout=out)
+    call_command('check', '--fail-level=%s' % level, stdout=out)
     output = out.getvalue()
 
     if 'System check identified no issues' not in output:

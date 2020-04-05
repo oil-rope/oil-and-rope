@@ -45,11 +45,10 @@ class TestSingUpForm(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        profile = self.faker.simple_profile()
         email = self.faker.safe_email()
         password = ''.join(self.faker.words(3))
         self.data_ok = {
-            'username': profile['username'],
+            'username': self.faker.user_name(),
             'email': email,
             'password1': password,
             'password2': password
