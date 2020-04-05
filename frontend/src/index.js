@@ -2,4 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Calendar from './components/calendar/Calendar';
 
-ReactDOM.render(<Calendar /> , document.getElementById('oarCalendar'));
+let calendar = document.getElementById('oarCalendar');
+if (calendar != null && calendar != undefined) {
+    ReactDOM.render(<Calendar /> , document.getElementById('oarCalendar'));
+}
+
