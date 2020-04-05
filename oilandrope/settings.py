@@ -127,7 +127,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
-
+ASGI_APPLICATION = 'oilandrope.routing.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
