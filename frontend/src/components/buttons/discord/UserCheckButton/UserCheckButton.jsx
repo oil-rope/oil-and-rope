@@ -10,23 +10,23 @@ export class UserCheckButton extends Component {
 			text: `${gettext("Look for user")}!`,
 			showModal: false,
 		};
-		this.connector = new WebSocket(props.url);
 	}
 
 	componentDidMount() {
+		this.connector = new WebSocket(this.props.url);
 		this.connector.onmessage = this.WSOnMessage;
 	}
 
 	WSOnMessage = (message) => {
-		let data = JSON.parse(message.data);
+		let { exists, error } = JSON.parse(message.data);
 
-		if (data.error) {
-			console.error(data.error);
+		if (error) {
+			console.error(error);
 		}
 
-		if (data.exists === true) {
+		if (exists === true) {
 			this.userExists();
-		} else if (data.exists === false) {
+		} else if (exists === false) {
 			this.userDoesNotExist();
 		}
 	};
@@ -63,29 +63,31 @@ export class UserCheckButton extends Component {
 
 	render() {
 		return (
-			<Fragment data-testid="userCheckButton">
-				<Button onClick={this.handlerClick} className="w-100" variant="info">
-					{this.state.text}
-				</Button>
-				<Modal show={this.state.showModal} onHide={this.handleClose}>
-					<Modal.Header closeButton>
-						<Modal.Title>{`${gettext("User not found")}! ✗`}</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						{`${gettext("Seems like this user doesn't exists")}.`}
-						<br />
-						{`${gettext("Have you invited the bot to your server?")}`}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button variant="extra" onClick={this.handleInvite}>
-							{gettext("Invite")}
-						</Button>
-						<Button variant="primary" onClick={this.handleClose}>
-							{gettext("Close")}
-						</Button>
-					</Modal.Footer>
-				</Modal>
-			</Fragment>
+			<div data-testid="userCheckButton">
+				<Fragment>
+					<Button onClick={this.handlerClick} className="w-100" variant="info">
+						{this.state.text}
+					</Button>
+					<Modal show={this.state.showModal} onHide={this.handleClose}>
+						<Modal.Header closeButton>
+							<Modal.Title>{`${gettext("User not found")}! ✗`}</Modal.Title>
+						</Modal.Header>
+						<Modal.Body>
+							{`${gettext("Seems like this user doesn't exists")}.`}
+							<br />
+							{`${gettext("Have you invited the bot to your server?")}`}
+						</Modal.Body>
+						<Modal.Footer>
+							<Button variant="extra" onClick={this.handleInvite}>
+								{gettext("Invite")}
+							</Button>
+							<Button variant="primary" onClick={this.handleClose}>
+								{gettext("Close")}
+							</Button>
+						</Modal.Footer>
+					</Modal>
+				</Fragment>
+			</div>
 		);
 	}
 }
