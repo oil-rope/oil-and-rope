@@ -3,11 +3,12 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, Column, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Field, Layout, Row, Submit
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -24,7 +25,7 @@ class LoginForm(AuthenticationForm):
     custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
 
     def __init__(self, request=None, *args, **kwargs):
-        super(LoginForm, self).__init__(request=request, *args, **kwargs)
+        super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.id = 'loginForm'
         self.helper.form_class = 'container-fluid'
@@ -56,9 +57,10 @@ class LoginForm(AuthenticationForm):
                 ),
                 Column(
                     HTML(
-                        '<a class="btn btn-link w-100" href="#no-url">{text}</a>'.format(
-                            text=_('Forgot password?')
-                        )
+                        '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
+                            url=reverse('registration:resend_email'),
+                            text=_('Send confirmation email')
+                        ),
                     ),
                     css_class='col-12 col-lg-6'
                 ),
@@ -89,7 +91,7 @@ class SignUpForm(UserCreationForm):
     )
 
     def __init__(self, request, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
         self.helper = FormHelper(self)
@@ -236,7 +238,7 @@ class SignUpForm(UserCreationForm):
             The user created.
         """
 
-        instance = super(SignUpForm, self).save(commit=False)
+        instance = super().save(commit=False)
         # Set active to False until user acitvates email
         instance.is_active = False
         # Checks for DiscordUser
@@ -259,3 +261,40 @@ class SignUpForm(UserCreationForm):
         help_texts = {
             'email': _('We will send you an email to confirm your account') + '.'
         }
+
+
+class ResendEmailForm(forms.Form):
+    """
+    Checks for given email in database.
+    """
+
+    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes = 'btn btn-extra btn-lg'
+
+    email = forms.EmailField(
+        label=_('Email address'),
+        help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'container-fluid'
+        self.helper.layout = Layout(
+            Row(
+                Field('email', css_class=self.custom_classes),
+                css_class='justify-content-sm-center'
+            ),
+            ButtonHolder(
+                Submit('submit', _('Resend email'), css_class=self.submit_classes + ' col-12 col-sm-6'),
+                css_class='d-sm-flex justify-content-sm-center'
+            )
+        )
+
+    def clean_email(self):
+        data = self.cleaned_data.get('email')
+        if not get_user_model().objects.filter(email=data).exists():
+            msg = _('This email doesn\'t belong to a user') + '.'
+            self.add_error('email', msg)
+        return data
