@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     'sheet.apps.SheetConfig',
     # FrontEnd
     'frontend.apps.FrontendConfig',
+    # Django channels
+    'django.channels',
 ]
 
 MIDDLEWARE = [
