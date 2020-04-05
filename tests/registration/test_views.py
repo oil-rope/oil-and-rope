@@ -29,7 +29,7 @@ class TestLoginView(TestCase):
 
     def test_user_can_login_ok(self):
         # Change password so we can control input
-        password = ''.join(self.faker.words(4))
+        password = self.faker.password()
         self.user.set_password(password)
         self.user.save()
         data = {
@@ -44,7 +44,7 @@ class TestLoginView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
         # Change password so we can control input
-        password = ''.join(self.faker.words(4))
+        password = self.faker.password()
         self.user.set_password(password)
         # Set user as inactive
         self.user.is_active = False
@@ -95,7 +95,7 @@ class TestSignUpView(TestCase):
     def setUp(self):
         self.faker = Faker()
         email = self.faker.safe_email()
-        password = ''.join(self.faker.words(3))
+        password = self.faker.password()
         self.data_ok = {
             'username': self.faker.user_name(),
             'email': email,

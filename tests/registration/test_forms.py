@@ -16,7 +16,7 @@ class TestLoginForm(TestCase):
         self.faker = Faker()
         self.user = baker.make(get_user_model())
         # Reset password so we can control input
-        password = ''.join(self.faker.words(3))
+        password = self.faker.password()
         self.user.set_password(password)
         self.user.save()
         self.data_ok = {
@@ -27,9 +27,7 @@ class TestLoginForm(TestCase):
 
     def test_form_ok(self):
         form = forms.LoginForm(data=self.data_ok)
-        self.assertTrue(form.is_valid(), 'Form is invalid.\nErrors: {errors}'.format(
-            errors=', '.join([str(k) + ':' + str(v) for k, v in form.errors])
-        ))
+        self.assertTrue(form.is_valid(), 'Form is invalid.')
 
     def test_form_invalid_password_ko(self):
         data_ko = self.data_ok.copy()
@@ -46,7 +44,7 @@ class TestSingUpForm(TestCase):
     def setUp(self):
         self.faker = Faker()
         email = self.faker.safe_email()
-        password = ''.join(self.faker.words(3))
+        password = self.faker.password()
         self.data_ok = {
             'username': self.faker.user_name(),
             'email': email,
@@ -58,9 +56,7 @@ class TestSingUpForm(TestCase):
 
     def test_form_ok(self):
         form = forms.SignUpForm(self.request, data=self.data_ok)
-        self.assertTrue(form.is_valid(), 'Form is invalid.\nErrors: {errors}'.format(
-            errors=', '.join([str(k) + ':' + str(v) for k, v in form.errors])
-        ))
+        self.assertTrue(form.is_valid(), 'Form is invalid.')
 
         # Adding Discord ID
         data_discord = self.data_ok.copy()
