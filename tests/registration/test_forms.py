@@ -79,6 +79,12 @@ class TestSingUpForm(TestCase):
     def test_form_wrong_discord_id(self):
         data_ko = self.data_ok.copy()
         data_ko['discord_id'] = self.faker.random_int()
+
+    def test_form_taken_email_ko(self):
+        # First we create a user
+        user = baker.make(get_user_model(), email=self.faker.email())
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = user.email
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 

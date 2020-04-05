@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import argparse
+import os
 import subprocess
 import sys
 from io import StringIO
@@ -10,6 +11,9 @@ import pytest
 from django.core.management import call_command
 
 parser = argparse.ArgumentParser(description='Run Tests and Linting.')
+
+
+DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
 
 PYTEST_ARGS = {
     'default': ['tests'],
@@ -103,5 +107,8 @@ if __name__ == '__main__':
         pytest_args = PYTEST_ARGS['default']
     if args.coverage:
         pytest_args.extend(COVERAGE_ARGS)
+
+    if DJANGO_SETTINGS_MODULE:
+        pytest_args.extend(['--ds=%s' % DJANGO_SETTINGS_MODULE])
 
     run(run_pytest, run_flake8, run_isort, run_django_check)
