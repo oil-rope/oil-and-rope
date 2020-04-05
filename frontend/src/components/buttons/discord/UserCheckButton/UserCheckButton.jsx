@@ -63,7 +63,7 @@ export class UserCheckButton extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<Fragment data-testid="userCheckButton">
 				<Button onClick={this.handlerClick} className="w-100" variant="info">
 					{this.state.text}
 				</Button>

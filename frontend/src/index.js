@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Calendar from "./components/calendar/Calendar";
-import UserCheckButton from "./components/buttons/discord/user_check_button/UserCheckButton";
+import Calendar from "./components/Calendar/Calendar";
+import UserCheckButton from "./components/buttons/discord/UserCheckButton/UserCheckButton";
 import JQuery from "jquery";
 
 let calendar = document.getElementById("oarCalendar");
