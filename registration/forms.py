@@ -148,6 +148,7 @@ class SignUpForm(UserCreationForm):
             )
         )
 
+    # TODO: Change to work with actual host, not localhost:8000
     def _resolve_consumer_url(self):
         consumer_url = 'ws://' if settings.DEBUG else 'wss://'
         consumer_url += 'localhost:8000'
