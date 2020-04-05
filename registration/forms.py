@@ -3,8 +3,9 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -94,6 +95,7 @@ class SignUpForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
+        self.consumer_url = self._resolve_consumer_url()
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
         self.helper.form_class = 'container-fluid'
@@ -126,9 +128,13 @@ class SignUpForm(UserCreationForm):
                     css_class='col-12 col-md-8 col-lg-6 col-xl-5'
                 ),
                 Column(
-                    Button('search', _('Look for user') + '!',
-                           css_class=self.button_classes + ' w-100',
-                           css_id='btn_discord_invite'),
+                    Div(
+                        # Refers to ReactComponent `UserCheckButton`
+                        data_consumer_url=self.consumer_url,
+                        data_invitation_url=settings.BOT_INVITATION,
+                        data_related_field='id_discord_id',
+                        css_id='discord_check_user'
+                    ),
                     css_class='col-12 col-md-4 col-xl-5 align-self-center',
                 ),
                 css_class='justify-content-lg-between'
@@ -141,6 +147,12 @@ class SignUpForm(UserCreationForm):
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
+
+    def _resolve_consumer_url(self):
+        consumer_url = 'ws://' if settings.DEBUG else 'wss://'
+        consumer_url += 'localhost:8000'
+        consumer_url += reverse('bot:ws_bot_register')
+        return consumer_url
 
     def clean_email(self):
         """

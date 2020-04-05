@@ -12,6 +12,9 @@
     "test": "jest",
     "twatch": "jest --watch"
   },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "jest": {
     "moduleNameMapper": {
       "\\.(css|scss|sass|less)$": "identity-obj-proxy"

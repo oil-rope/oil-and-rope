@@ -1,7 +1,6 @@
 import logging
 from smtplib import SMTPAuthenticationError
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -55,7 +54,6 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['BOT_INVITATION'] = settings.BOT_INVITATION
         return context
 
     def get_success_message(self) -> str:

@@ -27,8 +27,5 @@
 {% endblock body_content %}
 
 {% block javascript %}
-<script src="{% static 'websockets/botConsumer.js' %}"
-        consumer-url="{% url 'bot:ws_bot_register' %}"
-        debug="{{ debug }}"
-        invitation-url="{{ BOT_INVITATION }}"></script>
+<script src="{% static 'frontend/main.js' %}"></script>
 {% endblock javascript %}
