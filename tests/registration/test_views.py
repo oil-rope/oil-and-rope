@@ -113,13 +113,13 @@ class TestSignUpView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_can_register_ok(self, mock_call: mock.MagicMock):
         response = self.client.post(self.url, data=self.data_ok)
-        succes_message = '{} {}.'.format(
-            _('User created!'),
+        success_message = '{}! {}.'.format(
+            _('User created'),
             _('Please confirm your email')
         )
         mock_call.success.assert_called_with(
             response.wsgi_request,
-            succes_message
+            success_message
         )
 
     def test_user_is_created_ok(self):
@@ -199,7 +199,65 @@ class TestActivateAccountView(TestCase):
         self.assertRedirects(response, ActivateAccountView.url)
         mock_call.success.assert_called_with(
             response.wsgi_request,
-            _('Your email has been confirmed!')
+            'Your email has been confirmed!'
         )
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_active, 'User is not active.')
+
+
+class TestResendConfirmationEmailView(TestCase):
+    """
+    Checks that errors are sent, email is sent and success message displays correctly.
+    """
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.data_ok = {
+            'email': self.user.email
+        }
+        self.url = reverse('registration:resend_email')
+
+    def test_access_ok(self):
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code, 'User cannot access.')
+        self.assertTemplateUsed(response, 'registration/resend_email.html')
+
+    @mock.patch('registration.views.messages')
+    def test_ok(self, mock_call):
+        response = self.client.post(self.url, data=self.data_ok)
+        self.assertEqual(302, response.status_code, 'User is no redirected.')
+        success_message = _('Your confirmation email has been sent') + '!'
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            success_message
+        )
+
+    def test_email_sent_ok(self):
+        # Changing Django Settings to get email sent
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            self.client.post(self.url, data=self.data_ok)
+            self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')
+
+    def test_required_fields_not_given_ko(self):
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        response = self.client.post(self.url, data=data_without_email)
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+
+    def test_email_does_not_exists_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = self.faker.email()
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
+
+    @mock.patch('registration.views.messages')
+    def test_multiple_users_with_same_email_ko(self, mock_call):
+        # First we create a user with same email since this is possible at database-level
+        baker.make(get_user_model(), email=self.data_ok['email'])
+        response = self.client.post(self.url, data=self.data_ok)
+        warning_message = _('Multiple users with same email, please contact our developers')
+        mock_call.warning.assert_called_with(
+            response.wsgi_request,
+            warning_message
+        )
