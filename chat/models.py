@@ -12,10 +12,11 @@ class Chat(models.Model):
     ----------
     name: :class:`str`
     users: :class:`User`
-    private_game: :class:`??????`
-        The private game the users are playing (not like pathfinder)
+    TODO:
     game: :class:`Game`
         Like pathfinder, dnd...
+    board: :class:`Board`
+        The private game
     """
 
     name = models.CharField(_("Chat name"), max_length=50)
