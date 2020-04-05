@@ -83,7 +83,7 @@ INSTALLED_APPS = [
     # FrontEnd
     'frontend.apps.FrontendConfig',
     # Django channels
-    'django.channels',
+    'channels'
 ]
 
 MIDDLEWARE = [
