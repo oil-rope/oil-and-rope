@@ -125,7 +125,8 @@ class SignUpForm(UserCreationForm):
                 ),
                 Column(
                     Button('search', _('Look for user') + '!', css_class=self.button_classes + ' w-100'),
-                    css_class='col-12 col-md-4 col-xl-5 align-self-center'
+                    css_class='col-12 col-md-4 col-xl-5 align-self-center',
+                    css_id='btn_discord_invite'
                 ),
                 css_class='justify-content-lg-between'
             ),
