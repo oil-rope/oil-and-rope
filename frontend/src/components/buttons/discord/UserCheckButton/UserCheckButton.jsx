@@ -9,13 +9,25 @@ export class UserCheckButton extends Component {
 		this.state = {
 			text: `${gettext("Look for user")}!`,
 			showModal: false,
+			buttonDisabled: false,
 		};
 	}
 
 	componentDidMount() {
 		this.connector = new WebSocket(this.props.url);
 		this.connector.onmessage = this.WSOnMessage;
+		this.connector.onerror = this.WSOnError;
+		this.connector.onclose = this.WSOnClose;
 	}
+
+	WSOnClose = (close) => {
+		// Set button as disabled if WS is closed
+		this.setState({ buttonDisabled: true });
+	};
+
+	WSOnError = (error) => {
+		console.log(error);
+	};
 
 	WSOnMessage = (message) => {
 		let { exists, error } = JSON.parse(message.data);
@@ -65,7 +77,12 @@ export class UserCheckButton extends Component {
 		return (
 			<div data-testid="userCheckButton">
 				<Fragment>
-					<Button onClick={this.handlerClick} className="w-100" variant="info">
+					<Button
+						onClick={this.handlerClick}
+						className="w-100"
+						variant="info"
+						disabled={this.state.buttonDisabled}
+					>
 						{this.state.text}
 					</Button>
 					<Modal show={this.state.showModal} onHide={this.handleClose}>

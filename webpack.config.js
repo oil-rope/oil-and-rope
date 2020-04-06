@@ -2,12 +2,13 @@ const path = require("path");
 
 module.exports = {
 	entry: {
-		calendar: "./frontend/src/renderCalendar.js",
-		userCheckButton: "./frontend/src/renderUserCheckButton.js"
+		Calendar: "./frontend/src/renderCalendar.js",
+		UserCheckButton: "./frontend/src/renderUserCheckButton.js",
 	},
 	output: {
 		filename: "[name].bundle.js",
 		path: path.resolve(__dirname, "./frontend/static/frontend/dist/"),
+		chunkFilename: "[name].bundle.js",
 	},
 	devServer: {
 		contentBase: "dist",
