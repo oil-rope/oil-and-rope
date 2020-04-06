@@ -3,14 +3,17 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+
+from bot.models import DiscordUser
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +95,7 @@ class SignUpForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
+        self.consumer_url = self._resolve_consumer_url()
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
         self.helper.form_class = 'container-fluid'
@@ -124,8 +128,14 @@ class SignUpForm(UserCreationForm):
                     css_class='col-12 col-md-8 col-lg-6 col-xl-5'
                 ),
                 Column(
-                    Button('search', _('Send invitation') + '!', css_class=self.button_classes + ' w-100'),
-                    css_class='col-12 col-md-4 col-xl-5 align-self-center'
+                    Div(
+                        # Refers to ReactComponent `UserCheckButton`
+                        data_consumer_url=self.consumer_url,
+                        data_invitation_url=settings.BOT_INVITATION,
+                        data_related_field='id_discord_id',
+                        css_id='discord_check_user'
+                    ),
+                    css_class='col-12 col-md-4 col-xl-5 align-self-center',
                 ),
                 css_class='justify-content-lg-between'
             ),
@@ -137,6 +147,13 @@ class SignUpForm(UserCreationForm):
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
+
+    # TODO: Change to work with actual host, not localhost:8000
+    def _resolve_consumer_url(self):
+        consumer_url = 'ws://' if settings.DEBUG else 'wss://'
+        consumer_url += 'localhost:8000'
+        consumer_url += reverse('bot:ws_bot_register')
+        return consumer_url
 
     def clean_email(self):
         """
@@ -200,6 +217,30 @@ class SignUpForm(UserCreationForm):
         except SMTPAuthenticationError:
             LOGGER.exception('Unable to logging email server with given credentials.')
 
+    def clean_discord_id(self):
+        """
+        Checks if Discord User is created.
+        """
+
+        data = self.cleaned_data.get('discord_id')
+
+        if data:
+            if not DiscordUser.objects.filter(pk=data).exists():
+                msg = '{} {}'.format(_('User not found.'), _('Have you requested invitation?'))
+                self.add_error('discord_id', msg)
+        return data
+
+    def get_discord_user(self):
+        """
+        Looks for `discord_id` field and returns :class:`DiscordUser` instance or `None`.
+        """
+
+        discord_user = None
+        discord_id = self.cleaned_data.get('discord_id')
+        if discord_id:
+            discord_user = DiscordUser.objects.get(pk=discord_id)
+        return discord_user
+
     def save(self, commit=True):
         """
         Before saving the instance it sets it to inactive until the user confirms email.
@@ -213,8 +254,14 @@ class SignUpForm(UserCreationForm):
         instance = super().save(commit=False)
         # Set active to False until user acitvates email
         instance.is_active = False
+        # Checks for DiscordUser
+        discord_user = self.get_discord_user()
         if commit:
             instance.save()
+            # Adds foreing key if exists
+            if discord_user:
+                discord_user.user = instance
+                discord_user.save()
             # User shouldn't wait for the email to be sent
             with ThreadPoolExecutor(max_workers=2) as executor:
                 executor.submit(self._send_email_confirmation, instance)

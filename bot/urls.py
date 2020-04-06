@@ -9,8 +9,9 @@ router.register(r'discord_server', viewsets.DiscordServerViewSet)
 router.register(r'discord_text_channel', viewsets.DiscordTextChannelViewSet)
 router.register(r'discord_voice_channel', viewsets.DiscordVoiceChannelViewSet)
 
-app_name = "bot"
+app_name = 'bot'
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('ws/', include('bot.routing')),
 ]

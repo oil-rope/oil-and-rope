@@ -228,6 +228,9 @@ dist
 .yarn/build-state.yml
 .pnp.*
 
+# Locked dependencies
+package-lock.json
+
 # IDE stuff
 .vscode/
 .idea/
