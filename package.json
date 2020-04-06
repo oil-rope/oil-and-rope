@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "webpack --mode development ./frontend/src/index.js --output ./frontend/static/frontend/main.js --watch",
-    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production",
     "test": "jest",
     "twatch": "jest --watch"
   },
