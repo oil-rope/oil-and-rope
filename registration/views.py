@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -51,6 +52,10 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     succes_message = None
     success_url = reverse_lazy('registration:login')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
     def get_success_message(self) -> str:
         if self.succes_message:
             return self.succes_message
@@ -68,9 +73,9 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        response = super(SignUpView, self).form_valid(form)
+        self.object = form.save()
         messages.success(self.request, self.get_success_message())
-        return response
+        return redirect(self.success_url)
 
 
 class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):

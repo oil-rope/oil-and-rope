@@ -64,6 +64,9 @@ class HelpfulError(OilAndRopeException):
             footnote=self.footnote
         )
 
+    def __str__(self):
+        return self.message
+
 
 class HelpfulErrorWarning(HelpfulError):
     """

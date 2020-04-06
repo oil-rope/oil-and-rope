@@ -1,4 +1,5 @@
-discord.py
+channels
+discord.py[voice]
 django>=2, <3
 django-crispy-forms
 django-ckeditor
@@ -11,4 +12,5 @@ djangorestframework
 Pillow
 psycopg2-binary
 python-dateutil
+python-dotenv
 xlrd

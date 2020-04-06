@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 
 class Chat(models.Model):
@@ -18,7 +18,7 @@ class Chat(models.Model):
         Like pathfinder, dnd...
     """
 
-    name = models.CharField(_("Chat name"), max_length=50)
+    name = models.CharField(verbose_name=_("Chat name"), max_length=50)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name=_("Usuarios"), related_name='chats')
 
@@ -46,7 +46,7 @@ class ChatMessage(models.Model):
 
     chat = models.ForeignKey("chat.Chat", verbose_name=_("Chat"),
                              on_delete=models.CASCADE, related_name='messages')
-    message = models.CharField(_("Message"), max_length=150)
+    message = models.CharField(verbose_name=_("Message"), max_length=150)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),
                              on_delete=models.CASCADE, related_name='messages')
     created_at = models.DateTimeField(
