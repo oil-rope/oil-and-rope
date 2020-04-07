@@ -1,9 +1,8 @@
-import React, { Component, Suspense } from "react";
+import React, { Component } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import FullCalendar from '@fullcalendar/react'
 
 import "./main.scss";
-
-const FullCalendar = React.lazy(() => import("@fullcalendar/react"));
 
 export class Calendar extends Component {
 	constructor(props) {
@@ -17,15 +16,12 @@ export class Calendar extends Component {
 
 	render() {
 		return (
-			<Suspense fallback={<div>Loading...</div>}>
-				<div data-testid="calendar">
-					<FullCalendar
-						defaultView={this.state.defaultView}
-						plugins={this.state.plugins}
-						events={this.state.events}
-					/>
-				</div>
-			</Suspense>
+			<FullCalendar
+				data-testid="calendar"
+				defaultView={this.state.defaultView}
+				plugins={this.state.plugins}
+				events={this.state.events}
+			/>
 		);
 	}
 }
