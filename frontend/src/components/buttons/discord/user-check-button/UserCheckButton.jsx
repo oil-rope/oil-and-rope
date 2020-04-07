@@ -75,7 +75,7 @@ export class UserCheckButton extends Component {
 
 	render() {
 		return (
-			<div data-testid="userCheckButton">
+			<div data-testid="testUserCheckButton">
 				<Fragment>
 					<Button
 						onClick={this.handlerClick}

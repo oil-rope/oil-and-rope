@@ -9,7 +9,7 @@ afterEach(cleanup);
 
 it("Renders without problem", () => {
 	const { getByTestId } = render(<Calendar />);
-	expect(getByTestId("calendar")).not.toBeNull();
+	expect(getByTestId("testCalendar")).not.toBeNull();
 });
 
 // Dummy as example of SnapShots
