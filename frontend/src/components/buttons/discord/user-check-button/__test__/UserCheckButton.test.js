@@ -1,7 +1,7 @@
 import React from "react";
 import { render, cleanup } from "@testing-library/react";
 import UserCheckButton from "../UserCheckButton";
-import $ from 'jquery';
+import $ from "jquery";
 
 // Mocking Django's gettext
 global.gettext = (txt) => txt;
