@@ -5,7 +5,7 @@ import time
 import uuid
 
 from channels.db import database_sync_to_async
-from channels.generic.webwsocket import AsyncWebSocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from django import db
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -16,7 +16,7 @@ from . import models
 from .serializers import ChatMessageSerializer, ChatSerializer
 
 
-class ChatConsumer(AsyncWebSocketConsumer):
+class ChatConsumer(AsyncWebsocketConsumer):
     """
     Consumer for chat
     """
