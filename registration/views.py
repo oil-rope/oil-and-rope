@@ -1,12 +1,15 @@
 import logging
+from smtplib import SMTPAuthenticationError
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import CreateView, RedirectView
+from django.views.generic import CreateView, FormView, RedirectView
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
@@ -49,11 +52,15 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     succes_message = None
     success_url = reverse_lazy('registration:login')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
     def get_success_message(self) -> str:
         if self.succes_message:
             return self.succes_message
-        succes_message = '{} {}.'.format(
-            _('User created!'),
+        succes_message = '{}! {}.'.format(
+            _('User created'),
             _('Please confirm your email')
         )
         return succes_message
@@ -66,9 +73,9 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        response = super(SignUpView, self).form_valid(form)
+        self.object = form.save()
         messages.success(self.request, self.get_success_message())
-        return response
+        return redirect(self.success_url)
 
 
 class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
@@ -125,5 +132,71 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
         if self.validate_token():
             self.user.is_active = True
             self.user.save()
-            messages.success(request, _('Your email has been confirmed!'))
+            messages.success(request, _('Your email has been confirmed') + '!')
         return super(ActivateAccountView, self).get(request, *args, **kwargs)
+
+
+class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
+    """
+    In case user needs the email to be resend we create this view.
+    """
+
+    template_name = 'registration/resend_email.html'
+    form_class = forms.ResendEmailForm
+    success_message = None
+    success_url = reverse_lazy('registration:login')
+
+    def get_user(self, email):
+        try:
+            user = get_user_model().objects.get(email=email)
+            return user
+        except get_user_model().MultipleObjectsReturned as ex:
+            LOGGER.exception('Multiple users with same email found.')
+            raise ex
+
+    def generate_token(self, user) -> str:
+        """
+        Generates a token for the user to confirm it's email.
+
+        Parameters
+        ----------
+        user: User instance
+            The user associated to this token.
+
+        Returns
+        -------
+        token: :class:`str`
+            The token generated.
+        """
+
+        token = PasswordResetTokenGenerator()
+        token = token.make_token(user)
+        return token
+
+    def send_email(self, user):
+        """
+        Resends a confirmation email to the user.
+        """
+
+        msg_html = render_to_string('email_templates/confirm_email.html', {
+            # We declare localhost as default for tests purposes
+            'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
+            'token': self.generate_token(user),
+            'object': user
+        })
+
+        try:
+            user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+        except SMTPAuthenticationError:
+            LOGGER.exception('Unable to logging email server with given credentials.')
+
+    def form_valid(self, form):
+        cleaned_data = form.cleaned_data
+        try:
+            user = self.get_user(cleaned_data['email'])
+            self.send_email(user)
+            messages.success(self.request, _('Your confirmation email has been sent') + '!')
+            return super().form_valid(form)
+        except get_user_model().MultipleObjectsReturned:
+            messages.warning(self.request, _('Multiple users with same email, please contact our developers'))
+            return super().form_invalid(form)

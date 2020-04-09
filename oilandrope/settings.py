@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
@@ -127,7 +129,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
+# DjangoChannels ASGI Router
 ASGI_APPLICATION = 'oilandrope.routing.application'
+
+
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -270,3 +275,10 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
+
+# Bot Settings
+
+BOT_INVITATION = os.getenv(
+    'BOT_INVITATION',
+    'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
+)

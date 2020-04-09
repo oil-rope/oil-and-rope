@@ -6,7 +6,13 @@ def language(request):
     Sets language depending on the profile.
     """
 
+    content = {
+        'lan': settings.LANGUAGE_CODE,
+        'languages': dict(settings.LANGUAGES).keys(),
+    }
+
     if request.user.is_authenticated:
         profile = request.user.profile
-        return {'lan': profile.language}
-    return {'lan': settings.LANGUAGE_CODE}
+        content['lan'] = profile.language
+        return content
+    return content

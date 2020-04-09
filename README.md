@@ -7,43 +7,43 @@
 
 Oil &amp; Rope is a Python project for managing Roleplay Games.
 
-
 ## Setup for linux
 
 1. Clone the github repository
 
-    `$git clone https://github.com/oil-rope/oil-and-rope.git`
+    `$ git clone https://github.com/oil-rope/oil-and-rope.git`
 
 2. Install necessary tools
-    - Anaconda (recommended)
-    - Docker (needed)
-    - npm (needed for developers)
-    - nodejs (needed for developers)
+
+   - Anaconda (recommended)
+   - Docker (needed)
+   - npm (needed for developers)
+   - nodejs (needed for developers)
 
 3. Install the requirements
-    - For developers: 
 
-        `$pip install -r requirements/requirements_develop.txt`
+    - For developers:
+
+        `$ pip install -r requirements/requirements_develop.txt`
+
     - For testers:
 
-        `$pip install -r requirements/requirements_base.txt`
+        `$ pip install -r requirements/requirements_base.txt`
 
-4. Create environment local settings and ask the developers for its content.
+4. For development and testing use `dev_settings.py`
 
-    `$touch oilandrope/local_settings.py`
+5. Create and run a Docker Container for Redis (in order to use WebSockets)
 
-5. Create a docker container for redis
+    `$ docker run --rm -p 6739:6739 --name redis redis`
 
-    `$docker run --rm -p 6739:6739 --name redis redis` 
+6. For React Views install npm dependencies
 
-6. For developers, It's needed to install npm dependencies
-
-    `$npm install`
+    `$ npm install`
 
 7. Apply migrations
 
-    `$python manage.py migrate`
+    `$ python manage.py migrate --settings oilandrope.dev_settings`
 
-7. Run server
+8. Run server pointing to the develop settings
 
-    `$python manage.py runserver`
+    `$ python manage.py runserver --settings oilandrope.dev_settings`

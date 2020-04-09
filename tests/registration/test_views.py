@@ -29,7 +29,7 @@ class TestLoginView(TestCase):
 
     def test_user_can_login_ok(self):
         # Change password so we can control input
-        password = ''.join(self.faker.words(4))
+        password = self.faker.password()
         self.user.set_password(password)
         self.user.save()
         data = {
@@ -44,7 +44,7 @@ class TestLoginView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
         # Change password so we can control input
-        password = ''.join(self.faker.words(4))
+        password = self.faker.password()
         self.user.set_password(password)
         # Set user as inactive
         self.user.is_active = False
@@ -73,7 +73,7 @@ class TestLoginView(TestCase):
         """
 
         data = {
-            'username': self.faker.word(),
+            'username': self.faker.user_name(),
             'password': self.faker.word()
         }
         response = self.client.post(self.url, data=data)
@@ -94,16 +94,16 @@ class TestSignUpView(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        profile = self.faker.simple_profile()
         email = self.faker.safe_email()
-        password = ''.join(self.faker.words(3))
+        password = self.faker.password()
         self.data_ok = {
-            'username': profile['username'],
+            'username': self.faker.user_name(),
             'email': email,
             'password1': password,
             'password2': password
         }
         self.url = reverse('registration:register')
+        self.discord_user = baker.make('bot.DiscordUser')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -113,6 +113,21 @@ class TestSignUpView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_can_register_ok(self, mock_call: mock.MagicMock):
         response = self.client.post(self.url, data=self.data_ok)
+        success_message = '{}! {}.'.format(
+            _('User created'),
+            _('Please confirm your email')
+        )
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            success_message
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_user_can_register_with_discord_user(self, mock_call: mock.MagicMock):
+        data_ok = self.data_ok.copy()
+        data_ok['discord_id'] = self.discord_user.id
+        response = self.client.post(self.url, data=data_ok)
+
         succes_message = '{} {}.'.format(
             _('User created!'),
             _('Please confirm your email')
@@ -127,6 +142,15 @@ class TestSignUpView(TestCase):
         user_exists = get_user_model().objects.filter(username=self.data_ok['username']).exists()
         self.assertTrue(user_exists, 'User is not created.')
 
+    def test_user_is_vinculed_to_discord_user(self):
+        data_ok = self.data_ok.copy()
+        data_ok['discord_id'] = self.discord_user.id
+        self.client.post(self.url, data=data_ok)
+
+        user = get_user_model().objects.get(username=data_ok['username'])
+        self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
+        self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
+
     def test_email_sent_ok(self):
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.client.post(self.url, data=self.data_ok, follow=True)
@@ -137,6 +161,20 @@ class TestSignUpView(TestCase):
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'password2', 'The two password fields didn\'t match.')
+
+    def test_wrong_discord_id_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['discord_id'] = self.faker.random_int()
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'discord_id', 'User not found. Have you requested invitation?')
+
+    def test_email_already_in_use(self):
+        # First we create a user
+        user = baker.make(get_user_model(), email=self.faker.email())
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = user.email
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'email', 'This email is already in use.')
 
     def test_required_fields_not_given(self):
         data_without_email = self.data_ok.copy()
@@ -191,7 +229,65 @@ class TestActivateAccountView(TestCase):
         self.assertRedirects(response, ActivateAccountView.url)
         mock_call.success.assert_called_with(
             response.wsgi_request,
-            _('Your email has been confirmed!')
+            'Your email has been confirmed!'
         )
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_active, 'User is not active.')
+
+
+class TestResendConfirmationEmailView(TestCase):
+    """
+    Checks that errors are sent, email is sent and success message displays correctly.
+    """
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.data_ok = {
+            'email': self.user.email
+        }
+        self.url = reverse('registration:resend_email')
+
+    def test_access_ok(self):
+        response = self.client.get(self.url)
+        self.assertEqual(200, response.status_code, 'User cannot access.')
+        self.assertTemplateUsed(response, 'registration/resend_email.html')
+
+    @mock.patch('registration.views.messages')
+    def test_ok(self, mock_call):
+        response = self.client.post(self.url, data=self.data_ok)
+        self.assertEqual(302, response.status_code, 'User is no redirected.')
+        success_message = _('Your confirmation email has been sent') + '!'
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            success_message
+        )
+
+    def test_email_sent_ok(self):
+        # Changing Django Settings to get email sent
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            self.client.post(self.url, data=self.data_ok)
+            self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')
+
+    def test_required_fields_not_given_ko(self):
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        response = self.client.post(self.url, data=data_without_email)
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+
+    def test_email_does_not_exists_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = self.faker.email()
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
+
+    @mock.patch('registration.views.messages')
+    def test_multiple_users_with_same_email_ko(self, mock_call):
+        # First we create a user with same email since this is possible at database-level
+        baker.make(get_user_model(), email=self.data_ok['email'])
+        response = self.client.post(self.url, data=self.data_ok)
+        warning_message = _('Multiple users with same email, please contact our developers')
+        mock_call.warning.assert_called_with(
+            response.wsgi_request,
+            warning_message
+        )

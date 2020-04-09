@@ -19,10 +19,13 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = []
 
 urlpatterns += i18n_patterns(
+    # JavaScript translations
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     # Main site
     path('', include('core.urls')),
     # Admin site

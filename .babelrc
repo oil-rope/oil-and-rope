@@ -4,6 +4,7 @@
         "@babel/preset-react"
     ],
     "plugins": [
-        "transform-class-properties"
+        "transform-class-properties",
+        "syntax-dynamic-import"
     ]
 }
