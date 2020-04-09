@@ -1,5 +1,8 @@
+import os
+import tempfile
 from unittest.mock import patch
 
+import dotenv
 from django.test import TestCase
 from faker import Faker
 
@@ -25,6 +28,25 @@ class TestOilAndRopeBot(TestCase):
             bot = self.bot_class()
             self.assertEqual(self.env_variables['BOT_COMMAND_PREFIX'], bot.command_prefix)
             self.assertEqual(self.env_variables['BOT_TOKEN'], bot.token)
+
+    def test_init_with_env_file_ok(self):
+        # Creating temporary file
+        env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
+        env_file = env_file.name
+
+        # Make sure .env file is created
+        self.assertTrue(dotenv.load_dotenv(env_file), '.env file is not loaded.')
+        # Adds text
+        dotenv.set_key(env_file, 'BOT_COMMAND_PREFIX', self.env_variables['BOT_COMMAND_PREFIX'])
+        dotenv.set_key(env_file, 'BOT_TOKEN', self.env_variables['BOT_TOKEN'])
+
+        with patch.dict('os.environ'):
+            bot = self.bot_class(env_file=env_file)
+            self.assertEqual(self.env_variables['BOT_COMMAND_PREFIX'], bot.command_prefix)
+            self.assertEqual(self.env_variables['BOT_TOKEN'], bot.token)
+
+        # Cleaning
+        os.unlink(env_file)
 
     def test_instance_without_bot_token_ko(self):
         msg = 'Use .env file or set up BOT_TOKEN environment variables.'
