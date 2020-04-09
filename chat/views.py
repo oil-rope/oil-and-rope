@@ -10,11 +10,3 @@ def room(request, room_name):
 
 def index(request):
     return render(request, 'chat/room_index.html')
-
-
-class roomView(templateView):
-    """
-    Chat rooms View
-    """
-
-    template_name = "chat/room_index.html"

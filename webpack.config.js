@@ -4,6 +4,7 @@ module.exports = {
 	entry: {
 		Calendar: "./frontend/src/renderCalendar.js",
 		UserCheckButton: "./frontend/src/renderUserCheckButton.js",
+		Chat: "./frontend/src/renderChat.js",
 	},
 	output: {
 		filename: "[name].bundle.js",

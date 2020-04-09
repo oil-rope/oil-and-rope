@@ -1,13 +1,16 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}{% trans "Chat Room" %}{% endblock title %}
 
 {% block body_content %}
 
-
-    What chat room would you like to enter?<br>
+    <div id="chat_room_index">
+    </div>
+    
+    {% comment %} What chat room would you like to enter?<br>
     <input id="room-name-input" type="text" size="100"><br>
     <input id="room-name-submit" type="button" value="Enter">
 
@@ -23,7 +26,9 @@
             var roomName = document.querySelector('#room-name-input').value;
             window.location.pathname = '/chat/' + roomName + '/';
         };
-    </script>
-
+    </script> {% endcomment %}
 
 {% endblock body_content %}
+{% block javascript %}
+<script src="{% static 'frontend/dist/Chat.bundle.js' %}"></script>
+{% endblock javascript %}

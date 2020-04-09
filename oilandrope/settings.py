@@ -56,8 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
