@@ -12,5 +12,6 @@ model_bakery
 pytest
 pytest-asyncio
 pytest-django
+pytest-mock
 selenium
 werkzeug

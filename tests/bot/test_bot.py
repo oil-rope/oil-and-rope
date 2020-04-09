@@ -23,6 +23,17 @@ class TestOilAndRopeBot(TestCase):
             'BOT_TOKEN': self.faker.password()
         }
 
+    @classmethod
+    def setUpClass(cls):
+        # Creating temporary file
+        cls.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Cleaning
+        cls.env_file.close()
+        os.unlink(cls.env_file.name)
+
     def test_init_ok(self):
         with patch.dict('os.environ', self.env_variables):
             bot = self.bot_class()
@@ -31,8 +42,7 @@ class TestOilAndRopeBot(TestCase):
 
     def test_init_with_env_file_ok(self):
         # Creating temporary file
-        env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
-        env_file = env_file.name
+        env_file = self.env_file.name
 
         # Make sure .env file is created
         self.assertTrue(dotenv.load_dotenv(env_file), '.env file is not loaded.')
@@ -44,9 +54,6 @@ class TestOilAndRopeBot(TestCase):
             bot = self.bot_class(env_file=env_file)
             self.assertEqual(self.env_variables['BOT_COMMAND_PREFIX'], bot.command_prefix)
             self.assertEqual(self.env_variables['BOT_TOKEN'], bot.token)
-
-        # Cleaning
-        os.unlink(env_file)
 
     def test_instance_without_bot_token_ko(self):
         msg = 'Use .env file or set up BOT_TOKEN environment variables.'
