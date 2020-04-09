@@ -1,17 +1,10 @@
 import json
-import os
-import re
-import time
-import uuid
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django import db
 from django.contrib.auth.models import User
-from django.core.serializers import serialize
-from django.db import transaction
 
-from registration.serializers import ProfileSerializer, UserSerializer
+from registration.serializers import UserSerializer
 
 from . import models
 from .serializers import ChatMessageSerializer, ChatSerializer
@@ -57,6 +50,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_str = text_data_json.get('message', '')
         created_at = text_data_json.get('created_at')
 
+        
         chat, created = models.Chat.objects.get_or_create(name=chat_pk)
         chat.users.add(user)
         chat_msg_sender = User.objects.get(pk=owner_pk)
@@ -77,6 +71,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
+        
         chat_json = event['chat']
         message = event['message']
         owner_json = event['owner']
@@ -89,20 +84,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         own_message = True if owner.id == user.id else False
 
-        chat_message = self.save_to_db(chat, message, owner, created_at)
+        if own_message:
+            await self.save_to_db(chat, message, owner, created_at)
 
-        message_json = ChatMessageSerializer(chat_message).data
+        # message_json = ChatMessageSerializer(chat_message).data
+
+        message_json = {
+            'chat': chat_json,
+            'message': message,
+            'user': owner.username,
+            'created_at': created_at,
+        }
 
         await self.send(text_data=json.dumps({
             'message': message_json,
-            'chat': chat_json,
-            'user': owner_json,
-            'owner': event['owner'],
-            'created_at': created_at,
             'own_message': own_message,
         }))
 
-    @transaction.atomic
     @database_sync_to_async
     def save_to_db(self, chat, message, owner, created_at):
         chat_message, created = models.ChatMessage.objects.get_or_create(
@@ -112,16 +110,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             created_at=created_at,
         )
 
-        return chat_message
-
     async def recover_chat_messages(self):
 
         user = self.scope['user']
 
+        chat = models.Chat.objects.get(id=self.room_name)
+        chat_json = ChatSerializer(chat, many=False).data
+
         messages = models.ChatMessage.objects.all()
 
         for message in messages:
-            message_json = ChatMessageSerializer(message).data
+
+            message_json = {
+                'chat': chat_json,
+                'message': message.message,
+                'user': message.user.username,
+                'created_at': str(message.created_at),
+            }
 
             if user.id == message.user.id:
                 own_message = True

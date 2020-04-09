@@ -59,6 +59,7 @@ class ChatMessage(models.Model):
     class Meta:
         verbose_name = _("chat Message")
         verbose_name_plural = _("chat Messages")
+        models.UniqueConstraint(fields=['message', 'user', 'created_at'], name='unique_message_user_and_date')
 
     def __str__(self):
         return self.message
