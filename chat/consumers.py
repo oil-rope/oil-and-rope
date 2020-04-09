@@ -8,6 +8,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django import db
 from django.contrib.auth.models import User
+from django.core.serializers import serialize
 from django.db import transaction
 
 from registration.serializers import ProfileSerializer, UserSerializer
@@ -24,7 +25,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super(ChatConsumer, self).__init__(*args, **kwargs)
 
-        self.room_name = self.scope['url_route']['kwargs']['chat']
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group = 'board_{}'.format(self.room_name)
 
     async def connect(self):
@@ -34,6 +35,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        await self.recover_chat_messages()
 
         # user = self.scope['user']
         # chats = user.Profile.objects.all()
@@ -55,15 +57,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_str = text_data_json.get('message', '')
         created_at = text_data_json.get('created_at')
 
-        chat = user.chats.get(pk=chat_pk)
+        chat, created = models.Chat.objects.get_or_create(name=chat_pk)
+        chat.users.add(user)
         chat_msg_sender = User.objects.get(pk=owner_pk)
 
-        owner_json = UserSerializer(chat_msg_sender, many=False)
-        chat_json = ChatSerializer(chat, many=False)
+        owner_json = UserSerializer(chat_msg_sender, many=False).data
+        chat_json = ChatSerializer(chat, many=False).data
 
         await self.channel_layer.group_send(
             self.room_group,
             {
+                'type': 'chat_message',
                 'chat': chat_json,
                 'message': message_str,
                 'owner': owner_json,
@@ -72,17 +76,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    @transaction.atomic
     async def chat_message(self, event):
-        chat = event['chat']
+        chat_json = event['chat']
         message = event['message']
-        owner = event['owner']
+        owner_json = event['owner']
         created_at = event['created_at']
 
         user = self.scope['user']
 
-        own_message = True if owner == user.id else False
+        chat = models.Chat.objects.get(id=chat_json['id'])
+        owner = User.objects.get(id=owner_json['id'])
 
+        own_message = True if owner.id == user.id else False
+
+        chat_message = self.save_to_db(chat, message, owner, created_at)
+
+        message_json = ChatMessageSerializer(chat_message).data
+
+        await self.send(text_data=json.dumps({
+            'message': message_json,
+            'chat': chat_json,
+            'user': owner_json,
+            'owner': event['owner'],
+            'created_at': created_at,
+            'own_message': own_message,
+        }))
+
+    @transaction.atomic
+    @database_sync_to_async
+    def save_to_db(self, chat, message, owner, created_at):
         chat_message, created = models.ChatMessage.objects.get_or_create(
             chat=chat,
             message=message,
@@ -90,14 +112,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             created_at=created_at,
         )
 
-        message_json = ChatMessageSerializer(chat_message).data
-        owner_json = UserSerializer(owner)
+        return chat_message
 
-        await self.send(text_data=json.dumps({
-            'message': message_json,
-            'chat': chat,
-            'user': owner_json,
-            'owner': event['owner'],
-            'created_at': created_at,
-            'own_message': own_message,
-        }))
+    async def recover_chat_messages(self):
+
+        user = self.scope['user']
+
+        messages = models.ChatMessage.objects.all()
+
+        for message in messages:
+            message_json = ChatMessageSerializer(message).data
+
+            if user.id == message.user.id:
+                own_message = True
+            else:
+                own_message = False
+
+            await self.send(text_data=json.dumps({
+                'message': message_json,
+                'own_message': own_message,
+            }))

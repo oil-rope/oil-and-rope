@@ -2,18 +2,14 @@ import os
 
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-from django.conf.urls import url
-
-from chat.consumers import ChatConsumer
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
+import chat.routing
 
 application = ProtocolTypeRouter({
 
     # WebSocket chat handler
-    "websocket": AuthMiddlewareStack(
-        URLRouter([
-            url(r"^chat/$", ChatConsumer),
-        ])
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            chat.routing.websocket_urlpatterns
+        )
     ),
 })

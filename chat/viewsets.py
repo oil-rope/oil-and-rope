@@ -16,7 +16,7 @@ class ChatViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsModelOwner]
 
 
-class ChatMessageViewSet(viewsets.ReadONlyModelViewSet):
+class ChatMessageViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Viewsets for :class:`ChatMessage`
     """
@@ -24,4 +24,3 @@ class ChatMessageViewSet(viewsets.ReadONlyModelViewSet):
     queryset = ChatMessage.objects.all()
     serializer_class = ChatMessageSerializer
     permission_classes = [IsModelOwner]
-    
