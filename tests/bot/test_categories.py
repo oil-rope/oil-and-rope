@@ -1,11 +1,13 @@
 from unittest import mock
 from unittest.mock import call
 
+import pytest
 from django.test import TestCase
 from faker import Faker
 
 from bot.categories import RoleplayCog
 
+fake = Faker()
 
 class TestRoleplayCog(TestCase):
 
@@ -66,3 +68,17 @@ class TestRoleplayCog(TestCase):
         result, results_message = self.cog._process_roll(roll)
         expected_regex = r'(\d+\+){%s}%s\-%s\+\d+' % (roll_1, modifier_1, modifier_2)
         self.assertRegex(results_message, expected_regex)
+
+
+@pytest.fixture(scope='function', autouse=False)
+def cog():
+    return RoleplayCog()
+
+
+@pytest.mark.asyncio
+async def test_roll(cog, mocker):
+    ctx = mocker.MagicMock()
+    rolls = fake.random_int(1, 10)
+    dice_face_1 = fake.random_int(1, 100)
+    roll = '{}d{}'.format(rolls, dice_face_1)
+    await cog.roll(cog, ctx=ctx, roll=roll)

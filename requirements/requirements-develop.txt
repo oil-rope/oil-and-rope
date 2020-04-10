@@ -12,5 +12,6 @@ pytest
 pytest-asyncio
 pytest-django
 pytest-mock
+pytest-xdist
 selenium
 werkzeug
