@@ -33,6 +33,3 @@ jobs:
         pip install pytest
         pip install pytest-cov
         pytest --junitxml=junit/test-${{ matrix.python-version }}.coverage.xml --cov=tests/ --cov-report=xml
-    - name: Uploading Coverage
-      run: |
-        codevov
