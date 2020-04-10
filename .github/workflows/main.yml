@@ -1,4 +1,4 @@
-name: Project check
+name: Project checker
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
     - develop
 
 jobs:
-  build:
+  python-build:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
