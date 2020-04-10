@@ -5,6 +5,10 @@ on:
     branches:
     - master
     - develop
+    - releases/*
+    - test/*
+    - feature/*
+    - bug/*
   pull_request:
     branches:
     - master
