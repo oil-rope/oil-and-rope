@@ -30,7 +30,6 @@ class OilAndRopeBot(commands.Bot):
             self.load_env_file(env_file)
         self.load_variables()
         super(OilAndRopeBot, self).__init__(command_prefix=self.command_prefix, description=self.description, **options)
-        self.load_commands()
 
     def load_variables(self):
         """
@@ -104,6 +103,7 @@ class OilAndRopeBot(commands.Bot):
             await context.send_help(context.command)
 
     def run(self, *args, **kwargs):
+        self.load_commands()
         super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
 
     async def confirm_user(self, user_id):
