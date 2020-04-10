@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "webpack --mode development -w --devtools source-map",
-    "build": "webpack -p --progress",
+    "build": "webpack --mode production --progress",
     "test": "jest",
     "twatch": "jest --watch"
   },
@@ -67,5 +67,5 @@
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1"
   },
-  "heroku-postbuild": "webpack -p --progress"
+  "heroku-postbuild": "webpack --mode production --progress"
 }

@@ -68,7 +68,9 @@ class RoleplayCog(Cog, name='Roleplay'):
                 continue
             if self.dice_pattern_compiled.match(roll):
                 n_rolls, d_faces = re.split(r'[dD]', roll)
-                results = self._process_roll_dice(int(n_rolls), int(d_faces))
+                n_rolls = int(n_rolls) if n_rolls else 1
+                d_faces = int(d_faces)
+                results = self._process_roll_dice(n_rolls, d_faces)
                 results_message += action.join([str(r) for r in results])
                 result += self._process_roll_action(action, *results)
             else:

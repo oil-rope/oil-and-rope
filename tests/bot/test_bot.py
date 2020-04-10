@@ -7,7 +7,7 @@ from django.test import TestCase
 from faker import Faker
 
 from bot.bot import OilAndRopeBot
-from bot.exceptions import HelpfulError
+from bot.exceptions import HelpfulError, OilAndRopeException
 
 
 class TestOilAndRopeBot(TestCase):
@@ -54,6 +54,15 @@ class TestOilAndRopeBot(TestCase):
             bot = self.bot_class(env_file=env_file)
             self.assertEqual(self.env_variables['BOT_COMMAND_PREFIX'], bot.command_prefix)
             self.assertEqual(self.env_variables['BOT_TOKEN'], bot.token)
+
+    def test_init_with_unexistent_env_file_ko(self):
+        # Random file
+        env_file = self.faker.file_name(category='text', extension='env')
+        msg = 'Env file doesn\'t exist.'
+
+        with self.assertRaises(OilAndRopeException) as ex:
+            self.bot_class(env_file=env_file)
+        self.assertEqual(msg, str(ex.exception))
 
     def test_instance_without_bot_token_ko(self):
         msg = 'Use .env file or set up BOT_TOKEN environment variables.'
