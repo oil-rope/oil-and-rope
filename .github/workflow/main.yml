@@ -5,10 +5,10 @@ on:
     branches:
     - master
     - develop
-    - releases/*
-    - test/*
-    - feature/*
-    - bug/*
+    # - releases/*
+    # - test/*
+    # - feature/*
+    # - bug/*
   pull_request:
     branches:
     - master
@@ -37,22 +37,21 @@ jobs:
         pip install pytest-cov codecov
         pytest -c setup.cfg --ds oilandrope.dev_settings
 
-  npm-build:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        node_version: ['10.x', '12.x']
+  # npm-build:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       node_version: ['10.x', '12.x']
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup NodeJS ${{ matrix.node_version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node_version }}
-    - name: Install dependencies
-      run: npm install
-    - name: Build and run tests
-      run: |
-        npm run build
-        npm test
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Setup NodeJS ${{ matrix.node_version }}
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ matrix.node_version }}
+  #   - name: Install dependencies
+  #     run: npm install
+  #   - name: Build and run tests
+  #     run: |
+  #       npm run build
+  #       npm test
