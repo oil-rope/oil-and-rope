@@ -1,0 +1,42 @@
+language: python
+
+services:
+  - postgresql
+
+
+python:
+  - "3.7.6"
+  - "3.8"
+
+env:
+  - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
+
+install:
+  - pip install -r requirements/requirements-develop.txt
+  # Extra
+  - pip install codecov pytest-cov
+
+before_script:
+  - psql -c 'create database oilandrope;' -U postgres
+  # Fixing isort on migrations
+  - isort -sk ./**/migrations/*.py
+
+script:
+  - python runtests.py --coverage
+
+after_success:
+  - codecov -e DJANGO_SETTINGS_MODULE
+
+jobs:
+  include:
+    - language: node_js
+      before_install:
+      - sudo apt-get update
+      - sudo apt-get install python3 python3-pip
+      - pip3 install -U pip setuptools --user
+      install:
+        - pip3 install -r requirements/requirements-develop.txt
+        - npm install
+      node_js: 12
+      script:
+      - npm test
