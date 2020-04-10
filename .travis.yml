@@ -39,7 +39,9 @@ jobs:
       - sudo apt-get install python3 python3-pip
       - pip3 install -U pip setuptools --user
       install:
-        - npm install
+      - npm install
       node_js: 12
+      before_script:
+      - psql -c 'create database oilandrope;' -U postgres
       script:
       - npm test
