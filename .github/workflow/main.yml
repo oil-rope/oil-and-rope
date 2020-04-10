@@ -1,5 +1,3 @@
-name: Project checker
-
 on:
   push:
     branches:
