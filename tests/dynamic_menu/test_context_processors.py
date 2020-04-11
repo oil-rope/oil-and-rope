@@ -42,6 +42,6 @@ class TestMenuContextProcessor(TestCase):
     def test_access_wrong_menu_referrer_ko(self):
         main_menu = baker.make(DynamicMenu, menu_type=DynamicMenu.MAIN_MENU)
         baker.make(DynamicMenu, menu_type=DynamicMenu.CONTEXT_MENU, parent=main_menu)
-        self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': self.faker.random_int(2, 20)})
+        self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': self.faker.random_int(3, 20)})
         request = self.client.get(self.url, follow=True).wsgi_request
         self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])
