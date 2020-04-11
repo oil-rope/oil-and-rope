@@ -29,7 +29,7 @@ class TestLoadMenuCommand(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.json_file = tempfile.TemporaryFile(mode='w', suffix='.json', dir='./tests/', delete=False)
+        cls.json_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', dir='./tests/', delete=False)
 
     @classmethod
     def tearDownClass(cls):
