@@ -1,36 +1,68 @@
-import pytest
-from django.test import Client
+
+from django.test import TestCase
+from faker import Faker
 from model_bakery import baker
 
-from dynamic_menu import models
+from dynamic_menu.models import DynamicMenu, dynamic_menu_path
+from django.shortcuts import reverse
 
 
-@pytest.fixture()
-def create_dynamic_menu():
-    """
-    Fakes instances to test.
-    """
+class TestDynamicMenuModel(TestCase):
 
-    return baker.make(models.DynamicMenu)
+    def setUp(self):
+        self.faker = Faker()
+        self.instance = baker.make(DynamicMenu, url_resolver='core:home')
 
+    def test_url_property_ok(self):
+        expected_url = reverse('core:home')
+        self.assertEqual(expected_url, self.instance.url)
 
-@pytest.mark.django_db
-def test_str_is_correct(client: Client, create_dynamic_menu: models.DynamicMenu):
-    """
-    Checks if `__str__` works correctly with `mark_safe`.
-    """
+    def test_url_with_extra_urls_args_ok(self):
+        extra_urls_args = '?username=' + self.faker.user_name()
+        self.instance.extra_urls_args = extra_urls_args
+        self.instance.save()
+        expected_url = reverse('core:home') + extra_urls_args
+        self.assertEqual(expected_url, self.instance.url)
 
-    prepended_text = '<i class="md md-prepended-icon"></i>'
-    appended_text = '<i class="md md-appended-icon"></i>'
+    def test_dynamic_menu_path_ok(self):
+        file_name = self.faker.file_name(category='image')
+        expected = 'dynamic_menu/dynamic_menu/{}/{}'.format(self.instance.pk, file_name)
+        result = dynamic_menu_path(self.instance, file_name)
+        self.assertEqual(expected, result)
 
-    create_dynamic_menu.prepended_text = prepended_text
-    create_dynamic_menu.appended_text = appended_text
-    create_dynamic_menu.save()
+    def test_absolute_url_ok(self):
+        expected_url = reverse('core:home')
+        self.assertEqual(expected_url, self.instance.get_absolute_url())
 
-    assert prepended_text in str(create_dynamic_menu),\
-        'Prepended text isn\'t marked as safe.'
-    assert appended_text in str(create_dynamic_menu),\
-        'Appended text isn\'t marked as safe.'
+    def test_str_without_extra_text_ok(self):
+        expected = self.instance.name
+        self.assertEqual(expected, str(self.instance))
 
-    assert create_dynamic_menu.url == '#no-url',\
-        'URL Resolver works without resolver.'
+    def test_str_with_extra_text_ok(self):
+        prepended_text = '<i class="fa fa-user"></i>'
+        self.instance.prepended_text = prepended_text
+        appended_text = '<i class="fa fa-user"></i>'
+        self.instance.appended_text = appended_text
+        self.instance.save()
+        expected = prepended_text + self.instance.name + appended_text
+        self.assertEqual(expected, str(self.instance))
+
+    def test_str_with_prepended_text_ok(self):
+        prepended_text = '<i class="fa fa-user"></i>'
+        self.instance.prepended_text = prepended_text
+        self.instance.save()
+        expected = prepended_text + self.instance.name
+        self.assertEqual(expected, str(self.instance))
+
+    def test_str_with_appended_text_ok(self):
+        appended_text = '<i class="fa fa-user"></i>'
+        self.instance.appended_text = appended_text
+        self.instance.save()
+        expected = self.instance.name + appended_text
+        self.assertEqual(expected, str(self.instance))
+
+    def test_url_property_ko(self):
+        self.instance.url_resolver = 'random:random'
+        self.instance.save()
+        expected_url = '#no-url'
+        self.assertEqual(expected_url, self.instance.url)
