@@ -16,7 +16,7 @@ install:
   # Linting
   - pip install flake8 isort
   # Install pytest and dependencies
-  - pip install pytest pytest-django pytest-asyncio pytest-mock model_bakery
+  - pip install pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun
   # Codecov and coverage
   - pip install codecov pytest-cov
 

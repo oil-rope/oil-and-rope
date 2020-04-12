@@ -214,7 +214,7 @@ class SignUpForm(UserCreationForm):
 
         try:
             user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
-        except SMTPAuthenticationError:
+        except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
     def clean_discord_id(self):

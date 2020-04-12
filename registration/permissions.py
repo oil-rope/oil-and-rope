@@ -11,4 +11,4 @@ class IsModelOwner(permissions.BasePermission):
         Checks if owner is the same as `request.user`.
         """
 
-        return obj.user == request.user
+        return obj.user == request.user  # pragma: no cover

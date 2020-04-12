@@ -57,7 +57,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return context
 
     def get_success_message(self) -> str:
-        if self.succes_message:
+        if self.succes_message:  # pragma: no cover
             return self.succes_message
         succes_message = '{}! {}.'.format(
             _('User created'),
@@ -187,7 +187,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
 
         try:
             user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
-        except SMTPAuthenticationError:
+        except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
     def form_valid(self, form):

@@ -5,6 +5,7 @@ channels_redis
 django-extensions
 django-pdb
 flake8
+freezegun
 ipdb
 isort
 model_bakery
