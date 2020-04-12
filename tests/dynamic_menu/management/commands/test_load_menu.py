@@ -9,7 +9,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from faker import Faker
 
-from dynamic_menu import models
+from dynamic_menu.models import DynamicMenu
 
 
 class TestLoadMenuCommand(TestCase):
@@ -17,12 +17,28 @@ class TestLoadMenuCommand(TestCase):
     def setUp(self):
         self.data = [
             {
-                'name': 'TestName',
-                'menu_type': models.DynamicMenu.MAIN_MENU,
+                'name': 'First Menu',
+                'name_en': 'First Menu',
+                'name_es': 'Primer Menú',
+                'menu_type': DynamicMenu.MAIN_MENU,
+                'children': [{
+                        'name': 'First Submenu',
+                        'name_en': 'First Submenu',
+                        'name_es': 'Primer Submenú',
+                        'menu_type': DynamicMenu.MAIN_MENU,
+                        'children': [{
+                            'name': 'First Context Menu',
+                            'name_en': 'First Context Menu',
+                            'name_es': 'Primer Menú Contextual',
+                            'menu_type': DynamicMenu.CONTEXT_MENU
+                        }]
+                }]
             },
             {
-                'name': 'TestName2',
-                'menu_type': models.DynamicMenu.CONTEXT_MENU,
+                'name': 'Second Menu',
+                'name_en': 'Second Menu',
+                'name_es': 'Segundo Menú',
+                'menu_type': DynamicMenu.MAIN_MENU,
             }
         ]
         self.faker = Faker()
@@ -52,8 +68,9 @@ class TestLoadMenuCommand(TestCase):
 
         call_command('load_menu', str(json_file))
 
-        entries = models.DynamicMenu.objects.count()
-        self.assertEqual(len(self.data), entries, 'Menu entries weren\'t correctly created.')
+        entries = DynamicMenu.objects.count()
+        expected_len = 4
+        self.assertEqual(expected_len, entries, 'Menu entries weren\'t correctly created.')
 
     def test_load_inexistent_file_ko(self):
         json_file = self.faker.file_name(category='text', extension='json')
