@@ -1,12 +1,11 @@
-from django.test import TestCase
-from faker import Faker
 from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.utils.timezone import datetime
+from faker import Faker
+from freezegun import freeze_time
 from model_bakery import baker
 
-from django.utils.timezone import datetime
 from registration.models import user_directory_path
-
-from freezegun import freeze_time
 
 
 class TestProfileModel(TestCase):
