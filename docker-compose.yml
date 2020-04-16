@@ -19,7 +19,6 @@ services:
     build:
       context: .
       dockerfile: ./compose/django/Dockerfile
-    working_dir: /app/
     volumes:
       - ./:/app/
       - ./compose/django/entrypoint.sh:/entrypoint.sh
@@ -40,12 +39,38 @@ services:
       - postgres_db
     expose:
       - "5000"
+    working_dir: /app/
+
+  channels:
+    image: oil-and-rope:latest
+    volumes:
+      - ./:/app/
+      - ./compose/django/entrypoint.sh:/entrypoint.sh
+      - ./compose/channels/command.sh:/command.sh
+    environment:
+      - DB_NAME=oilandrope
+      - DB_HOST=postgres_db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=p4ssw0rd@
+      - DJANGO_SETTINGS_MODULE=oilandrope.settings
+      # Dummy key
+      - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+      - ALLOWED_HOSTS=*
+    entrypoint: /entrypoint.sh
+    command: /command.sh
+    depends_on:
+      - django
+      - postgres_db
+    expose:
       - "5001"
+    working_dir: /app/
 
   nginx:
     image: nginx:latest
     depends_on:
       - django
+      - channels
     volumes:
       - ./:/app/
       - ./static:/static

@@ -152,7 +152,7 @@ class SignUpForm(UserCreationForm):
     def _resolve_consumer_url(self):
         consumer_url = 'ws://' if settings.DEBUG else 'wss://'
         consumer_url += 'localhost:8000'
-        consumer_url += reverse('bot:ws_bot_register')
+        consumer_url += reverse('bot_ws:register')
         return consumer_url
 
     def clean_email(self):
