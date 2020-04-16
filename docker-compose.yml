@@ -48,7 +48,8 @@ services:
       - django
     volumes:
       - ./:/app/
-      - ./static/:/static
+      - ./static:/static
+      - ./media:/media
       - ./compose/nginx/conf.d:/etc/nginx/conf.d
     ports:
       - 80:80
