@@ -21,6 +21,8 @@ services:
       dockerfile: ./compose/django/Dockerfile
     volumes:
       - ./:/app/
+      - ./compose/django/entrypoint.sh:/entrypoint.sh
+      - ./compose/django/command.sh:/command.sh
     environment:
       - DB_NAME=oilandrope
       - DB_HOST=postgres_db
@@ -44,6 +46,8 @@ services:
     image: oil-and-rope:latest
     volumes:
       - ./:/app/
+      - ./compose/django/entrypoint.sh:/entrypoint.sh
+      - ./compose/channels/command.sh:/command.sh
     environment:
       - DB_NAME=oilandrope
       - DB_HOST=postgres_db
