@@ -15,8 +15,8 @@ RUN apt-get install -y nodejs
 
 # Settup locales
 RUN dpkg-reconfigure locales
-RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen
-RUN echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen
-RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen
-RUN echo "en_GB UTF-8" >> /etc/locale.gen
+RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
+    echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen && \
+    echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
+    echo "en_GB UTF-8" >> /etc/locale.gen
 RUN /usr/sbin/locale-gen

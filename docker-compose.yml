@@ -13,6 +13,7 @@ services:
     # Saving data on local
     volumes:
       - postgres_db_data:/var/lib/postgresql/data/
+
   django:
     image: oil-and-rope:latest
     build:
@@ -30,14 +31,23 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=p4ssw0rd@
       - DJANGO_SETTINGS_MODULE=oilandrope.settings
+      # Dummy key
       - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+      - ALLOWED_HOSTS=*
     entrypoint: /entrypoint.sh
     command: /command.sh
     depends_on:
       - postgres_db
+    expose:
+      - "80"
+
   nginx:
     image: nginx:latest
     depends_on:
       - django
+    volumes:
+      - ./:/app/
+      - ./static/:/static
+      - ./compose/nginx/config:/etc/nginx/conf.d
     ports:
-      - 8080:80
+      - 80:80

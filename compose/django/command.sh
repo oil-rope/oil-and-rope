@@ -8,6 +8,10 @@ npm install && npm run build echo 'Done!'
 echo 'Updating database...'
 python manage.py migrate && echo 'Done!'
 
+# Statics
+echo 'Collecting statics...'
+python manage.py collectstatic --noinput
+
 # Start server
 echo 'Starting server...'
-gunicorn oilandrope.wsgi --chdir=/app -w 4
+/usr/local/bin/gunicorn oilandrope.wsgi --bind 0.0.0.0:80 --workers 4 --access-logfile -
