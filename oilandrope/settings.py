@@ -128,7 +128,7 @@ WSGI_APPLICATION = 'oilandrope.wsgi.application'
 # DjangoChannels ASGI Router
 ASGI_APPLICATION = 'oilandrope.routing.application'
 
-WS_HOST = os.getenv('WS_HOST', 'localhost')
+WS_HOST = os.getenv('WS_HOST', None)
 
 
 # Database
