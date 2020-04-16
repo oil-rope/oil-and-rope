@@ -1,7 +1,6 @@
-from django.urls import re_path
-
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
+from django.urls import re_path
 
 from bot import consumers as bot_consumers
 
