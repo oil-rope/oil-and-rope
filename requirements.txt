@@ -2,4 +2,3 @@
 -r requirements/requirements-base.txt
 
 django-heroku
-gunicorn

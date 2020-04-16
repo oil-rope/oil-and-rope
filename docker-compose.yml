@@ -1,0 +1,43 @@
+version: "2"
+
+volumes:
+  postgres_db_data: {}
+
+services:
+  postgres_db:
+    image: postgres:11.7
+    environment:
+      - POSTGRES_PASSWORD=p4ssw0rd@
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=oilandrope
+    # Saving data on local
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data/
+  django:
+    image: oil-and-rope:latest
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    working_dir: /app/
+    volumes:
+      - ./:/app/
+      - ./compose/django/entrypoint.sh:/entrypoint.sh
+      - ./compose/django/command.sh:/command.sh
+    environment:
+      - DB_NAME=oilandrope
+      - DB_HOST=postgres_db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=p4ssw0rd@
+      - DJANGO_SETTINGS_MODULE=oilandrope.settings
+      - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+    entrypoint: /entrypoint.sh
+    command: /command.sh
+    depends_on:
+      - postgres_db
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - django
+    ports:
+      - 8080:80

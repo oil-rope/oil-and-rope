@@ -9,6 +9,8 @@ django-mptt-admin
 django-simple-history
 django-tables2
 djangorestframework
+faker
+gunicorn
 Pillow
 psycopg2-binary
 python-dateutil
