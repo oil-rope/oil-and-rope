@@ -10,8 +10,10 @@ django-simple-history
 django-tables2
 djangorestframework
 faker
+gunicorn
 Pillow
 psycopg2-binary
 python-dateutil
 python-dotenv
+Twisted[tls,http2]
 xlrd
