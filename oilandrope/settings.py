@@ -128,6 +128,8 @@ WSGI_APPLICATION = 'oilandrope.wsgi.application'
 # DjangoChannels ASGI Router
 ASGI_APPLICATION = 'oilandrope.routing.application'
 
+WS_HOST = os.getenv('WS_HOST', 'localhost')
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
