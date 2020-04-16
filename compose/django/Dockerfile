@@ -20,3 +20,7 @@ RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "en_GB UTF-8" >> /etc/locale.gen
 RUN /usr/sbin/locale-gen
+
+# Copy Entrypoint and Command
+COPY ./compose/django/command.sh /command.sh
+COPY ./compose/django/entrypoint.sh /entrypoint.sh
