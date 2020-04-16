@@ -39,8 +39,8 @@ services:
     depends_on:
       - postgres_db
     expose:
-      - "80"
-      - "443"
+      - "5000"
+      - "5001"
 
   nginx:
     image: nginx:latest
@@ -52,5 +52,5 @@ services:
       - ./media:/media
       - ./compose/nginx/conf.d:/etc/nginx/conf.d
     ports:
-      - 80:80
-      - 443:433
+      - 5000:5000
+      - 5001:5001

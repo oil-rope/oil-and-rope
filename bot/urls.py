@@ -12,6 +12,7 @@ router.register(r'discord_voice_channel', viewsets.DiscordVoiceChannelViewSet)
 app_name = 'bot'
 
 urlpatterns = [
+    # WebSockets
+    path('', include('bot.routing')),
     path('api/', include(router.urls)),
-    path('ws/', include('bot.routing')),
 ]
