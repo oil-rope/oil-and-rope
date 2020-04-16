@@ -14,4 +14,4 @@ python manage.py collectstatic --noinput
 
 # Start server
 echo 'Starting server...'
-/usr/local/bin/gunicorn oilandrope.wsgi --bind 0.0.0.0:80 --workers 4 --access-logfile -
+/usr/local/bin/gunicorn oilandrope.wsgi:application --bind 0.0.0.0:80 --workers 4 --access-logfile -

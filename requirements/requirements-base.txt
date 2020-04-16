@@ -15,4 +15,5 @@ Pillow
 psycopg2-binary
 python-dateutil
 python-dotenv
+Twisted[tls,http2]
 xlrd

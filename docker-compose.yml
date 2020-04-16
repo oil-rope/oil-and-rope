@@ -40,6 +40,7 @@ services:
       - postgres_db
     expose:
       - "80"
+      - "443"
 
   nginx:
     image: nginx:latest
@@ -48,6 +49,7 @@ services:
     volumes:
       - ./:/app/
       - ./static/:/static
-      - ./compose/nginx/config:/etc/nginx/conf.d
+      - ./compose/nginx/conf.d:/etc/nginx/conf.d
     ports:
       - 80:80
+      - 443:433
