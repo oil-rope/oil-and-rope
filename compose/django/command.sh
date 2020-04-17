@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Compile JavaScript
 echo 'Intalling NPM dependencies and building...'

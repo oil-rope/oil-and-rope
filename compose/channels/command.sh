@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/sh
 
 # Start server
 echo 'Starting Daphne...'
