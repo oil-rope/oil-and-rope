@@ -1,4 +1,3 @@
-const webpack = require("webpack");
 const path = require("path");
 
 const PUBLIC_PATH = process.env.STATIC_URL || "/static/frontend/dist/";

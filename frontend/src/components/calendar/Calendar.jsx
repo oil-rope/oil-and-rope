@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 
-import "./main.scss";
-
 export class Calendar extends Component {
 	constructor(props) {
 		super(props);

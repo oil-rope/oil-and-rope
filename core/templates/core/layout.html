@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
   <!-- Oil & Rope Styles -->
   <link rel="stylesheet" href="{% static 'core/css/oilandrope-theme.css' %}">
+  <!-- Extra Styles -->
+  {% block css %}{% endblock css %}
 
   <title>{% block title %}{% endblock title %} | Oil &amp; Rope</title>
 
