@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 export class UserCheckButton extends Component {
 	constructor(props) {
@@ -75,7 +75,7 @@ export class UserCheckButton extends Component {
 
 	render() {
 		return (
-			<div data-testid="userCheckButton">
+			<div data-testid="testUserCheckButton">
 				<Fragment>
 					<Button
 						onClick={this.handlerClick}

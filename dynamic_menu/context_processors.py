@@ -17,17 +17,17 @@ def menus(request) -> dict:
         'context_menus': models.DynamicMenu.objects.none()
     }
 
-    # Checking for user and its permissions
-    user = request.user
-    user_permissions = [per.split('.')[1]
-                        for per in user.get_all_permissions()]
-    user_permissions = Permission.objects.filter(codename__in=user_permissions)
-
     # Getting menus
     qs = models.DynamicMenu.objects.all()
 
     if not qs.exists():
         return menus_dict
+
+    # Checking for user and its permissions
+    user = request.user
+    user_permissions = [per.split('.')[1]
+                        for per in user.get_all_permissions()]
+    user_permissions = Permission.objects.filter(codename__in=user_permissions)
 
     # Filtering by permissions
     qs = qs.filter(
@@ -42,7 +42,7 @@ def menus(request) -> dict:
     if menu_referrer and menu_referrer != 'None':  # Because of JavaScript
         try:
             menu_parent = models.DynamicMenu.objects.get(pk=menu_referrer)
-            context_menus = menu_parent.get_descendants()
+            context_menus = menu_parent.get_children()
 
             # Checking for permissions
             context_menus = context_menus.filter(

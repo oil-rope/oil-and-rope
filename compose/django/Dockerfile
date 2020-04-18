@@ -3,7 +3,7 @@ FROM python:3.7
 # Update packages
 RUN apt-get update
 # Install dependencies
-RUN apt-get install -y gettext locales vim
+RUN apt-get install -y gettext locales vim ruby-sass
 
 # Copy and install requirements
 COPY ./requirements/requirements-base.txt /tmp/requirements.txt

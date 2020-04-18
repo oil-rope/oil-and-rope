@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from core.models import TracingMixin
@@ -45,8 +44,6 @@ class DiscordUser(TracingMixin):
     def __str__(self):
         return '{}#{}'.format(self.nick, self.code)
 
-    def get_absolute_url(self):
-        return reverse('bot:discorduser_detail', kwargs={'pk': self.pk})
 
 
 class DiscordServer(TracingMixin):
@@ -94,9 +91,6 @@ class DiscordServer(TracingMixin):
 
     def __str__(self):
         return 'Server {} ({})'.format(self.name, self.pk)
-
-    def get_absolute_url(self):
-        return reverse('bot:discordserver_detail', kwargs={'pk': self.pk})
 
 
 class DiscordChannelMixin(models.Model):
@@ -166,9 +160,6 @@ class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
     def __str__(self):
         return 'Text Channel {} ({})'.format(self.name, self.pk)
 
-    def get_absolute_url(self):
-        return reverse('bot:discordchanneltext_detail', kwargs={'pk': self.pk})
-
 
 class DiscordVoiceChannel(TracingMixin, DiscordChannelMixin):
     """
@@ -205,6 +196,3 @@ class DiscordVoiceChannel(TracingMixin, DiscordChannelMixin):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse('bot:discordvoicechannel_detail', kwargs={'pk': self.pk})

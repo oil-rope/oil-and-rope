@@ -1,5 +1,7 @@
 from django.conf import settings
 
+from registration.models import Profile
+
 
 def language(request):
     """
@@ -12,7 +14,8 @@ def language(request):
     }
 
     if request.user.is_authenticated:
-        profile = request.user.profile
-        content['lan'] = profile.language
+        # Optimizacion of language selector
+        language = Profile.objects.filter(user_id=request.user.id).values_list('language', flat=True).first()
+        content['lan'] = language
         return content
     return content

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, cleanup } from "@testing-library/react";
 import UserCheckButton from "../UserCheckButton";
-import JQuery from "jquery";
+import $ from "jquery";
 
 // Mocking Django's gettext
 global.gettext = (txt) => txt;
@@ -12,7 +12,7 @@ afterEach(cleanup);
 it("Renders without problem", () => {
 	let url = "ws://localhost";
 	let invitationURL = "http://localhost";
-	let relatedField = JQuery(document.createElement("input"));
+	let relatedField = $(document.createElement("input"));
 	const { getByTestId } = render(
 		<UserCheckButton
 			url={url}
@@ -20,5 +20,5 @@ it("Renders without problem", () => {
 			relatedField={relatedField}
 		/>
 	);
-	expect(getByTestId("userCheckButton")).not.toBeNull();
+	expect(getByTestId("testUserCheckButton")).not.toBeNull();
 });

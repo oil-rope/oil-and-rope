@@ -7,6 +7,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 from discord.ext.commands import errors
+from discord.gateway import DiscordWebSocket
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 from faker import Faker
@@ -29,8 +30,7 @@ class OilAndRopeBot(commands.Bot):
         if env_file:
             self.load_env_file(env_file)
         self.load_variables()
-        super(OilAndRopeBot, self).__init__(command_prefix=self.command_prefix, description=self.description, **options)
-        self.load_commands()
+        super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
 
     def load_variables(self):
         """
@@ -96,7 +96,7 @@ class OilAndRopeBot(commands.Bot):
                 message=message.content
             )
             print(log_message)
-        await super(OilAndRopeBot, self).on_message(message)
+        await super().on_message(message)
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, errors.MissingRequiredArgument):
@@ -104,7 +104,8 @@ class OilAndRopeBot(commands.Bot):
             await context.send_help(context.command)
 
     def run(self, *args, **kwargs):
-        super(OilAndRopeBot, self).run(self.token, *args, **kwargs)
+        self.load_commands()
+        super().run(self.token, *args, **kwargs)
 
     async def confirm_user(self, user_id):
         """

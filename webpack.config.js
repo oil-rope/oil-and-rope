@@ -1,11 +1,14 @@
 const path = require("path");
 
+const PUBLIC_PATH = process.env.STATIC_URL || "/static/frontend/dist/";
+
 module.exports = {
 	entry: {
 		Calendar: "./frontend/src/renderCalendar.js",
 		UserCheckButton: "./frontend/src/renderUserCheckButton.js",
 	},
 	output: {
+		publicPath: PUBLIC_PATH,
 		filename: "[name].bundle.js",
 		path: path.resolve(__dirname, "./frontend/static/frontend/dist/"),
 		chunkFilename: "[name].bundle.js",
@@ -40,4 +43,7 @@ module.exports = {
 	resolve: {
 		extensions: [".js", ".jsx", ".scss", ".sass"],
 	},
+	externals: {
+		jquery: 'jQuery'
+	}
 };

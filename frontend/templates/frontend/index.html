@@ -1,6 +1,12 @@
 {% extends 'core/layout.html' %}
 {% load static %}
 
+{% block css %}
+<!-- Full Calendar -->
+<link rel="stylesheet" href="{% static 'frontend/fullcalendar/core/main.min.css' %}">
+<link rel="stylesheet" href="{% static 'frontend/fullcalendar/daygrid/main.min.css' %}">
+{% endblock css %}
+
 {% block title %}Test React{% endblock title %}
 
 {% block body_content %}
