@@ -50,7 +50,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_str = text_data_json.get('message', '')
         created_at = text_data_json.get('created_at')
 
-        
         chat, created = models.Chat.objects.get_or_create(name=chat_pk)
         chat.users.add(user)
         chat_msg_sender = User.objects.get(pk=owner_pk)
@@ -137,3 +136,55 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message_json,
                 'own_message': own_message,
             }))
+
+
+class ChatRooms(AsyncWebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        super(ChatConsumer, self).__init__(*args, **kwargs)
+
+        self.room_name = 'rooms'
+        self.room_group = 'chats_{}'.format(self.room_name)
+
+    async def connect(self):
+        await self.channel_layer.group_add(
+            self.room_group,
+            self.channel_name
+        )
+
+        await self.accept("subprotocol")
+        # To reject the connection, call:
+
+        await self.show_rooms()
+
+        await self.close()
+
+    async def receive(self, text_data=None, bytes_data=None):
+        # Called with either text_data or bytes_data for each frame
+        # You can call:
+        await self.send(text_data="Hello world!")
+        # Or, to send a binary frame:
+        await self.send(bytes_data="Hello world!")
+        # Want to force-close the connection? Call:
+        await self.close()
+        # Or add a custom WebSocket error code!
+        await self.close(code=4123)
+
+    async def show_rooms(self):
+
+        user = self.scope['user']
+
+        chats = user.chats.all()
+
+        chats_serialized = ChatSerializer(chats, many=True)
+
+        await self.send(text_data=json.dumps({
+            'chats': chats_serialized
+        }))
+
+    async def disconnect(self, close_code):
+        # Called when the socket closes
+        await self.channel_layer.group_discard(
+            self.room_group,
+            self.channel_name
+        )

@@ -1,8 +1,8 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from .views import index, room
 from .viewsets import ChatMessageViewSet, ChatViewSet
-from .views import room, index
 
 router = routers.DefaultRouter()
 router.register(r'chat', ChatViewSet)

@@ -1,7 +1,6 @@
 from rest_framework import viewsets
 
-from .models import Chat
-from .models import ChatMessage
+from .models import Chat, ChatMessage
 from .permissions import IsModelOwner
 from .serializers import ChatMessageSerializer, ChatSerializer
 

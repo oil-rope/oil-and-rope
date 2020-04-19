@@ -2,6 +2,7 @@ import React, { Component}  from 'react';
 class Chat extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       data: [],
       loaded: false,
@@ -10,55 +11,29 @@ class Chat extends Component {
   }
 
   componentDidMount() {
-    fetch("api")
-      .then(response => {
-        if (response.status > 400) {
-          return this.setState(() => {
-            return { placeholder: "Something went wrong!" };
-          });
-        }
-        return response.json();
-      })
-      .then(data => {
-        this.setState(() => {
-          return {
-            data,
-            loaded: true
-          };
-        });
-      });
+    console.log(this);
+    this.connector = new WebSocket('ws://localhost:8000/chat/');
+    this.connector.onmessage = this.WSOnMessage;
+    this.connector.onerror = this.WSOnError;
+    this.connector.onclose = this.WSOnClose;
+    debugger;
+  }
+
+  WSOnMessage = (message) =>{
+    let { exists, error } = JSON.parse(message.data);
+
+    console.log(exists);
+    console.log(error);
+
   }
 
   render() {
-    if (this.state.data !== undefined) {
 
-      console.log(this.state.data);
-      const { data } = this.state.data;
-      // return this.state.data.length ? this.renderData() : (
-        // <span>Loading chats...</span>
-        // )
-      return this.renderData();
-    }
-  
-  }
-
-
-  renderData() {
     return (
       <ul>
-        {console.log(this.state)}
-        {
-
-          this.state.data.forEach(element => {
-            return (
-              <li key={element.id}>
-              {element.name}
-            </li>
-          );
-        }) 
-        }
       </ul>
     );
+  
   }
 
 }
