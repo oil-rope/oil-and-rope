@@ -141,23 +141,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
 class ChatRooms(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
-        super(ChatConsumer, self).__init__(*args, **kwargs)
+        super(ChatRooms, self).__init__(*args, **kwargs)
 
         self.room_name = 'rooms'
         self.room_group = 'chats_{}'.format(self.room_name)
 
     async def connect(self):
+
+        await super().connect()
+
         await self.channel_layer.group_add(
             self.room_group,
             self.channel_name
         )
 
-        await self.accept("subprotocol")
-        # To reject the connection, call:
-
         await self.show_rooms()
-
-        await self.close()
 
     async def receive(self, text_data=None, bytes_data=None):
         # Called with either text_data or bytes_data for each frame
@@ -176,7 +174,7 @@ class ChatRooms(AsyncWebsocketConsumer):
 
         chats = user.chats.all()
 
-        chats_serialized = ChatSerializer(chats, many=True)
+        chats_serialized = ChatSerializer(chats, many=True).data
 
         await self.send(text_data=json.dumps({
             'chats': chats_serialized
