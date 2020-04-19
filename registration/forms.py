@@ -148,11 +148,10 @@ class SignUpForm(UserCreationForm):
             )
         )
 
-    # TODO: Change to work with actual host, not localhost:8000
     def _resolve_consumer_url(self):
         consumer_url = 'ws://' if settings.DEBUG else 'wss://'
-        consumer_url += 'localhost:8000'
-        consumer_url += reverse('bot:ws_bot_register')
+        consumer_url += settings.WS_HOST if settings.WS_HOST else self.request.get_host()
+        consumer_url += reverse('bot_ws:register')
         return consumer_url
 
     def clean_email(self):
@@ -214,7 +213,7 @@ class SignUpForm(UserCreationForm):
 
         try:
             user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
-        except SMTPAuthenticationError:
+        except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
     def clean_discord_id(self):

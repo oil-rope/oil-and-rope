@@ -3,24 +3,11 @@ import logging
 import discord
 from discord import abc
 from django.conf import settings
-from django.utils.timezone import make_aware
+from django.utils.timezone import is_naive, make_aware
 
 from . import exceptions
 
 LOGGER = logging.getLogger(__name__)
-
-
-def validate(*validations):
-    """
-    Checks if all `validations` are correct before executing.
-    """
-
-    def message_validation(func):
-        def func_wrapper(*args, **kwargs):
-            if all(validations):
-                func(*args, **kwargs)
-        return func_wrapper
-    return message_validation
 
 
 def get_or_create_discord_user(member: abc.User):
@@ -41,10 +28,14 @@ def get_or_create_discord_user(member: abc.User):
     if not member:
         raise exceptions.OilAndRopeException('Discord User cannot be None.')
 
-    if not hasattr(member, 'premium_since'):
+    if not hasattr(member, 'premium_since'):  # pragma: no cover
         premium_since = None
     else:
         premium_since = member.premium_since
+
+    created_at = member.created_at
+    if is_naive(created_at):
+        created_at = make_aware(created_at)
 
     # Importing DiscordUser inside a function to avoid 'Apps not ready'
     from .models import DiscordUser
@@ -57,7 +48,7 @@ def get_or_create_discord_user(member: abc.User):
             'avatar_url': member.avatar_url or None,
             'locale': settings.LANGUAGE_CODE or None,
             'premium': True if premium_since else False,
-            'created_at': make_aware(member.created_at)
+            'created_at': created_at
         }
     )
 
@@ -85,6 +76,10 @@ def get_or_create_discord_server(guild: discord.Guild):
     # Importing DiscordServer inside a function to avoid 'Apps not ready'
     from .models import DiscordServer
 
+    created_at = guild.created_at
+    if is_naive(created_at):
+        created_at = make_aware(created_at)
+
     server, created = DiscordServer.objects.get_or_create(
         id=guild.id,
         defaults={
@@ -94,7 +89,7 @@ def get_or_create_discord_server(guild: discord.Guild):
             'owner_id': guild.owner_id,
             'description': guild.description or None,
             'member_count': guild.member_count,
-            'created_at': make_aware(guild.created_at)
+            'created_at': created_at
         }
     )
 
@@ -124,6 +119,10 @@ def get_or_create_discord_text_channel(channel: discord.channel.TextChannel, gui
     # Importing DiscordTextChannel inside a function to avoid 'Apps not ready'
     from .models import DiscordTextChannel
 
+    created_at = channel.created_at
+    if is_naive(created_at):
+        created_at = make_aware(created_at)
+
     text_channel, created = DiscordTextChannel.objects.get_or_create(
         id=channel.id,
         defaults={
@@ -132,7 +131,7 @@ def get_or_create_discord_text_channel(channel: discord.channel.TextChannel, gui
             'nsfw': channel.is_nsfw(),
             'topic': channel.topic or None,
             'news': channel.is_news(),
-            'created_at': make_aware(channel.created_at),
+            'created_at': created_at,
             'server_id': guild.id
         }
     )

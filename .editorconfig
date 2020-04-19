@@ -25,7 +25,7 @@ indent_style = tab
 insert_final_newline = true
 
 # Use 2 spaces on HTML
-[*.html]
+[*.html, *.yml]
 indent_size = 2
 
 # The JSON files contain newlines inconsistently

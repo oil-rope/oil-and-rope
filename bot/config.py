@@ -53,7 +53,9 @@ class Config:
 
         # Checks if example configuration file was moved or removed
         if not example_config.exists():
-            LOGGER.error("File '%(example_config)s' not found!\nDid you removed it?", {'example_config': example_config})
+            LOGGER.error("File '%(example_config)s' not found!\nDid you removed it?", {
+                'example_config': example_config
+            })
             raise OilAndRopeException("Example Config file is needed in order to start the bot.")
 
         config_file = CONFIG_DIR / CONFIG_FILE

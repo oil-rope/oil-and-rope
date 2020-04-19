@@ -27,9 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'oil-and-rope.herokuapp.com',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
 
 # Defines Admins
 # https://docs.djangoproject.com/en/2.2/ref/settings/#admins
@@ -129,6 +127,8 @@ WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
 # DjangoChannels ASGI Router
 ASGI_APPLICATION = 'oilandrope.routing.application'
+
+WS_HOST = os.getenv('WS_HOST', None)
 
 
 # Database

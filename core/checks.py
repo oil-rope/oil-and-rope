@@ -30,13 +30,13 @@ def check_model(model):
     for node in model_node.body[0].body:
 
         # Check for Top-Level
-        if not isinstance(node, ast.Assign):
+        if not isinstance(node, ast.Assign):  # pragma: no cover
             continue
         # Node must have targets
         if len(node.targets) != 1:
             continue
         # Looking for name target (name of the field)
-        if not isinstance(node.targets[0], ast.Name):
+        if not isinstance(node.targets[0], ast.Name):  # pragma: no cover
             continue
 
         field_name = node.targets[0].id

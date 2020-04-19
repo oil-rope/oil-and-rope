@@ -25,7 +25,7 @@ def user_directory_path(instance, filename: str) -> str:
     """
 
     # File will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user_{0}/{1}'.format(instance.profile.user.pk, filename)
+    return 'user_{0}/{1}'.format(instance.user.pk, filename)
 
 
 class Profile(TracingMixin):

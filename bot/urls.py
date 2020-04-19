@@ -13,5 +13,4 @@ app_name = 'bot'
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('ws/', include('bot.routing')),
 ]
