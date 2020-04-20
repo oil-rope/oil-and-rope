@@ -1,28 +1,25 @@
-import React, { Component } from "react";
+import React, { useState, Suspense } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import FullCalendar from "@fullcalendar/react";
+import Loader from "../loader/Loader";
 
-export class Calendar extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			events: [],
-			plugins: [dayGridPlugin],
-			defaultView: "dayGridMonth",
-		};
-	}
+const FullCalendar = React.lazy(() => import("@fullcalendar/react"));
 
-	render() {
-		return (
-			<div data-testid="testCalendar">
+const Calendar = () => {
+	const [plugins, setPlugins] = useState([dayGridPlugin]);
+	const [defaultView, setDefaultView] = useState("dayGridMonth");
+	const [events, setEvents] = useState([]);
+
+	return (
+		<div data-testid="testCalendar">
+			<Suspense fallback={<Loader/>}>
 				<FullCalendar
-					defaultView={this.state.defaultView}
-					plugins={this.state.plugins}
-					events={this.state.events}
+					defaultView={defaultView}
+					plugins={plugins}
+					events={events}
 				/>
-			</div>
-		);
-	}
-}
+			</Suspense>
+		</div>
+	);
+};
 
 export default Calendar;
