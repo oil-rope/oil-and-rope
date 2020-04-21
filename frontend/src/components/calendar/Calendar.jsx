@@ -1,8 +1,6 @@
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import Loader from "../loader/Loader";
-
-const FullCalendar = React.lazy(() => import("@fullcalendar/react"));
+import FullCalendar from "@fullcalendar/react";
 
 const Calendar = () => {
 	const [plugins, setPlugins] = useState([dayGridPlugin]);
@@ -11,13 +9,11 @@ const Calendar = () => {
 
 	return (
 		<div data-testid="testCalendar">
-			<Suspense fallback={<Loader/>}>
-				<FullCalendar
-					defaultView={defaultView}
-					plugins={plugins}
-					events={events}
-				/>
-			</Suspense>
+			<FullCalendar
+				defaultView={defaultView}
+				plugins={plugins}
+				events={events}
+			/>
 		</div>
 	);
 };

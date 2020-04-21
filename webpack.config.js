@@ -4,8 +4,8 @@ const PUBLIC_PATH = process.env.STATIC_URL || "/static/frontend/dist/";
 
 module.exports = {
 	entry: {
-		Calendar: "./frontend/src/renderCalendar.js",
-		UserCheckButton: "./frontend/src/renderUserCheckButton.js",
+		Calendar: "./frontend/src/renderCalendar.jsx",
+		UserCheckButton: "./frontend/src/renderUserCheckButton.jsx",
 	},
 	output: {
 		publicPath: PUBLIC_PATH,
