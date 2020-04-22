@@ -8,16 +8,23 @@ const UserCheckButton = React.lazy(() =>
 
 let checkUserButton = document.getElementById("discord_check_user");
 if (checkUserButton != null && checkUserButton != undefined) {
+
 	let jCheckUserButton = $(checkUserButton);
 	let jInput = $(`#${jCheckUserButton.data("related-field")}`);
-	ReactDOM.render(
-		<Suspense fallback={<Loader></Loader>}>
-			<UserCheckButton
-				url={jCheckUserButton.data("consumer-url")}
-				invitationURL={jCheckUserButton.data("invitation-url")}
-				relatedField={jInput}
-			/>
-		</Suspense>,
-		checkUserButton
-	);
+
+	const App = () => {
+		return (
+			<>
+				<Suspense fallback={<Loader />}>
+					<UserCheckButton
+						url={jCheckUserButton.data("consumer-url")}
+						invitationURL={jCheckUserButton.data("invitation-url")}
+						relatedField={jInput}
+					/>
+				</Suspense>
+			</>
+		);
+	};
+
+	ReactDOM.render(<App />, checkUserButton);
 }

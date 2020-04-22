@@ -1,28 +1,21 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 
-export class Calendar extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			events: [],
-			plugins: [dayGridPlugin],
-			defaultView: "dayGridMonth",
-		};
-	}
+const Calendar = () => {
+	const [plugins, setPlugins] = useState([dayGridPlugin]);
+	const [defaultView, setDefaultView] = useState("dayGridMonth");
+	const [events, setEvents] = useState([]);
 
-	render() {
-		return (
-			<div data-testid="testCalendar">
-				<FullCalendar
-					defaultView={this.state.defaultView}
-					plugins={this.state.plugins}
-					events={this.state.events}
-				/>
-			</div>
-		);
-	}
-}
+	return (
+		<div data-testid="testCalendar">
+			<FullCalendar
+				defaultView={defaultView}
+				plugins={plugins}
+				events={events}
+			/>
+		</div>
+	);
+};
 
 export default Calendar;
