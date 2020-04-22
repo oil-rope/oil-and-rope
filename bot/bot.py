@@ -7,7 +7,6 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 from discord.ext.commands import errors
-from discord.gateway import DiscordWebSocket
 from django.utils.translation import ugettext_lazy as _
 from dotenv import load_dotenv
 from faker import Faker

@@ -45,7 +45,6 @@ class DiscordUser(TracingMixin):
         return '{}#{}'.format(self.nick, self.code)
 
 
-
 class DiscordServer(TracingMixin):
     """
     Model that manages Discord Servers.
