@@ -1,4 +1,7 @@
 language: python
+# Using default dist and os
+dist: xenial
+os: linux
 
 services:
   - postgresql
@@ -12,13 +15,13 @@ env:
   - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
 
 install:
-  - pip install -r requirements/requirements-base.txt
+  - pip install -r requirements/requirements-base.txt -U
   # Linting
-  - pip install flake8 isort
+  - pip install -U flake8 isort
   # Install pytest and dependencies
-  - pip install pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun
+  - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun
   # Codecov and coverage
-  - pip install codecov pytest-cov
+  - pip install -U codecov pytest-cov
 
 before_script:
   - psql -c 'create database oilandrope;' -U postgres

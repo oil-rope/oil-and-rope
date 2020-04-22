@@ -16,13 +16,10 @@ parser = argparse.ArgumentParser(description='Run Tests and Linting.')
 DJANGO_SETTINGS_MODULE = os.getenv('DJANGO_SETTINGS_MODULE')
 
 PYTEST_ARGS = {
-    'default': ['tests'],
-    'fast': ['tests', '-q']
+    'default': ['./'],
+    'fast': ['./', '-q']
 }
 COVERAGE_ARGS = ['--cov', './', '--cov-report', 'xml']
-
-EXCLUDE_PATTERNS = ['**/migrations/**', 'heroku_settings.py']
-FLAKE8_ARGS = ['--exclude'] + EXCLUDE_PATTERNS
 
 ISORT_ARGS = ['--recursive', '--check-only', '--diff']
 
@@ -32,9 +29,9 @@ def exit_on_failure(ret, message=None):
         sys.exit(ret)
 
 
-def flake8_main(args):
+def flake8_main():
     print('Running flake8 code linting')
-    ret = subprocess.call(['flake8'] + [str(arg) for arg in args])
+    ret = subprocess.call(['flake8'])
     print('flake8 failed' if ret else 'flake8 passed')
     return ret
 
@@ -79,7 +76,7 @@ def run(_pytest, flake8, isort, _django):
     if _pytest:
         exit_on_failure(pytest.main(pytest_args))
     if flake8:
-        exit_on_failure(flake8_main(FLAKE8_ARGS))
+        exit_on_failure(flake8_main())
     if isort:
         exit_on_failure(isort_main(ISORT_ARGS))
     if _django:
