@@ -7,6 +7,7 @@ module.exports = {
 		Calendar: "./frontend/src/renderCalendar.js",
 		UserCheckButton: "./frontend/src/renderUserCheckButton.js",
 		Chat: "./frontend/src/renderChat.js",
+		Messages: "./frontend/src/renderMessages.js"
 	},
 	output: {
 		publicPath: PUBLIC_PATH,

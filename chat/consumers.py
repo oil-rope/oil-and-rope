@@ -19,6 +19,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         super(ChatConsumer, self).__init__(*args, **kwargs)
 
         self.room_name = self.scope['url_route']['kwargs']['room_name']
+
         self.room_group = 'board_{}'.format(self.room_name)
 
     async def connect(self):
@@ -42,7 +43,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytest_data=None):
 
-        user = self.scope['user']
         text_data_json = json.loads(text_data)
 
         owner_pk = text_data_json.get('user')
@@ -50,8 +50,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_str = text_data_json.get('message', '')
         created_at = text_data_json.get('created_at')
 
-        chat, created = models.Chat.objects.get_or_create(name=chat_pk)
-        chat.users.add(user)
+        chat = models.Chat.objects.get(id=chat_pk)
+
         chat_msg_sender = User.objects.get(pk=owner_pk)
 
         owner_json = UserSerializer(chat_msg_sender, many=False).data
@@ -70,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
-        
+
         chat_json = event['chat']
         message = event['message']
         owner_json = event['owner']
@@ -85,8 +85,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if own_message:
             await self.save_to_db(chat, message, owner, created_at)
-
-        # message_json = ChatMessageSerializer(chat_message).data
 
         message_json = {
             'chat': chat_json,
@@ -120,22 +118,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         for message in messages:
 
-            message_json = {
-                'chat': chat_json,
-                'message': message.message,
-                'user': message.user.username,
-                'created_at': str(message.created_at),
-            }
+            if message.chat.id == chat.id:
+                message_json = {
+                    'chat': chat_json,
+                    'message': message.message,
+                    'user': message.user.username,
+                    'created_at': str(message.created_at),
+                }
 
-            if user.id == message.user.id:
-                own_message = True
-            else:
-                own_message = False
+                if user.id == message.user.id:
+                    own_message = True
+                else:
+                    own_message = False
 
-            await self.send(text_data=json.dumps({
-                'message': message_json,
-                'own_message': own_message,
-            }))
+                await self.send(text_data=json.dumps({
+                    'message': message_json,
+                    'own_message': own_message,
+                }))
 
 
 class ChatRooms(AsyncWebsocketConsumer):
@@ -158,15 +157,11 @@ class ChatRooms(AsyncWebsocketConsumer):
         await self.show_rooms()
 
     async def receive(self, text_data=None, bytes_data=None):
-        # Called with either text_data or bytes_data for each frame
-        # You can call:
-        await self.send(text_data="Hello world!")
-        # Or, to send a binary frame:
-        await self.send(bytes_data="Hello world!")
-        # Want to force-close the connection? Call:
-        await self.close()
-        # Or add a custom WebSocket error code!
-        await self.close(code=4123)
+        text_data_json = json.loads(text_data)
+
+        room_name = text_data_json.get('room_name')
+
+        chat, created = await self.create_room(room_name)
 
     async def show_rooms(self):
 
@@ -179,6 +174,18 @@ class ChatRooms(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'chats': chats_serialized
         }))
+
+    async def create_room(self, room_name):
+
+        user = self.scope['user']
+
+        chat, created = models.Chat.objects.get_or_create(name=room_name)
+
+        chat.users.add(user)
+
+        await self.show_rooms()
+
+        return chat, created
 
     async def disconnect(self, close_code):
         # Called when the socket closes
