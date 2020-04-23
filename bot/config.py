@@ -6,7 +6,7 @@ import shutil
 
 from .exceptions import OilAndRopeException
 
-LOG = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 CONFIG_DIR = pathlib.Path(__file__).parent / 'config/'
 EXAMPLE_CONFIG_DIR = 'example_configuration.ini'
 CONFIG_FILE = 'configuration.ini'
@@ -35,8 +35,8 @@ class Config:
                 self.configuration[section].update({option: value})
 
         # Checking for sensitive crendentials
-        if 'token' not in self.configuration['Credentials']:
-            LOG.warning("\nToken not found in 'Credentials'\nLooking in environment variables 'BOT_TOKEN'\n")
+        if 'BOT_TOKEN' in os.environ:
+            LOGGER.warning('\nToken found in \'Environment Vairables\', using it.')
             self.configuration['Credentials'].update({'token': os.getenv('BOT_TOKEN', '')})
 
     def get_config_file(self) -> pathlib.Path:
@@ -53,7 +53,9 @@ class Config:
 
         # Checks if example configuration file was moved or removed
         if not example_config.exists():
-            LOG.error("File '%(example_config)s' not found!\nDid you removed it?", {'example_config': example_config})
+            LOGGER.error("File '%(example_config)s' not found!\nDid you removed it?", {
+                'example_config': example_config
+            })
             raise OilAndRopeException("Example Config file is needed in order to start the bot.")
 
         config_file = CONFIG_DIR / CONFIG_FILE
@@ -63,7 +65,7 @@ class Config:
             try:
                 shutil.copy(str(example_config), str(config_file))
             except IOError:
-                LOG.error("Couldn't copy configuration file!\nDo you have read and write permissions?")
+                LOGGER.error("Couldn't copy configuration file!\nDo you have read and write permissions?")
                 OilAndRopeException("You need permissions to copy the configuration file.")
 
         return config_file

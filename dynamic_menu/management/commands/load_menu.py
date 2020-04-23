@@ -19,10 +19,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Reading arguments and parsing
+        json_file = None
         if 'fixture' in options:
             json_file = pathlib.Path(options.get('fixture', '')[0])
-        else:
-            json_file = pathlib.Path('')
 
         if not json_file.exists():
             raise CommandError('Fixture does not exist.')

@@ -3,7 +3,7 @@ import random
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 
 class SheetHeader(models.Model):
@@ -18,7 +18,7 @@ class SheetHeader(models.Model):
     user: :class:`User`
     """
 
-    name = models.CharField(_("Name"), max_length=50)
+    name = models.CharField(verbose_name=_("Name"), max_length=50)
     # Game
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"), on_delete=models.CASCADE)
@@ -54,12 +54,12 @@ class CharacterInfo(models.Model):
     weight_measurement_system: :class:`select`
     """
 
-    name = models.CharField(_("Name"), max_length=50)
-    age = models.IntegerField(_("Age"))
-    height = models.DecimalField(_("Height"), max_digits=5, decimal_places=2, null=True, blank=True)
-    weight = models.DecimalField(_("Weight"), max_digits=5, decimal_places=2, null=True, blank=True)
-    hair_color = models.CharField(_("Hair Color"), max_length=30, null=True, blank=True)
-    eye_color = models.CharField(_("Eye Color"), max_length=30, null=True, blank=True)
+    name = models.CharField(verbose_name=_("Name"), max_length=50)
+    age = models.IntegerField(verbose_name=_("Age"))
+    height = models.DecimalField(verbose_name=_("Height"), max_digits=5, decimal_places=2, null=True, blank=True)
+    weight = models.DecimalField(verbose_name=_("Weight"), max_digits=5, decimal_places=2, null=True, blank=True)
+    hair_color = models.CharField(verbose_name=_("Hair Color"), max_length=30, null=True, blank=True)
+    eye_color = models.CharField(verbose_name=_("Eye Color"), max_length=30, null=True, blank=True)
 
     METRIC = 0
     US = 1
@@ -68,9 +68,9 @@ class CharacterInfo(models.Model):
         (US, _('US Standard')),
     )
 
-    height_measurement_system = models.PositiveSmallIntegerField(_("Height Measurement System"),
+    height_measurement_system = models.PositiveSmallIntegerField(verbose_name=_("Height Measurement System"),
                                                                  choices=MEASUREMENT_SYSTEM, default=0)
-    WEIGHT_MEASUREMENT_SYSTEM = models.PositiveSmallIntegerField(_("Weight Measurement System"),
+    WEIGHT_MEASUREMENT_SYSTEM = models.PositiveSmallIntegerField(verbose_name=_("Weight Measurement System"),
                                                                  choices=MEASUREMENT_SYSTEM, default=0)
 
     class Meta:
@@ -104,9 +104,9 @@ class SheetDetail(models.Model):
     sheet: :class:`Sheet`
     """
 
-    name = models.CharField(_("Name"), max_length=50)
-    start_value = models.SmallIntegerField(_("Start Value"), default=0)
-    rollable = models.BooleanField(_("Rollable"), default=True)
+    name = models.CharField(verbose_name=_("Name"), max_length=50)
+    start_value = models.SmallIntegerField(verbose_name=_("Start Value"), default=0)
+    rollable = models.BooleanField(verbose_name=_("Rollable"), default=True)
 
     D3 = 0
     D4 = 1
@@ -130,12 +130,12 @@ class SheetDetail(models.Model):
         (D100, _("D100")),
     )
 
-    dice_class = models.PositiveSmallIntegerField(_("Dice Class"), default=20)
-    dice_number = models.PositiveSmallIntegerField(_("Dice Number"), default=1)
+    dice_class = models.PositiveSmallIntegerField(verbose_name=_("Dice Class"), default=20)
+    dice_number = models.PositiveSmallIntegerField(verbose_name=_("Dice Number"), default=1)
     # Inherited bonus
-    misc_bonus = models.SmallIntegerField(_("Miscelaneous Bonus"), default=0)
-    extra_bonus_1 = models.SmallIntegerField(_("Extra Bonus 1"), default=0)
-    extra_bonus_2 = models.SmallIntegerField(_("Extra Bonus 2"), default=0)
+    misc_bonus = models.SmallIntegerField(verbose_name=_("Miscelaneous Bonus"), default=0)
+    extra_bonus_1 = models.SmallIntegerField(verbose_name=_("Extra Bonus 1"), default=0)
+    extra_bonus_2 = models.SmallIntegerField(verbose_name=_("Extra Bonus 2"), default=0)
     sheet = models.ForeignKey("sheet.SheetHeader", verbose_name=_("Sheet Header"),
                               on_delete=models.CASCADE, related_name="sheet_details")
 

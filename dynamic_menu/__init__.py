@@ -23,12 +23,17 @@ def get_version(version: tuple) -> str:
     This method is based on ``django-extensions`` get_version method.
     """
 
-    if not isinstance(version[-1], int):
-        str_version = '.'.join(list(map(str, version[:-1])))
-        str_version += '_{}'.format(version[-1])
-        return str_version
+    str_version = ''
+    for idx, n in enumerate(version):
+        try:
+            str_version += '%d' % int(n)
+        except ValueError:
+            str_version = str_version[:-1]
+            str_version += '_%s' % str(n)
+        finally:
+            if idx < len(version) - 1:
+                str_version += '.'
 
-    str_version = '.'.join(list(map(str, version)))
     return str_version
 
 

@@ -27,9 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'oil-and-rope.herokuapp.com',
-]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
 
 # Defines Admins
 # https://docs.djangoproject.com/en/2.2/ref/settings/#admins
@@ -56,6 +54,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     # Sheet
     'sheet.apps.SheetConfig',
+    # FrontEnd
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
@@ -122,6 +124,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
+
+# DjangoChannels ASGI Router
+ASGI_APPLICATION = 'oilandrope.routing.application'
+
+WS_HOST = os.getenv('WS_HOST', None)
 
 
 # Database
@@ -253,3 +260,10 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
+
+# Bot Settings
+
+BOT_INVITATION = os.getenv(
+    'BOT_INVITATION',
+    'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
+)

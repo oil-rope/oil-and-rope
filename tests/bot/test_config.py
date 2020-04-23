@@ -6,25 +6,25 @@ from django.test import TestCase
 from bot import config, exceptions
 
 
-@pytest.fixture(scope='module', autouse=True)
-def del_config_file():
+@pytest.fixture(scope='class')
+def del_config_file(request):
     """
     Deletes config file and unnecesary files after test.
     """
 
+    request.cls.config = config.Config()
+    request.cls.config_file = config.CONFIG_DIR / config.CONFIG_FILE
+
     yield
 
-    config_file = config.CONFIG_DIR / config.CONFIG_FILE
-    config_file.unlink()
+    request.cls.config_file.unlink()
 
 
+@pytest.mark.usefixtures('del_config_file')
 class ConfigFileTest(TestCase):
     """
     Checks if config file is created, read and applied correctly.
     """
-
-    def setUp(self):
-        self.config_file = config.CONFIG_DIR / config.CONFIG_FILE
 
     def test_creates_config_file(self):
         """

@@ -8,14 +8,24 @@ end_of_line = lf
 charset = utf-8
 
 # Docstring and comments user max_line_length = 125
-[*.js, *.py]
+[*.py]
 indent_style = space
 insert_final_newline = true
 indent_size = 4
 max_line_length = 125
 
+[*.js]
+indent_size = 4
+indent_style = tab
+insert_final_newline = true
+
+[*.jsx]
+indent_size = 2
+indent_style = tab
+insert_final_newline = true
+
 # Use 2 spaces on HTML
-[*.html]
+[*.html, *.yml]
 indent_size = 2
 
 # The JSON files contain newlines inconsistently

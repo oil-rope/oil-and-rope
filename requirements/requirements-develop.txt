@@ -1,13 +1,18 @@
 -r ./requirements-base.txt
 
 autopep8
+channels_redis
 django-extensions
 django-pdb
-faker
 flake8
+freezegun
 ipdb
 isort
 model_bakery
 pytest
+pytest-asyncio
 pytest-django
+pytest-mock
+pytest-xdist
+selenium
 werkzeug

@@ -16,4 +16,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', views.SignUpView.as_view(), name='register'),
     path('activate/<token>/<int:pk>/', views.ActivateAccountView.as_view(), name='activate'),
+    path('resend_email/', views.ResendConfirmationEmailView.as_view(), name='resend_email'),
 ]

@@ -3,13 +3,17 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Button, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+
+from bot.models import DiscordUser
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,36 +26,46 @@ class LoginForm(AuthenticationForm):
     custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
 
     def __init__(self, request=None, *args, **kwargs):
-        super(LoginForm, self).__init__(request=request, *args, **kwargs)
+        super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.id = 'loginForm'
         self.helper.form_class = 'container-fluid'
         self.helper.layout = Layout(
-            Div(
-                Field(
-                    'username',
-                    placeholder=_('Username'),
-                    css_class=self.custom_classes,
-                ),
-                Field(
-                    'password',
-                    placeholder=_('Password'),
-                    css_class=self.custom_classes,
-                ),
-                Div(
-                    Div(
-                        HTML(
-                            '<a class="col-lg-8 btn-link" href="#no-url">{text}</a>'.format(
-                                text=_('Forgot password?')
-                            )
-                        ),
-                        Submit('', _('Login'), css_class='btn btn-extra col-lg-4'),
-                        css_class='row align-items-lg-center justify-content-lg-between'
+            Row(
+                Column(
+                    Field(
+                        'username',
+                        placeholder=_('Username'),
+                        css_class=self.custom_classes,
                     ),
-                    css_class='container-fluid'
+                    css_class='col-12'
                 ),
-                css_class='row flex-column'
-            )
+            ),
+            Row(
+                Column(
+                    Field(
+                        'password',
+                        placeholder=_('Password'),
+                        css_class=self.custom_classes,
+                    ),
+                    css_class='col-12'
+                ),
+            ),
+            Row(
+                Column(
+                    Submit('login', _('Login'), css_class='btn-extra w-100'),
+                    css_class='col-12 col-lg-6'
+                ),
+                Column(
+                    HTML(
+                        '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
+                            url=reverse('registration:resend_email'),
+                            text=_('Send confirmation email')
+                        ),
+                    ),
+                    css_class='col-12 col-lg-6'
+                ),
+            ),
         )
 
         self._clean_labels()
@@ -78,9 +92,10 @@ class SignUpForm(UserCreationForm):
     )
 
     def __init__(self, request, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
+        self.consumer_url = self._resolve_consumer_url()
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
         self.helper.form_class = 'container-fluid'
@@ -88,30 +103,67 @@ class SignUpForm(UserCreationForm):
             Row(
                 Column(
                     Field('username', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('email', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
+                css_class='justify-content-xl-between'
+            ),
+            Row(
                 Column(
                     Field('password1', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
+                    css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
                     Field('password2', css_class=self.custom_classes),
-                    css_class='col-12 col-md-6'
-                )
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                css_class='justify-content-xl-between'
             ),
             Row(
-                Field('discord_id', css_class=self.custom_classes),
-                Button('search', _('Send invitation!'), css_class=self.button_classes + ' align-self-center'),
-                css_class='justify-content-between'
+                Column(
+                    Field('discord_id', css_class=self.custom_classes),
+                    css_class='col-12 col-md-8 col-lg-6 col-xl-5'
+                ),
+                Column(
+                    Div(
+                        # Refers to ReactComponent `UserCheckButton`
+                        data_consumer_url=self.consumer_url,
+                        data_invitation_url=settings.BOT_INVITATION,
+                        data_related_field='id_discord_id',
+                        css_id='discord_check_user'
+                    ),
+                    css_class='col-12 col-md-4 col-xl-5 align-self-center',
+                ),
+                css_class='justify-content-lg-between'
             ),
-            ButtonHolder(
-                Submit('submit', _('Register'), css_class=self.submit_classes)
+            Row(
+                Column(
+                    Submit('submit', _('Register'), css_class=self.submit_classes + ' w-100'),
+                    css_class='col-12 col-xl-6'
+                ),
+                css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
+
+    def _resolve_consumer_url(self):
+        consumer_url = 'ws://' if settings.DEBUG else 'wss://'
+        consumer_url += settings.WS_HOST if settings.WS_HOST else self.request.get_host()
+        consumer_url += reverse('bot_ws:register')
+        return consumer_url
+
+    def clean_email(self):
+        """
+        Checks if email already exists!
+        """
+
+        data = self.cleaned_data.get('email')
+        if get_user_model().objects.filter(email=data).exists():
+            msg = _('This email is already in use') + '.'
+            self.add_error('email', msg)
+        return data
 
     def setup(self, required_fields=None):
         """
@@ -161,8 +213,32 @@ class SignUpForm(UserCreationForm):
 
         try:
             user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
-        except SMTPAuthenticationError:
+        except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
+
+    def clean_discord_id(self):
+        """
+        Checks if Discord User is created.
+        """
+
+        data = self.cleaned_data.get('discord_id')
+
+        if data:
+            if not DiscordUser.objects.filter(pk=data).exists():
+                msg = '{} {}'.format(_('User not found.'), _('Have you requested invitation?'))
+                self.add_error('discord_id', msg)
+        return data
+
+    def get_discord_user(self):
+        """
+        Looks for `discord_id` field and returns :class:`DiscordUser` instance or `None`.
+        """
+
+        discord_user = None
+        discord_id = self.cleaned_data.get('discord_id')
+        if discord_id:
+            discord_user = DiscordUser.objects.get(pk=discord_id)
+        return discord_user
 
     def save(self, commit=True):
         """
@@ -174,11 +250,17 @@ class SignUpForm(UserCreationForm):
             The user created.
         """
 
-        instance = super(SignUpForm, self).save(commit=False)
+        instance = super().save(commit=False)
         # Set active to False until user acitvates email
         instance.is_active = False
+        # Checks for DiscordUser
+        discord_user = self.get_discord_user()
         if commit:
             instance.save()
+            # Adds foreing key if exists
+            if discord_user:
+                discord_user.user = instance
+                discord_user.save()
             # User shouldn't wait for the email to be sent
             with ThreadPoolExecutor(max_workers=2) as executor:
                 executor.submit(self._send_email_confirmation, instance)
@@ -191,3 +273,40 @@ class SignUpForm(UserCreationForm):
         help_texts = {
             'email': _('We will send you an email to confirm your account') + '.'
         }
+
+
+class ResendEmailForm(forms.Form):
+    """
+    Checks for given email in database.
+    """
+
+    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes = 'btn btn-extra btn-lg'
+
+    email = forms.EmailField(
+        label=_('Email address'),
+        help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'container-fluid'
+        self.helper.layout = Layout(
+            Row(
+                Field('email', css_class=self.custom_classes),
+                css_class='justify-content-sm-center'
+            ),
+            ButtonHolder(
+                Submit('submit', _('Resend email'), css_class=self.submit_classes + ' col-12 col-sm-6'),
+                css_class='d-sm-flex justify-content-sm-center'
+            )
+        )
+
+    def clean_email(self):
+        data = self.cleaned_data.get('email')
+        if not get_user_model().objects.filter(email=data).exists():
+            msg = _('This email doesn\'t belong to a user') + '.'
+            self.add_error('email', msg)
+        return data
