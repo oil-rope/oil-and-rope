@@ -34,6 +34,7 @@ services:
       - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       - ALLOWED_HOSTS=*
       - WS_HOST=localhost:5001
+      - DEBUG=True
     entrypoint: /entrypoint.sh
     command: /command.sh
     depends_on:
@@ -59,6 +60,7 @@ services:
       - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       - ALLOWED_HOSTS=*
       - WS_HOST=localhost:5001
+      - DEBUG=True
     entrypoint: /entrypoint.sh
     command: /command.sh
     depends_on:

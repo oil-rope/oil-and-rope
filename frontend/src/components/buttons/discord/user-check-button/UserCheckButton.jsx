@@ -9,15 +9,21 @@ export class UserCheckButton extends Component {
 		this.state = {
 			text: `${gettext("Look for user")}!`,
 			showModal: false,
-			buttonDisabled: false,
+			buttonDisabled: true,
 		};
 	}
 
 	componentDidMount() {
 		this.connector = new WebSocket(this.props.url);
+		this.connector.onopen = this.WSOnOpen;
 		this.connector.onmessage = this.WSOnMessage;
 		this.connector.onerror = this.WSOnError;
 		this.connector.onclose = this.WSOnClose;
+	}
+
+	WSOnOpen = (open) => {
+		// Set button as enabled
+		this.setState({ buttonDisabled: false });
 	}
 
 	WSOnClose = (close) => {
