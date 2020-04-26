@@ -1,5 +1,5 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
 # Start server
 echo 'Starting Daphne...'
-/usr/local/bin/daphne oilandrope.asgi:application -b 0.0.0.0 -p 5001
+daphne oilandrope.asgi:application -b 0.0.0.0 -p 5001

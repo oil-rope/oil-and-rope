@@ -1,2 +1,2 @@
-web: python manage.py collectstatic --noinput && gunicorn oilandrope.wsgi:application --workers 4 --access-logfile -
-worker: python manage.py runbot
+web: bash ./heroku/web/start.sh
+worker: bash ./heroku/worker/start.sh
