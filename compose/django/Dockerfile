@@ -13,7 +13,7 @@ RUN pip install -r /tmp/requirements.txt
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
 
-# Settup locales
+# Set up locales
 RUN dpkg-reconfigure locales
 RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen && \

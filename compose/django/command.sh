@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 
+CYAN='\e[36m'
+GREEN='\e[32m'
+END='\e[0m'
+
 # Compile JavaScript
-echo 'Installing NPM dependencies and building...'
-npm install && npm run build echo 'Done!'
+echo -e "${CYAN}Installing NPM dependencies and building...${END}"
+npm install && npm run build && echo -e "${GREEN}Done!${END}"
 
 # Run migrations
-echo 'Updating database...'
-python manage.py migrate && echo 'Done!'
+echo -e "${CYAN}Updating database...${END}"
+python manage.py migrate && echo -e "${GREEN}Done!${END}"
 
 # Statics
-echo 'Collecting statics...'
-python manage.py collectstatic --noinput
+echo -e "${CYAN}Collecting statics...${END}"
+python manage.py collectstatic --noinput && echo -e "${GREEN}Done!${END}"
 
 # Start server
-echo 'Starting server...'
+echo -e "${CYAN}Starting server...${END}"
 gunicorn oilandrope.wsgi:application --bind 0.0.0.0:5000 --workers 4 --access-logfile -

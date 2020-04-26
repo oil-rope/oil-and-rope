@@ -1,7 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+CYAN='\e[36m'
+GREEN='\e[32m'
+END='\e[0m'
 
 set -e
-cmd="$@"
+cmd="$*"
 
 wait_for_postgres() {
 python << END
@@ -25,9 +29,9 @@ END
 }
 
 until wait_for_postgres; do
-    >&2 echo 'Waiting for PostgreSQL...'
+    >&2 echo -e "${CYAN}Waiting for Postgres...${END}"
     sleep 1
 done
->&2 echo 'PostgreSQL is available!'
+>&2 echo -e "${GREEN}Postgres is available!${END}"
 
-exec $cmd
+exec "$cmd"
