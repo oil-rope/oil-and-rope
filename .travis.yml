@@ -4,8 +4,8 @@ dist: xenial
 os: linux
 
 python:
-  - "python 3.7.6"
-  - "python 3.8"
+  - 3.7.6
+  - 3.8
 
 services:
   - postgresql
@@ -27,23 +27,14 @@ before_script:
 
 jobs:
   include:
-    - name: "Python 3.7.6 syntax check"
+    - name: "Python $TRAVIS_PYTHON_VERSION syntax check"
       script: flake8
-    - name: "Python 3.7.6 imports check"
+    - name: "Python $TRAVIS_PYTHON_VERSION imports check"
       script: isort --recursive --check-only --diff
-    - name: "Python 3.7.6 Tests"
+    - name: "Python $TRAVIS_PYTHON_VERSION Tests"
       script: pytest --cov ./ --cov-report xml
       after_success: codecov -e DJANGO_SETTINGS_MODULE
-    - name: "Python 3.7.6 Django Checks"
-      script: python manage.py check
-    - name: "Python 3.8 syntax check"
-      script: flake8
-    - name: "Python 3.8 imports check"
-      script: isort --recursive --check-only --diff
-    - name: "Python 3.8 Tests"
-      script: pytest --cov ./ --cov-report xml
-      after_success: codecov -e DJANGO_SETTINGS_MODULE
-    - name: "Python 3.8 Django Checks"
+    - name: "Python $TRAVIS_PYTHON_VERSION Django Checks"
       script: python manage.py check
     - name: "NodeJS Tests"
       language: node_js
