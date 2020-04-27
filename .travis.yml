@@ -6,7 +6,6 @@ os: linux
 services:
   - postgresql
 
-
 python:
   - "3.7.6"
   - "3.8"
@@ -29,7 +28,10 @@ before_script:
   - isort -sk ./**/migrations/*.py
 
 script:
-  - python runtests.py --coverage
+  - flake8
+  - isort --recursive --check-only --diff
+  - pytest --cov ./ --cov-report xml
+  - python manage.py check
 
 after_success:
   - codecov -e DJANGO_SETTINGS_MODULE
@@ -37,14 +39,11 @@ after_success:
 jobs:
   include:
     - language: node_js
-      before_install:
-      - sudo apt-get update
-      - sudo apt-get install python3 python3-pip
-      - pip3 install -U pip setuptools --user
+      node_js: 12
       install:
       - npm install
-      node_js: 12
       before_script:
       - psql -c 'create database oilandrope;' -U postgres
       script:
       - npm test
+      after_success: ignore
