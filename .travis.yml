@@ -4,12 +4,8 @@ language: python
 dist: xenial
 os: linux
 
-services:
-  - postgresql
-
-env:
-  - SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
-
+services: postgresql
+env: SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo" DJANGO_SETTINGS_MODULE="oilandrope.settings"
 before_script: psql -c 'create database oilandrope;' -U postgres
 
 jobs:
@@ -26,12 +22,35 @@ jobs:
       - pip install -r requirements/requirements-base.txt -U
       - pip install -U isort
       script: isort --recursive --check-only --diff
-    - name: "Python 3.7.6 Django Checks"
+    - name: "Python 3.7.6 Django check"
       python: 3.7.6
       install: pip install -r requirements/requirements-base.txt -U
       script: python manage.py check
     - name: "Python 3.7.6 Tests"
       python: 3.7.6
+      install:
+        - pip install -r requirements/requirements-base.txt -U
+        - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+      script: pytest --cov ./ --cov-report xml
+      after_success: codecov -e DJANGO_SETTINGS_MODULE
+    - name: "Python 3.8 syntax check"
+      python: 3.8
+      install:
+        - pip install -r requirements/requirements-base.txt -U
+        - pip install -U flake8
+      script: flake8
+    - name: "Python 3.8 imports check"
+      python: 3.8
+      install:
+        - pip install -r requirements/requirements-base.txt -U
+        - pip install -U isort
+      script: isort --recursive --check-only --diff
+    - name: "Python 3.8 Django check"
+      python: 3.8
+      install: pip install -r requirements/requirements-base.txt -U
+      script: python manage.py check
+    - name: "Python 3.8 Tests"
+      python: 3.8
       install:
         - pip install -r requirements/requirements-base.txt -U
         - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
