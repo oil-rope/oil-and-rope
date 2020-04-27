@@ -15,34 +15,34 @@ env:
 
 install:
   - pip install -r requirements/requirements-base.txt -U
-  # Linting
-  - pip install -U flake8 isort
   # Install pytest and dependencies
   - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun
   # Codecov and coverage
   - pip install -U codecov pytest-cov
 
-before_script:
-  - psql -c 'create database oilandrope;' -U postgres
+before_script: psql -c 'create database oilandrope;' -U postgres
 
 jobs:
   include:
-    - name: "Python $TRAVIS_PYTHON_VERSION syntax check"
+    - name: "Python ${TRAVIS_PYTHON_VERSION} syntax check"
+      install:
+        - pip install -r requirements/requirements-base.txt -U
+        - pip install -U flake8
       script: flake8
-    - name: "Python $TRAVIS_PYTHON_VERSION imports check"
+    - name: "Python ${TRAVIS_PYTHON_VERSION} imports check"
+      install:
+      - pip install -r requirements/requirements-base.txt -U
+      - pip install -U isort
       script: isort --recursive --check-only --diff
-    - name: "Python $TRAVIS_PYTHON_VERSION Tests"
-      script: pytest --cov ./ --cov-report xml
-      after_success: codecov -e DJANGO_SETTINGS_MODULE
-    - name: "Python $TRAVIS_PYTHON_VERSION Django Checks"
+    - name: "Python ${TRAVIS_PYTHON_VERSION} Django Checks"
+      install: pip install -r requirements/requirements-base.txt -U
       script: python manage.py check
     - name: "NodeJS Tests"
       language: node_js
       node_js: 12
-      install:
-      - npm install
-      before_script:
-      - psql -c 'create database oilandrope;' -U postgres
-      script:
-      - npm test
+      install: npm install
+      script: npm test
       after_success: skip
+
+script: pytest --cov ./ --cov-report xml
+after_success: codecov -e DJANGO_SETTINGS_MODULE
