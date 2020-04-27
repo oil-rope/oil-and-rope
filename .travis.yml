@@ -20,23 +20,37 @@ install:
 
 before_script:
   - psql -c 'create database oilandrope;' -U postgres
-  # Fixing isort on migrations
-  - isort -sk ./**/migrations/*.py
-
-after_success:
-  - codecov -e DJANGO_SETTINGS_MODULE
 
 jobs:
   include:
     - name: "Python 3.7.6 syntax check"
       python: "3.7.6"
-      script:
-        - flake8
+      script: flake8
+    - name: "Python 3.7.6 imports check"
+      python: "3.7.6"
+      script: isort --recursive --check-only --diff
+    - name: "Python 3.7.6 Tests"
+      python: "3.7.6"
+      script: pytest --cov ./ --cov-report xml
+      after_success: codecov -e DJANGO_SETTINGS_MODULE
+    - name: "Python 3.7.6 Django Checks"
+      python: "3.7.6"
+      script: python manage.py check
     - name: "Python 3.8 syntax check"
       python: "3.8"
-      script:
-        - flake8
-    - language: node_js
+      script: flake8
+    - name: "Python 3.8 imports check"
+      python: "3.8"
+      script: isort --recursive --check-only --diff
+    - name: "Python 3.8 Tests"
+      python: "3.8"
+      script: pytest --cov ./ --cov-report xml
+      after_success: codecov -e DJANGO_SETTINGS_MODULE
+    - name: "Python 3.8 Django Checks"
+      python: "3.8"
+      script: python manage.py check
+    - name: "NodeJS Tests"
+      language: node_js
       node_js: 12
       install:
       - npm install
