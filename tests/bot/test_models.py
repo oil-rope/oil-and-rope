@@ -1,7 +1,7 @@
 from django.test import TestCase
-from model_bakery import baker
 
 from bot.models import DiscordServer, DiscordTextChannel, DiscordUser, DiscordVoiceChannel
+from model_bakery import baker
 
 
 class TestDiscordServer(TestCase):

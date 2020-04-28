@@ -7,8 +7,8 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from faker import Faker
-from model_bakery import baker
 
+from model_bakery import baker
 from registration.views import ActivateAccountView
 
 

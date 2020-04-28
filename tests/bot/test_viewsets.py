@@ -2,10 +2,10 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
-from model_bakery import baker
 from rest_framework.test import APIClient
 
 from bot.models import DiscordServer, DiscordTextChannel
+from model_bakery import baker
 
 
 class TestDiscordServerViewSet(TestCase):

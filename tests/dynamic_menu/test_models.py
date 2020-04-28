@@ -2,9 +2,9 @@
 from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
-from model_bakery import baker
 
 from dynamic_menu.models import DynamicMenu, dynamic_menu_path
+from model_bakery import baker
 
 
 class TestDynamicMenuModel(TestCase):

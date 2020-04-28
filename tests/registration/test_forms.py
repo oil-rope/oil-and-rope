@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import RequestFactory, TestCase
 from faker import Faker
-from model_bakery import baker
 
+from model_bakery import baker
 from registration import forms
 
 
