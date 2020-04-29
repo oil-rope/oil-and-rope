@@ -1,10 +1,10 @@
 import unittest
 
-from django.test import TestCase
 from django.db import connection
-from django.db.utils import IntegrityError, DataError
-from model_bakery import baker
+from django.db.utils import DataError, IntegrityError
+from django.test import TestCase
 from faker import Faker
+from model_bakery import baker
 
 from roleplay import models
 

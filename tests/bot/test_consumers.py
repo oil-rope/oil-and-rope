@@ -4,10 +4,10 @@ written as top-level functions.
 """
 
 import faker
+import pytest
 from channels.testing import WebsocketCommunicator
 from django.shortcuts import reverse
 
-import pytest
 from bot.consumers import BotConsumer
 
 fake = faker.Faker()

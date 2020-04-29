@@ -2,9 +2,9 @@ from django.contrib.auth import get_user_model
 from django.http.cookie import SimpleCookie
 from django.test import TestCase
 from faker import Faker
+from model_bakery import baker
 
 from dynamic_menu.models import DynamicMenu
-from model_bakery import baker
 
 
 class TestMenuContextProcessor(TestCase):
