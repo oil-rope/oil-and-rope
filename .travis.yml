@@ -1,5 +1,4 @@
 language: python
-cache: pip
 
 # Using default dist and os
 dist: xenial
