@@ -36,3 +36,19 @@ class TestDomain(TestCase):
         with self.assertRaises(IntegrityError) as ex:
             self.model.objects.create(name=None)
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
+
+    def test_is_domain_ok(self):
+        instance = baker.make(self.model, domain_type=self.model.DOMAIN)
+        self.assertTrue(instance.is_domain)
+
+    def test_is_domain_ko(self):
+        instance = baker.make(self.model, domain_type=self.model.SUBDOMAIN)
+        self.assertFalse(instance.is_domain)
+
+    def test_is_subdomain_ok(self):
+        instance = baker.make(self.model, domain_type=self.model.SUBDOMAIN)
+        self.assertTrue(instance.is_subdomain)
+
+    def test_is_subdomain_ko(self):
+        instance = baker.make(self.model, domain_type=self.model.DOMAIN)
+        self.assertFalse(instance.is_subdomain)
