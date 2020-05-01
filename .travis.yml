@@ -32,7 +32,7 @@ jobs:
       install:
         - pip install -r requirements/requirements-base.txt -U
         - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
-      script: pytest --cov ./ --cov-report xml
+      script: pytest --cov ./ --cov-report xml -v
       after_success: codecov -e DJANGO_SETTINGS_MODULE
     - name: "Python 3.8 syntax check"
       python: 3.8
@@ -55,7 +55,7 @@ jobs:
       install:
         - pip install -r requirements/requirements-base.txt -U
         - pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
-      script: pytest --cov ./ --cov-report xml
+      script: pytest --cov ./ --cov-report xml -v
       after_success: codecov -e DJANGO_SETTINGS_MODULE
     - name: "NodeJS Tests"
       language: node_js
