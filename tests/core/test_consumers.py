@@ -1,10 +1,10 @@
 import faker
+import pytest
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from django.urls import path
 from django.utils.translation import ugettext_lazy as _
 
-import pytest
 from core.consumers import HandlerJsonWebsocketConsumer
 
 application = URLRouter([
