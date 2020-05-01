@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from core.models import TracingMixin
+
 from . import managers
 
 
@@ -105,8 +106,8 @@ class Homeland(MPTTModel, TracingMixin):
 
     name = models.CharField(verbose_name=_('Name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SITE_TYPES, default=TOWN, null=False,
-                                                 blank=False)
+    site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SITE_TYPES, default=TOWN,
+                                                 null=False, blank=False)
     image = models.ImageField(verbose_name=_('Image'), upload_to=homeland_upload_to, null=True, blank=True)
     parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
                                  related_name='children_sites')
