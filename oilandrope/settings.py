@@ -71,6 +71,8 @@ INSTALLED_APPS = [
     'mptt',
     # Source
     'core.apps.CoreConfig',
+    # Common
+    'common.apps.CommonConfig',
     # Dynamic Menu
     'dynamic_menu.apps.DynamicMenuConfig',
     # Bot
