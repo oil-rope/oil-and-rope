@@ -1,9 +1,13 @@
+import os
+import tempfile
 import unittest
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
 from django.test import TestCase
 from faker import Faker
+from freezegun import freeze_time
 from model_bakery import baker
 
 from roleplay import models
@@ -69,6 +73,23 @@ class TestHomeland(TestCase):
         entries = self.faker.pyint(min_value=1, max_value=100)
         baker.make(self.model, entries)
         self.assertEqual(entries, self.model.objects.count())
+
+    @freeze_time('2020-01-01')
+    def test_image_upload_ok(self):
+        tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+        image_data = open(tmpfile.name, 'rb').read()
+        image_file = tmpfile.name
+        image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+
+        homeland = baker.make(self.model)
+        homeland.image = image
+        homeland.save()
+        expected_path = '\\media\\roleplay\\homeland\\2020\\01\\01\\{}\\{}'.format(homeland.pk, image.name)
+        self.assertIn(expected_path, homeland.image.path)
+
+        tmpfile.close()
+        os.unlink(tmpfile.name)
+        os.unlink(homeland.image.path)
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):

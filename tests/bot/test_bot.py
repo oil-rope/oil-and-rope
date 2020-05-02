@@ -12,7 +12,7 @@ from bot.exceptions import HelpfulError, OilAndRopeException
 
 class TestOilAndRopeBot(TestCase):
     """
-    Checks beahviour of the bot.
+    Checks behaviour of the bot.
     """
 
     def setUp(self):
