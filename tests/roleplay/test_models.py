@@ -1,4 +1,5 @@
 import os
+import pathlib
 import tempfile
 import unittest
 
@@ -84,8 +85,9 @@ class TestHomeland(TestCase):
         homeland = baker.make(self.model)
         homeland.image = image
         homeland.save()
-        expected_path = '\\media\\roleplay\\homeland\\2020\\01\\01\\{}\\{}'.format(homeland.pk, image.name)
-        self.assertIn(expected_path, homeland.image.path)
+        expected_path = '/media/roleplay/homeland/2020/01/01/{}/{}'.format(homeland.pk, image.name)
+        expected_path = pathlib.Path(expected_path)
+        self.assertIn(str(expected_path), homeland.image.path)
 
         tmpfile.close()
         os.unlink(tmpfile.name)
