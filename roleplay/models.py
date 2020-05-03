@@ -109,6 +109,8 @@ class Homeland(MPTTModel, TracingMixin):
     parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
                                  related_name='children_sites')
 
+    objects = managers.HomelandManager()
+
     @property
     def is_house(self):
         return self.site_type == self.HOUSE
