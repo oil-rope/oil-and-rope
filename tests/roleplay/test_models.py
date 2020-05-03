@@ -60,15 +60,15 @@ class TestDomain(TestCase):
         self.assertFalse(instance.is_subdomain)
 
 
-class TestHomeland(TestCase):
+class TestPlace(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        self.model = models.Homeland
+        self.model = models.Place
 
     def test_str_ok(self):
-        homeland = baker.make(self.model)
-        self.assertEqual(str(homeland), homeland.name)
+        place = baker.make(self.model)
+        self.assertEqual(str(place), place.name)
 
     def test_ok(self):
         entries = self.faker.pyint(min_value=1, max_value=100)
@@ -82,16 +82,16 @@ class TestHomeland(TestCase):
         image_file = tmpfile.name
         image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
 
-        homeland = baker.make(self.model)
-        homeland.image = image
-        homeland.save()
-        expected_path = '/media/roleplay/homeland/2020/01/01/{}/{}'.format(homeland.pk, image.name)
+        place = baker.make(self.model)
+        place.image = image
+        place.save()
+        expected_path = '/media/roleplay/place/2020/01/01/{}/{}'.format(place.pk, image.name)
         expected_path = pathlib.Path(expected_path)
-        self.assertIn(str(expected_path), homeland.image.path)
+        self.assertIn(str(expected_path), place.image.path)
 
         tmpfile.close()
         os.unlink(tmpfile.name)
-        os.unlink(homeland.image.path)
+        os.unlink(place.image.path)
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
@@ -106,617 +106,633 @@ class TestHomeland(TestCase):
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
 
     def test_is_house_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertTrue(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertTrue(place.is_house)
 
     def test_is_town_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertTrue(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertTrue(place.is_town)
 
     def test_is_village_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertTrue(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertTrue(place.is_village)
 
     def test_is_city_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertTrue(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertTrue(place.is_city)
 
     def test_is_metropolis_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertTrue(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertTrue(place.is_metropolis)
 
     def test_is_forest_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertTrue(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertTrue(place.is_forest)
 
     def test_is_hills_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertTrue(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertTrue(place.is_hills)
 
     def test_is_mountains_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertTrue(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertTrue(place.is_mountains)
 
     def test_is_mines_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertTrue(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertTrue(place.is_mines)
 
     def test_is_river_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertTrue(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertTrue(place.is_river)
 
     def test_is_sea_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertTrue(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertTrue(place.is_sea)
 
     def test_is_desert_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertTrue(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertTrue(place.is_desert)
 
     def test_is_tundra_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertTrue(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertTrue(place.is_tundra)
 
     def test_is_unusual_ok(self):
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertTrue(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertTrue(place.is_unusual)
+
+    def test_is_island_ok(self):
+        place = baker.make(self.model, site_type=self.model.ISLAND)
+        self.assertTrue(place.is_island)
+
+    def test_is_country_ok(self):
+        place = baker.make(self.model, site_type=self.model.COUNTRY)
+        self.assertTrue(place.is_country)
+
+    def test_is_continent_ok(self):
+        place = baker.make(self.model, site_type=self.model.CONTINENT)
+        self.assertTrue(place.is_continent)
+
+    def test_is_world_ok(self):
+        place = baker.make(self.model, site_type=self.model.WORLD)
+        self.assertTrue(place.is_world)
 
     def test_is_house_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_house)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_house)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_house)
 
     def test_is_town_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_town)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_town)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_town)
 
     def test_is_city_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_city)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_city)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_city)
 
     def test_is_village_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_village)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_village)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_village)
 
     def test_is_metropolis_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_metropolis)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_metropolis)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_metropolis)
 
     def test_is_forest_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_forest)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_forest)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_forest)
 
     def test_is_hills_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_hills)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_hills)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_hills)
 
     def test_is_mountains_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_mountains)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_mountains)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_mountains)
 
     def test_is_mines_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_mines)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_mines)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_mines)
 
     def test_is_river_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_river)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_river)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_river)
 
     def test_is_sea_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_sea)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_sea)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_sea)
 
     def test_is_desert_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_desert)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_desert)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_desert)
 
     def test_is_tundra_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_tundra)
 
-        homeland = baker.make(self.model, site_type=self.model.UNUSUAL)
-        self.assertFalse(homeland.is_tundra)
+        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        self.assertFalse(place.is_tundra)
 
     def test_is_unusual_ko(self):
-        homeland = baker.make(self.model, site_type=self.model.HOUSE)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.HOUSE)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.TOWN)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.TOWN)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.CITY)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.CITY)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.METROPOLIS)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.FOREST)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.FOREST)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.HILLS)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.HILLS)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.MOUNTAINS)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.MINES)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.MINES)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.RIVER)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.RIVER)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.SEA)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.SEA)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.DESERT)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.DESERT)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.TUNDRA)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        self.assertFalse(place.is_unusual)
 
-        homeland = baker.make(self.model, site_type=self.model.VILLAGE)
-        self.assertFalse(homeland.is_unusual)
+        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        self.assertFalse(place.is_unusual)

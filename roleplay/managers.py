@@ -54,3 +54,15 @@ class HomelandManager(TreeManager):
 
     def unusuals(self):
         return super().get_queryset().filter(site_type=self.model.UNUSUAL)
+
+    def islands(self):
+        return super().get_queryset().filter(site_type=self.model.ISLAND)
+
+    def countries(self):
+        return super().get_queryset().filter(site_type=self.model.COUNTRY)
+
+    def continents(self):
+        return super().get_queryset().filter(site_type=self.model.CONTINENT)
+
+    def worlds(self):
+        return super().get_queryset().filter(site_type=self.model.WORLD)

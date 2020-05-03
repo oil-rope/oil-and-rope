@@ -51,9 +51,10 @@ class Domain(TracingMixin):
         return self.name
 
 
-class Homeland(MPTTModel, TracingMixin):
+class Place(MPTTModel, TracingMixin):
     """
     Declares where did the creature grown, how it was, what does it belong to?
+    Also used for declaring a World.
 
     Parameters
     ----------
@@ -66,7 +67,7 @@ class Homeland(MPTTModel, TracingMixin):
     image: :class:`str`
         Path to the image.
     parent_site: :class:`int`
-       If the homeland is child of another Homeland, this is where it can be settled.
+       If the place is child of another Place, this is where it can be settled.
     """
 
     HOUSE = 0
@@ -83,6 +84,10 @@ class Homeland(MPTTModel, TracingMixin):
     DESERT = 11
     TUNDRA = 12
     UNUSUAL = 13
+    ISLAND = 14
+    COUNTRY = 15
+    CONTINENT = 16
+    WORLD = 17
 
     SITE_TYPES = (
         (HOUSE, _('House')),
@@ -98,7 +103,11 @@ class Homeland(MPTTModel, TracingMixin):
         (SEA, _('Sea')),
         (DESERT, _('Desert')),
         (TUNDRA, _('Tundra')),
-        (UNUSUAL, _('Unusual'))
+        (UNUSUAL, _('Unusual')),
+        (ISLAND, _('Island')),
+        (COUNTRY, _('Country')),
+        (CONTINENT, _('Continent')),
+        (WORLD, _('World'))
     )
 
     name = models.CharField(verbose_name=_('Name'), max_length=50, null=False, blank=False)
@@ -167,12 +176,28 @@ class Homeland(MPTTModel, TracingMixin):
     def is_unusual(self):
         return self.site_type == self.UNUSUAL
 
+    @property
+    def is_island(self):
+        return self.site_type == self.ISLAND
+
+    @property
+    def is_country(self):
+        return self.site_type == self.COUNTRY
+
+    @property
+    def is_continent(self):
+        return self.site_type == self.CONTINENT
+
+    @property
+    def is_world(self):
+        return self.site_type == self.WORLD
+
     class MPTTMeta:
         parent_attr = 'parent_site'
 
     class Meta:
-        verbose_name = _('Homeland')
-        verbose_name_plural = _('Homelands')
+        verbose_name = _('Place')
+        verbose_name_plural = _('Places')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
 
     def __str__(self):

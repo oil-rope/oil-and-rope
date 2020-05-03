@@ -29,11 +29,11 @@ class TestDomainManager(TestCase):
         self.assertEqual(self.number_of_subdomains, self.model.objects.subdomains().count())
 
 
-class TestHomelandManager(TestCase):
+class TestPlaceManager(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        self.model = models.Homeland
+        self.model = models.Place
         random_int = functools.partial(self.faker.pyint, min_value=1, max_value=100)
 
         self.number_of_houses = random_int()
