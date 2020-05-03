@@ -64,12 +64,21 @@ class TestPlaceManager(TestCase):
         baker.make(self.model, self.number_of_tundras, site_type=self.model.TUNDRA)
         self.number_of_unusuals = random_int()
         baker.make(self.model, self.number_of_unusuals, site_type=self.model.UNUSUAL)
+        self.number_of_islands = random_int()
+        baker.make(self.model, self.number_of_islands, site_type=self.model.ISLAND)
+        self.number_of_countries = random_int()
+        baker.make(self.model, self.number_of_countries, site_type=self.model.COUNTRY)
+        self.number_of_continents = random_int()
+        baker.make(self.model, self.number_of_continents, site_type=self.model.CONTINENT)
+        self.number_of_worlds = random_int()
+        baker.make(self.model, self.number_of_worlds, site_type=self.model.WORLD)
 
     def test_all_ok(self):
         total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
                 + self.number_of_metropolis + self.number_of_forests + self.number_of_hills + self.number_of_mountains \
                 + self.number_of_mines + self.number_of_rivers + self.number_of_seas + self.number_of_deserts \
-                + self.number_of_tundras + self.number_of_unusuals
+                + self.number_of_tundras + self.number_of_unusuals + self.number_of_islands \
+                + self.number_of_countries + self.number_of_continents + self.number_of_worlds
         self.assertEqual(total, self.model.objects.count())
 
     def test_houses_ok(self):
@@ -113,3 +122,15 @@ class TestPlaceManager(TestCase):
 
     def test_unusuals_ok(self):
         self.assertEqual(self.number_of_unusuals, self.model.objects.unusuals().count())
+
+    def test_islands_ok(self):
+        self.assertEqual(self.number_of_islands, self.model.objects.islands().count())
+
+    def test_countries_ok(self):
+        self.assertEqual(self.number_of_countries, self.model.objects.countries().count())
+
+    def test_continents_ok(self):
+        self.assertEqual(self.number_of_continents, self.model.objects.continents().count())
+
+    def test_worlds_ok(self):
+        self.assertEqual(self.number_of_worlds, self.model.objects.worlds().count())
