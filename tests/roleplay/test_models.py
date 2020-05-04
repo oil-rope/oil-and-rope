@@ -31,6 +31,24 @@ class TestDomain(TestCase):
         baker.make(self.model, entries)
         self.assertEqual(entries, self.model.objects.count())
 
+    @freeze_time('2020-01-01')
+    def test_image_upload_ok(self):
+        tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+        image_data = open(tmpfile.name, 'rb').read()
+        image_file = tmpfile.name
+        image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+
+        place = baker.make(self.model)
+        place.image = image
+        place.save()
+        expected_path = '/media/roleplay/domain/2020/01/01/{}/{}'.format(place.pk, image.name)
+        expected_path = pathlib.Path(expected_path)
+        self.assertIn(str(expected_path), place.image.path)
+
+        tmpfile.close()
+        os.unlink(tmpfile.name)
+        os.unlink(place.image.path)
+
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
         name = self.faker.password(length=26)
@@ -92,6 +110,40 @@ class TestPlace(TestCase):
         tmpfile.close()
         os.unlink(tmpfile.name)
         os.unlink(place.image.path)
+
+    def test_nested_world_ok(self):
+        world = self.model.objects.create(name='World', site_type=self.model.WORLD)
+        continents = []
+        for _ in range(0, 3):
+            continents.append(
+                self.model.objects.create(name=self.faker.country(), site_type=self.model.CONTINENT, parent_site=world)
+            )
+
+        countries = []
+        for continent in continents:
+            self.assertIn(continent, world.get_continents())
+            countries.append(
+                self.model.objects.create(
+                    name=self.faker.country(), site_type=self.model.COUNTRY, parent_site=continent
+                )
+            )
+
+        islands = []
+        cities = []
+        for country in countries:
+            self.assertIn(country, world.get_countries())
+            islands.append(
+                self.model.objects.create(name=self.faker.country(), site_type=self.model.ISLAND, parent_site=country)
+            )
+            cities.append(
+                self.model.objects.create(name=self.faker.city(), site_type=self.model.CITY, parent_site=country)
+            )
+
+        for island in islands:
+            self.assertIn(island, world.get_islands())
+
+        for city in cities:
+            self.assertIn(city, world.get_cities())
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):

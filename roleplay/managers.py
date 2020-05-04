@@ -11,7 +11,7 @@ class DomainManager(models.Manager):
         return super().get_queryset().filter(domain_type=self.model.DOMAIN)
 
 
-class HomelandManager(TreeManager):
+class PlaceManager(TreeManager):
 
     def houses(self):
         return super().get_queryset().filter(site_type=self.model.HOUSE)

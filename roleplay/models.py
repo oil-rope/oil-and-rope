@@ -31,6 +31,7 @@ class Domain(TracingMixin):
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
     domain_type = models.PositiveSmallIntegerField(verbose_name=_('Domain type'), choices=DOMAIN_TYPES, default=DOMAIN,
                                                    null=False, blank=False)
+    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
 
     objects = managers.DomainManager()
 
@@ -118,7 +119,19 @@ class Place(MPTTModel, TracingMixin):
     parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
                                  related_name='children_sites')
 
-    objects = managers.HomelandManager()
+    objects = managers.PlaceManager()
+
+    def get_continents(self):
+        return self.get_descendants().filter(site_type=self.CONTINENT)
+
+    def get_countries(self):
+        return self.get_descendants().filter(site_type=self.COUNTRY)
+
+    def get_islands(self):
+        return self.get_descendants().filter(site_type=self.ISLAND)
+
+    def get_cities(self):
+        return self.get_descendants().filter(site_type=self.CITY)
 
     @property
     def is_house(self):
