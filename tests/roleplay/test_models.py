@@ -112,7 +112,11 @@ class TestPlace(TestCase):
         os.unlink(place.image.path)
 
     def test_nested_world_ok(self):
-        world = self.model.objects.create(name='World', site_type=self.model.WORLD)
+        universe = self.model.objects.create(name='Universe', site_type=self.model.WORLD)
+        world = self.model.objects.create(name='World', site_type=self.model.WORLD, parent_site=universe)
+
+        self.assertIn(world, universe.get_worlds())
+
         continents = []
         for _ in range(0, 3):
             continents.append(
@@ -120,6 +124,9 @@ class TestPlace(TestCase):
             )
 
         countries = []
+        seas = []
+        rivers = []
+        unusuals = []
         for continent in continents:
             self.assertIn(continent, world.get_continents())
             countries.append(
@@ -127,9 +134,33 @@ class TestPlace(TestCase):
                     name=self.faker.country(), site_type=self.model.COUNTRY, parent_site=continent
                 )
             )
+            seas.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.SEA, parent_site=continent)
+            )
+            rivers.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.RIVER, parent_site=continent)
+            )
+            unusuals.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.UNUSUAL, parent_site=continent)
+            )
+
+        for sea in seas:
+            self.assertIn(sea, world.get_seas())
+
+        for river in rivers:
+            self.assertIn(river, world.get_rivers())
+
+        for unusual in unusuals:
+            self.assertIn(unusual, world.get_unusuals())
 
         islands = []
         cities = []
+        mountains = []
+        mines = []
+        deserts = []
+        tundras = []
+        hills = []
+        metropolis = []
         for country in countries:
             self.assertIn(country, world.get_countries())
             islands.append(
@@ -138,12 +169,78 @@ class TestPlace(TestCase):
             cities.append(
                 self.model.objects.create(name=self.faker.city(), site_type=self.model.CITY, parent_site=country)
             )
+            mountains.append(
+                self.model.objects.create(
+                    name=self.faker.country(), site_type=self.model.MOUNTAINS, parent_site=country
+                )
+            )
+            deserts.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.DESERT, parent_site=country)
+            )
+            hills.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.HILLS, parent_site=country)
+            )
+            tundras.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.TUNDRA, parent_site=country)
+            )
+            mines.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.MINES, parent_site=country)
+            )
+            metropolis.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.METROPOLIS, parent_site=country)
+            )
 
+        forests = []
         for island in islands:
             self.assertIn(island, world.get_islands())
+            forests.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.FOREST, parent_site=island)
+            )
 
+        for m in metropolis:
+            self.assertIn(m, world.get_metropolis())
+
+        villages = []
+        towns = []
         for city in cities:
             self.assertIn(city, world.get_cities())
+            villages.append(
+                self.model.objects.create(name=self.faker.city(), site_type=self.model.VILLAGE, parent_site=city)
+            )
+            towns.append(
+                self.model.objects.create(name=self.faker.city(), site_type=self.model.TOWN, parent_site=city)
+            )
+
+        houses = []
+        for village in villages:
+            self.assertIn(village, world.get_villages())
+            houses.append(
+                self.model.objects.create(name=self.faker.city(), site_type=self.model.HOUSE, parent_site=village)
+            )
+
+        for town in towns:
+            self.assertIn(town, world.get_towns())
+
+        for house in houses:
+            self.assertIn(house, world.get_houses())
+
+        for mountain in mountains:
+            self.assertIn(mountain, world.get_mountains())
+
+        for mine in mines:
+            self.assertIn(mine, world.get_mines())
+
+        for desert in deserts:
+            self.assertIn(desert, world.get_deserts())
+
+        for hill in hills:
+            self.assertIn(hill, world.get_hills())
+
+        for forest in forests:
+            self.assertIn(forest, world.get_forests())
+
+        for tundra in tundras:
+            self.assertIn(tundra, world.get_tundras())
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):

@@ -121,17 +121,59 @@ class Place(MPTTModel, TracingMixin):
 
     objects = managers.PlaceManager()
 
-    def get_continents(self):
-        return self.get_descendants().filter(site_type=self.CONTINENT)
+    def get_houses(self):
+        return self.get_descendants().filter(site_type=self.HOUSE)
 
-    def get_countries(self):
-        return self.get_descendants().filter(site_type=self.COUNTRY)
+    def get_towns(self):
+        return self.get_descendants().filter(site_type=self.TOWN)
+
+    def get_villages(self):
+        return self.get_descendants().filter(site_type=self.VILLAGE)
+
+    def get_cities(self):
+        return self.get_descendants().filter(site_type=self.CITY)
+
+    def get_metropolis(self):
+        return self.get_descendants().filter(site_type=self.METROPOLIS)
+
+    def get_forests(self):
+        return self.get_descendants().filter(site_type=self.FOREST)
+
+    def get_hills(self):
+        return self.get_descendants().filter(site_type=self.HILLS)
+
+    def get_mountains(self):
+        return self.get_descendants().filter(site_type=self.MOUNTAINS)
+
+    def get_mines(self):
+        return self.get_descendants().filter(site_type=self.MINES)
+
+    def get_rivers(self):
+        return self.get_descendants().filter(site_type=self.RIVER)
+
+    def get_seas(self):
+        return self.get_descendants().filter(site_type=self.SEA)
+
+    def get_deserts(self):
+        return self.get_descendants().filter(site_type=self.DESERT)
+
+    def get_tundras(self):
+        return self.get_descendants().filter(site_type=self.TUNDRA)
+
+    def get_unusuals(self):
+        return self.get_descendants().filter(site_type=self.UNUSUAL)
 
     def get_islands(self):
         return self.get_descendants().filter(site_type=self.ISLAND)
 
-    def get_cities(self):
-        return self.get_descendants().filter(site_type=self.CITY)
+    def get_countries(self):
+        return self.get_descendants().filter(site_type=self.COUNTRY)
+
+    def get_continents(self):
+        return self.get_descendants().filter(site_type=self.CONTINENT)
+
+    def get_worlds(self):
+        return self.get_descendants().filter(site_type=self.WORLD)
 
     @property
     def is_house(self):
