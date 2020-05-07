@@ -111,7 +111,8 @@ class TestPlace(TestCase):
         os.unlink(tmpfile.name)
         os.unlink(place.image.path)
 
-    def test_nested_world_ok(self):
+    # TODO: Refactor this test so is not that complex
+    def test_nested_world_ok(self):  # noqa
         universe = self.model.objects.create(name='Universe', site_type=self.model.WORLD)
         world = self.model.objects.create(name='World', site_type=self.model.WORLD, parent_site=universe)
 
