@@ -8,9 +8,9 @@ class TracingMixin(models.Model):
 
     Attributes
     -----------
-    created_at: :class:`datetime.datetime`
+    entry_created_at: :class:`datetime.datetime`
         The date when the model was created.
-    updated_at: :class:`datetime.datetime`
+    entry_updated_at: :class:`datetime.datetime`
         Last time model was updated.
     """
 
@@ -19,4 +19,4 @@ class TracingMixin(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-created_at', 'updated_at']
+        ordering = ['-entry_created_at', 'entry_updated_at']

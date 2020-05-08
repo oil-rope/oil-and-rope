@@ -1,6 +1,7 @@
 import pytest
-from bot.models import DiscordServer, DiscordUser
 from model_bakery import baker
+
+from bot.models import DiscordServer, DiscordUser
 
 
 @pytest.fixture(scope='function', autouse=False)

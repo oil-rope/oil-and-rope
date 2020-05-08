@@ -79,10 +79,10 @@ INSTALLED_APPS = [
     'registration.apps.RegistrationConfig',
     # Chat
     'chat.apps.ChatConfig',
-    # Sheet
-    'sheet.apps.SheetConfig',
     # FrontEnd
     'frontend.apps.FrontendConfig',
+    # Roleplay
+    'roleplay.apps.RoleplayConfig'
 ]
 
 MIDDLEWARE = [
