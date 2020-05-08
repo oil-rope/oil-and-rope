@@ -1,0 +1,36 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/requirements-base.txt
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 --config=setup.cfg
+    - name: Test with pytest
+      run: |
+        pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+        pytest --cov ./ --cov-report xml
+    - name: Check iSort
+      run: |
+        pip install -U isort
+        isort -rc -sp setup.cfg -c -df
