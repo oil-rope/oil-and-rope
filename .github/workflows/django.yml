@@ -1,0 +1,82 @@
+name: Django CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    # Set up Postgres
+    services:
+      postgres:
+        image: postgres:11.7
+        env:
+          POSTGRES_PASSWORD: p4ssw0rd@
+          POSTGRES_USER: postgres
+          POSTGRES_DB: oilandrope
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/requirements-base.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --config=setup.cfg
+
+      - name: Check iSort
+        run: |
+          pip install -U isort
+          isort -rc -sp setup.cfg -c -df
+
+      - name: Pytest with PostgreSQL
+        env:
+          DB_HOST: localhost
+          DB_NAME: oilandrope
+          DB_PASSWORD: p4ssword@
+          DB_PORT: 5432
+          DB_USER: postgres
+          DJANGO_SETTINGS_MODULE: oilandrope.settings
+          SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+        run: |
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+          pytest --cov ./ --cov-report xml
+
+      - name: Pytest with SQLite3
+        run: |
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+          pytest --cov ./ --cov-report xml
+
+      - name: Django Check
+        run: |
+          python manage.py migrate
+          python manage.py check --settings oilandrope.dev_settings
