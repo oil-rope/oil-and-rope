@@ -76,14 +76,13 @@ jobs:
           python manage.py migrate
           python manage.py check
 
-      - name: Updating coverage
+      - name: Updating Codecov (coverage)
         if: ${{ success() && matrix.python-version==3.8 }}
-        continue-on-error: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-          pip install codecov
-          codecov -e DJANGO_SETTINGS_MODULE
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          file: ./coverage.xml
 
   python-build-without-postgres:
     name: Python Build without PostgreSQL
