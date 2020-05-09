@@ -111,7 +111,7 @@ class Place(MPTTModel, TracingMixin):
         (WORLD, _('World'))
     )
 
-    name = models.CharField(verbose_name=_('Name'), max_length=50, null=False, blank=False)
+    name = models.CharField(verbose_name=_('Name'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
     site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SITE_TYPES, default=TOWN,
                                                  null=False, blank=False)
