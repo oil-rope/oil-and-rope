@@ -84,8 +84,8 @@ jobs:
   python-build-without-postgres:
     name: Python Build without PostgreSQL
     runs-on: ubuntu-latest
-      env:
-        DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
+    env:
+      DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
 
     strategy:
       max-parallel: 4
