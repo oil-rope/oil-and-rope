@@ -77,9 +77,13 @@ jobs:
           python manage.py check
 
       - name: Updating coverage
-        if: ${{ success() }}
+        if: ${{ success() && matrix.python-version==3.8 }}
+        continue-on-error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          echo -e "Congrats!"
+          pip install codecov
+          codecov -e DJANGO_SETTINGS_MODULE
 
   python-build-without-postgres:
     name: Python Build without PostgreSQL
@@ -123,15 +127,6 @@ jobs:
         run: |
           python manage.py migrate
           python manage.py check
-
-      - name: Updating coverage
-        if: ${{ success() }}
-        continue-on-error: true
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: |
-          pip install codecov
-          codecov -e DJANGO_SETTINGS_MODULE
 
   node-build:
     name: Node Build
