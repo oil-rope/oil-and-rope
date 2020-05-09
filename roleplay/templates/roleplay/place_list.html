@@ -1,10 +1,52 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load mptt_tags %}
 
 {% block title %}{% trans 'Worlds' %}{% endblock title %}
 
 {% block body_content %}
-<div class="container">
-
+<div class="container-fluid">
+  {% if not place_list.exists %}
+    <h2 class="display-4 text-center">Seems like you haven't any world. Create one!</h2>
+    <a href="{% url 'roleplay:place_create' %}" class="btn btn-primary">Create world!</a>
+  {% else %}
+    <h2 class="display-4 text-center">Your worlds!</h2>
+    <div class="tree-container row flex-column align-content-xl-center">
+      <ul class="tree-list">
+      {% recursetree place_list %}
+        {% if node.is_leaf_node %}
+          <li class="tree-element">
+            <a class="tree-node" href="javascript:">
+              {% if node.is_world %}
+                <span class="ic-world"></span>
+              {% elif node.is_city %}
+                <span class="ic-city"></span>
+              {% elif node.is_town %}
+                <span class="ic-town"></span>
+              {% endif %}
+              {{ node }}
+            </a>
+          </li>
+        {% else %}
+          <li class="tree-element">
+            <a class="tree-node" href="javascript:">
+              {% if node.is_world %}
+                <span class="ic-world"></span>
+              {% elif node.is_city %}
+                <span class="ic-city"></span>
+              {% elif node.is_town %}
+                <span class="ic-town"></span>
+              {% endif %}
+              {{ node }}
+            </a>
+            <ul class="tree-list">
+              {{ children }}
+            </ul>
+          </li>
+        {% endif %}
+      {% endrecursetree %}
+      </ul>
+    </div>
+  {% endif %}
 </div>
 {% endblock body_content %}

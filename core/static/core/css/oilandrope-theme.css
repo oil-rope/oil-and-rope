@@ -1,12 +1,78 @@
 @charset "UTF-8";
-.full-background {
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-
 html {
   scroll-behavior: smooth;
+}
+
+.tree-container .tree-list {
+  padding-top: 20px;
+  position: relative;
+}
+.tree-container .tree-list .tree-list::before {
+  content: "";
+  border-left: 1px solid #1A202C;
+  height: 20px;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+.tree-container .tree-element {
+  float: left;
+  list-style-type: none;
+  padding: 20px 5px 0 5px;
+  position: relative;
+  text-align: center;
+}
+.tree-container .tree-element::after, .tree-container .tree-element::before {
+  border-top: 1px solid #1A202C;
+  content: "";
+  height: 20px;
+  position: absolute;
+  right: 50%;
+  top: 0;
+  width: 50%;
+}
+.tree-container .tree-element::after {
+  border-left: 1px solid #1A202C;
+  right: auto;
+  left: 50%;
+}
+.tree-container .tree-element:only-child {
+  padding-top: 0;
+}
+.tree-container .tree-element:only-child::after, .tree-container .tree-element:only-child::before {
+  display: none;
+}
+.tree-container .tree-element:first-child::before, .tree-container .tree-element:last-child::after {
+  border: 0 none;
+}
+.tree-container .tree-element:last-child::before {
+  border-radius: 0 5px 0 0;
+  border-right: 1px solid #1A202C;
+}
+.tree-container .tree-element:first-child::after {
+  border-radius: 5px 0 0 0;
+}
+.tree-container .tree-element .tree-node {
+  border: 1px solid #1A202C;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 5px 10px;
+  text-decoration: navajowhite;
+  transition: background-color 0.5s;
+}
+.tree-container .tree-element .tree-node:hover, .tree-container .tree-element .tree-node:hover + .tree-list .tree-element .tree-node {
+  background-color: #D13F31;
+  box-shadow: 0 0 10px #DEDBA7;
+}
+.tree-container .tree-element .tree-node:hover + .tree-list::before {
+  border-color: #D13F31;
+}
+.tree-container .tree-element .tree-node:hover + .tree-list .tree-list::before {
+  border-color: #D13F31;
+}
+.tree-container .tree-element .tree-node:hover + .tree-list .tree-element::after, .tree-container .tree-element .tree-node:hover + .tree-list .tree-element::before {
+  border-color: #D13F31;
 }
 
 /*!

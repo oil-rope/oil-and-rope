@@ -1,0 +1,82 @@
+.tree-container
+  .tree-list
+    padding-top: 20px
+    position: relative
+
+    // Time to add downward connectors from parents
+    .tree-list::before
+      content: ''
+      border-left: 1px solid theme-color("primary")
+      height: 20px
+      left: 50%
+      position: absolute
+      top: 0
+      width: 0
+
+
+  .tree-element
+    float: left
+    list-style-type: none
+    padding: 20px 5px 0 5px
+    position: relative
+    text-align: center
+
+    // We will use ::before and ::after to draw the connectors
+    &::after, &::before
+      border-top: 1px solid theme-color("primary")
+      content: ''
+      height: 20px
+      position: absolute
+      right: 50%
+      top: 0
+      width: 50%
+
+    &::after
+      border-left: 1px solid theme-color("primary")
+      right: auto
+      left: 50%
+
+    // We need to remove left-right connectors from elements without any siblings
+    &:only-child
+      padding-top: 0
+
+      &::after, &::before
+        display: none
+
+    // Remove left connector from first child and right connector from last child
+    &:first-child::before, &:last-child::after
+      border: 0 none
+
+    // Adding back the vertical connector to the last nodes
+    &:last-child::before
+      border-radius: 0 5px 0 0
+      border-right: 1px solid theme-color("primary")
+
+    &:first-child::after
+      border-radius: 5px 0 0 0
+
+    // Borders
+    .tree-node
+      border: 1px solid theme-color("primary")
+      border-radius: 5px
+      color: theme-color("light")
+      display: inline-block
+      padding: 5px 10px
+      text-decoration: navajowhite
+      transition: background-color .5s
+
+      &:hover
+        &, &+.tree-list .tree-element .tree-node
+          background-color: theme-color("extra")
+          box-shadow: 0 0 10px theme-color("palid")
+
+        &+.tree-list
+          &::before
+            border-color: theme-color("extra")
+
+          .tree-list::before
+            border-color: theme-color("extra")
+
+          .tree-element
+            &::after, &::before
+              border-color: theme-color("extra")
