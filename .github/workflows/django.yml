@@ -19,7 +19,7 @@ jobs:
       DB_NAME: oilandrope
       DB_PASSWORD: p4ssword@
       DB_PORT: 5432
-      DB_USER: postgres
+      DB_USER: oilandrope
       DJANGO_SETTINGS_MODULE: oilandrope.settings
       SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
 
@@ -28,8 +28,8 @@ jobs:
       postgres:
         image: postgres:11.7
         env:
-          POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: p4ssword@
+          POSTGRES_USER: oilandrope
           POSTGRES_DB: oilandrope
         options: >-
           --health-cmd pg_isready
