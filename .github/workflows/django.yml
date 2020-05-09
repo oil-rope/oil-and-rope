@@ -17,7 +17,7 @@ jobs:
     env:
       DB_HOST: localhost
       DB_NAME: oilandrope
-      DB_PASSWORD: p4ssword@
+      DB_PASSWORD: p4ssw0rd@
       DB_PORT: 5432
       DB_USER: oilandrope
       DJANGO_SETTINGS_MODULE: oilandrope.settings
@@ -28,7 +28,7 @@ jobs:
       postgres:
         image: postgres:11.7
         env:
-          POSTGRES_PASSWORD: p4ssword@
+          POSTGRES_PASSWORD: p4ssw0rd@
           POSTGRES_USER: oilandrope
           POSTGRES_DB: oilandrope
         options: >-
@@ -116,7 +116,7 @@ jobs:
 
       - name: Pytest
         run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov
           pytest --cov ./ --cov-report xml
 
       - name: Django Check
@@ -126,5 +126,30 @@ jobs:
 
       - name: Updating coverage
         if: ${{ success() }}
+        continue-on-error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          echo -e "Congrats!"
+          pip install codecov
+          codecov -e DJANGO_SETTINGS_MODULE
+
+  node-build:
+    name: Node Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Test
+      run: npm test
