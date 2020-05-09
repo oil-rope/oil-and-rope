@@ -1,18 +1,18 @@
 @font-face {
-  font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?o2ov4h');
-  src:  url('fonts/icomoon.eot?o2ov4h#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?o2ov4h') format('truetype'),
-    url('fonts/icomoon.woff?o2ov4h') format('woff'),
-    url('fonts/icomoon.svg?o2ov4h#icomoon') format('svg');
+  font-family: 'Oil-and-Rope';
+  src:  url('fonts/Oil-and-Rope.eot?fhwgcj');
+  src:  url('fonts/Oil-and-Rope.eot?fhwgcj#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?fhwgcj') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?fhwgcj') format('woff'),
+    url('fonts/Oil-and-Rope.svg?fhwgcj#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="ic-"], [class*=" ic-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
+  font-family: 'Oil-and-Rope' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -25,24 +25,24 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-home3:before {
+.ic-home:before {
   content: "\e902";
 }
-.icon-pencil:before {
+.ic-edit:before {
   content: "\e905";
 }
-.icon-pencil2:before {
+.ic-pencil:before {
   content: "\e906";
 }
-.icon-quill:before {
+.ic-quill:before {
   content: "\e907";
 }
-.icon-map:before {
+.ic-map:before {
   content: "\e94b";
 }
-.icon-plus:before {
+.ic-plus:before {
   content: "\ea0a";
 }
-.icon-minus:before {
+.ic-minus:before {
   content: "\ea0b";
 }
