@@ -245,7 +245,7 @@ class TestPlace(TestCase):
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
-        name = self.faker.password(length=51)
+        name = self.faker.password(length=101)
         with self.assertRaises(DataError) as ex:
             self.model.objects.create(name=name)
         self.assertRegex(str(ex.exception), r'.*value too long.*')
