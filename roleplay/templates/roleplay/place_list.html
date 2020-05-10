@@ -6,46 +6,84 @@
 
 {% block body_content %}
 <div class="container-fluid">
-  {% if not place_list.exists %}
-    <h2 class="display-4 text-center">Seems like you haven't any world. Create one!</h2>
-    <a href="{% url 'roleplay:place_create' %}" class="btn btn-primary">Create world!</a>
+
+  <!-- User's worlds -->
+  {% if not user_places.exists %}
+    <h2 class="display-4 text-center">
+      {% trans "Seems like you haven't any world" %}.<br>
+      {% trans "Create one" %}!
+    </h2>
+    <div class="row justify-content-center py-5">
+      <a href="#no-url" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
+    </div>
   {% else %}
-    <h2 class="display-4 text-center">Your worlds!</h2>
-    <div class="tree-container row flex-column align-content-xl-center">
-      <ul class="tree-list">
-      {% recursetree place_list %}
-        {% if node.is_leaf_node %}
-          <li class="tree-element">
-            <a class="tree-node" href="javascript:">
-              {% if node.is_world %}
-                <span class="ic-world"></span>
-              {% elif node.is_city %}
-                <span class="ic-city"></span>
-              {% elif node.is_town %}
-                <span class="ic-town"></span>
-              {% endif %}
-              {{ node }}
-            </a>
-          </li>
-        {% else %}
-          <li class="tree-element">
-            <a class="tree-node" href="javascript:">
-              {% if node.is_world %}
-                <span class="ic-world"></span>
-              {% elif node.is_city %}
-                <span class="ic-city"></span>
-              {% elif node.is_town %}
-                <span class="ic-town"></span>
-              {% endif %}
-              {{ node }}
-            </a>
-            <ul class="tree-list">
-              {{ children }}
-            </ul>
-          </li>
-        {% endif %}
-      {% endrecursetree %}
-      </ul>
+    <h2 class="display-4 text-center">{% trans "Your worlds" %}!</h2>
+    <div class="row">
+      <div class="tree-container">
+        <ul class="tree-list">
+        {% recursetree user_places %}
+          {% if node.is_leaf_node %}
+            <li class="tree-element">
+              <a class="tree-node" href="javascript:">
+                {{ node.resolve_icon }}
+                {{ node }}
+              </a>
+            </li>
+          {% else %}
+            <li class="tree-element">
+              <a class="tree-node" href="javascript:">
+                {{ node.resolve_icon }}
+                {{ node }}
+              </a>
+              <ul class="tree-list">
+                {{ children }}
+              </ul>
+            </li>
+          {% endif %}
+        {% endrecursetree %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Community worlds -->
+  {% if not place_list.exists %}
+    <h2 class="display-4 text-center">
+      {% trans "Seems like we don't have comunity worlds" %}<br>
+      {% trans "Would you like to create one?" %}
+    </h2>
+    <div class="row justify-content-center">
+      <a href="#no-url" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
+    </div>
+  {% else %}
+    <h2 class="display-4 text-center">
+      {% trans "Checkout our community worlds" %}
+    </h2>
+    <div class="row">
+      <div class="tree-container">
+        <ul class="tree-list">
+        {% recursetree place_list %}
+          {% if node.is_leaf_node %}
+            <li class="tree-element">
+              <a class="tree-node" href="javascript:">
+                {{ node.resolve_icon }}
+                {{ node }}
+              </a>
+            </li>
+          {% else %}
+            <li class="tree-element">
+              <a class="tree-node" href="javascript:">
+                {{ node.resolve_icon }}
+                {{ node }}
+              </a>
+              <ul class="tree-list">
+                {{ children }}
+              </ul>
+            </li>
+          {% endif %}
+        {% endrecursetree %}
+        </ul>
+      </div>
     </div>
   {% endif %}
 </div>
