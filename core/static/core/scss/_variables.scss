@@ -37,3 +37,28 @@ $sizes: ("10vh": 10vh,
     "80vw": 80vw,
     "90vw": 90vw,
     "100vw": 100vw);
+
+// Inherited from Bootstrap
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+
+$spacer: 1rem !default;
+$spacers: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$spacers: map-merge(
+  (
+    0: 0,
+    1: ($spacer * .25),
+    2: ($spacer * .5),
+    3: $spacer,
+    4: ($spacer * 1.5),
+    5: ($spacer * 3)
+  ),
+  $spacers
+);
+
+// Tables
+$tree-list-separation: map-get($spacers, 4)

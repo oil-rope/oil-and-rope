@@ -1,82 +1,49 @@
+@import "../../bootstrap/scss/functions"
+@import "../../bootstrap/scss/variables"
+@import "../../bootstrap/scss/mixins/breakpoints"
+@import "variables"
+
 .tree-container
+
   .tree-list
-    padding-top: 20px
-    position: relative
-
-    // Time to add downward connectors from parents
-    .tree-list::before
-      content: ''
-      border-left: 1px solid theme-color("primary")
-      height: 20px
-      left: 50%
-      position: absolute
-      top: 0
-      width: 0
-
-
-  .tree-element
-    float: left
-    list-style-type: none
-    padding: 20px 5px 0 5px
-    position: relative
+    display: flex
+    flex-direction: row
+    justify-content: center
+    list-style: none
     text-align: center
 
-    // We will use ::before and ::after to draw the connectors
-    &::after, &::before
-      border-top: 1px solid theme-color("primary")
-      content: ''
-      height: 20px
-      position: absolute
-      right: 50%
-      top: 0
-      width: 50%
+    .tree-element
+      display: flex
+      flex-direction: column
+      align-content: center
 
-    &::after
-      border-left: 1px solid theme-color("primary")
-      right: auto
-      left: 50%
+      .tree-node
+        border-color: theme-color()
+        border-style: solid
+        border-width: 1px
+        padding: $spacer
+        transition: box-shadow .3s
 
-    // We need to remove left-right connectors from elements without any siblings
-    &:only-child
-      padding-top: 0
+        &:hover
+          text-decoration: none
 
-      &::after, &::before
-        display: none
+          &, &+.tree-list .tree-element .tree-node
+            box-shadow: 0 0 10px theme-color("extra")
 
-    // Remove left connector from first child and right connector from last child
-    &:first-child::before, &:last-child::after
-      border: 0 none
+    @each $color in map-keys($theme-colors)
+      &-#{$color}
+        .tree-element
+          .tree-node
+            border-color: theme-color($color)
 
-    // Adding back the vertical connector to the last nodes
-    &:last-child::before
-      border-radius: 0 5px 0 0
-      border-right: 1px solid theme-color("primary")
+.tree-responsive
+  @each $breakpoint in map-keys($grid-breakpoints)
+    $next: breakpoint-next($breakpoint, $grid-breakpoints)
+    $infix: breakpoint-infix($next, $grid-breakpoints)
 
-    &:first-child::after
-      border-radius: 5px 0 0 0
-
-    // Borders
-    .tree-node
-      border: 1px solid theme-color("primary")
-      border-radius: 5px
-      color: theme-color("light")
-      display: inline-block
-      padding: 5px 10px
-      text-decoration: navajowhite
-      transition: background-color .5s
-
-      &:hover
-        &, &+.tree-list .tree-element .tree-node
-          background-color: theme-color("extra")
-          box-shadow: 0 0 10px theme-color("palid")
-
-        &+.tree-list
-          &::before
-            border-color: theme-color("extra")
-
-          .tree-list::before
-            border-color: theme-color("extra")
-
-          .tree-element
-            &::after, &::before
-              border-color: theme-color("extra")
+    &#{$infix}
+      @include media-breakpoint-down($breakpoint)
+        display: block
+        width: 100%
+        overflow-x: auto
+        -webkit-overflow-scrolling: touch
