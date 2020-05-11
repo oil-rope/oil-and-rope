@@ -11,6 +11,7 @@ class TestPlaceListView(TestCase):
 
     def setUp(self):
         self.faker = Faker()
+        self.model = models.Place
         self.user = baker.make(get_user_model())
         self.url = reverse('roleplay:place_list')
 
@@ -19,7 +20,7 @@ class TestPlaceListView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/place_list.html')
+        self.assertTemplateUsed(response, 'roleplay/world_list.html')
 
     def test_access_anonymous_ko(self):
         response = self.client.get(self.url)
@@ -31,7 +32,7 @@ class TestPlaceListView(TestCase):
         entries = []
         for _ in range(0, 10):
             entries.append(
-                models.Place.objects.create(name=self.faker.country())
+                models.Place.objects.create(name=self.faker.country(), site_type=self.model.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -44,7 +45,7 @@ class TestPlaceListView(TestCase):
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=another_user)
+                models.Place.objects.create(name=self.faker.country(), user=another_user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -58,13 +59,13 @@ class TestPlaceListView(TestCase):
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.name(), user=another_user)
+                models.Place.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
             )
 
         user_entries = []
         for _ in range(0, 10):
             user_entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=self.user)
+                models.Place.objects.create(name=self.faker.country(), user=self.user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -81,16 +82,16 @@ class TestPlaceListView(TestCase):
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.name(), user=another_user)
+                models.Place.objects.create(name=self.faker.country(), user=another_user, site_type=self.model.WORLD)
             )
 
         entries = []
         for _ in range(0, 10):
             entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=self.user)
+                models.Place.objects.create(name=self.faker.country(), user=self.user, site_type=self.model.WORLD)
             )
             entries.append(
-                models.Place.objects.create(name=self.faker.country())
+                models.Place.objects.create(name=self.faker.country(), site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)

@@ -1,0 +1,64 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans 'Worlds' %}{% endblock title %}
+
+{% block body_content %}
+  <div class="container-fluid">
+
+    <!-- User's worlds -->
+    {% if not user_worlds.exists %}
+      <h2 class="display-4 text-center">
+        {% trans "Seems like you haven't any world" %}.<br>
+        {% trans "Create one" %}!
+      </h2>
+      <div class="row justify-content-center py-5">
+        <a href="#no-url" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
+      </div>
+    {% else %}
+      <h2 class="display-4 text-center">
+        {% blocktrans count counter=place_list.count %}
+          Your world
+        {% plural %}
+          Your worlds
+        {% endblocktrans %}
+      </h2>
+      <div class="d-none d-xl-block w-100 py-3"></div>
+      <div class="row justify-content-xl-around">
+        {% for world in user_worlds %}
+          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5">
+            {% include 'roleplay/include/world_card.html' with world=world only %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Community worlds -->
+    {% if not object_list.exists %}
+      <h2 class="display-4 text-center">
+        {% trans "Seems like we don't have comunity worlds" %}<br>
+        {% trans "Would you like to create one?" %}
+      </h2>
+      <div class="row justify-content-center py-5">
+        <a href="#no-url" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
+      </div>
+    {% else %}
+      <h2 class="display-4 text-center">
+        {% blocktrans count counter=object_list.count %}
+          Checkout our community world
+        {% plural %}
+          Checkout our {{ counter }} community worlds
+        {% endblocktrans %}
+      </h2>
+      <div class="d-none d-xl-block w-100 py-3"></div>
+      <div class="row justify-content-xl-around">
+        {% for world in object_list %}
+          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5">
+            {% include 'roleplay/include/world_card.html' with world=world only %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock body_content %}

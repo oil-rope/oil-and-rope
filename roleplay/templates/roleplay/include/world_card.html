@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load static %}
+
+<div class="card h-100">
+  <div class="card-header">
+    <div id="worldCarousel_{{ world.pk }}" class="carousel slide" data-ride="carousel">
+      <div class="carousel-inner">
+        {% for image in world.images %}
+          <div class="carousel-item{% if forloop.first %} active{% endif %}">
+            <div class="d-inline-block w-100 full-background"
+                 style="background-image: url('{{ image.url }}')"></div>
+          </div>
+        {% empty %}
+          <div class="carousel-item active">
+            {% static 'roleplay/img/places/default_image.png' as default_image %}
+            <div class="d-inline-block w-100 full-background"
+                 style="background-image: url('{{ default_image }}')"></div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title text-center">{{ world.name }}</h5>
+    <hr class="w-50">
+    <p class="card-text text-justify">
+      {{ world.description|truncatechars_html:250|default:_("No description provided")|add:"." }}
+    </p>
+  </div>
+  <div class="card-footer">
+    <p class="text-muted text-center">
+      {% with sessions=0 %}
+        {% blocktrans count counter=sessions %}
+          Used in {{ sessions }} session
+        {% plural %}
+          Used in {{ sessions }} sessions
+        {% endblocktrans %}
+      {% endwith %}
+    </p>
+  </div>
+</div>

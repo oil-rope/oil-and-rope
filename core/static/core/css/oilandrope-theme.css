@@ -83,6 +83,14 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
+.full-background {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 25vh;
+  min-height: 250px;
+}
+
 /*!
  * Bootstrap v4.4.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 The Bootstrap Authors

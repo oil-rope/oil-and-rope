@@ -144,6 +144,10 @@ class Place(MPTTModel, TracingMixin):
 
     objects = managers.PlaceManager()
 
+    def images(self):
+        images = [obj.image for obj in self.get_descendants().filter(image__isnull=False) if obj.image]
+        return images
+
     def resolve_icon(self):
         return '<span class="{}"></span>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
 

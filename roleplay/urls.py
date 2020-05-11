@@ -5,7 +5,7 @@ from . import views
 app_name = 'roleplay'
 
 PLACE_PATTERNS = [
-    path('', views.PlaceListView.as_view(), name='place_list'),
+    path('', views.WorldListView.as_view(), name='place_list'),
 ]
 
 urlpatterns = [
