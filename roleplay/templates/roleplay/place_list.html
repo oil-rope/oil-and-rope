@@ -17,49 +17,16 @@
       <a href="#no-url" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
     </div>
   {% else %}
-    <h2 class="display-4 text-center">{% trans "Your worlds" %}!</h2>
+    <h2 class="display-4 text-center">
+      {% blocktrans count counter=place_list.count %}
+        Your world
+        {% plural %}
+        Your worlds
+      {% endblocktrans %}
+    </h2>
     <div class="d-none d-xl-block w-100 py-3"></div>
     <div class="row justify-content-xl-center">
-      {% recursetree place_list %}
-
-        {% if node.is_leaf_node and node.get_ancestors.exists %}
-          <li class="tree-element">
-            <a href="javascript:" class="tree-node">
-              {{ node.resolve_icon|safe }}
-              {{ node }}
-            </a>
-          </li>
-        {% elif not node.get_ancestors.exists %}
-          <div class="tree-container tree-responsive col-12 col-xl-auto">
-            <ul class="tree-list">
-              <li class="tree-element">
-                <a href="javascript:" class="tree-node">
-                  {{ node.resolve_icon|safe }}
-                  {{ node }}
-                </a>
-                {% if node.get_children.exists %}
-                  <ul class="tree-list">
-                    {{ children }}
-                  </ul>
-                {% endif %}
-              </li>
-            </ul>
-          </div>
-        {% elif not node.is_leaf_node and node.get_ancestors.exists %}
-          <li class="tree-element">
-            <a href="javascript:" class="tree-node">
-              {{ node.resolve_icon|safe }}
-              {{ node }}
-            </a>
-            {% if node.get_children.exists %}
-              <ul class="tree-list">
-                {{ children }}
-              </ul>
-            {% endif %}
-          </li>
-        {% endif %}
-
-      {% endrecursetree %}
+      {% include 'common/include/tree.html' with place_list=user_places %}
     </div>
   {% endif %}
 
@@ -74,50 +41,15 @@
     </div>
   {% else %}
     <h2 class="display-4 text-center">
-      {% trans "Checkout our community worlds" %}
+      {% blocktrans count counter=place_list.count %}
+        Checkout our community world
+        {% plural %}
+        Checkout our {{ counter }} community worlds
+      {% endblocktrans %}
     </h2>
     <div class="d-none d-xl-block w-100 py-3"></div>
     <div class="row justify-content-xl-around">
-      {% recursetree place_list %}
-
-        {% if node.is_leaf_node and node.get_ancestors.exists %}
-          <li class="tree-element">
-            <a href="javascript:" class="tree-node">
-              {{ node.resolve_icon|safe }}
-              {{ node }}
-            </a>
-          </li>
-        {% elif not node.get_ancestors.exists %}
-          <div class="tree-container tree-responsive col-12 col-xl-auto">
-            <ul class="tree-list">
-              <li class="tree-element">
-                <a href="javascript:" class="tree-node">
-                  {{ node.resolve_icon|safe }}
-                  {{ node }}
-                </a>
-                {% if node.get_children.exists %}
-                  <ul class="tree-list">
-                    {{ children }}
-                  </ul>
-                {% endif %}
-              </li>
-            </ul>
-          </div>
-        {% elif not node.is_leaf_node and node.get_ancestors.exists %}
-          <li class="tree-element">
-            <a href="javascript:" class="tree-node">
-              {{ node.resolve_icon|safe }}
-              {{ node }}
-            </a>
-            {% if node.get_children.exists %}
-              <ul class="tree-list">
-                {{ children }}
-              </ul>
-            {% endif %}
-          </li>
-        {% endif %}
-
-      {% endrecursetree %}
+      {% include 'common/include/tree.html' with place_list=place_list %}
     </div>
   {% endif %}
 </div>
