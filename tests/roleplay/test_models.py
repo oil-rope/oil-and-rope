@@ -111,6 +111,32 @@ class TestPlace(TestCase):
         os.unlink(tmpfile.name)
         os.unlink(place.image.path)
 
+    def test_images_ok(self):
+        images = []
+
+        for _ in range(0, 3):
+            tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+            image_data = open(tmpfile.name, 'rb').read()
+            image_file = tmpfile.name
+            image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+            images.append(image)
+
+            tmpfile.close()
+            os.unlink(tmpfile.name)
+
+        parent = None
+        for image in images:
+            place = self.model.objects.create(name=self.faker.country(), parent_site=parent)
+            place.image = image
+            place.save()
+            parent = place
+
+        obj_images = self.model.objects.first().images()
+        self.assertEqual(len(images), len(obj_images))
+
+        for place in self.model.objects.all():
+            os.unlink(place.image.path)
+
     # TODO: Refactor this test so is not that complex
     def test_nested_world_ok(self):  # noqa
         universe = self.model.objects.create(name='Universe', site_type=self.model.WORLD)
@@ -326,3 +352,9 @@ class TestPlace(TestCase):
     def test_is_world_ok(self):
         place = baker.make(self.model, site_type=self.model.WORLD)
         self.assertTrue(place.is_world)
+
+    def test_resolve_icon(self):
+        for site_type in self.model.ICON_RESOLVERS.keys():
+            obj = self.model.objects.create(name=self.faker.country(), site_type=site_type)
+            expected_url = '<span class="{}"></span>'.format(self.model.ICON_RESOLVERS.get(site_type, ''))
+            self.assertEqual(expected_url, obj.resolve_icon())

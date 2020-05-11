@@ -145,7 +145,10 @@ class Place(MPTTModel, TracingMixin):
     objects = managers.PlaceManager()
 
     def images(self):
-        images = [obj.image for obj in self.get_descendants().filter(image__isnull=False) if obj.image]
+        images = []
+        if self.image:
+            images.extend([self.image])
+        images.extend([obj.image for obj in self.get_descendants().filter(image__isnull=False) if obj.image])
         return images
 
     def resolve_icon(self):

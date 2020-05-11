@@ -7,7 +7,7 @@ from model_bakery import baker
 from roleplay import models
 
 
-class TestPlaceListView(TestCase):
+class TestWorldListView(TestCase):
 
     def setUp(self):
         self.faker = Faker()
@@ -32,7 +32,7 @@ class TestPlaceListView(TestCase):
         entries = []
         for _ in range(0, 10):
             entries.append(
-                models.Place.objects.create(name=self.faker.country(), site_type=self.model.WORLD)
+                models.Place.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -78,11 +78,13 @@ class TestPlaceListView(TestCase):
             self.assertIn(str(entry), str(response.content))
 
     def test_user_can_see_community_worlds_and_its_world_but_not_other_users_worlds_ok(self):
+        # To avoid repetition, we use different fakers
+
         another_user = baker.make(get_user_model())
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=another_user, site_type=self.model.WORLD)
+                models.Place.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
             )
 
         entries = []
@@ -91,7 +93,7 @@ class TestPlaceListView(TestCase):
                 models.Place.objects.create(name=self.faker.country(), user=self.user, site_type=self.model.WORLD)
             )
             entries.append(
-                models.Place.objects.create(name=self.faker.country(), site_type=self.model.WORLD)
+                models.Place.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
