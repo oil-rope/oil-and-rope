@@ -33,7 +33,7 @@ async def test_websocket_sends_error():
 
 
 @pytest.mark.asyncio
-async def test_websocket_handler_inexistent_function():
+async def test_websocket_handler_non_existent_function():
     communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer, 'testws/')
     data = {
         'type': fake.word()
@@ -42,7 +42,7 @@ async def test_websocket_handler_inexistent_function():
     response = await communicator.receive_json_from()
 
     error_response = {
-        'error': _('Inexistent type') + '.'
+        'error': _('Non existent type') + '.'
     }
     assert response == error_response, 'Incorrect response.'
 

@@ -34,7 +34,7 @@ class TestWorldListView(TestCase):
         entries = []
         for _ in range(0, self.pagination):
             entries.append(
-                self.model.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
+                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -46,9 +46,8 @@ class TestWorldListView(TestCase):
         another_user = baker.make(get_user_model())
         another_user_entries = []
         for _ in range(0, 10):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             another_user_entries.append(
-                self.model.objects.create(name=country_name, user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(name='world_{}'.format(_), user=another_user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -62,14 +61,13 @@ class TestWorldListView(TestCase):
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
-                self.model.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(name='another_user_'.format(_), user=another_user, site_type=self.model.WORLD)
             )
 
         user_entries = []
         for _ in range(0, self.pagination):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             user_entries.append(
-                self.model.objects.create(name=country_name, user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -93,12 +91,11 @@ class TestWorldListView(TestCase):
 
         entries = []
         for _ in range(0, self.pagination):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             entries.append(
-                self.model.objects.create(name=country_name, user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD)
             )
             entries.append(
-                self.model.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
+                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -118,8 +115,7 @@ class TestWorldListView(TestCase):
 
     def test_correct_community_worlds_are_paginated_ok(self):
         for _ in range(0, self.pagination + 1):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
-            self.model.objects.create(name=country_name, site_type=self.model.WORLD)
+            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?page=1')
 
@@ -144,8 +140,7 @@ class TestWorldListView(TestCase):
 
     def test_correct_user_worlds_are_paginated_ok(self):
         for _ in range(0, self.pagination + 1):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
-            self.model.objects.create(name=country_name, site_type=self.model.WORLD, user=self.user)
+            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD, user=self.user)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1'.format(self.view.user_worlds_page_kwarg))
 
@@ -166,9 +161,8 @@ class TestWorldListView(TestCase):
         community_worlds = []
         user_worlds = []
         for _ in range(0, self.pagination + 1):
-            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ').replace('\'', ' ')
             user_worlds.append(
-                self.model.objects.create(name=country_name, site_type=self.model.WORLD, user=self.user)
+                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD, user=self.user)
             )
         for _ in range(0, self.pagination):
             community_worlds.append(
@@ -193,3 +187,20 @@ class TestWorldListView(TestCase):
         for entry in user_worlds[:self.pagination]:
             self.assertNotIn(str(entry), str(response.content))
         self.assertIn(str(user_worlds[self.pagination]), str(response.content))
+
+    def test_non_numeric_page_kwarg_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?page=random')
+
+        self.assertEqual(404, response.status_code)
+
+    def test_last_page_ok(self):
+        for _ in range(0, self.pagination + 1):
+            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?page=last')
+
+        self.assertEqual(200, response.status_code)
+        for entry in self.model.objects.all()[:self.pagination]:
+            self.assertNotIn(str(entry), str(response.content))
+        self.assertIn(str(self.model.objects.last()), str(response.content))
