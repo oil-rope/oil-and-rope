@@ -1,6 +1,5 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
-{% load static %}
 
 {% block title %}{% trans 'Worlds' %}{% endblock title %}
 
@@ -13,21 +12,24 @@
         {% trans "Seems like you haven't any world" %}.<br>
         {% trans "Create one" %}!
       </h2>
-      <div class="row justify-content-center py-5">
+      <div class="row justify-content-center">
         <a href="#no-url" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
-        {% blocktrans count counter=place_list.count %}
+        {% blocktrans count counter=user_worlds_full.count %}
           Your world
         {% plural %}
           Your worlds
         {% endblocktrans %}
       </h2>
-      <div class="d-none d-xl-block w-100 py-3"></div>
-      <div class="row justify-content-xl-around">
-        {% for world in user_worlds %}
-          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5">
+      <div class="d-none d-xl-block w-100"></div>
+      {% if user_worlds_is_paginated %}
+        {% include 'common/include/paginator.html' with paginator=user_worlds_paginator page_obj=user_worlds_page_obj path=request.path align='center' page_kwarg='page_user_worlds' only %}
+      {% endif %}
+      <div class="row justify-content-xl-around mb-5">
+        {% for world in user_worlds_page_obj %}
+          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world only %}
           </div>
         {% endfor %}
@@ -40,21 +42,24 @@
         {% trans "Seems like we don't have comunity worlds" %}<br>
         {% trans "Would you like to create one?" %}
       </h2>
-      <div class="row justify-content-center py-5">
+      <div class="row justify-content-center">
         <a href="#no-url" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
-        {% blocktrans count counter=object_list.count %}
+        {% blocktrans count counter=object_list_full.count %}
           Checkout our community world
         {% plural %}
           Checkout our {{ counter }} community worlds
         {% endblocktrans %}
       </h2>
-      <div class="d-none d-xl-block w-100 py-3"></div>
+      <div class="d-none d-xl-block w-100"></div>
+      {% if is_paginated %}
+        {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
+      {% endif %}
       <div class="row justify-content-xl-around">
-        {% for world in object_list %}
-          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5">
+        {% for world in page_obj %}
+          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world only %}
           </div>
         {% endfor %}

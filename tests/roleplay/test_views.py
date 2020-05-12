@@ -4,14 +4,16 @@ from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
-from roleplay import models
+from roleplay import models, views
 
 
 class TestWorldListView(TestCase):
+    view = views.WorldListView
 
     def setUp(self):
         self.faker = Faker()
         self.model = models.Place
+        self.pagination = views.WorldListView.paginate_by
         self.user = baker.make(get_user_model())
         self.url = reverse('roleplay:place_list')
 
@@ -30,9 +32,9 @@ class TestWorldListView(TestCase):
 
     def test_places_are_listed_ok(self):
         entries = []
-        for _ in range(0, 10):
+        for _ in range(0, self.pagination):
             entries.append(
-                models.Place.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
+                self.model.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -44,8 +46,9 @@ class TestWorldListView(TestCase):
         another_user = baker.make(get_user_model())
         another_user_entries = []
         for _ in range(0, 10):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(name=country_name, user=another_user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -57,15 +60,16 @@ class TestWorldListView(TestCase):
     def test_user_can_see_its_worlds_but_no_other_users_worlds_ok(self):
         another_user = baker.make(get_user_model())
         another_user_entries = []
-        for _ in range(0, 10):
+        for _ in range(0, self.pagination):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
             )
 
         user_entries = []
-        for _ in range(0, 10):
+        for _ in range(0, self.pagination):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             user_entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(name=country_name, user=self.user, site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -82,18 +86,19 @@ class TestWorldListView(TestCase):
 
         another_user = baker.make(get_user_model())
         another_user_entries = []
-        for _ in range(0, 10):
+        for _ in range(0, self.pagination):
             another_user_entries.append(
-                models.Place.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
             )
 
         entries = []
-        for _ in range(0, 10):
+        for _ in range(0, self.pagination):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
             entries.append(
-                models.Place.objects.create(name=self.faker.country(), user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(name=country_name, user=self.user, site_type=self.model.WORLD)
             )
             entries.append(
-                models.Place.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
+                self.model.objects.create(name=self.faker.word(), site_type=self.model.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -104,3 +109,87 @@ class TestWorldListView(TestCase):
 
         for entry in entries:
             self.assertIn(str(entry), str(response.content))
+
+    def test_non_existent_community_worlds_pagination_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?page=2')
+
+        self.assertEqual(404, response.status_code)
+
+    def test_correct_community_worlds_are_paginated_ok(self):
+        for _ in range(0, self.pagination + 1):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
+            self.model.objects.create(name=country_name, site_type=self.model.WORLD)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?page=1')
+
+        visible_entries = self.model.objects.all()[:self.pagination]
+        last_entry = self.model.objects.last()
+
+        for entry in visible_entries:
+            self.assertIn(str(entry), str(response.content))
+        self.assertNotIn(str(last_entry), str(response.content))
+
+        response = self.client.get(self.url + '?page=2')
+
+        for entry in visible_entries:
+            self.assertNotIn(str(entry), str(response.content))
+        self.assertIn(str(last_entry), str(response.content))
+
+    def test_non_existent_user_worlds_pagination_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?{}=2'.format(self.view.user_worlds_page_kwarg))
+
+        self.assertEqual(404, response.status_code)
+
+    def test_correct_user_worlds_are_paginated_ok(self):
+        for _ in range(0, self.pagination + 1):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ')
+            self.model.objects.create(name=country_name, site_type=self.model.WORLD, user=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?{}=1'.format(self.view.user_worlds_page_kwarg))
+
+        visible_entries = self.model.objects.all()[:self.pagination]
+        last_entry = self.model.objects.last()
+
+        for entry in visible_entries:
+            self.assertIn(str(entry), str(response.content))
+        self.assertNotIn(str(last_entry), str(response.content))
+
+        response = self.client.get(self.url + '?{}=2'.format(self.view.user_worlds_page_kwarg))
+
+        for entry in visible_entries:
+            self.assertNotIn(str(entry), str(response.content))
+        self.assertIn(str(last_entry), str(response.content))
+
+    def test_user_worlds_are_paginated_community_worlds_are_not_ko(self):
+        community_worlds = []
+        user_worlds = []
+        for _ in range(0, self.pagination + 1):
+            country_name = self.faker.country().replace('&', 'and').replace('\'', ' ').replace('\'', ' ')
+            user_worlds.append(
+                self.model.objects.create(name=country_name, site_type=self.model.WORLD, user=self.user)
+            )
+        for _ in range(0, self.pagination):
+            community_worlds.append(
+                self.model.objects.create(name=self.faker.name(), site_type=self.model.WORLD)
+            )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?{}=1&page=1'.format(self.view.user_worlds_page_kwarg))
+
+        for entry in community_worlds[:self.pagination - 1]:
+            self.assertIn(str(entry), str(response.content))
+        for entry in user_worlds[:self.pagination]:
+            self.assertIn(str(entry), str(response.content))
+        self.assertNotIn(str(user_worlds[self.pagination]), str(response.content))
+
+        response = self.client.get(self.url + '?{}=2&page=2'.format(self.view.user_worlds_page_kwarg))
+
+        self.assertEqual(404, response.status_code)
+
+        response = self.client.get(self.url + '?{}=2&page=1'.format(self.view.user_worlds_page_kwarg))
+        for entry in community_worlds[:self.pagination - 1]:
+            self.assertIn(str(entry), str(response.content))
+        for entry in user_worlds[:self.pagination]:
+            self.assertNotIn(str(entry), str(response.content))
+        self.assertIn(str(user_worlds[self.pagination]), str(response.content))
