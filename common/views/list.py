@@ -24,7 +24,8 @@ class MultiplePaginatorListView(ListView):
         except ValueError:
             if page == 'last':
                 page_number = paginator.num_pages
-            else:
+            # TODO: Test case for this (it cannot be tested now due to inheritance from ListView)
+            else:  # pragma: no cover
                 raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
         try:
             page = paginator.page(page_number)

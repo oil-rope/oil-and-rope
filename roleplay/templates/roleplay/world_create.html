@@ -1,0 +1,15 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Create" %} {% trans "World" %}{% endblock title %}
+
+{% block body_content %}
+  <main class="container">
+    <h1 class="text-center font-weight-lighter">{% trans "Create your world" %}!</h1>
+    <hr class="mx-3 pb-3">
+    <div class="row">
+      {% crispy form %}
+    </div>
+  </main>
+{% endblock body_content %}

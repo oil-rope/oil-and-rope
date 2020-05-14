@@ -1,30 +1,21 @@
 import pathlib
 
-import pytest
 from django.test import TestCase
 
 from bot import config, exceptions
 
 
-@pytest.fixture(scope='class')
-def del_config_file(request):
-    """
-    Deletes config file and unnecesary files after test.
-    """
-
-    request.cls.config = config.Config()
-    request.cls.config_file = config.CONFIG_DIR / config.CONFIG_FILE
-
-    yield
-
-    request.cls.config_file.unlink()
-
-
-@pytest.mark.usefixtures('del_config_file')
 class ConfigFileTest(TestCase):
     """
     Checks if config file is created, read and applied correctly.
     """
+
+    def setUp(self):
+        self.config = config.Config()
+        self.config_file = self.config.config_file
+
+    def tearDown(self):
+        self.config_file.unlink()
 
     def test_creates_config_file(self):
         """
@@ -38,8 +29,11 @@ class ConfigFileTest(TestCase):
         Checks if invalid config file raises exception.
         """
 
-        self.config_file = pathlib.Path(__file__).parent / 'files/configuration.ini'
+        config_file = pathlib.Path('./configuration.ini')
+        config_file.touch()
 
         with self.assertRaises(exceptions.OilAndRopeException):
-            self.assertTrue(self.config_file.exists(), 'Config file does not exist.')
-            config.Config(config_file=self.config_file)
+            self.assertTrue(config_file.exists(), 'Config file does not exist.')
+            config.Config(config_file=config_file)
+
+        config_file.unlink()

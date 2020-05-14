@@ -11,4 +11,13 @@ def default_upload_to(instance, file):
     formatted_date = date.strftime('%Y/%m/%d')
     app = instance._meta.app_label
     model = instance._meta.model_name
-    return '{}/{}/{}/{}/{}'.format(app, model, formatted_date, instance.pk, file)
+    identifier = instance.pk
+
+    if not identifier:
+        if hasattr(instance, 'tree_id'):
+            identifier = instance.tree_id
+        # TODO: Correct test cases
+        else:  # pragma: no cover
+            identifier = 'unknown_identifier'
+
+    return '{}/{}/{}/{}/{}'.format(app, model, formatted_date, identifier, file)

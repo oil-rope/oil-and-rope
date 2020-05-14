@@ -13,7 +13,7 @@
         {% trans "Create one" %}!
       </h2>
       <div class="row justify-content-center">
-        <a href="#no-url" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
+        <a href="{% url 'roleplay:world_create' %}?user" class="btn btn-lg btn-extra">{% trans "Create world" %}!</a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
@@ -22,6 +22,9 @@
         {% plural %}
           Your worlds
         {% endblocktrans %}
+        <a title="{% trans 'Create new world' %}" href="{% url 'roleplay:world_create' %}?user" class="btn btn-extra">
+          <span class="ic-plus"></span>
+        </a>
       </h2>
       <div class="d-none d-xl-block w-100"></div>
       {% if user_worlds_is_paginated %}
@@ -43,7 +46,7 @@
         {% trans "Would you like to create one?" %}
       </h2>
       <div class="row justify-content-center">
-        <a href="#no-url" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
+        <a href="{% url 'roleplay:world_create' %}" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
@@ -52,6 +55,9 @@
         {% plural %}
           Checkout our {{ counter }} community worlds
         {% endblocktrans %}
+        <a title="{% trans 'Create community world' %}" href="{% url 'roleplay:world_create' %}" class="btn btn-extra">
+          <span class="ic-plus"></span>
+        </a>
       </h2>
       <div class="d-none d-xl-block w-100"></div>
       {% if is_paginated %}

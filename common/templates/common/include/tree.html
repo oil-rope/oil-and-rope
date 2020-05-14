@@ -1,6 +1,6 @@
 {% load mptt_tags %}
 
-{% recursetree place_list %}
+{% recursetree tree %}
   {% if node.is_leaf_node and node.get_ancestors.exists %}
     <li class="tree-element">
       <a href="javascript:" class="tree-node">

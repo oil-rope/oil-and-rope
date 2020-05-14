@@ -1,7 +1,13 @@
+import logging
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
 
 from common.views import MultiplePaginatorListView
-from . import models
+from . import models, forms
+
+LOGGER = logging.getLogger(__name__)
 
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
@@ -68,3 +74,18 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
         })
 
         return context
+
+
+class WorldCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.WorldForm
+    model = models.Place
+    success_url = reverse_lazy('roleplay:world_list')
+    template_name = 'roleplay/world_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if 'user' in self.request.GET:
+            kwargs.update({
+                'user': self.request.user
+            })
+        return kwargs
