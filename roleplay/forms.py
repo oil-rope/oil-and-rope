@@ -15,11 +15,12 @@ class WorldForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field('name'),
+                    Field('name', placeholder='Middle-Earth, Narnia, Argos...'),
                     css_class='col-12'
                 ),
                 Column(
-                    Field('description'),
+                    Field('description',
+                          placeholder=_('Write something about your world, its civilizations, its culture...')),
                     css_class='col-12'
                 ),
                 Column(
@@ -28,8 +29,8 @@ class WorldForm(forms.ModelForm):
                 )
             ),
             Row(
-                Submit('submit', _('Create'), css_class='btn btn-extra col-5'),
-                Reset('reset', _('Clean'), css_class='btn btn-dark col-5'),
+                Submit('submit', _('Create'), css_class='btn btn-extra col-5 col-xl-6'),
+                Reset('reset', _('Clean'), css_class='btn btn-dark col-5 d-xl-none'),
                 css_class='justify-content-around'
             )
         )
@@ -37,6 +38,9 @@ class WorldForm(forms.ModelForm):
     class Meta:
         exclude = ('user', 'parent_site', 'site_type')
         model = models.Place
+        help_texts = {
+            'image': _('A picture is worth a thousand words') + '.'
+        }
 
     def save(self, commit=True):
         if self.user:

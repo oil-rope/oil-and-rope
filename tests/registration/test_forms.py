@@ -36,7 +36,7 @@ class TestLoginForm(TestCase):
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
 
-class TestSingUpForm(TestCase):
+class TestSignUpForm(TestCase):
     """
     Checks if validations, save and everything else related to SignUpForm is working.
     """

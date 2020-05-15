@@ -3,6 +3,10 @@
 
 {% block title %}{% trans 'Worlds' %}{% endblock title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
   <div class="container-fluid">
 
