@@ -272,6 +272,7 @@ class TestWorldCreateView(TestCase):
         self.assertEqual(data['name'], entry.name)
         self.assertEqual(data['description'], entry.description)
         self.assertEqual(self.model.WORLD, entry.site_type)
+        self.assertEqual(self.user, entry.owner)
         self.assertIsNone(entry.user)
         self.assertIsNotNone(entry.image)
 
@@ -292,6 +293,7 @@ class TestWorldCreateView(TestCase):
         self.assertEqual(data['name'], entry.name)
         self.assertEqual(data['description'], entry.description)
         self.assertEqual(self.model.WORLD, entry.site_type)
+        self.assertEqual(self.user, entry.owner)
         self.assertEqual(self.user, entry.user)
         self.assertIsNotNone(entry.image)
 
@@ -303,7 +305,7 @@ class TestWorldDetailView(TestCase):
     def setUp(self):
         self.faker = Faker()
         self.user = baker.make(get_user_model())
-        self.world = baker.make(models.Place, name=self.faker.country())
+        self.world = baker.make(models.Place, name=self.faker.country(), owner=self.user, user=self.user)
         self.url = reverse('roleplay:world_detail', kwargs={'pk': self.world.pk})
 
     def test_access_ok(self):
@@ -318,3 +320,10 @@ class TestWorldDetailView(TestCase):
 
         self.assertNotEqual(200, response.status_code)
         self.assertEqual(302, response.status_code)
+
+    def test_access_not_owner_ko(self):
+        another_user = baker.make(get_user_model())
+        self.client.force_login(another_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)

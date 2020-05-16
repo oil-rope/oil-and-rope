@@ -21,6 +21,7 @@ class TestWorldForm(TestCase):
             'name': self.faker.country(),
             'description': self.faker.paragraph()
         }
+        self.user = baker.make(get_user_model())
 
         self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
         image_file = self.tmp.name
@@ -36,38 +37,39 @@ class TestWorldForm(TestCase):
         os.unlink(self.tmp.name)
 
     def test_data_ok(self):
-        form = self.form_class(data=self.data_ok, files=self.files_ok)
+        form = self.form_class(owner=self.user, data=self.data_ok, files=self.files_ok)
 
         self.assertTrue(form.is_valid(), 'Errors: {}'.format(form.errors.values()))
 
     def test_data_without_name_ko(self):
         data_ko = self.data_ok.copy()
         del data_ko['name']
-        form = self.form_class(data=data_ko, files=self.files_ok)
+        form = self.form_class(owner=self.user, data=data_ko, files=self.files_ok)
 
         self.assertFalse(form.is_valid())
 
     def test_data_without_description_ok(self):
         data_ok = self.data_ok.copy()
         del data_ok['description']
-        form = self.form_class(data=data_ok, files=self.files_ok)
+        form = self.form_class(owner=self.user, data=data_ok, files=self.files_ok)
 
         self.assertTrue(form.is_valid())
 
     def test_data_without_image_ok(self):
         data_ok = self.data_ok.copy()
-        form = self.form_class(data=data_ok)
+        form = self.form_class(owner=self.user, data=data_ok)
 
         self.assertTrue(form.is_valid())
 
     def test_save_ok(self):
-        form = self.form_class(data=self.data_ok, files=self.files_ok)
+        form = self.form_class(owner=self.user, data=self.data_ok, files=self.files_ok)
         instance = form.save()
 
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
         self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
 
@@ -76,37 +78,39 @@ class TestWorldForm(TestCase):
     def test_save_without_description_ok(self):
         data_without_description = self.data_ok.copy()
         del data_without_description['description']
-        form = self.form_class(data=data_without_description, files=self.files_ok)
+        form = self.form_class(owner=self.user, data=data_without_description, files=self.files_ok)
         instance = form.save()
 
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
 
         os.unlink(instance.image.path)
 
     def test_save_without_image_ok(self):
-        form = self.form_class(data=self.data_ok)
+        form = self.form_class(owner=self.user, data=self.data_ok)
         instance = form.save()
 
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
         self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
 
     def test_save_user_world_ok(self):
-        user = baker.make(get_user_model())
-        form = self.form_class(user=user, data=self.data_ok, files=self.files_ok)
+        form = self.form_class(owner=self.user, user=self.user, data=self.data_ok, files=self.files_ok)
         instance = form.save()
 
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
         self.assertEqual(self.model.WORLD, instance.site_type)
-        self.assertEqual(user, instance.user)
+        self.assertEqual(instance.owner, self.user)
+        self.assertEqual(self.user, instance.user)
         self.assertIsNotNone(instance.image)
 
         os.unlink(instance.image.path)

@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.views.generic import CreateView, DetailView
 
@@ -86,9 +87,13 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        user = self.request.user
+        kwargs.update({
+            'owner': user
+        })
         if 'user' in self.request.GET:
             kwargs.update({
-                'user': self.request.user
+                'user': user
             })
         return kwargs
 
@@ -96,6 +101,20 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 class WorldDetailView(LoginRequiredMixin, DetailView):
     model = models.Place
     template_name = 'roleplay/world_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        user = request.user
+
+        # Community world
+        if not self.object.user or not self.object.owner:
+            return response
+
+        # Private world
+        if user == self.object.user:
+            return response
+
+        return HttpResponseForbidden()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

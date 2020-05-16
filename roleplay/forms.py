@@ -8,9 +8,10 @@ from . import models
 
 class WorldForm(forms.ModelForm):
 
-    def __init__(self, user=None, *args, **kwargs):
+    def __init__(self, owner, user=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.owner = owner
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
             Row(
@@ -36,7 +37,7 @@ class WorldForm(forms.ModelForm):
         )
 
     class Meta:
-        exclude = ('user', 'parent_site', 'site_type')
+        exclude = ('user', 'parent_site', 'site_type', 'owner')
         model = models.Place
         help_texts = {
             'image': _('A picture is worth a thousand words') + '.'
@@ -45,5 +46,6 @@ class WorldForm(forms.ModelForm):
     def save(self, commit=True):
         if self.user:
             self.instance.user = self.user
+        self.instance.owner = self.owner
         self.instance.site_type = models.Place.WORLD
         return super().save(commit)
