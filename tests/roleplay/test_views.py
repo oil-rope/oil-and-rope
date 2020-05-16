@@ -321,6 +321,23 @@ class TestWorldDetailView(TestCase):
         self.assertNotEqual(200, response.status_code)
         self.assertEqual(302, response.status_code)
 
+    def test_access_community_world_ok(self):
+        another_user = baker.make(get_user_model())
+        self.client.force_login(another_user)
+        world = baker.make(self.model, name=self.faker.country(), owner=self.user)
+        url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_default_world_ok(self):
+        self.client.force_login(self.user)
+        world = baker.make(self.model, name=self.faker.country())
+        url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
     def test_access_not_owner_ko(self):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
