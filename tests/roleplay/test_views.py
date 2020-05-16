@@ -257,10 +257,11 @@ class TestWorldCreateView(TestCase):
     def test_create_community_world_ok(self):
         self.client.force_login(self.user)
         data = self.data_ok.copy()
-        self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data)
 
         self.assertTrue(self.model.objects.exists())
         self.assertEqual(1, self.model.objects.count())
+        self.assertRedirects(response, reverse('roleplay:world_detail', kwargs={'pk': self.model.objects.first().pk}))
 
     def test_community_world_data_is_correct_ok(self):
         self.client.force_login(self.user)
@@ -293,3 +294,27 @@ class TestWorldCreateView(TestCase):
         self.assertEqual(self.model.WORLD, entry.site_type)
         self.assertEqual(self.user, entry.user)
         self.assertIsNotNone(entry.image)
+
+
+class TestWorldDetailView(TestCase):
+    model = models.Place
+    view = views.WorldDetailView
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model())
+        self.world = baker.make(models.Place, name=self.faker.country())
+        self.url = reverse('roleplay:world_detail', kwargs={'pk': self.world.pk})
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'roleplay/world_detail.html')
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+
+        self.assertNotEqual(200, response.status_code)
+        self.assertEqual(302, response.status_code)

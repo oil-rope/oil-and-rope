@@ -1,0 +1,16 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{{ object.name }} {% trans 'Detail' %}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Detail' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container">
+    <div class="row">
+      {% include 'common/include/tree.html' with tree=world_structure only %}
+    </div>
+  </main>
+{% endblock body_content %}

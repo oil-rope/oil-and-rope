@@ -1,5 +1,6 @@
 import functools
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
@@ -34,6 +35,7 @@ class TestPlaceManager(TestCase):
     def setUp(self):
         self.faker = Faker()
         self.model = models.Place
+        self.user = baker.make(get_user_model())
         random_int = functools.partial(self.faker.pyint, min_value=1, max_value=100)
 
         self.number_of_houses = random_int()
@@ -73,13 +75,29 @@ class TestPlaceManager(TestCase):
         self.number_of_worlds = random_int()
         baker.make(self.model, self.number_of_worlds, site_type=self.model.WORLD)
 
+        self.total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
+                     + self.number_of_metropolis + self.number_of_forests + self.number_of_hills \
+                     + self.number_of_mountains + self.number_of_mines + self.number_of_rivers + self.number_of_seas \
+                     + self.number_of_deserts + self.number_of_tundras + self.number_of_unusuals \
+                     + self.number_of_islands + self.number_of_countries + self.number_of_continents \
+                     + self.number_of_worlds
+
     def test_all_ok(self):
-        total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
-                + self.number_of_metropolis + self.number_of_forests + self.number_of_hills + self.number_of_mountains \
-                + self.number_of_mines + self.number_of_rivers + self.number_of_seas + self.number_of_deserts \
-                + self.number_of_tundras + self.number_of_unusuals + self.number_of_islands \
-                + self.number_of_countries + self.number_of_continents + self.number_of_worlds
-        self.assertEqual(total, self.model.objects.count())
+        self.assertEqual(self.total, self.model.objects.count())
+
+    def test_user_places(self):
+        quantity = 5
+        expected_queries = 1
+        baker.make(self.model, quantity, user=self.user)
+        with self.assertNumQueries(expected_queries):
+            result = self.model.objects.user_places(user=self.user)
+            self.assertEqual(quantity, result.count())
+
+    def test_community_places(self):
+        expected_queries = 1
+        with self.assertNumQueries(expected_queries):
+            result = self.model.objects.community_places()
+            self.assertEqual(self.total, result.count())
 
     def test_houses_ok(self):
         self.assertEqual(self.number_of_houses, self.model.objects.houses().count())

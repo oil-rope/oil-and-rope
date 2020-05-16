@@ -1,8 +1,8 @@
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
+from django.shortcuts import reverse
+from django.views.generic import CreateView, DetailView
 
 from common.views import MultiplePaginatorListView
 from . import models, forms
@@ -19,10 +19,10 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 
     def get_user_worlds(self):
         user = self.request.user
-        return self.get_queryset().filter(user_id=user.id)
+        return self.model.objects.user_places(user=user.id)
 
     def get_community_worlds(self):
-        return self.get_queryset().filter(user__isnull=True)
+        return self.model.objects.community_places()
 
     def paginate_user_worlds(self, page_size):
         queryset = self.get_user_worlds()
@@ -79,8 +79,10 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 class WorldCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.WorldForm
     model = models.Place
-    success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world_create.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -89,3 +91,14 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
                 'user': self.request.user
             })
         return kwargs
+
+
+class WorldDetailView(LoginRequiredMixin, DetailView):
+    model = models.Place
+    template_name = 'roleplay/world_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['world_structure'] = self.object.get_descendants(include_self=True)
+
+        return context

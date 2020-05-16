@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from mptt.models import TreeManager
 
 
@@ -12,6 +13,28 @@ class DomainManager(models.Manager):
 
 
 class PlaceManager(TreeManager):
+
+    def user_places(self, user):
+        """
+        :param user: Either a user ID or User instance.
+        :return: All the places related to that user.
+        """
+
+        if isinstance(user, get_user_model()):
+            user = user.id
+        return super().get_queryset().filter(user_id=user)
+
+    def community_places(self):
+        """
+        Union places without user (community) and without owner (created by default).
+
+        :return: A QuerySet with all community_places.
+        """
+
+        queryset = super().get_queryset()
+        queryset = queryset.filter(user__isnull=True) & queryset.filter(owner__isnull=True)
+        primary_keys = queryset.values_list('pk', flat=True)
+        return super().get_queryset().filter(pk__in=primary_keys)
 
     def houses(self):
         return super().get_queryset().filter(site_type=self.model.HOUSE)

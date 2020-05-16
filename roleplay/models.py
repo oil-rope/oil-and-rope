@@ -69,6 +69,10 @@ class Place(MPTTModel, TracingMixin):
         Path to the image.
     parent_site: :class:`int`
        If the place is child of another Place, this is where it can be settled.
+    user: :class:`auth.User`
+        Declares this maps belongs to a user.
+    owner: :class:`auth.User`
+        The person who created this map.
     """
 
     HOUSE = 0
@@ -141,6 +145,8 @@ class Place(MPTTModel, TracingMixin):
                                  related_name='children_sites', db_index=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places', verbose_name=_('User'),
                              blank=True, null=True, db_index=True)
+    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places_owned',
+                              verbose_name=_('Owner'), blank=True, null=True, db_index=True)
 
     objects = managers.PlaceManager()
 
