@@ -15,8 +15,6 @@ class TestOilAndRopeBot(TestCase):
     Checks behaviour of the bot.
     """
 
-    env_file = None
-
     def setUp(self):
         self.faker = Faker()
         self.bot_class = OilAndRopeBot
@@ -24,17 +22,11 @@ class TestOilAndRopeBot(TestCase):
             'BOT_COMMAND_PREFIX': self.faker.word(),
             'BOT_TOKEN': self.faker.password()
         }
+        self.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
 
-    @classmethod
-    def setUpClass(cls):
-        # Creating temporary file
-        cls.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
-
-    @classmethod
-    def tearDownClass(cls):
-        # Cleaning
-        cls.env_file.close()
-        os.unlink(cls.env_file.name)
+    def tearDown(self):
+        self.env_file.close()
+        os.unlink(self.env_file.name)
 
     def test_init_ok(self):
         with patch.dict('os.environ', self.env_variables):

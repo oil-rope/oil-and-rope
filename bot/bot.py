@@ -22,7 +22,7 @@ fake = Faker()  # To generate tokens and stuff
 
 class OilAndRopeBot(commands.Bot):
     """
-    Custom class to control the behaviour of the bot by enviroment variables.
+    Custom class to control the behaviour of the bot by environment variables.
     """
 
     def __init__(self, env_file=None, **options):
@@ -55,7 +55,7 @@ class OilAndRopeBot(commands.Bot):
             env_file = pathlib.Path(str(env_file))
 
         if not env_file.exists():
-            raise OilAndRopeException(_('Env file doesn\'t exist') + '.')
+            raise OilAndRopeException(_('Env file does not exist') + '.')
         load_dotenv(env_file.as_posix())
 
     def load_commands(self):
