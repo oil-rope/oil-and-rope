@@ -5,6 +5,10 @@
 
 {% block title %}{% trans "Create your account" %}{% endblock title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Register' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
 <header class="container">
   <h2 class="display-3 text-center">

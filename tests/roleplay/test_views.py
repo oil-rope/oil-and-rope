@@ -120,23 +120,25 @@ class TestWorldListView(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_correct_community_worlds_are_paginated_ok(self):
-        for _ in range(0, self.pagination + 1):
-            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
+        for i in range(0, self.pagination + 1):
+            self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?page=1')
+        context = response.context
 
-        visible_entries = self.model.objects.all()[:self.pagination]
+        community_worlds_visible = self.model.objects.all()[:self.pagination]
         last_entry = self.model.objects.last()
 
-        for entry in visible_entries:
-            self.assertIn(str(entry), str(response.content))
-        self.assertNotIn(str(last_entry), str(response.content))
+        for world in community_worlds_visible:
+            self.assertIn(world, context['object_list'])
+        self.assertNotIn(last_entry, context['object_list'])
 
         response = self.client.get(self.url + '?page=2')
+        context = response.context
 
-        for entry in visible_entries:
-            self.assertNotIn(str(entry), str(response.content))
-        self.assertIn(str(last_entry), str(response.content))
+        for world in community_worlds_visible:
+            self.assertNotIn(world, context['object_list'])
+        self.assertIn(last_entry, context['object_list'])
 
     def test_non_existent_user_worlds_pagination_ko(self):
         self.client.force_login(self.user)
@@ -149,26 +151,28 @@ class TestWorldListView(TestCase):
             self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD, user=self.user)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1'.format(self.view.user_worlds_page_kwarg))
+        context = response.context
 
-        visible_entries = self.model.objects.all()[:self.pagination]
+        user_worlds_visible = self.model.objects.all()[:self.pagination]
         last_entry = self.model.objects.last()
 
-        for entry in visible_entries:
-            self.assertIn(str(entry), str(response.content))
-        self.assertNotIn(str(last_entry), str(response.content))
+        for world in user_worlds_visible:
+            self.assertIn(world, context['user_worlds'])
+        self.assertNotIn(last_entry, context['user_worlds'])
 
         response = self.client.get(self.url + '?{}=2'.format(self.view.user_worlds_page_kwarg))
+        context = response.context
 
-        for entry in visible_entries:
-            self.assertNotIn(str(entry), str(response.content))
-        self.assertIn(str(last_entry), str(response.content))
+        for entry in user_worlds_visible:
+            self.assertNotIn(entry, context['user_worlds'])
+        self.assertIn(last_entry, context['user_worlds'])
 
     def test_user_worlds_are_paginated_community_worlds_are_not_ko(self):
         community_worlds = []
         user_worlds = []
-        for _ in range(0, self.pagination + 1):
+        for i in range(0, self.pagination + 1):
             user_worlds.append(
-                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD, user=self.user)
+                self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD, user=self.user)
             )
         for _ in range(0, self.pagination):
             community_worlds.append(
@@ -176,23 +180,25 @@ class TestWorldListView(TestCase):
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1&page=1'.format(self.view.user_worlds_page_kwarg))
+        context = response.context
 
         for entry in community_worlds[:self.pagination - 1]:
-            self.assertIn(str(entry), str(response.content))
+            self.assertIn(entry, context['object_list'])
         for entry in user_worlds[:self.pagination]:
-            self.assertIn(str(entry), str(response.content))
-        self.assertNotIn(str(user_worlds[self.pagination]), str(response.content))
+            self.assertIn(entry, context['user_worlds'])
+        self.assertNotIn(user_worlds[self.pagination], context['user_worlds'])
 
         response = self.client.get(self.url + '?{}=2&page=2'.format(self.view.user_worlds_page_kwarg))
 
         self.assertEqual(404, response.status_code)
 
         response = self.client.get(self.url + '?{}=2&page=1'.format(self.view.user_worlds_page_kwarg))
+        context = response.context
         for entry in community_worlds[:self.pagination - 1]:
-            self.assertIn(str(entry), str(response.content))
+            self.assertIn(entry, context['object_list'])
         for entry in user_worlds[:self.pagination]:
-            self.assertNotIn(str(entry), str(response.content))
-        self.assertIn(str(user_worlds[self.pagination]), str(response.content))
+            self.assertNotIn(entry, context['user_worlds'])
+        self.assertIn(user_worlds[self.pagination], context['user_worlds'])
 
     def test_non_numeric_page_kwarg_ko(self):
         self.client.force_login(self.user)
@@ -201,15 +207,16 @@ class TestWorldListView(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_last_page_ok(self):
-        for _ in range(0, self.pagination + 1):
-            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
+        for i in range(0, self.pagination + 1):
+            self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?page=last')
+        context = response.context
 
         self.assertEqual(200, response.status_code)
         for entry in self.model.objects.all()[:self.pagination]:
-            self.assertNotIn(str(entry), str(response.content))
-        self.assertIn(str(self.model.objects.last()), str(response.content))
+            self.assertNotIn(entry, context['object_list'])
+        self.assertIn(self.model.objects.last(), context['object_list'])
 
 
 class TestWorldCreateView(TestCase):

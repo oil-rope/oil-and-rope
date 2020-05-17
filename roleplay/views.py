@@ -20,10 +20,10 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 
     def get_user_worlds(self):
         user = self.request.user
-        return self.model.objects.user_places(user=user.id)
+        return self.model.objects.user_places(user=user.id).filter(site_type=self.model.WORLD)
 
     def get_community_worlds(self):
-        return self.model.objects.community_places()
+        return self.model.objects.community_places().filter(site_type=self.model.WORLD)
 
     def paginate_user_worlds(self, page_size):
         queryset = self.get_user_worlds()

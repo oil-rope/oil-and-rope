@@ -26,15 +26,12 @@ class PlaceManager(TreeManager):
 
     def community_places(self):
         """
-        Union places without user (community) and without owner (created by default).
+        Union places without user (community).
 
         :return: A QuerySet with all community_places.
         """
 
-        queryset = super().get_queryset()
-        queryset = queryset.filter(user__isnull=True) & queryset.filter(owner__isnull=True)
-        primary_keys = queryset.values_list('pk', flat=True)
-        return super().get_queryset().filter(pk__in=primary_keys)
+        return super().get_queryset().filter(user__isnull=True)
 
     def houses(self):
         return super().get_queryset().filter(site_type=self.model.HOUSE)

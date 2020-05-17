@@ -37,7 +37,7 @@
       <div class="row justify-content-xl-around mb-5">
         {% for world in user_worlds_page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
-            {% include 'roleplay/include/world_card.html' with world=world only %}
+            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>
@@ -50,7 +50,7 @@
         {% trans "Would you like to create one?" %}
       </h2>
       <div class="row justify-content-center">
-        <a href="{% url 'roleplay:world_create' %}" class="btn btn-large btn-secondary">{% trans "Create world" %}!</a>
+        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">{% trans "Create world" %}!</a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
@@ -70,7 +70,7 @@
       <div class="row justify-content-xl-around">
         {% for world in page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
-            {% include 'roleplay/include/world_card.html' with world=world only %}
+            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>

@@ -27,6 +27,39 @@
       {{ world.description|truncatechars_html:250|default:_("No description provided")|add:"." }}
     </p>
   </div>
+  <div class="card-body">
+    <div class="btn-group dropright">
+      <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-outline-primary"
+         role="button">{% trans "View" %}
+      </a>
+      <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split"
+              id="world_{{ world.pk }}_actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+              data-reference="parent">
+        <span class="sr-only">{% trans "Show actions" %}</span>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
+        <a href="#no-url" class="dropdown-item">
+          <span class="ic-quill"></span>
+          {% trans "Create campaign" %}
+        </a>
+        {% if world.owner == user %}
+          <a href="#no-url" class="dropdown-item">
+            <span class="ic-city"></span>
+            {% trans "Create city" %}
+          </a>
+          <a href="#no-url" class="dropdown-item">
+            <span class="ic-cogs"></span>
+            {% trans "Settings" %}
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#no-url" class="dropdown-item">
+            <span class="ic-trash text-danger"></span>
+            {% trans "Delete" %} {% trans "world" %}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
   <div class="card-footer">
     <p class="text-muted text-center">
       {% with sessions=0 %}

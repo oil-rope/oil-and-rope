@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Oil-and-Rope';
-  src:  url('fonts/Oil-and-Rope.eot?6dun33');
-  src:  url('fonts/Oil-and-Rope.eot?6dun33#iefix') format('embedded-opentype'),
-    url('fonts/Oil-and-Rope.ttf?6dun33') format('truetype'),
-    url('fonts/Oil-and-Rope.woff?6dun33') format('woff'),
-    url('fonts/Oil-and-Rope.svg?6dun33#Oil-and-Rope') format('svg');
+  src:  url('fonts/Oil-and-Rope.eot?gsu18b');
+  src:  url('fonts/Oil-and-Rope.eot?gsu18b#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?gsu18b') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?gsu18b') format('woff'),
+    url('fonts/Oil-and-Rope.svg?gsu18b#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,8 +25,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ic-globe:before {
-  content: "\e900";
+.ic-cogs:before {
+  content: "\e904";
+}
+.ic-cog:before {
+  content: "\e908";
+}
+.ic-cross:before {
+  content: "\e909";
+}
+.ic-trash:before {
+  content: "\e90a";
 }
 .ic-town:before {
   content: "\e901";
@@ -60,4 +69,7 @@
 }
 .ic-minus:before {
   content: "\ea0b";
+}
+.ic-globe:before {
+  content: "\e900";
 }

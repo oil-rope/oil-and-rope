@@ -5,6 +5,10 @@
 
 {% block title %}{% trans "Login" %}{% endblock title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
 <main class="container p-sm-5 px-lg-2">
   <div class="row align-items-lg-center shadow-lg">
