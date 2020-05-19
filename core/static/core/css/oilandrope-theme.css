@@ -7692,100 +7692,84 @@ button.bg-extra:focus {
   width: auto !important;
 }
 
-.w-10vh {
-  width: 10vh !important;
-}
-
-.w-20vh {
-  width: 20vh !important;
-}
-
-.w-25vh {
-  width: 25vh !important;
-}
-
-.w-30vh {
-  width: 30vh !important;
-}
-
-.w-40vh {
-  width: 40vh !important;
-}
-
-.w-50vh {
-  width: 50vh !important;
-}
-
-.w-60vh {
-  width: 60vh !important;
-}
-
-.w-70vh {
-  width: 70vh !important;
-}
-
-.w-75vh {
-  width: 75vh !important;
-}
-
-.w-80vh {
-  width: 80vh !important;
-}
-
-.w-90vh {
-  width: 90vh !important;
-}
-
-.w-100vh {
-  width: 100vh !important;
-}
-
 .w-10vw {
   width: 10vw !important;
+}
+
+.w-10vh {
+  width: 10vh !important;
 }
 
 .w-20vw {
   width: 20vw !important;
 }
 
-.w-25vw {
-  width: 25vw !important;
+.w-20vh {
+  width: 20vh !important;
 }
 
 .w-30vw {
   width: 30vw !important;
 }
 
+.w-30vh {
+  width: 30vh !important;
+}
+
 .w-40vw {
   width: 40vw !important;
+}
+
+.w-40vh {
+  width: 40vh !important;
 }
 
 .w-50vw {
   width: 50vw !important;
 }
 
+.w-50vh {
+  width: 50vh !important;
+}
+
 .w-60vw {
   width: 60vw !important;
+}
+
+.w-60vh {
+  width: 60vh !important;
 }
 
 .w-70vw {
   width: 70vw !important;
 }
 
-.w-75vw {
-  width: 75vw !important;
+.w-70vh {
+  width: 70vh !important;
 }
 
 .w-80vw {
   width: 80vw !important;
 }
 
+.w-80vh {
+  width: 80vh !important;
+}
+
 .w-90vw {
   width: 90vw !important;
 }
 
+.w-90vh {
+  width: 90vh !important;
+}
+
 .w-100vw {
   width: 100vw !important;
+}
+
+.w-100vh {
+  width: 100vh !important;
 }
 
 .h-25 {
@@ -7808,100 +7792,84 @@ button.bg-extra:focus {
   height: auto !important;
 }
 
-.h-10vh {
-  height: 10vh !important;
-}
-
-.h-20vh {
-  height: 20vh !important;
-}
-
-.h-25vh {
-  height: 25vh !important;
-}
-
-.h-30vh {
-  height: 30vh !important;
-}
-
-.h-40vh {
-  height: 40vh !important;
-}
-
-.h-50vh {
-  height: 50vh !important;
-}
-
-.h-60vh {
-  height: 60vh !important;
-}
-
-.h-70vh {
-  height: 70vh !important;
-}
-
-.h-75vh {
-  height: 75vh !important;
-}
-
-.h-80vh {
-  height: 80vh !important;
-}
-
-.h-90vh {
-  height: 90vh !important;
-}
-
-.h-100vh {
-  height: 100vh !important;
-}
-
 .h-10vw {
   height: 10vw !important;
+}
+
+.h-10vh {
+  height: 10vh !important;
 }
 
 .h-20vw {
   height: 20vw !important;
 }
 
-.h-25vw {
-  height: 25vw !important;
+.h-20vh {
+  height: 20vh !important;
 }
 
 .h-30vw {
   height: 30vw !important;
 }
 
+.h-30vh {
+  height: 30vh !important;
+}
+
 .h-40vw {
   height: 40vw !important;
+}
+
+.h-40vh {
+  height: 40vh !important;
 }
 
 .h-50vw {
   height: 50vw !important;
 }
 
+.h-50vh {
+  height: 50vh !important;
+}
+
 .h-60vw {
   height: 60vw !important;
+}
+
+.h-60vh {
+  height: 60vh !important;
 }
 
 .h-70vw {
   height: 70vw !important;
 }
 
-.h-75vw {
-  height: 75vw !important;
+.h-70vh {
+  height: 70vh !important;
 }
 
 .h-80vw {
   height: 80vw !important;
 }
 
+.h-80vh {
+  height: 80vh !important;
+}
+
 .h-90vw {
   height: 90vw !important;
 }
 
+.h-90vh {
+  height: 90vh !important;
+}
+
 .h-100vw {
   height: 100vw !important;
+}
+
+.h-100vh {
+  height: 100vh !important;
 }
 
 .mw-100 {
