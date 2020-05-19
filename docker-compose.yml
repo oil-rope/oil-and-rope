@@ -40,7 +40,7 @@ services:
     depends_on:
       - postgres_db
     expose:
-      - "5000"
+      - "80"
     working_dir: /app/
 
   channels:
@@ -59,7 +59,7 @@ services:
       # Dummy key
       - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       - ALLOWED_HOSTS=*
-      - WS_HOST=localhost:5001
+      - WS_HOST=live.oilandrope.com
       - DEBUG=True
     entrypoint: /entrypoint.sh
     command: /command.sh
@@ -67,7 +67,7 @@ services:
       - django
       - postgres_db
     expose:
-      - "5001"
+      - "80"
     working_dir: /app/
 
   nginx:
@@ -80,6 +80,7 @@ services:
       - ./static:/static
       - ./media:/media
       - ./compose/nginx/conf.d:/etc/nginx/conf.d
+      - ./compose/nginx/sites-available:/etc/nginx/sites-available
+      - ./compose/nginx/sites-available:/etc/nginx/sites-enabled
     ports:
-      - 5000:5000
-      - 5001:5001
+      - 80:80

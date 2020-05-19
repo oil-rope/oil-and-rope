@@ -18,4 +18,4 @@ python manage.py collectstatic --noinput && echo -e "${GREEN}Done!${END}"
 
 # Start server
 echo -e "${CYAN}Starting server...${END}"
-gunicorn oilandrope.wsgi:application --bind 0.0.0.0:5000 --workers 4 --access-logfile -
+gunicorn oilandrope.wsgi:application --bind 0.0.0.0:80 --workers 4 --reload --access-logfile -

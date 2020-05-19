@@ -28,10 +28,5 @@ server {
 upstream gunicorn_server {
   # Sticky session
   ip_hash;
-  server django:80;
-}
-
-upstream daphne_server {
-  ip_hash;
-  server channels:80;
+  server django:5000;
 }
