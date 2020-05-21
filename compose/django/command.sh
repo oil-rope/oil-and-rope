@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-CYAN='\e[36m'
-GREEN='\e[32m'
-END='\e[0m'
+CYAN="\e[36m"
+GREEN="\e[32m"
+END="\e[0m"
 
 # Compile JavaScript
 echo -e "${CYAN}Installing NPM dependencies and building...${END}"

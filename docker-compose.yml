@@ -1,7 +1,7 @@
-version: "2"
+version: "3"
 
 volumes:
-  postgres_db_data: {}
+  postgres_db_data:
 
 services:
   postgres_db:
@@ -12,7 +12,7 @@ services:
       - POSTGRES_DB=oilandrope
     # Saving data on local
     volumes:
-      - postgres_db_data:/var/lib/postgresql/data/
+      - "postgres_db_data:/var/lib/postgresql/data/"
 
   django:
     image: oil-and-rope:latest
@@ -20,21 +20,11 @@ services:
       context: .
       dockerfile: ./compose/django/Dockerfile
     volumes:
-      - ./:/app/
-      - ./compose/django/entrypoint.sh:/entrypoint.sh
-      - ./compose/django/command.sh:/command.sh
-    environment:
-      - DB_NAME=oilandrope
-      - DB_HOST=postgres_db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=p4ssw0rd@
-      - DJANGO_SETTINGS_MODULE=oilandrope.settings
-      # Dummy key
-      - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
-      - ALLOWED_HOSTS=*
-      - WS_HOST=localhost:5001
-      - DEBUG=True
+      - "./:/app/"
+      - "./compose/django/entrypoint.sh:/entrypoint.sh"
+      - "./compose/django/command.sh:/command.sh"
+    env_file:
+      - ./compose/django/django.env
     entrypoint: /entrypoint.sh
     command: /command.sh
     depends_on:
@@ -46,21 +36,11 @@ services:
   channels:
     image: oil-and-rope:latest
     volumes:
-      - ./:/app/
-      - ./compose/django/entrypoint.sh:/entrypoint.sh
-      - ./compose/channels/command.sh:/command.sh
-    environment:
-      - DB_NAME=oilandrope
-      - DB_HOST=postgres_db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=p4ssw0rd@
-      - DJANGO_SETTINGS_MODULE=oilandrope.settings
-      # Dummy key
-      - SECRET_KEY=de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
-      - ALLOWED_HOSTS=*
-      - WS_HOST=live.oilandrope.com
-      - DEBUG=True
+      - "./:/app/"
+      - "./compose/django/entrypoint.sh:/entrypoint.sh"
+      - "./compose/channels/command.sh:/command.sh"
+    env_file:
+      - ./compose/django/django.env
     entrypoint: /entrypoint.sh
     command: /command.sh
     depends_on:
@@ -76,11 +56,12 @@ services:
       - django
       - channels
     volumes:
-      - ./:/app/
-      - ./static:/static
-      - ./media:/media
-      - ./compose/nginx/conf.d:/etc/nginx/conf.d
-      - ./compose/nginx/sites-available:/etc/nginx/sites-available
-      - ./compose/nginx/sites-available:/etc/nginx/sites-enabled
+      - "./:/app/"
+      - "./static:/static"
+      - "./media:/media"
+      - "./compose/nginx/conf.d:/etc/nginx/conf.d"
+      - "./compose/nginx/sites-available:/etc/nginx/sites-available"
+      - "./compose/nginx/sites-available:/etc/nginx/sites-enabled"
+      - "./compose/nginx/nginx.conf:/etc/nginx/nginx.conf"
     ports:
-      - 80:80
+      - "127.0.0.1:8000:80"
