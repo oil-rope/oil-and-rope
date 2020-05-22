@@ -6,10 +6,8 @@ volumes:
 services:
   postgres_db:
     image: postgres:11.7
-    environment:
-      - POSTGRES_PASSWORD=p4ssw0rd@
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=oilandrope
+    env_file:
+      - ./compose/postgres/postgres.env
     # Saving data on local
     volumes:
       - "postgres_db_data:/var/lib/postgresql/data/"
@@ -64,4 +62,5 @@ services:
       - "./compose/nginx/sites-available:/etc/nginx/sites-enabled"
       - "./compose/nginx/nginx.conf:/etc/nginx/nginx.conf"
     ports:
-      - "127.0.0.1:8000:80"
+      - "127.0.0.1:8000:80/tcp"
+      - "127.0.0.1:443:433/tcp"

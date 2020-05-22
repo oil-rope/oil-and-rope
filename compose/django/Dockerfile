@@ -1,5 +1,7 @@
 FROM python:3.7
 
+WORKDIR /tmp/
+
 # Update packages
 RUN apt-get update
 # Install dependencies
@@ -20,3 +22,9 @@ RUN echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen && \
     echo "en_GB UTF-8" >> /etc/locale.gen
 RUN /usr/sbin/locale-gen
+
+# Bash completation
+RUN apt-get install -y bash-completion
+RUN echo "\nif [ -f /etc/bash_completion ]; then\n\
+  . /etc/bash_completion\n\
+fi\n" >> /etc/profile
