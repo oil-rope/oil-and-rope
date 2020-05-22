@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-CYAN="\e[36m"
-GREEN="\e[32m"
-END="\e[0m"
+CYAN='\e[36m'
+GREEN='\e[32m'
+END='\e[0m'
 
 # Compile JavaScript
 echo -e "${CYAN}Installing NPM dependencies and building...${END}"
@@ -18,4 +18,7 @@ python manage.py collectstatic --noinput && echo -e "${GREEN}Done!${END}"
 
 # Start server
 echo -e "${CYAN}Starting server...${END}"
-gunicorn oilandrope.wsgi:application --bind 0.0.0.0:80 --workers 4 --reload --access-logfile -
+gunicorn ${GUNICORN_WSGI_MODULE}:application -c python:${GUNICORN_CONFIG_FILE} && echo -e "${GREEN}Done!${END}"
+
+# Listening to log
+tail -f -n 1 ${GUNICORN_ACCESS_LOGFILE}
