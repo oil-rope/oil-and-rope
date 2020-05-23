@@ -23,7 +23,7 @@ class LoginForm(AuthenticationForm):
     Custom form to render with Crispy.
     """
 
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    custom_classes = 'bg-transparent border-primary border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
 
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
@@ -53,12 +53,12 @@ class LoginForm(AuthenticationForm):
             ),
             Row(
                 Column(
-                    Submit('login', _('Login'), css_class='btn-extra w-100'),
+                    Submit('login', _('Login'), css_class='btn btn-lg w-100'),
                     css_class='col-12 col-lg-6'
                 ),
                 Column(
                     HTML(
-                        '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
+                        '<a class="col-lg-8 btn-link text-secondary" href="{url}">{text}</a>'.format(
                             url=reverse('registration:resend_email'),
                             text=_('Send confirmation email')
                         ),
@@ -81,8 +81,8 @@ class SignUpForm(UserCreationForm):
     """
 
     button_classes = 'btn btn-info'
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-extra btn-lg'
+    custom_classes = 'bg-transparent border-primary border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
+    submit_classes = 'btn btn-lg'
 
     discord_id = forms.CharField(
         label=_('Discord Identifier'),

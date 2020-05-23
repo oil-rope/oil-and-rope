@@ -71,7 +71,7 @@
           <li class="nav-item">
             {% url 'registration:register' as register %}
             <a href="{{ register }}"
-               class="nav-link text-uppercase text-extra {% if actual_path|startswith:register %}active{% endif %}">
+               class="nav-link text-uppercase {% if actual_path|startswith:register %}text-pale active{% else %}text-primary{% endif %}">
               {% trans "Create your account" %}
             </a>
           </li>
