@@ -7,10 +7,10 @@ END='\e[0m'
 # Checking for existing socket
 if test -f "${DAPHNE_SOCKET}"; then
   echo -e "${CYAN}Socket exists, deleting...${END}"
-  rm -f ${DAPHNE_SOCKET} && echo "${GREEN}Done!${END}"
+  rm -f ${DAPHNE_SOCKET} && echo -e "${GREEN}Done!${END}"
 else
   echo -e "${CYAN}Socket file doesn't exist. Creating...${END}"
-  touch ${DAPHNE_ACCESS_LOGFILE} && echo "${GREEN}Done!${END}"
+  touch ${DAPHNE_ACCESS_LOGFILE} && echo -e "${GREEN}Done!${END}"
 fi
 
 # Start server

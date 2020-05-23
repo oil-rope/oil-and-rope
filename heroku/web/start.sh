@@ -15,10 +15,10 @@ python manage.py collectstatic --noinput && echo -e "${GREEN}Done!${END}"
 # Checking for existing socket
 if test -f "${GUNICORN_SOCK}"; then
   echo -e "${CYAN}Socket exists, deleting...${END}"
-  rm -f ${GUNICORN_SOCK} && echo "${GREEN}Done!${END}"
+  rm -f ${GUNICORN_SOCK} && echo -e "${GREEN}Done!${END}"
 else
   echo -e "${CYAN}Socket file doesn't exist. Creating...${END}"
-  touch ${GUNICORN_ACCESS_LOGFILE} && echo "${GREEN}Done!${END}"
+  touch ${GUNICORN_ACCESS_LOGFILE} && echo -e "${GREEN}Done!${END}"
 fi
 
 # Start server
