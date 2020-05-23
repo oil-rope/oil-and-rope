@@ -10,7 +10,7 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-<main class="container p-sm-5 px-lg-2">
+{% comment %}<main class="container p-sm-5 px-lg-2">
   <div class="row align-items-lg-center shadow-lg">
 
     <div class="col-lg-7 col-xl-8 bg-primary p-4 order-lg-last">
@@ -31,5 +31,16 @@
     </div>
 
   </div>
-</main>
+</main>{% endcomment %}
+  <main class="container-fluid">
+    <div class="row min-vh-100">
+
+      <!-- Presentation -->
+      <div class="col-12">
+        <h2 class="display-4 text-center">
+          {% blocktrans %}Welcome to Oil &amp; Rope{% endblocktrans %}!
+        </h2>
+      </div>
+    </div>
+  </main>
 {% endblock body_content %}

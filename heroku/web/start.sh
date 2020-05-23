@@ -14,4 +14,7 @@ python manage.py migrate && echo -e "${GREEN}Done!${END}"
 
 # Start server
 echo -e "${CYAN}Starting gunicorn...${END}"
-gunicorn oilandrope.wsgi:application --workers 4 --access-logfile -
+gunicorn ${GUNICORN_WSGI_MODULE}:application -c python:${GUNICORN_CONFIG_FILE} && echo -e "${GREEN}Done!${END}"
+
+# Listening to log
+tail -f -n 1 ${GUNICORN_ACCESS_LOGFILE}
