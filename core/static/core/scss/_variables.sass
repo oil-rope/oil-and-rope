@@ -1,13 +1,13 @@
 // Color Palette
 $color-1: #1A202C
-$color-2: #1F7872
-$color-3: #72B095
+$color-2: #a3c0bb
+$color-3: #EDCA76
 $color-4: #DEDBA7
-$color-5: #D13F31
+$color-5: #EE7A55
 
 $body-bg: $color-4
 
-$theme-colors: ("primary": $color-5, "secondary": $color-1, "info": $color-2, "pale": $color-4, "extra": $color-3)
+$theme-colors: ("primary": $color-5, "info": $color-2, "extra": $color-3)
 
 $sizes: ()
 @for $i from 1 through 10
@@ -28,3 +28,6 @@ $spacers: map_merge($spacers, (0: 0, 1: ($spacer * .25), 2: ($spacer * .5), 3: $
 
 // Tables
 $tree-list-separation: map-get($spacers, 4)
+
+// Fonts
+$font-ds-regular: 'Dancing Script', cursive

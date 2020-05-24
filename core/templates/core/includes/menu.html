@@ -7,8 +7,8 @@
 
   <!-- Logo -->
   <a href="{% url 'core:home' %}" class="navbar-brand">
-    <img width="50" class="p-1" src="{% static 'img/oilandrope_color.png' %}" alt="{% trans "Logo" %}">
-    <span class="d-none d-sm-inline">Oil &amp; Rope</span>
+    <img width="50" class="p-1" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="{% trans "Logo" %}">
+    <span class="d-none d-sm-inline font-ds-bold">Oil &amp; Rope</span>
   </a>
   <!-- Button for NavBar -->
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOilAndRope"
@@ -71,7 +71,7 @@
           <li class="nav-item">
             {% url 'registration:register' as register %}
             <a href="{{ register }}"
-               class="nav-link text-uppercase {% if actual_path|startswith:register %}text-pale active{% else %}text-primary{% endif %}">
+               class="nav-link text-uppercase {% if actual_path|startswith:register %}text-danger active{% else %}text-primary{% endif %}">
               {% trans "Create your account" %}
             </a>
           </li>

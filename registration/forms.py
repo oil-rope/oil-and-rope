@@ -3,7 +3,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import ButtonHolder, Column, Div, Field, Layout, Row, Submit, HTML
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -23,52 +23,34 @@ class LoginForm(AuthenticationForm):
     Custom form to render with Crispy.
     """
 
-    custom_classes = 'bg-transparent border-primary border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.id = 'loginForm'
-        self.helper.form_class = 'container-fluid'
+        self.helper.label_class = 'text-white'
         self.helper.layout = Layout(
             Row(
-                Column(
-                    Field(
-                        'username',
-                        placeholder=_('Username'),
-                        css_class=self.custom_classes,
-                    ),
-                    css_class='col-12'
-                ),
-            ),
-            Row(
-                Column(
-                    Field(
-                        'password',
-                        placeholder=_('Password'),
-                        css_class=self.custom_classes,
-                    ),
-                    css_class='col-12'
-                ),
+                Column('username', css_class='col-12'),
+                Column('password', css_class='col-12'),
             ),
             Row(
                 Column(
                     Submit('login', _('Login'), css_class='btn btn-lg w-100'),
-                    css_class='col-12 col-lg-6'
+                    css_class='col-sm-10 col-xl-6'
                 ),
                 Column(
                     HTML(
-                        '<a class="col-lg-8 btn-link text-secondary" href="{url}">{text}</a>'.format(
-                            url=reverse('registration:resend_email'),
-                            text=_('Send confirmation email')
-                        ),
+                        '<a class="text-info" href="#no-url">{text}</a>'.format(text=_('Forgot password?'))
                     ),
-                    css_class='col-12 col-lg-6'
+                    HTML(
+                        '<a class="text-info" href="{url}">{text}</a>'.format(url=reverse('registration:resend_email'),
+                                                                              text=_('Resend email'))
+                    ),
+                    css_class='col-xl-6 d-flex justify-content-around align-items-lg-center mt-3 mt-xl-0'
                 ),
+                css_class='justify-content-center mt-5'
             ),
         )
-
-        self._clean_labels()
 
     def _clean_labels(self):
         for field in self.fields:
@@ -176,7 +158,7 @@ class SignUpForm(UserCreationForm):
         """
 
         if not required_fields:
-            required_fields = ('email', )
+            required_fields = ('email',)
         for field in required_fields:
             self.fields[field].required = True
 

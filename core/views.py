@@ -1,9 +1,10 @@
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView
+from django.urls import reverse_lazy
 
 
-class IndexView(TemplateView):
+class IndexView(RedirectView):
     """
     It just displays the index page.
     """
 
-    template_name = 'core/index.html'
+    url = reverse_lazy('registration:login')

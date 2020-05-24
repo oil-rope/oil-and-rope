@@ -6,11 +6,11 @@
 {% block title %}{% trans "Login" %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' no_separation=True %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
-{% comment %}<main class="container p-sm-5 px-lg-2">
+  {% comment %}<main class="container p-sm-5 px-lg-2">
   <div class="row align-items-lg-center shadow-lg">
 
     <div class="col-lg-7 col-xl-8 bg-primary p-4 order-lg-last">
@@ -33,14 +33,22 @@
   </div>
 </main>{% endcomment %}
   <main class="container-fluid">
-    <div class="row min-vh-100">
+    <div class="row min-vh-100 cover justify-content-lg-center"
+         style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static 'img/cover-min.png' %}'); background-position: center top;">
 
       <!-- Presentation -->
-      <div class="col-12">
-        <h2 class="display-4 text-center">
-          {% blocktrans %}Welcome to Oil &amp; Rope{% endblocktrans %}!
+      <div class="col-12 text-center pt-3">
+        <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="Oil & Rope Logo">
+        <h2 class="display-3 text-white font-ds-bold">
+          Oil &amp; Rope
         </h2>
       </div>
+
+      <!-- Form -->
+      <div class="col-12 col-xl-6">
+        {% crispy form %}
+      </div>
+
     </div>
   </main>
 {% endblock body_content %}

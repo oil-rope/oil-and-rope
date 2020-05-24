@@ -3,7 +3,7 @@
 
 {% with actual_path=actual_path|default:request.path %}
   <nav aria-label="breadcrumb">
-    <ol class="breadcrumb rounded-0 bg-dark text-light">
+    <ol class="breadcrumb rounded-0 bg-dark text-light {% if no_separation|default:False %}mb-0{% endif %}">
       {% url 'core:home' as home %}
       {% if actual_path == home %}
         <li class="breadcrumb-item active" aria-current="page">

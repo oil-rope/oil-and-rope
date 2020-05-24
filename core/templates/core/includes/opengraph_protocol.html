@@ -1,14 +1,15 @@
 {% load i18n %}
 {% load static %}
-<meta property="og:title" content="Oil &amp; Rope" />
-<meta property="og:descripton" content="{% trans "Oil &amp; Rope is a Django project for managing Roleplay Games" %}." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://oil-and-rope.herokuapp.com/" />
-<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="Oil &amp; Rope"/>
+<meta property="og:description" content="{% trans "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://oil-and-rope.herokuapp.com/"/>
+<meta property="og:locale" content="en_US"/>
 {% for language in languages %}
-<meta property="og:locale:alternate" content="{{ language }}" />
+  <meta property="og:locale:alternate" content="{{ language }}"/>
 {% endfor %}
-<meta property="og:site_name" content="Oil &amp; Rope" />
-<meta property="og:image" content="https://oil-and-rope.herokuapp.com/static/img/oil-and-rope.jpg" />
-<meta property="og:image:secure_url" content="https://oil-and-rope.herokuapp.com/static/img/oil-and-rope.jpg" />
-<meta property="og:image:alt" content="{% trans "Oil &amp; Rope is a Django project for managing Roleplay Games" %}." />
+<meta property="og:site_name" content="Oil &amp; Rope"/>
+<meta property="og:image" content="https://oil-and-rope.herokuapp.com{% static 'img/oil_and_rope_logo_color.svg' %}"/>
+<meta property="og:image:secure_url"
+      content="https://oil-and-rope.herokuapp.com{% static 'img/oil_and_rope_logo_color.svg' %}"/>
+<meta property="og:image:alt" content="{% trans "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."/>
