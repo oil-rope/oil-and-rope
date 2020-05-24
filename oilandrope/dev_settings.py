@@ -5,7 +5,10 @@ SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if 'ALLOWED_HOSTS' in os.environ:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
+else:
+    ALLOWED_HOSTS = []
 
 INTERNAL_IPS = (
     '127.0.0.1',

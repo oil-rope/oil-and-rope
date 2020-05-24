@@ -28,7 +28,12 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
+if 'ALLOWED_HOSTS' in os.environ:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
+else:
+    ALLOWED_HOSTS = [
+        'oil-and-rope.herokuapp.com'
+    ]
 
 # Defines Admins
 # https://docs.djangoproject.com/en/2.2/ref/settings/#admins
@@ -195,13 +200,13 @@ USE_TZ = True
 # Translation files
 
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale')
+    os.path.join(BASE_DIR, 'locale/')
 ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 
 # Login System
@@ -213,7 +218,7 @@ LOGOUT_REDIRECT_URL = 'registration:login'
 # Media files
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
 # CKEditor
