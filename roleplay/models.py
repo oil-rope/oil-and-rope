@@ -5,6 +5,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
+
 from . import managers
 
 

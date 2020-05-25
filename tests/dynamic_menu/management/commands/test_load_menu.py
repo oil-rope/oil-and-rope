@@ -1,6 +1,5 @@
 import json
 import os
-import pathlib
 import tempfile
 from io import StringIO
 

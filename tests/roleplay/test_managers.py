@@ -76,11 +76,11 @@ class TestPlaceManager(TestCase):
         baker.make(self.model, self.number_of_worlds, site_type=self.model.WORLD)
 
         self.total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
-                     + self.number_of_metropolis + self.number_of_forests + self.number_of_hills \
-                     + self.number_of_mountains + self.number_of_mines + self.number_of_rivers + self.number_of_seas \
-                     + self.number_of_deserts + self.number_of_tundras + self.number_of_unusuals \
-                     + self.number_of_islands + self.number_of_countries + self.number_of_continents \
-                     + self.number_of_worlds
+            + self.number_of_metropolis + self.number_of_forests + self.number_of_hills \
+            + self.number_of_mountains + self.number_of_mines + self.number_of_rivers + self.number_of_seas \
+            + self.number_of_deserts + self.number_of_tundras + self.number_of_unusuals \
+            + self.number_of_islands + self.number_of_countries + self.number_of_continents \
+            + self.number_of_worlds
 
     def test_all_ok(self):
         self.assertEqual(self.total, self.model.objects.count())

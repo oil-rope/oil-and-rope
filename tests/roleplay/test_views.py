@@ -1,7 +1,6 @@
 import os
 import tempfile
 
-from PIL import Image
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -9,6 +8,7 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
+from PIL import Image
 
 from roleplay import models, views
 
@@ -67,7 +67,11 @@ class TestWorldListView(TestCase):
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
-                self.model.objects.create(name='another_user_'.format(_), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(
+                    name='another_user_world_{}'.format(_),
+                    user=another_user,
+                    site_type=self.model.WORLD
+                )
             )
 
         user_entries = []

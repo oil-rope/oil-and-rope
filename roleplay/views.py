@@ -6,7 +6,8 @@ from django.shortcuts import reverse
 from django.views.generic import CreateView, DetailView
 
 from common.views import MultiplePaginatorListView
-from . import models, forms
+
+from . import forms, models
 
 LOGGER = logging.getLogger(__name__)
 

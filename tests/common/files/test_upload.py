@@ -4,7 +4,6 @@ from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
 
-from roleplay.models import Place
 from common.files.upload import default_upload_to
 
 

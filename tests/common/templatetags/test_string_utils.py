@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from common.templatetags.string_utils import startswith, generate_breadcrumbs
+from common.templatetags.string_utils import generate_breadcrumbs, startswith
 
 
 class TestStartsWithTemplateFilter(TestCase):

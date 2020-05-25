@@ -3,7 +3,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import ButtonHolder, Column, Div, Field, Layout, Row, Submit, HTML
+from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model

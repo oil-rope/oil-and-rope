@@ -1,12 +1,12 @@
 import os
 import tempfile
 
-from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
+from PIL import Image
 
 from roleplay import forms, models
 
