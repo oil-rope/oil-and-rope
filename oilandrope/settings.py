@@ -207,7 +207,7 @@ LOCALE_PATHS = [
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static/'))
-STATIC_URL = '/static/'
+STATIC_URL = os.getenv('STATIC_URL', '/static/')
 
 # Login System
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth
@@ -219,7 +219,7 @@ LOGOUT_REDIRECT_URL = 'registration:login'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
 
 MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(BASE_DIR, 'media/'))
-MEDIA_URL = '/media/'
+MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 
 # CKEditor
 # https://django-ckeditor.readthedocs.io/en/latest/#optional-customizing-ckeditor-editor
