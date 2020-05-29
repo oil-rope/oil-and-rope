@@ -229,6 +229,16 @@ dist
 .yarn/build-state.yml
 .pnp.*
 
+# Sass
+.sass-cache/
+*.css.map
+*.sass.map
+*.scss.map
+
+# TypeScript compiled
+*.ts.map
+*.js.map
+
 # IDE stuff
 .vscode/
 .idea/
