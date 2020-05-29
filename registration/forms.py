@@ -52,10 +52,6 @@ class LoginForm(AuthenticationForm):
             ),
         )
 
-    def _clean_labels(self):
-        for field in self.fields:
-            self.fields[field].label = ''
-
 
 class SignUpForm(UserCreationForm):
     """

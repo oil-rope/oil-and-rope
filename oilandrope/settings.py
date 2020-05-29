@@ -212,7 +212,7 @@ STATIC_URL = os.getenv('STATIC_URL', '/static/')
 # Login System
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth
 
-LOGIN_REDIRECT_URL = 'core:home'
+LOGIN_REDIRECT_URL = 'core:index'
 LOGOUT_REDIRECT_URL = 'registration:login'
 
 # Media files
