@@ -13,3 +13,6 @@ else:
 daemon = True
 reload = bool(to_bool(os.getenv('DEBUG', 'False')))
 workers = multiprocessing.cpu_count() * 2 + 1
+if all(k in os.environ for k in ('GUNICORN_CERTFILE', 'GUNICORN_KEYFILE')):
+    certfile = os.getenv('GUNICORN_CERTFILE')
+    keyfile = os.getenv('GUNICORN_KEYFILE')
