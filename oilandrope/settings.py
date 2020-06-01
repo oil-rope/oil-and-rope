@@ -29,10 +29,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
 
 if 'ALLOWED_HOSTS' in os.environ:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oilandrope-project.com').split(',')
 else:
     ALLOWED_HOSTS = [
-        'oil-and-rope.herokuapp.com'
+        'oil-and-rope.herokuapp.com',
+        'oilandrope-project.com'
     ]
 
 # Defines Admins
@@ -124,6 +125,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'common.context_processors.utils.requests_utils',
                 'core.context_processors.language',
                 'dynamic_menu.context_processors.menus',
             ],
