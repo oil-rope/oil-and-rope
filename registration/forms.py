@@ -27,6 +27,7 @@ class LoginForm(AuthenticationForm):
         super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.id = 'loginForm'
+        self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
         self.helper.layout = Layout(
             Row(
@@ -35,20 +36,30 @@ class LoginForm(AuthenticationForm):
             ),
             Row(
                 Column(
-                    Submit('login', _('Login'), css_class='btn btn-lg w-100'),
-                    css_class='col-sm-10 col-xl-6'
+                    Submit('login', _('Login'), css_class='btn btn-lg text-white w-100'),
+                    css_class='col-6'
                 ),
                 Column(
-                    HTML(
-                        '<a class="text-info" href="#no-url">{text}</a>'.format(text=_('Forgot password?'))
+                    Div(
+                        Row(
+                            HTML(
+                                '<a class="mr-lg-5" href="{url}">{text}</a>'.format(
+                                    url='#no-url',
+                                    text=_('Forgot password?')
+                                )
+                            ),
+                            HTML(
+                                '<a class="" href="{url}">{text}</a>'.format(
+                                    url=reverse('registration:resend_email'),
+                                    text=_('Resend email')
+                                )
+                            ),
+                            css_class='row justify-content-sm-between justify-content-lg-center'
+                        ),
+                        css_class='container-fluid'
                     ),
-                    HTML(
-                        '<a class="text-info" href="{url}">{text}</a>'.format(url=reverse('registration:resend_email'),
-                                                                              text=_('Resend email'))
-                    ),
-                    css_class='col-xl-6 d-flex justify-content-around align-items-lg-center mt-3 mt-xl-0'
+                    css_class='col-6'
                 ),
-                css_class='justify-content-center mt-5'
             ),
         )
 

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Oil-and-Rope';
-  src:  url('fonts/Oil-and-Rope.eot?gsu18b');
-  src:  url('fonts/Oil-and-Rope.eot?gsu18b#iefix') format('embedded-opentype'),
-    url('fonts/Oil-and-Rope.ttf?gsu18b') format('truetype'),
-    url('fonts/Oil-and-Rope.woff?gsu18b') format('woff'),
-    url('fonts/Oil-and-Rope.svg?gsu18b#Oil-and-Rope') format('svg');
+  src:  url('fonts/Oil-and-Rope.eot?kdiuci');
+  src:  url('fonts/Oil-and-Rope.eot?kdiuci#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?kdiuci') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?kdiuci') format('woff'),
+    url('fonts/Oil-and-Rope.svg?kdiuci#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,33 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ic-discord:before {
+  content: "\e916";
+}
+.ic-connect:before {
+  content: "\e910";
+}
+.ic-dice:before {
+  content: "\e915";
+}
+.ic-user-check:before {
+  content: "\e912";
+}
+.ic-user:before {
+  content: "\e913";
+}
+.ic-users:before {
+  content: "\e911";
+}
+.ic-shield:before {
+  content: "\e90f";
+}
+.ic-hammer:before {
+  content: "\e90e";
+}
+.ic-arrow-down:before {
+  content: "\e90b";
+}
 .ic-cogs:before {
   content: "\e904";
 }
@@ -69,6 +96,15 @@
 }
 .ic-minus:before {
   content: "\ea0b";
+}
+.ic-responsive-device:before {
+  content: "\e914";
+}
+.ic-triangle-relation:before {
+  content: "\e90d";
+}
+.ic-diana:before {
+  content: "\e90c";
 }
 .ic-globe:before {
   content: "\e900";

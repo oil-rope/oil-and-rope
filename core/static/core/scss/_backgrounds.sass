@@ -1,3 +1,5 @@
+@import "variables"
+
 .full-background
   background-position: center
   background-repeat: no-repeat
@@ -10,3 +12,6 @@
   background-repeat: no-repeat
   background-size: cover
   min-height: 250px
+
+.bg-gradient-logo
+  background: linear-gradient(135deg, map_get($theme-colors, "primary"), map_get($theme-colors, "extra"), map_get($theme-colors, "info"))

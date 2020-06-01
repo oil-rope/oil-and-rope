@@ -1,6 +1,10 @@
+from rest_framework import routers
 from django.urls import include, path
 
-from . import views
+from . import views, viewsets
+
+router = routers.DefaultRouter()
+router.register('place', viewsets.PlaceViewSet)
 
 app_name = 'roleplay'
 
@@ -11,5 +15,6 @@ PLACE_PATTERNS = [
 ]
 
 urlpatterns = [
+    path('api/', include(router.urls)),
     path('place/', include(PLACE_PATTERNS)),
 ]

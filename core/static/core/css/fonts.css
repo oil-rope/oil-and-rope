@@ -3,7 +3,7 @@
  * 2 |   font-family: $font-ds-regular
  *   |                ^^^^^^^^^^^^^^^^
  *   '
- *   fonts.sass 2:16  root stylesheet */
+ *   _fonts.sass 2:16  root stylesheet */
 
 body::before {
   font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
