@@ -1,10 +1,12 @@
 def requests_utils(request):
     host = request.get_host()
     port = request.get_port()
-    raw_uri = 'https://' if request.is_secure() else 'http://'
-    raw_uri = '{}{}'.format(raw_uri, host)
+    uri = '{}:{}'.format(host, port) if port not in ('80', '443') else '{}'.format(host)
+    real_uri = request.build_absolute_uri()
     return {
         'host': host,
         'port': port,
-        'raw_uri': raw_uri
+        'secure_uri': 'https://{}'.format(uri),
+        'insecure_uri': 'http://{}'.format(uri),
+        'real_uri': real_uri
     }
