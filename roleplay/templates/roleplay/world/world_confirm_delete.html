@@ -1,0 +1,48 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% block title %}{% trans "Delete" %} {{ object.name }}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Delete ('|add:object.name|add:')' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+<main class="container py-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="card p-md-5">
+        <div class="card-body">
+          <p class="text-right">
+            <button class="btn" onclick="goBack();">
+              <i class="ic ic-cross-thin text-danger"></i>
+            </button>
+          </p>
+          <h4 class="card-title text-center">
+            <i class="display-4 ic ic-circle-cross-thin text-danger"></i><br>
+            {% trans "Are you sure traveller?" %}
+          </h4>
+          <p class="card-text text-center">
+            {% trans "Do you really want to erase this world and all its inhabitants?" %}<br>
+            {% trans "This action cannot be undone" %}.
+          </p>
+        </div>
+        <div class="card-body mt-xl-5">
+          <form class="d-flex justify-content-around" action="{% url 'roleplay:world_delete' object.pk %}" method="post">
+            {% csrf_token %}
+            <button onclick="goBack();" class="col-5 col-xl-4 btn btn-secondary">{% trans "Cancel" %}</button>
+            <input type="submit" value="{% trans 'Erase' %}" class="col-5 col-xl-4 btn btn-danger">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+{% endblock javascript %}

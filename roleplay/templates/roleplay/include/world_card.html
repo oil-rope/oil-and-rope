@@ -52,7 +52,7 @@
             {% trans "Settings" %}
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#no-url" class="dropdown-item">
+          <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
             <span class="ic-trash text-danger"></span>
             {% trans "Delete" %} {% trans "world" %}
           </a>

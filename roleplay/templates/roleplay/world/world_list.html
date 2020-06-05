@@ -16,10 +16,11 @@
         {% trans "Seems like you haven't any world" %}.<br>
         {% trans "Create one" %}!
       </h2>
-      <div class="row justify-content-center">
+      <div class="row justify-content-center py-5">
         <a href="{% url 'roleplay:world_create' %}?user"
-           class="btn btn-secondary btn-lg">{% trans "Create world" %}!</a>
+           class="btn btn-lg btn-primary">{% trans "Create world" %}!</a>
       </div>
+      <div class="w-100 my-5"></div>
     {% else %}
       <h2 class="display-4 text-center">
         {% blocktrans count counter=user_worlds_full.count %}
@@ -32,16 +33,20 @@
           <span class="ic-plus"></span>
         </a>
       </h2>
-      <div class="d-none d-xl-block w-100"></div>
+      <div class="w-100 py-2"></div>
       {% if user_worlds_is_paginated %}
         {% include 'common/include/paginator.html' with paginator=user_worlds_paginator page_obj=user_worlds_page_obj path=request.path align='center' page_kwarg='page_user_worlds' only %}
       {% endif %}
-      <div class="row justify-content-xl-around mb-5">
+      <div class="row justify-content-xl-around pb-5">
         {% for world in user_worlds_page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
+      </div>
+      <div class="row justify-content-center pb-5">
+        <a href="{% url 'roleplay:world_create' %}?user"
+           class="btn btn-lg btn-primary">{% trans "Create private world" %}!</a>
       </div>
     {% endif %}
 
@@ -51,7 +56,7 @@
         {% trans "Seems like we don't have comunity worlds" %}<br>
         {% trans "Would you like to create one?" %}
       </h2>
-      <div class="row justify-content-center">
+      <div class="row justify-content-center py-5">
         <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">{% trans "Create world" %}!</a>
       </div>
     {% else %}
@@ -62,20 +67,24 @@
           Checkout our {{ counter }} community worlds
         {% endblocktrans %}
         <a title="{% trans 'Create community world' %}" href="{% url 'roleplay:world_create' %}"
-           class="btn btn-lg btn-primary">
+           class="btn btn-lg btn-secondary">
           <span class="ic-plus"></span>
         </a>
       </h2>
-      <div class="d-none d-xl-block w-100"></div>
+      <div class="w-100 py-2"></div>
       {% if is_paginated %}
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
       {% endif %}
-      <div class="row justify-content-xl-around">
+      <div class="row justify-content-xl-around pb-5">
         {% for world in page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
+      </div>
+      <div class="row justify-content-center pb-5">
+        <a href="{% url 'roleplay:world_create' %}"
+           class="btn btn-lg btn-secondary">{% trans "Create public world" %}!</a>
       </div>
     {% endif %}
   </div>
