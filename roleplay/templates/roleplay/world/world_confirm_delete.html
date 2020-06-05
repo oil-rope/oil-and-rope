@@ -41,7 +41,8 @@
 
 {% block javascript %}
   <script>
-    function goBack() {
+    function goBack(e) {
+      e.preventDefault();
       window.history.back();
     }
   </script>
