@@ -28,7 +28,7 @@ class TestWorldListView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world_list.html')
+        self.assertTemplateUsed(response, 'roleplay/world/world_list.html')
 
     def test_access_anonymous_ko(self):
         response = self.client.get(self.url)
@@ -53,7 +53,10 @@ class TestWorldListView(TestCase):
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
-                self.model.objects.create(name='world_{}'.format(_), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(
+                    name='world_{}'.format(_), user=another_user,
+                    site_type=self.model.WORLD, owner=another_user
+                )
             )
 
         self.client.force_login(self.user)
@@ -70,6 +73,7 @@ class TestWorldListView(TestCase):
                 self.model.objects.create(
                     name='another_user_world_{}'.format(_),
                     user=another_user,
+                    owner=another_user,
                     site_type=self.model.WORLD
                 )
             )
@@ -77,7 +81,9 @@ class TestWorldListView(TestCase):
         user_entries = []
         for _ in range(0, self.pagination):
             user_entries.append(
-                self.model.objects.create(name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(
+                    name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD, owner=self.user
+                )
             )
 
         self.client.force_login(self.user)
@@ -96,13 +102,19 @@ class TestWorldListView(TestCase):
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
-                self.model.objects.create(name=self.faker.name(), user=another_user, site_type=self.model.WORLD)
+                self.model.objects.create(
+                    name=self.faker.name(), user=another_user,
+                    site_type=self.model.WORLD, owner=another_user
+                )
             )
 
         entries = []
         for _ in range(0, self.pagination):
             entries.append(
-                self.model.objects.create(name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD)
+                self.model.objects.create(
+                    name='user_world_{}'.format(_), user=self.user,
+                    site_type=self.model.WORLD, owner=self.user
+                )
             )
             entries.append(
                 self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
@@ -152,7 +164,10 @@ class TestWorldListView(TestCase):
 
     def test_correct_user_worlds_are_paginated_ok(self):
         for _ in range(0, self.pagination + 1):
-            self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD, user=self.user)
+            self.model.objects.create(
+                name='world_{}'.format(_), site_type=self.model.WORLD,
+                user=self.user, owner=self.user
+            )
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1'.format(self.view.user_worlds_page_kwarg))
         context = response.context
@@ -176,7 +191,10 @@ class TestWorldListView(TestCase):
         user_worlds = []
         for i in range(0, self.pagination + 1):
             user_worlds.append(
-                self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD, user=self.user)
+                self.model.objects.create(
+                    name='world_{}'.format(i), site_type=self.model.WORLD,
+                    user=self.user, owner=self.user
+                )
             )
         for _ in range(0, self.pagination):
             community_worlds.append(
@@ -257,7 +275,7 @@ class TestWorldCreateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world_create.html')
+        self.assertTemplateUsed(response, 'roleplay/world/world_create.html')
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
@@ -324,7 +342,7 @@ class TestWorldDetailView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world_detail.html')
+        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
@@ -353,5 +371,67 @@ class TestWorldDetailView(TestCase):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
         response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+
+class TestWorldDeleteView(TestCase):
+    model = models.Place
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model())
+        self.world = self.model.objects.create(
+            name=self.faker.city(),
+            owner=self.user
+        )
+        self.private_world = self.model.objects.create(
+            name=self.faker.city(),
+            owner=self.user,
+            user=self.user
+        )
+        self.url = reverse('roleplay:world_delete', kwargs={'pk': self.world.pk})
+        self.private_world_url = reverse('roleplay:world_delete', kwargs={'pk': self.private_world.pk})
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'roleplay/world/world_confirm_delete.html')
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+
+        self.assertNotEqual(200, response.status_code)
+        self.assertEqual(302, response.status_code)
+
+    def test_non_existent_world_ko(self):
+        self.client.force_login(self.user)
+        non_existent_pk = self.model.objects.last().pk + 1
+        url = reverse('roleplay:world_delete', kwargs={'pk': non_existent_pk})
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_non_owner_access_ko(self):
+        foreign_user = baker.make(get_user_model())
+        self.client.force_login(foreign_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    # noinspection PyTypeChecker
+    def test_delete_ok(self):
+        self.client.force_login(self.user)
+        self.client.delete(self.url)
+
+        with self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(pk=self.world.pk)
+
+    def test_non_owner_delete_ko(self):
+        foreign_user = baker.make(get_user_model())
+        self.client.force_login(foreign_user)
+        response = self.client.delete(self.url)
 
         self.assertEqual(403, response.status_code)

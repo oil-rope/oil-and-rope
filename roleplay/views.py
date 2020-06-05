@@ -2,8 +2,9 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
+from django.urls import reverse_lazy
 from django.shortcuts import reverse
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, DeleteView
 
 from common.views import MultiplePaginatorListView
 
@@ -17,7 +18,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     paginate_by = 9
     user_worlds_page_kwarg = 'page_user_worlds'
     queryset = models.Place.objects.filter(site_type=models.Place.WORLD)
-    template_name = 'roleplay/world_list.html'
+    template_name = 'roleplay/world/world_list.html'
 
     def get_user_worlds(self):
         user = self.request.user
@@ -81,7 +82,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 class WorldCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.WorldForm
     model = models.Place
-    template_name = 'roleplay/world_create.html'
+    template_name = 'roleplay/world/world_create.html'
 
     def get_success_url(self):
         return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
@@ -101,7 +102,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 
 class WorldDetailView(LoginRequiredMixin, DetailView):
     model = models.Place
-    template_name = 'roleplay/world_detail.html'
+    template_name = 'roleplay/world/world_detail.html'
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
@@ -122,3 +123,20 @@ class WorldDetailView(LoginRequiredMixin, DetailView):
         context['world_structure'] = self.object.get_descendants(include_self=True)
 
         return context
+
+
+class WorldDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Place
+    success_url = reverse_lazy('roleplay:world_list')
+    template_name = 'roleplay/world/world_confirm_delete.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # If user is not authenticated keep on
+        if not self.request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        # Checking for owner
+        obj = self.get_object()
+        if self.request.user == obj.owner:
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden()

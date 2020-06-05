@@ -24,7 +24,10 @@ DATABASES = {
     },
 }
 
-INSTALLED_APPS += ('django_extensions', )
+INSTALLED_APPS.insert(0, 'django_pdb')
+INSTALLED_APPS.append('django_extensions', )
+
+MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
 
 EMAIL_HOST = 'smtp.mailtrap.io'
 EMAIL_HOST_USER = '1d1194c55c4145'

@@ -3,6 +3,8 @@ import pathlib
 import tempfile
 import unittest
 
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
@@ -358,3 +360,28 @@ class TestPlace(TestCase):
             obj = self.model.objects.create(name=self.faker.country(), site_type=site_type)
             expected_url = '<span class="{}"></span>'.format(self.model.ICON_RESOLVERS.get(site_type, ''))
             self.assertEqual(expected_url, obj.resolve_icon())
+
+    def test_user_but_no_owner_save_ko(self):
+        user = baker.make(get_user_model())
+        with self.assertRaises(IntegrityError) as ex:
+            self.model.objects.create(
+                name=self.faker.city(),
+                user=user
+            )
+        self.assertEqual(str(ex.exception), 'A private world must have owner.')
+
+    def test_user_but_no_owner_clean_ko(self):
+        user = baker.make(get_user_model())
+        world = self.model.objects.create(
+            name=self.faker.city(),
+            user=user,
+            owner=user
+        )
+        world.owner = None
+
+        with self.assertRaises(ValidationError) as ex:
+            world.clean()
+        ex = ex.exception
+        self.assertIn('user', ex.error_dict)
+        message = ex.error_dict['user'][0].message
+        self.assertEqual(message, 'A private world must have owner.')

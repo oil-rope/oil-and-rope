@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -146,7 +147,7 @@ class Place(MPTTModel, TracingMixin):
                                  related_name='children_sites', db_index=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places', verbose_name=_('User'),
                              blank=True, null=True, db_index=True)
-    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places_owned',
+    owner = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name='places_owned',
                               verbose_name=_('Owner'), blank=True, null=True, db_index=True)
 
     objects = managers.PlaceManager()
@@ -294,6 +295,17 @@ class Place(MPTTModel, TracingMixin):
         verbose_name = _('Place')
         verbose_name_plural = _('Places')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
+
+    def clean(self):
+        if self.user and not self.owner:
+            raise ValidationError({
+                'user': _('A private world must have owner') + '.'
+            })
+
+    def save(self, *args, **kwargs):
+        if self.user and not self.owner:
+            raise IntegrityError(_('A private world must have owner') + '.')
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
