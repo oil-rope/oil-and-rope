@@ -253,8 +253,8 @@ class TestWorldCreateView(TestCase):
         self.tmp_image = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.png', delete=False)
         image_file = self.tmp_image.name
         Image.new('RGB', (30, 30), color='red').save(image_file)
-        image_content = open(image_file, 'rb').read()
-        self.image = SimpleUploadedFile(name=image_file, content=image_content, content_type='image/png')
+        with open(image_file, 'rb') as image_content:
+            self.image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/png')
         self.data_ok = {
             'name': self.faker.country(),
             'description': self.faker.paragraph(),

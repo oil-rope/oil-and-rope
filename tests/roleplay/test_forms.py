@@ -26,8 +26,8 @@ class TestWorldForm(TestCase):
         self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
         image_file = self.tmp.name
         Image.new('RGB', (30, 60), color='red').save(image_file)
-        image_content = open(image_file, 'rb').read()
-        image = SimpleUploadedFile(name=image_file, content=image_content, content_type='image/jpeg')
+        with open(image_file, 'rb') as image_content:
+            image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
         self.files_ok = {
             'image': image
         }

@@ -36,9 +36,9 @@ class TestDomain(TestCase):
     @freeze_time('2020-01-01')
     def test_image_upload_ok(self):
         tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-        image_data = open(tmpfile.name, 'rb').read()
         image_file = tmpfile.name
-        image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+        with open(tmpfile.name, 'rb') as image_data:
+            image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
 
         place = baker.make(self.model)
         place.image = image
@@ -98,9 +98,9 @@ class TestPlace(TestCase):
     @freeze_time('2020-01-01')
     def test_image_upload_ok(self):
         tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-        image_data = open(tmpfile.name, 'rb').read()
         image_file = tmpfile.name
-        image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+        with open(tmpfile.name, 'rb') as image_data:
+            image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
 
         place = baker.make(self.model)
         place.image = image
@@ -118,9 +118,9 @@ class TestPlace(TestCase):
 
         for _ in range(0, 3):
             tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-            image_data = open(tmpfile.name, 'rb').read()
             image_file = tmpfile.name
-            image = SimpleUploadedFile(name=image_file, content=image_data, content_type='image/jpeg')
+            with open(tmpfile.name, 'rb') as image_data:
+                image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
             images.append(image)
 
             tmpfile.close()
