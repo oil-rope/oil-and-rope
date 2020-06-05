@@ -37,7 +37,7 @@
       {% if user_worlds_is_paginated %}
         {% include 'common/include/paginator.html' with paginator=user_worlds_paginator page_obj=user_worlds_page_obj path=request.path align='center' page_kwarg='page_user_worlds' only %}
       {% endif %}
-      <div class="row justify-content-xl-around pb-5">
+      <div class="row justify-content-around pb-5">
         {% for world in user_worlds_page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
@@ -75,7 +75,7 @@
       {% if is_paginated %}
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
       {% endif %}
-      <div class="row justify-content-xl-around pb-5">
+      <div class="row justify-content-around pb-5">
         {% for world in page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
