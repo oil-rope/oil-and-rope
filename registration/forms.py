@@ -26,7 +26,7 @@ class LoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.id = 'loginForm'
+        self.helper.form_id = 'loginForm'
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
         self.helper.layout = Layout(
@@ -69,10 +69,6 @@ class SignUpForm(UserCreationForm):
     User registration form.
     """
 
-    button_classes = 'btn btn-info'
-    custom_classes = 'bg-transparent border-primary border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-lg'
-
     discord_id = forms.CharField(
         label=_('Discord Identifier'),
         max_length=254,
@@ -91,29 +87,29 @@ class SignUpForm(UserCreationForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field('username', css_class=self.custom_classes),
+                    'username',
                     css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
-                    Field('email', css_class=self.custom_classes),
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                css_class='justify-content-xl-between'
-            ),
-            Row(
-                Column(
-                    Field('password1', css_class=self.custom_classes),
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                Column(
-                    Field('password2', css_class=self.custom_classes),
+                    'email',
                     css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 css_class='justify-content-xl-between'
             ),
             Row(
                 Column(
-                    Field('discord_id', css_class=self.custom_classes),
+                    'password1',
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                Column(
+                    'password2',
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                css_class='justify-content-xl-between'
+            ),
+            Row(
+                Column(
+                    'discord_id',
                     css_class='col-12 col-md-8 col-lg-6 col-xl-5'
                 ),
                 Column(
@@ -130,7 +126,7 @@ class SignUpForm(UserCreationForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Register'), css_class=self.submit_classes + ' w-100'),
+                    Submit('submit', _('Register'), css_class='btn-lg w-100'),
                     css_class='col-12 col-xl-6'
                 ),
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
@@ -138,7 +134,7 @@ class SignUpForm(UserCreationForm):
         )
 
     def _resolve_consumer_url(self):
-        consumer_url = 'ws://' if settings.DEBUG else 'wss://'
+        consumer_url = 'wss://' if self.request.is_secure() else 'ws://'
         consumer_url += settings.WS_HOST if settings.WS_HOST else self.request.get_host()
         consumer_url += reverse('bot_ws:register')
         return consumer_url

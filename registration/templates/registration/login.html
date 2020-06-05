@@ -5,6 +5,26 @@
 
 {% block title %}{% trans "Login" %}{% endblock title %}
 
+{% block css %}
+  <style>
+    #cover {
+      background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url('{% static 'img/cover-min.png' %}');
+      background-position: center top;
+    }
+
+    /*
+     * Because of the background image we need a different border and focus color
+     */
+    #loginForm input {
+      border-color: var(--primary);
+    }
+
+    #loginForm input:focus {
+      border-color: var(--extra);
+    }
+  </style>
+{% endblock css %}
+
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' no_separation=True %}
 {% endblock breadcrumb %}
@@ -12,8 +32,7 @@
 {% block body_content %}
   <main class="container-fluid">
 
-    <div class="row min-vh-100 cover justify-content-lg-center"
-         style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static 'img/cover-min.png' %}'); background-position: center top;">
+    <div id="cover" class="row min-vh-100 cover justify-content-lg-center">
       <!-- Presentation -->
       <div class="col-12 text-center pt-3">
         <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="Oil & Rope Logo">
@@ -43,7 +62,7 @@
       </div>
     </div>
 
-    <div class="row bg-gradient-logo min-vh-100 py-5" id="about-us">
+    <div class="row bg-extra min-vh-100 py-5" id="about-us">
       <!-- About us -->
       <section class="col-12">
         <h2 class="display-3 text-center">
@@ -167,7 +186,7 @@
               </p>
             </div>
 
-            <a href="{% url 'registration:register' %}" class="btn btn-lg btn-success col-6 my-lg-5">
+            <a href="{% url 'registration:register' %}" class="btn btn-lg btn-primary col-6 my-lg-5">
               {% trans "Join now" %}!
             </a>
           </div>

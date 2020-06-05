@@ -32,8 +32,10 @@
 <body>
 {% language lan %}
 
-  {% include 'core/includes/menu.html' %}
-  {% block breadcrumb %}{% endblock breadcrumb %}
+  <div class="navigator sticky-top">
+    {% include 'core/includes/menu.html' %}
+    {% block breadcrumb %}{% endblock breadcrumb %}
+  </div>
 
   {% comment %} Messages System {% endcomment %}
   {% include 'core/includes/messages.html' %}
