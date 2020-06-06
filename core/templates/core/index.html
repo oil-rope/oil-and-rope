@@ -4,11 +4,18 @@
 {% block title %}{% trans "Home" %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' %}
+  {% include 'common/include/breadcrumb.html' with no_separation=True %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
-<main class="container">
-
+<main class="container-fluid bg-info px-0">
+  <div class="row no-gutters">
+    <div class="col-12 col-lg-6">
+      {% include 'core/includes/about_us.html' with no_margin=True %}
+    </div>
+    <div class="col-12 col-lg-6">
+      {% include 'core/includes/about_the_project.html' with no_margin=True %}
+    </div>
+  </div>
 </main>
 {% endblock body_content %}

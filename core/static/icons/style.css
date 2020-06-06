@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Oil-and-Rope';
-  src:  url('fonts/Oil-and-Rope.eot?y5b6vj');
-  src:  url('fonts/Oil-and-Rope.eot?y5b6vj#iefix') format('embedded-opentype'),
-    url('fonts/Oil-and-Rope.ttf?y5b6vj') format('truetype'),
-    url('fonts/Oil-and-Rope.woff?y5b6vj') format('woff'),
-    url('fonts/Oil-and-Rope.svg?y5b6vj#Oil-and-Rope') format('svg');
+  src:  url('fonts/Oil-and-Rope.eot?hw1t6j');
+  src:  url('fonts/Oil-and-Rope.eot?hw1t6j#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?hw1t6j') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?hw1t6j') format('woff'),
+    url('fonts/Oil-and-Rope.svg?hw1t6j#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,23 +25,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ic-dots-horizontal-triple:before {
-  content: "\e91b";
-}
-.ic-menu-thin:before {
-  content: "\e917";
-}
-.ic-circle-cross-thin:before {
-  content: "\e918";
-}
-.ic-cross-thin:before {
-  content: "\e919";
-}
-.ic-discord:before {
-  content: "\e916";
+.ic-join:before {
+  content: "\e91f";
 }
 .ic-connect:before {
   content: "\e910";
+}
+.ic-facebook:before {
+  content: "\e923";
+}
+.ic-mail:before {
+  content: "\e920";
+}
+.ic-share:before {
+  content: "\e921";
 }
 .ic-menu:before {
   content: "\e91a";
@@ -112,6 +109,12 @@
 .ic-minus:before {
   content: "\ea0b";
 }
+.ic-tv:before {
+  content: "\e91d";
+}
+.ic-eye:before {
+  content: "\e91e";
+}
 .ic-responsive-device:before {
   content: "\e914";
 }
@@ -123,4 +126,25 @@
 }
 .ic-globe:before {
   content: "\e900";
+}
+.ic-dots-horizontal-triple:before {
+  content: "\e91b";
+}
+.ic-menu-thin:before {
+  content: "\e917";
+}
+.ic-circle-cross-thin:before {
+  content: "\e918";
+}
+.ic-cross-thin:before {
+  content: "\e919";
+}
+.ic-twitter:before {
+  content: "\e922";
+}
+.ic-github:before {
+  content: "\e91c";
+}
+.ic-discord:before {
+  content: "\e916";
 }

@@ -1,7 +1,7 @@
 def requests_utils(request):
     host = request.get_host()
     port = request.get_port()
-    uri = '{}:{}'.format(host, port) if port not in ('80', '443') else '{}'.format(host)
+    uri = '{}'.format(host)
     real_uri = request.build_absolute_uri()
     return {
         'host': host,
