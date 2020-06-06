@@ -442,10 +442,24 @@ class TestWorldUpdateView(TestCase):
     view = views.WorldUpdateView
 
     def setUp(self):
+        tmp_image = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.png', delete=False)
+        self.image_file = tmp_image.name
+        Image.new('RGB', (30, 30), color='red').save(self.image_file)
+        with open(self.image_file, 'rb') as image:
+            self.image = SimpleUploadedFile(name=self.image_file, content=image.read(), content_type='image/png')
+
         self.faker = Faker()
         self.user = baker.make(get_user_model())
         self.world = self.model.objects.create(name=self.faker.city(), user=self.user, owner=self.user)
         self.url = reverse('roleplay:world_edit', kwargs={'pk': self.world.pk})
+        self.data_ok = {
+            'name': self.faker.city(),
+            'description': self.faker.paragraph(),
+            'image': self.image
+        }
+
+    def tearDown(self):
+        os.unlink(self.image_file)
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -483,5 +497,45 @@ class TestWorldUpdateView(TestCase):
         self.client.force_login(self.user)
         self.client.post(self.url, data=data)
 
+        self.world.refresh_from_db()
         self.assertEqual(data['name'], self.world.name)
         self.assertEqual(data['description'], self.world.description)
+
+    def test_data_with_image_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+
+        self.world.refresh_from_db()
+        self.assertEqual(self.data_ok['name'], self.world.name)
+        self.assertEqual(self.data_ok['description'], self.world.description)
+
+        # Okay now let's check if image is correct
+        with open(self.world.image.path, 'rb') as image:
+            world_image = image.read()
+        with open(self.image_file, 'rb') as image:
+            data_image = image.read()
+        self.assertEqual(data_image, world_image)
+
+    def test_data_without_name_ko(self):
+        self.client.force_login(self.user)
+        data_ko = self.data_ok.copy()
+        del data_ko['name']
+        response = self.client.post(self.url, data=data_ko)
+
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
+
+    def test_data_without_description_ok(self):
+        self.client.force_login(self.user)
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        self.client.post(self.url, data=data_without_description)
+
+        self.world.refresh_from_db()
+        self.assertEqual(data_without_description['name'], self.world.name)
+        self.assertEqual('', self.world.description)
+
+        with open(self.world.image.path, 'rb') as image:
+            world_image = image.read()
+        with open(self.image_file, 'rb') as image:
+            data_image = image.read()
+        self.assertEqual(data_image, world_image)
