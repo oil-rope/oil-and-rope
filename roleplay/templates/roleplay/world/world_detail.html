@@ -66,7 +66,7 @@
               </div>
               {% if object.owner == request.user %}
                 <div class="col-5">
-                  <a href="#no-url" class="btn btn-primary w-100 disabled">
+                  <a href="{% url 'roleplay:world_edit' object.pk %}" class="btn btn-primary w-100">
                     <i class="ic ic-edit"></i>
                     {% trans "Edit" %}
                   </a>

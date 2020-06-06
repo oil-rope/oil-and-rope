@@ -2,12 +2,13 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-from django.urls import reverse_lazy
 from django.shortcuts import reverse
-from django.views.generic import CreateView, DetailView, DeleteView
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, DetailView, DeleteView, UpdateView
 
+from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
-
 from . import forms, models
 
 LOGGER = logging.getLogger(__name__)
@@ -125,18 +126,29 @@ class WorldDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class WorldDeleteView(LoginRequiredMixin, DeleteView):
+class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
+    form_class = forms.WorldForm
+    model = models.Place
+    template_name = 'roleplay/world/world_update.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = self.request.user
+        kwargs.update({
+            'owner': user,
+            'submit_text': _('Update')
+        })
+        if 'user' in self.request.GET:
+            kwargs.update({
+                'user': user
+            })
+        return kwargs
+
+
+class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
     success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world/world_confirm_delete.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        # If user is not authenticated keep on
-        if not self.request.user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-
-        # Checking for owner
-        obj = self.get_object()
-        if self.request.user == obj.owner:
-            return super().dispatch(request, *args, **kwargs)
-        return HttpResponseForbidden()

@@ -17,7 +17,7 @@
       <div class="row">
 
         {% if world.owner == user %}
-          <a href="#no-url" class="btn btn-primary disabled">
+          <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary">
             <i class="ic ic-edit"></i>
             {% trans "Edit" %}
           </a>

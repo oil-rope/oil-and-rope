@@ -8,7 +8,7 @@ from . import models
 
 class WorldForm(forms.ModelForm):
 
-    def __init__(self, owner, user=None, *args, **kwargs):
+    def __init__(self, owner, user=None, submit_text=_('Create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
         self.owner = owner
@@ -31,7 +31,7 @@ class WorldForm(forms.ModelForm):
                 css_class='justify-content-lg-around'
             ),
             Row(
-                Submit('submit', _('Create'), css_class='btn btn-primary col-5 col-lg-6'),
+                Submit('submit', submit_text, css_class='btn btn-primary col-5 col-lg-6'),
                 Reset('reset', _('Clean'), css_class='btn btn-secondary col-5 d-lg-none'),
                 css_class='justify-content-around'
             )
