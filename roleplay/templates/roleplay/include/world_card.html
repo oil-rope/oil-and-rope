@@ -3,22 +3,7 @@
 
 <div class="card h-100">
   <div class="card-header">
-    <div id="worldCarousel_{{ world.pk }}" class="carousel slide" data-ride="carousel">
-      <div class="carousel-inner">
-        {% for image in world.images %}
-          <div class="carousel-item{% if forloop.first %} active{% endif %}">
-            <div class="d-inline-block w-100 full-background"
-                 style="background-image: url('{{ image.url }}')"></div>
-          </div>
-        {% empty %}
-          <div class="carousel-item active">
-            {% static 'roleplay/img/places/default_image.png' as default_image %}
-            <div class="d-inline-block w-100 full-background"
-                 style="background-image: url('{{ default_image }}')"></div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
+    {% include 'roleplay/include/world_image_carousel.html' with world=world only %}
   </div>
   <div class="card-body">
     <h5 class="card-title text-center">{{ world.name }}</h5>
