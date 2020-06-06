@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f /tmp/requirements.txt
+          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
           pip install -r /tmp/requirements.txt
 
       - name: Lint with flake8
@@ -106,7 +106,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f /tmp/requirements.txt
+          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
           pip install -r /tmp/requirements.txt
 
       - name: Lint with flake8
