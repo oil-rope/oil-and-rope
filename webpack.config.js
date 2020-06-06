@@ -6,7 +6,6 @@ module.exports = {
 	entry: {
 		Calendar: "./frontend/src/renderCalendar.jsx",
 		UserCheckButton: "./frontend/src/renderUserCheckButton.jsx",
-		TreeView: "./frontend/src/renderTreeView.jsx"
 	},
 	output: {
 		publicPath: PUBLIC_PATH,
@@ -45,6 +44,6 @@ module.exports = {
 		extensions: [".js", ".jsx", ".scss", ".sass"],
 	},
 	externals: {
-		jquery: 'jQuery'
-	}
+		jquery: "jQuery",
+	},
 };
