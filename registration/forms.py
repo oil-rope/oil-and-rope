@@ -54,7 +54,8 @@ class LoginForm(AuthenticationForm):
                                     text=_('Resend email')
                                 )
                             ),
-                            css_class='row justify-content-sm-between justify-content-lg-center align-items-center h-100'
+                            css_class='row justify-content-sm-between justify-content-lg-center \
+                                        align-items-center h-100'
                         ),
                         css_class='container-fluid h-100'
                     ),

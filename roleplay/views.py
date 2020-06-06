@@ -5,10 +5,11 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DetailView, DeleteView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
+
 from . import forms, models
 
 LOGGER = logging.getLogger(__name__)
