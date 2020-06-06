@@ -435,3 +435,42 @@ class TestWorldDeleteView(TestCase):
         response = self.client.delete(self.url)
 
         self.assertEqual(403, response.status_code)
+
+
+class TestWorldUpdateView(TestCase):
+    model = models.Place
+    view = views.WorldUpdateView
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model())
+        self.world = self.model.objects.create(name=self.faker.city(), user=self.user, owner=self.user)
+        self.url = reverse('roleplay:world_edit', kwargs={'pk': self.world.pk})
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'roleplay/world/world_update.html')
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+
+        self.assertNotEqual(200, response.status_code)
+        self.assertEqual(302, response.status_code)
+
+    def test_non_existent_world_ko(self):
+        self.client.force_login(self.user)
+        non_existent_pk = self.model.objects.last().pk + 1
+        url = reverse('roleplay:world_edit', kwargs={'pk': non_existent_pk})
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_non_owner_access_ko(self):
+        foreign_user = baker.make(get_user_model())
+        self.client.force_login(foreign_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)

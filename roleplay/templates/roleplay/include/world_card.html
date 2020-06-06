@@ -16,16 +16,16 @@
     <div class="container">
       <div class="row">
 
+        <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra mr-1">
+          <i class="ic ic-world"></i>
+          {% trans "View details" %}
+        </a>
         {% if world.owner == user %}
-          <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary">
+          <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary ml-1">
             <i class="ic ic-edit"></i>
             {% trans "Edit" %}
           </a>
         {% endif %}
-        <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra ml-1">
-          <i class="ic ic-world"></i>
-          {% trans "View details" %}
-        </a>
         <div class="btn-group dropright align-self-end ml-auto">
           <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true"
                   aria-expanded="false">
