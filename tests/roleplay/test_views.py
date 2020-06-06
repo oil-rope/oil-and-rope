@@ -451,6 +451,7 @@ class TestWorldUpdateView(TestCase):
         self.faker = Faker()
         self.user = baker.make(get_user_model())
         self.world = self.model.objects.create(name=self.faker.city(), user=self.user, owner=self.user)
+        self.community_world = self.model.objects.create(name=self.faker.city(), owner=self.user)
         self.url = reverse('roleplay:world_edit', kwargs={'pk': self.world.pk})
         self.data_ok = {
             'name': self.faker.city(),
@@ -490,10 +491,8 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(403, response.status_code)
 
     def test_data_without_image_ok(self):
-        data = {
-            'name': self.faker.city(),
-            'description': self.faker.paragraph()
-        }
+        data = self.data_ok.copy()
+        del data['image']
         self.client.force_login(self.user)
         self.client.post(self.url, data=data)
 
@@ -539,3 +538,17 @@ class TestWorldUpdateView(TestCase):
         with open(self.image_file, 'rb') as image:
             data_image = image.read()
         self.assertEqual(data_image, world_image)
+
+    def test_update_community_world_ok(self):
+        self.client.force_login(self.user)
+        url = reverse('roleplay:world_edit', kwargs={'pk': self.community_world.pk})
+        data = self.data_ok.copy()
+        # TODO: Figure out why image is failing
+        del data['image']
+        self.client.post(url, data=data)
+
+        self.community_world.refresh_from_db()
+        self.assertEqual(data['name'], self.community_world.name)
+        self.assertEqual(data['description'], self.community_world.description)
+        self.assertEqual(self.user, self.community_world.owner)
+        self.assertIsNone(self.community_world.user)

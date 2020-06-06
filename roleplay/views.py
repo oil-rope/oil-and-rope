@@ -136,12 +136,11 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        user = self.request.user
         kwargs.update({
-            'user': user,
-            'owner': user,
+            'owner': self.object.owner,
             'submit_text': _('Update')
         })
+
         return kwargs
 
 
