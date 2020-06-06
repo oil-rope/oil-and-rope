@@ -474,3 +474,14 @@ class TestWorldUpdateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(403, response.status_code)
+
+    def test_data_without_image_ok(self):
+        data = {
+            'name': self.faker.city(),
+            'description': self.faker.paragraph()
+        }
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data)
+
+        self.assertEqual(data['name'], self.world.name)
+        self.assertEqual(data['description'], self.world.description)
