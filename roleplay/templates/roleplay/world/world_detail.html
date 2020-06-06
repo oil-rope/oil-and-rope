@@ -2,6 +2,34 @@
 {% load static %}
 {% load i18n %}
 
+{% block css %}
+<style>
+  /* Styles for SVG */
+  #treeView {
+    min-height: 400px;
+    min-width: 600px;
+    width: 100%;
+  }
+
+  #treeView path {
+    fill: none;
+    stroke: var(--gray-dark);
+  }
+
+  /* Text glow */
+  #treeView text {
+    text-shadow:
+    -.1rem -.1rem 5px var(--extra),
+    -.1rem .1rem 5px var(--extra),
+    .1rem -.1rem 5px var(--extra),
+    .1rem .1rem 5px var(--extra);
+    /* Cursor pointer for future 'onclick' go to edit */
+    /* cursor: pointer; */
+    pointer-events: none;
+  }
+</style>
+{% endblock css %}
+
 {% block title %}{{ object.name }} {% trans 'Detail' %}{% endblock title %}
 
 {% block breadcrumb %}
@@ -10,14 +38,17 @@
 
 {% block body_content %}
   <main class="container">
-    <div class="row">
-      <section id="treeView"></section>
-      {% comment %}
-      {% include 'common/include/tree.html' with tree=world_structure only %}
-      {% endcomment %}
+    <h3 class="font-ds-lighter text-center">{{ object.name }}</h3>
+    <hr class="mx-2">
+    <div class="row overflow-hidden">
+      <svg id="treeView"></svg>
     </div>
   </main>
 {% endblock body_content %}
 {% block javascript %}
-  <script src="{% static 'frontend/dist/TreeView.bundle.js' %}"></script>
+  <!-- D3 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+
+  {% url 'roleplay:place-detail' object.pk as placeApiUrl %}
+  <script place-api-url="{{ placeApiUrl }}" source-view-element="#treeView" src="{% static 'roleplay/js/places/listWorlds.js' %}"></script>
 {% endblock javascript %}
