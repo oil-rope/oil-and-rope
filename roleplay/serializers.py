@@ -10,4 +10,4 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ('name', 'description', 'site_type', 'user', 'owner')
+        fields = ('name', 'description', 'site_type', 'parent_site', 'user', 'owner')

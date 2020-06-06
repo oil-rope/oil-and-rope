@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{{ object.name }} {% trans 'Detail' %}{% endblock title %}
@@ -10,7 +11,13 @@
 {% block body_content %}
   <main class="container">
     <div class="row">
+      <section id="treeView"></section>
+      {% comment %}
       {% include 'common/include/tree.html' with tree=world_structure only %}
+      {% endcomment %}
     </div>
   </main>
 {% endblock body_content %}
+{% block javascript %}
+  <script src="{% static 'frontend/dist/TreeView.bundle.js' %}"></script>
+{% endblock javascript %}

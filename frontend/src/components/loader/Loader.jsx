@@ -1,7 +1,7 @@
 import React from "react";
 import Spinner from "react-bootstrap/Spinner";
 
-function Loader() {
+const Loader = () => {
 	return (
 		<div data-testid="testLoader" className="d-flex justify-content-around">
 			<div>{`${gettext("Loading")}...`}</div>
