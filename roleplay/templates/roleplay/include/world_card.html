@@ -13,35 +13,47 @@
     </p>
   </div>
   <div class="card-body">
-    <div class="btn-group dropright">
-      <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-outline-secondary"
-         role="button">{% trans "View" %}
-      </a>
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
-              id="world_{{ world.pk }}_actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-              data-reference="parent">
-        <span class="sr-only">{% trans "Show actions" %}</span>
-      </button>
-      <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
-        <a href="#no-url" class="dropdown-item">
-          <span class="ic-quill"></span>
-          {% trans "Create campaign" %}
-        </a>
+    <div class="container">
+      <div class="row">
+
         {% if world.owner == user %}
-          <a href="#no-url" class="dropdown-item">
-            <span class="ic-city"></span>
-            {% trans "Create city" %}
-          </a>
-          <a href="#no-url" class="dropdown-item">
-            <span class="ic-cogs"></span>
-            {% trans "Settings" %}
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
-            <span class="ic-trash text-danger"></span>
-            {% trans "Delete" %} {% trans "world" %}
+          <a href="#no-url" class="btn btn-primary disabled">
+            <i class="ic ic-edit"></i>
+            {% trans "Edit" %}
           </a>
         {% endif %}
+        <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra ml-1">
+          <i class="ic ic-world"></i>
+          {% trans "View details" %}
+        </a>
+        <div class="btn-group dropright align-self-end ml-auto">
+          <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+            <i class="ic ic-dots-horizontal-triple"></i>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
+            <a href="#no-url" class="dropdown-item disabled">
+              <span class="ic-quill"></span>
+              {% trans "Create campaign" %}
+            </a>
+            {% if world.owner == user %}
+              <a href="#no-url" class="dropdown-item disabled">
+                <span class="ic-city"></span>
+                {% trans "Create city" %}
+              </a>
+              <a href="#no-url" class="dropdown-item disabled">
+                <span class="ic-cogs"></span>
+                {% trans "Settings" %}
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
+                <span class="ic-trash text-danger"></span>
+                {% trans "Delete" %} {% trans "world" %}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

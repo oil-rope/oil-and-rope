@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Oil-and-Rope';
-  src:  url('fonts/Oil-and-Rope.eot?mw4qud');
-  src:  url('fonts/Oil-and-Rope.eot?mw4qud#iefix') format('embedded-opentype'),
-    url('fonts/Oil-and-Rope.ttf?mw4qud') format('truetype'),
-    url('fonts/Oil-and-Rope.woff?mw4qud') format('woff'),
-    url('fonts/Oil-and-Rope.svg?mw4qud#Oil-and-Rope') format('svg');
+  src:  url('fonts/Oil-and-Rope.eot?y5b6vj');
+  src:  url('fonts/Oil-and-Rope.eot?y5b6vj#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?y5b6vj') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?y5b6vj') format('woff'),
+    url('fonts/Oil-and-Rope.svg?y5b6vj#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ic-dots-horizontal-triple:before {
+  content: "\e91b";
+}
+.ic-menu-thin:before {
+  content: "\e917";
+}
 .ic-circle-cross-thin:before {
   content: "\e918";
 }
@@ -34,11 +40,11 @@
 .ic-discord:before {
   content: "\e916";
 }
-.ic-circle-cross:before {
-  content: "\e917";
-}
 .ic-connect:before {
   content: "\e910";
+}
+.ic-menu:before {
+  content: "\e91a";
 }
 .ic-dice:before {
   content: "\e915";

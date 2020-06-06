@@ -17,21 +17,22 @@ class WorldForm(forms.ModelForm):
             Row(
                 Column(
                     Field('name', placeholder='Middle-Earth, Narnia, Argos...'),
-                    css_class='col-12'
+                    css_class='col-12 col-lg-7'
                 ),
                 Column(
                     Field('description',
                           placeholder=_('Write something about your world, its civilizations, its culture...')),
-                    css_class='col-12'
+                    css_class='col-12 col-lg-7'
                 ),
                 Column(
                     Field('image'),
-                    css_class='col-12'
-                )
+                    css_class='col-12 col-lg-7'
+                ),
+                css_class='justify-content-lg-around'
             ),
             Row(
-                Submit('submit', _('Create'), css_class='btn btn-extra col-5 col-xl-6'),
-                Reset('reset', _('Clean'), css_class='btn btn-dark col-5 d-xl-none'),
+                Submit('submit', _('Create'), css_class='btn btn-primary col-5 col-lg-6'),
+                Reset('reset', _('Clean'), css_class='btn btn-secondary col-5 d-lg-none'),
                 css_class='justify-content-around'
             )
         )
