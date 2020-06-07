@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from common.files.upload import default_upload_to
+from common.validators import validate_file_size
 from core.models import TracingMixin
 
 from . import managers
@@ -142,7 +143,8 @@ class Place(MPTTModel, TracingMixin):
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
     site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SITE_TYPES, default=TOWN,
                                                  null=False, blank=False)
-    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
+    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True,
+                              validators=[validate_file_size])
     parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
                                  related_name='children_sites', db_index=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places', verbose_name=_('User'),

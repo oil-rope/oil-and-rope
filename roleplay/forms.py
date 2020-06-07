@@ -3,6 +3,7 @@ from crispy_forms.layout import Column, Field, Layout, Reset, Row, Submit
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from common.files import utils
 from . import models
 
 
@@ -41,7 +42,9 @@ class WorldForm(forms.ModelForm):
         exclude = ('user', 'parent_site', 'site_type', 'owner')
         model = models.Place
         help_texts = {
-            'image': _('A picture is worth a thousand words') + '.'
+            'image': '{}. {} {} MiB.'.format(
+                _('A picture is worth a thousand words'), _('Max size file'), utils.max_size_file_mb()
+            )
         }
 
     def save(self, commit=True):

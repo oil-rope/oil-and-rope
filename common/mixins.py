@@ -1,4 +1,4 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
@@ -15,10 +15,12 @@ class OwnerRequiredMixin(SingleObjectMixin, View):
         if not self.request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
 
+        if not self.owner_attr:
+            raise ImproperlyConfigured('OwnerRequiredMixin requires a definition of \'owner_attr\'.')
+
         # Checking for owner
         obj = self.get_object()
-        if not hasattr(obj, self.owner_attr):
-            return
-        if self.request.user == getattr(obj, self.owner_attr):
-            return super().dispatch(request, *args, **kwargs)
-        raise PermissionDenied
+        if self.request.user != getattr(obj, self.owner_attr):
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)

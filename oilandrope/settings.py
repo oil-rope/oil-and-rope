@@ -223,6 +223,16 @@ LOGOUT_REDIRECT_URL = 'registration:login'
 MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(BASE_DIR, 'media/'))
 MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 
+# The maximum size (in bytes)
+# https://docs.djangoproject.com/en/3.0/ref/settings/#file-upload-max-memory-size
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 3145728
+
+# The maximum size in bytes that a request body may be
+# https://docs.djangoproject.com/en/3.0/ref/settings/#data-upload-max-memory-size
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
+
 # CKEditor
 # https://django-ckeditor.readthedocs.io/en/latest/#optional-customizing-ckeditor-editor
 
