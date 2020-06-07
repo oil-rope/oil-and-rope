@@ -1,12 +1,10 @@
 import random
-from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
-
+from django.test import RequestFactory, TestCase
 from model_bakery import baker
 
 from common import mixins

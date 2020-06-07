@@ -1,4 +1,4 @@
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
