@@ -1,6 +1,5 @@
 import json
 import os
-import pathlib
 import tempfile
 from io import StringIO
 
@@ -15,6 +14,7 @@ from dynamic_menu.models import DynamicMenu
 class TestLoadMenuCommand(TestCase):
 
     def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', dir='./tests/', delete=False)
         self.data = [
             {
                 'name': 'First Menu',
@@ -41,38 +41,32 @@ class TestLoadMenuCommand(TestCase):
                 'menu_type': DynamicMenu.MAIN_MENU,
             }
         ]
+
+        self.json_file = self.tmp_file.name
+        with open(self.json_file, 'w') as f:
+            json.dump(self.data, f)
         self.faker = Faker()
 
-    @classmethod
-    def setUpClass(cls):
-        cls.json_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', dir='./tests/', delete=False)
-
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         # Cleaning
-        cls.json_file.close()
-        os.unlink(cls.json_file.name)
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
 
     def test_syntax_ok(self):
         out = StringIO()
-        json_file = self.json_file.name
+        json_file = self.json_file
         call_command('load_menu', json_file, stdout=out)
         msg = 'Menu initialized.\n'
         self.assertEqual(msg, out.getvalue())
 
     def test_load_data_ok(self):
-        json_data = json.dumps(self.data)
-        json_file = self.json_file.name
-        json_file = pathlib.Path(json_file)
-        json_file.write_text(json_data)
-
-        call_command('load_menu', str(json_file))
+        call_command('load_menu', self.json_file)
 
         entries = DynamicMenu.objects.count()
         expected_len = 4
-        self.assertEqual(expected_len, entries, 'Menu entries weren\'t correctly created.')
+        self.assertEqual(expected_len, entries, 'Menu entries were not correctly created.')
 
-    def test_load_inexistent_file_ko(self):
+    def test_load_non_existent_file_ko(self):
         json_file = self.faker.file_name(category='text', extension='json')
         with self.assertRaises(CommandError) as ex:
             call_command('load_menu', json_file)

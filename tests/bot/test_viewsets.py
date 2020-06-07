@@ -26,7 +26,7 @@ class TestDiscordServerViewSet(TestCase):
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
-        self.assertEqual(401, response.status_code, 'Anonymous user can access.')
+        self.assertEqual(403, response.status_code, 'Anonymous user can access.')
 
     def test_post_request_ko(self):
         self.client.force_authenticate(user=self.user)
@@ -72,7 +72,7 @@ class TestDiscordTextChannelViewSet(TestCase):
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
-        self.assertEqual(401, response.status_code, 'Anonymous user can access.')
+        self.assertEqual(403, response.status_code, 'Anonymous user can access.')
 
     def test_post_request_ko(self):
         self.client.force_authenticate(user=self.user)

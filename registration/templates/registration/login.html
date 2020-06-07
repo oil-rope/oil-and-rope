@@ -5,25 +5,69 @@
 
 {% block title %}{% trans "Login" %}{% endblock title %}
 
+{% block css %}
+  <style>
+    #cover {
+      background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url('{% static 'img/cover-min.png' %}');
+      background-position: center top;
+    }
+
+    /*
+     * Because of the background image we need a different border and focus color
+     */
+    #loginForm input {
+      border-color: var(--primary);
+    }
+
+    #loginForm input:focus {
+      border-color: var(--extra);
+    }
+  </style>
+{% endblock css %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' no_separation=True %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
-<main class="container p-sm-5 px-lg-2">
-  <div class="row align-items-lg-center shadow-lg">
+  <main class="container-fluid">
 
-    <div class="col-lg-7 col-xl-8 bg-extra p-4 order-lg-last">
-      <h2 class="display-4 text-center text-white">{% trans "Welcome to Oil &amp; Rope!" %}</h2>
-      <hr>
-      <p class="d-none d-md-block">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda deleniti quidem mollitia tenetur sunt sint ab commodi nihil sed? Molestiae porro reiciendis enim, dicta consequuntur asperiores accusantium eligendi neque quod?
-        Ab laudantium eius doloremque saepe culpa et similique ipsa obcaecati, reiciendis eveniet veritatis dolore sed sint maxime inventore eaque corrupti, perferendis ea placeat, provident cum minus id omnis vitae. Hic.
-        Pariatur repellendus maxime quaerat, omnis minima delectus adipisci accusamus voluptatibus ex quasi, numquam dolores ratione natus? Explicabo, voluptatum ullam ea neque quidem assumenda ipsum debitis deleniti ut ipsam odio vero!
-        Inventore, esse ab illo, modi mollitia vero adipisci repellat eveniet quos distinctio maiores laborum blanditiis, necessitatibus molestias enim iure odit natus voluptatem possimus repellendus facilis expedita! Eius laboriosam corporis fugit.
-      </p>
+    <div id="cover" class="row min-vh-100 cover justify-content-lg-center">
+      <!-- Presentation -->
+      <div class="col-12 text-center pt-3">
+        <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="Oil & Rope Logo">
+        <h2 class="display-3 text-white font-ds-bold">
+          Oil &amp; Rope
+        </h2>
+      </div>
+
+      <!-- Form -->
+      <div class="col-12 col-xl-6">
+        {% crispy form %}
+      </div>
+
+      <!-- Join -->
+      <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0">
+        <p class="lead text-white mr-sm-3 mb-md-0">
+          {% trans "Don't have an account?" %}
+        </p>
+        <a class="lead" href="{% url 'registration:register' %}">{% trans "Join now" %}!</a>
+      </div>
+
+      <!-- Arrow -->
+      <div class="fixed-bottom text-right px-3" id="goto-arrow">
+        <a href="{% url 'registration:login' %}#about-us" class="lead text-white" style="font-size: 2rem">
+          <i class="ic ic-arrow-down"></i>
+        </a>
+      </div>
     </div>
 
-    <div class="col-lg-5 col-xl-4 p-3">
-      {% crispy form %}
+    <div class="row no-gutters">
+      <div class="col-12">
+        {% include 'core/includes/about_us.html' %}
+      </div>
     </div>
 
-  </div>
-</main>
+
+  </main>
 {% endblock body_content %}

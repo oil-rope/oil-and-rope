@@ -1,0 +1,49 @@
+@import "../../bootstrap/scss/functions"
+@import "../../bootstrap/scss/variables"
+@import "../../bootstrap/scss/mixins/breakpoints"
+@import "variables"
+
+.tree-container
+
+  .tree-list
+    display: flex
+    flex-direction: row
+    justify-content: center
+    list-style: none
+    text-align: center
+
+    .tree-element
+      display: flex
+      flex-direction: column
+      align-content: center
+
+      .tree-node
+        border-color: theme-color()
+        border-style: solid
+        border-width: 1px
+        padding: $spacer
+        transition: box-shadow .3s
+
+        &:hover
+          text-decoration: none
+
+          &, &+.tree-list .tree-element .tree-node
+            box-shadow: 0 0 10px theme-color("extra")
+
+    @each $color in map-keys($theme-colors)
+      &-#{$color}
+        .tree-element
+          .tree-node
+            border-color: theme-color($color)
+
+.tree-responsive
+  @each $breakpoint in map-keys($grid-breakpoints)
+    $next: breakpoint-next($breakpoint, $grid-breakpoints)
+    $infix: breakpoint-infix($next, $grid-breakpoints)
+
+    &#{$infix}
+      @include media-breakpoint-down($breakpoint)
+        display: block
+        width: 100%
+        overflow-x: auto
+        -webkit-overflow-scrolling: touch

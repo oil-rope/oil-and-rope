@@ -1,0 +1,32 @@
+# Database Configuration
+export DB_NAME=oilandrope
+export DB_HOST=postgres_db
+export DB_PORT=5432
+export DB_USER=postgres
+export DB_PASSWORD=p4ssw0rd@
+
+# Django
+export DJANGO_SETTINGS_MODULE=oilandrope.settings
+# This one is special because of the special characters
+export SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo"
+export ALLOWED_HOSTS=*
+export WS_HOST=localhost:8000
+export DEBUG=True
+
+# Gunicorn
+export GUNICORN_ACCESS_LOGFILE=/var/log/gunicorn/oilandrope_access.log
+export GUNICORN_ERROR_LOGFILE=/var/log/gunicorn/oilandrope_error.log
+export GUNICORN_CONFIG_FILE=oilandrope.gunicorn_conf
+export GUNICORN_IP=0.0.0.0
+export GUNICORN_PORT=80
+export GUNICORN_SOCK=/var/run/gunicorn/oilandrope.sock
+export GUNICORN_WSGI_MODULE=oilandrope.wsgi
+export GUNICORN_CERTFILE=/var/certificates/certificate.cert
+export GUNICORN_KEYFILE=/var/certificates/certificate.key
+
+# Daphne
+export DAPHNE_ACCESS_LOGFILE=/var/log/daphne/oilandrope_access.log
+export DAPHNE_ERROR_LOGFILE=/var/log/daphne/oilandrope_error.log
+export DAPHNE_ASGI_MODULE=oilandrope.asgi
+export DAPHNE_PORT=80
+export DAPHNE_SOCKET=/var/run/daphne/oilandrope.sock

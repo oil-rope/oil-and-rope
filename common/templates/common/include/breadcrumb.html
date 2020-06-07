@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load string_utils %}
+
+{% with actual_path=actual_path|default:request.path %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb rounded-0 bg-dark text-light {% if no_separation|default:False %}mb-0{% endif %}">
+      {% url 'core:index' as home %}
+      {% if actual_path == home %}
+        <li class="breadcrumb-item active" aria-current="page">
+          {% trans "Home" %}
+        </li>
+      {% else %}
+        <li class="breadcrumb-item">
+          <a class="text-light" href="{{ home }}">
+            {% trans "Home" %}
+          </a>
+        </li>
+      {% endif %}
+      {% if breadcrumbs %}
+        {% with breadcrumbs=breadcrumbs|generate_breadcrumbs %}
+          {% for breadcrumb, breadcrumb_url in breadcrumbs.items %}
+            {% if forloop.last %}
+              <li class="breadcrumb-item active" aria-current="page">
+                {% trans breadcrumb %}
+              </li>
+            {% else %}
+              <li class="breadcrumb-item" aria-current="page">
+                <a href="{{ breadcrumb_url }}" class="text-light">
+                  {% trans breadcrumb %}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+      {% endif %}
+    </ol>
+  </nav>
+{% endwith %}

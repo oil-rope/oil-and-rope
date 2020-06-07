@@ -22,17 +22,11 @@ class TestOilAndRopeBot(TestCase):
             'BOT_COMMAND_PREFIX': self.faker.word(),
             'BOT_TOKEN': self.faker.password()
         }
+        self.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
 
-    @classmethod
-    def setUpClass(cls):
-        # Creating temporary file
-        cls.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
-
-    @classmethod
-    def tearDownClass(cls):
-        # Cleaning
-        cls.env_file.close()
-        os.unlink(cls.env_file.name)
+    def tearDown(self):
+        self.env_file.close()
+        os.unlink(self.env_file.name)
 
     def test_init_ok(self):
         with patch.dict('os.environ', self.env_variables):
@@ -55,10 +49,10 @@ class TestOilAndRopeBot(TestCase):
             self.assertEqual(self.env_variables['BOT_COMMAND_PREFIX'], bot.command_prefix)
             self.assertEqual(self.env_variables['BOT_TOKEN'], bot.token)
 
-    def test_init_with_unexistent_env_file_ko(self):
+    def test_init_with_non_existent_env_file_ko(self):
         # Random file
         env_file = self.faker.file_name(category='text', extension='env')
-        msg = 'Env file doesn\'t exist.'
+        msg = 'Env file does not exist.'
 
         with self.assertRaises(OilAndRopeException) as ex:
             self.bot_class(env_file=env_file)

@@ -20,7 +20,6 @@ eggs/
 .eggs/
 lib/
 lib64/
-node_modules/
 parts/
 sdist/
 var/
@@ -57,9 +56,10 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 *.sqlite3
+/media/
+/static/
 
 # Flask stuff:
 instance/
@@ -87,13 +87,15 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Environment Variables config for direnv
+.envrc
 
 # Spyder project settings
 .spyderproject
@@ -187,7 +189,6 @@ web_modules/
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
-.cache
 .parcel-cache
 
 # Next.js build output
@@ -227,6 +228,16 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
+
+# Sass
+.sass-cache/
+*.css.map
+*.sass.map
+*.scss.map
+
+# TypeScript compiled
+*.ts.map
+*.js.map
 
 # IDE stuff
 .vscode/

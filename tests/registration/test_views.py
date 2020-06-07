@@ -156,7 +156,7 @@ class TestSignUpView(TestCase):
             self.client.post(self.url, data=self.data_ok, follow=True)
             self.assertTrue(len(mail.outbox) == 1, 'Email wasn\'t sent.')
 
-    def test_wrong_confim_password(self):
+    def test_wrong_confirm_password(self):
         data_ko = self.data_ok.copy()
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)

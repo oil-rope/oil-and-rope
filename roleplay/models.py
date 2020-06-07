@@ -1,8 +1,11 @@
-from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, models
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from common.files.upload import default_upload_to
+from common.validators import validate_file_size
 from core.models import TracingMixin
 
 from . import managers
@@ -69,6 +72,10 @@ class Place(MPTTModel, TracingMixin):
         Path to the image.
     parent_site: :class:`int`
        If the place is child of another Place, this is where it can be settled.
+    user: :class:`auth.User`
+        Declares this maps belongs to a user.
+    owner: :class:`auth.User`
+        The person who created this map.
     """
 
     HOUSE = 0
@@ -111,15 +118,51 @@ class Place(MPTTModel, TracingMixin):
         (WORLD, _('World'))
     )
 
+    ICON_RESOLVERS = {
+        HOUSE: '',
+        TOWN: 'ic-town',
+        VILLAGE: '',
+        CITY: 'ic-city',
+        METROPOLIS: '',
+        FOREST: '',
+        HILLS: '',
+        MOUNTAINS: '',
+        MINES: '',
+        RIVER: '',
+        SEA: '',
+        DESERT: '',
+        TUNDRA: '',
+        UNUSUAL: '',
+        ISLAND: '',
+        COUNTRY: 'ic-flag',
+        CONTINENT: '',
+        WORLD: 'ic-world'
+    }
+
     name = models.CharField(verbose_name=_('Name'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
     site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SITE_TYPES, default=TOWN,
                                                  null=False, blank=False)
-    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
+    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True,
+                              validators=[validate_file_size])
     parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
-                                 related_name='children_sites')
+                                 related_name='children_sites', db_index=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places', verbose_name=_('User'),
+                             blank=True, null=True, db_index=True)
+    owner = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name='places_owned',
+                              verbose_name=_('Owner'), blank=True, null=True, db_index=True)
 
     objects = managers.PlaceManager()
+
+    def images(self):
+        images = []
+        if self.image:
+            images.extend([self.image])
+        images.extend([obj.image for obj in self.get_descendants().filter(image__isnull=False) if obj.image])
+        return images
+
+    def resolve_icon(self):
+        return '<span class="{}"></span>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
 
     def get_houses(self):
         return self.get_descendants().filter(site_type=self.HOUSE)
@@ -254,6 +297,17 @@ class Place(MPTTModel, TracingMixin):
         verbose_name = _('Place')
         verbose_name_plural = _('Places')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
+
+    def clean(self):
+        if self.user and not self.owner:
+            raise ValidationError({
+                'user': _('A private world must have owner') + '.'
+            })
+
+    def save(self, *args, **kwargs):
+        if self.user and not self.owner:
+            raise IntegrityError(_('A private world must have owner') + '.')
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

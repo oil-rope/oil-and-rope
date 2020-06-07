@@ -23,66 +23,52 @@ class LoginForm(AuthenticationForm):
     Custom form to render with Crispy.
     """
 
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.id = 'loginForm'
-        self.helper.form_class = 'container-fluid'
+        self.helper.form_id = 'loginForm'
+        self.helper.field_class = 'form-text-white'
+        self.helper.label_class = 'text-white'
         self.helper.layout = Layout(
             Row(
-                Column(
-                    Field(
-                        'username',
-                        placeholder=_('Username'),
-                        css_class=self.custom_classes,
-                    ),
-                    css_class='col-12'
-                ),
+                Column('username', css_class='col-12'),
+                Column('password', css_class='col-12'),
             ),
             Row(
                 Column(
-                    Field(
-                        'password',
-                        placeholder=_('Password'),
-                        css_class=self.custom_classes,
-                    ),
-                    css_class='col-12'
-                ),
-            ),
-            Row(
-                Column(
-                    Submit('login', _('Login'), css_class='btn-extra w-100'),
-                    css_class='col-12 col-lg-6'
+                    Submit('login', _('Login'), css_class='btn btn-lg text-white w-100'),
+                    css_class='col-6'
                 ),
                 Column(
-                    HTML(
-                        '<a class="col-lg-8 btn-link" href="{url}">{text}</a>'.format(
-                            url=reverse('registration:resend_email'),
-                            text=_('Send confirmation email')
+                    Div(
+                        Row(
+                            HTML(
+                                '<a class="mr-lg-5" href="{url}">{text}</a>'.format(
+                                    url='#no-url',
+                                    text=_('Forgot password?')
+                                )
+                            ),
+                            HTML(
+                                '<a class="" href="{url}">{text}</a>'.format(
+                                    url=reverse('registration:resend_email'),
+                                    text=_('Resend email')
+                                )
+                            ),
+                            css_class='row justify-content-sm-between justify-content-lg-center \
+                                        align-items-center h-100'
                         ),
+                        css_class='container-fluid h-100'
                     ),
-                    css_class='col-12 col-lg-6'
+                    css_class='col-6'
                 ),
             ),
         )
-
-        self._clean_labels()
-
-    def _clean_labels(self):
-        for field in self.fields:
-            self.fields[field].label = ''
 
 
 class SignUpForm(UserCreationForm):
     """
     User registration form.
     """
-
-    button_classes = 'btn btn-info'
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-extra btn-lg'
 
     discord_id = forms.CharField(
         label=_('Discord Identifier'),
@@ -102,29 +88,29 @@ class SignUpForm(UserCreationForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field('username', css_class=self.custom_classes),
+                    'username',
                     css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 Column(
-                    Field('email', css_class=self.custom_classes),
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                css_class='justify-content-xl-between'
-            ),
-            Row(
-                Column(
-                    Field('password1', css_class=self.custom_classes),
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                Column(
-                    Field('password2', css_class=self.custom_classes),
+                    'email',
                     css_class='col-12 col-lg-6 col-xl-5'
                 ),
                 css_class='justify-content-xl-between'
             ),
             Row(
                 Column(
-                    Field('discord_id', css_class=self.custom_classes),
+                    'password1',
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                Column(
+                    'password2',
+                    css_class='col-12 col-lg-6 col-xl-5'
+                ),
+                css_class='justify-content-xl-between'
+            ),
+            Row(
+                Column(
+                    'discord_id',
                     css_class='col-12 col-md-8 col-lg-6 col-xl-5'
                 ),
                 Column(
@@ -141,7 +127,7 @@ class SignUpForm(UserCreationForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Register'), css_class=self.submit_classes + ' w-100'),
+                    Submit('submit', _('Register'), css_class='btn-lg w-100'),
                     css_class='col-12 col-xl-6'
                 ),
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
@@ -149,7 +135,7 @@ class SignUpForm(UserCreationForm):
         )
 
     def _resolve_consumer_url(self):
-        consumer_url = 'ws://' if settings.DEBUG else 'wss://'
+        consumer_url = 'wss://' if self.request.is_secure() else 'ws://'
         consumer_url += settings.WS_HOST if settings.WS_HOST else self.request.get_host()
         consumer_url += reverse('bot_ws:register')
         return consumer_url
@@ -176,7 +162,7 @@ class SignUpForm(UserCreationForm):
         """
 
         if not required_fields:
-            required_fields = ('email', )
+            required_fields = ('email',)
         for field in required_fields:
             self.fields[field].required = True
 

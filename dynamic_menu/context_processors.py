@@ -54,6 +54,10 @@ def menus(request) -> dict:
             request.COOKIES['_auth_user_menu_referrer'] = None
             context_menus = models.DynamicMenu.objects.none()
             logging.warning('Trying to access an non-existent menu.\n%s', ex)
+        except ValueError as ex:
+            request.COOKIES['_auth_user_menu_referrer'] = None
+            context_menus = models.DynamicMenu.objects.none()
+            logging.warning('Trying to access an non-existent menu.\n%s', ex)
     else:
         context_menus = models.DynamicMenu.objects.none()
 

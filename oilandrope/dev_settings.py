@@ -5,7 +5,10 @@ SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if 'ALLOWED_HOSTS' in os.environ:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oil-and-rope.herokuapp.com').split(',')
+else:
+    ALLOWED_HOSTS = []
 
 INTERNAL_IPS = (
     '127.0.0.1',
@@ -21,7 +24,10 @@ DATABASES = {
     },
 }
 
-INSTALLED_APPS += ('django_extensions', )
+INSTALLED_APPS.insert(0, 'django_pdb')
+INSTALLED_APPS.append('django_extensions', )
+
+MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
 
 EMAIL_HOST = 'smtp.mailtrap.io'
 EMAIL_HOST_USER = '1d1194c55c4145'

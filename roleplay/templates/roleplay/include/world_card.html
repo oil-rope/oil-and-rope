@@ -1,0 +1,71 @@
+{% load i18n %}
+{% load static %}
+
+<div class="card h-100">
+  <div class="card-header">
+    {% include 'roleplay/include/world_image_carousel.html' with world=world only %}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title text-center">{{ world.name }}</h5>
+    <hr class="w-50">
+    <p class="card-text text-justify">
+      {{ world.description|truncatechars_html:250|default:_("No description provided")|add:"." }}
+    </p>
+  </div>
+  <div class="card-body">
+    <div class="container">
+      <div class="row">
+
+        <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra mr-1">
+          <i class="ic ic-world"></i>
+          {% trans "View details" %}
+        </a>
+        {% if world.owner == user %}
+          <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary ml-1">
+            <i class="ic ic-edit"></i>
+            {% trans "Edit" %}
+          </a>
+        {% endif %}
+        <div class="btn-group dropright align-self-end ml-auto">
+          <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+            <i class="ic ic-dots-horizontal-triple"></i>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
+            <a href="#no-url" class="dropdown-item disabled">
+              <span class="ic-quill"></span>
+              {% trans "Create campaign" %}
+            </a>
+            {% if world.owner == user %}
+              <a href="#no-url" class="dropdown-item disabled">
+                <span class="ic-city"></span>
+                {% trans "Create city" %}
+              </a>
+              <a href="#no-url" class="dropdown-item disabled">
+                <span class="ic-cogs"></span>
+                {% trans "Settings" %}
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
+                <span class="ic-trash text-danger"></span>
+                {% trans "Delete" %} {% trans "world" %}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <p class="text-muted text-center">
+      {% with sessions=0 %}
+        {% blocktrans count counter=sessions %}
+          Used in {{ sessions }} session
+        {% plural %}
+          Used in {{ sessions }} sessions
+        {% endblocktrans %}
+      {% endwith %}
+    </p>
+  </div>
+</div>

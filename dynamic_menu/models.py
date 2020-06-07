@@ -50,7 +50,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
     extra_urls_args: Optional[:class:`str`]
         Extra information or params to add to URL.
         >>> # Whatever PKs uses
-        >>> obj = DinamyMenu.objects.get(pk=pk)
+        >>> obj = DynamicMenu.objects.get(pk=1)
         >>> param = '?extra_param=true'
         >>> obj.extra_url_args = param
         >>> obj.save()
@@ -151,12 +151,12 @@ class DynamicMenu(MPTTModel, TracingMixin):
 
         # Adding prepended_text
         if self.prepended_text:
-            menu_str = mark_safe(self.prepended_text)
+            menu_str = mark_safe(self.prepended_text) + '  '
         # Menu name
         menu_str += self.name
         # Adding appended_text
         if self.appended_text:
-            menu_str += mark_safe(self.appended_text)
+            menu_str += '  ' + mark_safe(self.appended_text)
 
         return menu_str
 
