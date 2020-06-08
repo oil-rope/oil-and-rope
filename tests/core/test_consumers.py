@@ -3,7 +3,7 @@ import pytest
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from django.urls import path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from core.consumers import HandlerJsonWebsocketConsumer
 
