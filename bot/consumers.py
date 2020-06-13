@@ -13,6 +13,10 @@ class BotConsumer(HandlerJsonWebsocketConsumer):
 
     async def check_user(self, content):
         discord_id = content.get('discord_id', None)
-        exists = DiscordUser.objects.filter(id=discord_id).exists()
+        try:
+            DiscordUser.objects.get(id=discord_id)
+            exists = True
+        except DiscordUser.DoesNotExist:
+            exists = False
         content = {'exists': exists}
         await self.send_json(content)

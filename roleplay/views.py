@@ -10,24 +10,25 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
 
-from . import forms, models
+from . import enums, forms, models
 
 LOGGER = logging.getLogger(__name__)
 
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
+    enum = enums.SiteTypes
     model = models.Place
     paginate_by = 9
     user_worlds_page_kwarg = 'page_user_worlds'
-    queryset = models.Place.objects.filter(site_type=models.Place.WORLD)
+    queryset = models.Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'
 
     def get_user_worlds(self):
         user = self.request.user
-        return self.model.objects.user_places(user=user.id).filter(site_type=self.model.WORLD)
+        return self.model.objects.user_places(user=user.id).filter(site_type=self.enum.WORLD)
 
     def get_community_worlds(self):
-        return self.model.objects.community_places().filter(site_type=self.model.WORLD)
+        return self.model.objects.community_places().filter(site_type=self.enum.WORLD)
 
     def paginate_user_worlds(self, page_size):
         queryset = self.get_user_worlds()

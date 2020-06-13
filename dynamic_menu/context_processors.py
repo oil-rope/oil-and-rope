@@ -4,6 +4,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from . import models
+from .enums import MenuTypes
 
 
 def menus(request) -> dict:
@@ -34,7 +35,7 @@ def menus(request) -> dict:
         Q(permissions_required__in=user_permissions) | Q(
             permissions_required__isnull=True),
     )
-    qs = qs.filter(menu_type=models.DynamicMenu.MAIN_MENU)
+    qs = qs.filter(menu_type=MenuTypes.MAIN_MENU)
     qs = qs.distinct()
 
     # Getting referrer

@@ -3,7 +3,7 @@ import re
 from random import randint
 
 from discord.ext.commands import Cog, command
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 LOGGER = logging.getLogger(__name__)
 

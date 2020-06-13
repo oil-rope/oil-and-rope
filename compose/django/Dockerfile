@@ -11,7 +11,7 @@ RUN apt-get install -y gettext locales vim ruby-sass
 COPY ./pyproject.toml /tmp/pyproject.toml
 COPY ./poetry.lock /tmp/poetry.lock
 RUN pip install poetry
-RUN poetry export -f requirements.txt -o /tmp/requirements.txt
+RUN poetry export --dev -f requirements.txt -o /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 # Installing Node and NPM

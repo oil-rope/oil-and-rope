@@ -11,7 +11,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from bot.models import DiscordUser
 

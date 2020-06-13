@@ -8,12 +8,13 @@ from faker import Faker
 from model_bakery import baker
 from PIL import Image
 
-from roleplay import forms, models
+from roleplay import enums, forms, models
 
 
 class TestWorldForm(TestCase):
     form_class = forms.WorldForm
     model = models.Place
+    enum = enums.SiteTypes
 
     def setUp(self):
         self.faker = Faker()
@@ -68,7 +69,7 @@ class TestWorldForm(TestCase):
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(self.enum.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
@@ -83,7 +84,7 @@ class TestWorldForm(TestCase):
 
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(self.enum.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
@@ -97,7 +98,7 @@ class TestWorldForm(TestCase):
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(self.enum.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
         self.assertIsNone(instance.user)
 
@@ -108,7 +109,7 @@ class TestWorldForm(TestCase):
         self.assertTrue(self.model.objects.filter(pk=instance.pk))
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertEqual(self.model.WORLD, instance.site_type)
+        self.assertEqual(self.enum.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
         self.assertEqual(self.user, instance.user)
         self.assertIsNotNone(instance.image)

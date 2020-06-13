@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 
-from . import models
+from . import enums, models
 
 
 class WorldForm(forms.ModelForm):
@@ -52,5 +52,5 @@ class WorldForm(forms.ModelForm):
         if self.user:
             self.instance.user = self.user
         self.instance.owner = self.owner
-        self.instance.site_type = models.Place.WORLD
+        self.instance.site_type = enums.SiteTypes.WORLD
         return super().save(commit)

@@ -10,16 +10,17 @@ from faker import Faker
 from model_bakery import baker
 from PIL import Image
 
-from roleplay import models, views
+from roleplay import enums, models, views
 
 
 class TestWorldListView(TestCase):
+    model = models.Place
+    enum = enums.SiteTypes
     view = views.WorldListView
 
     def setUp(self):
         self.faker = Faker()
-        self.model = models.Place
-        self.pagination = views.WorldListView.paginate_by
+        self.pagination = self.view.paginate_by
         self.user = baker.make(get_user_model())
         self.url = reverse('roleplay:world_list')
 
@@ -40,7 +41,7 @@ class TestWorldListView(TestCase):
         entries = []
         for _ in range(0, self.pagination):
             entries.append(
-                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
+                self.model.objects.create(name='world_{}'.format(_), site_type=self.enum.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -55,7 +56,7 @@ class TestWorldListView(TestCase):
             another_user_entries.append(
                 self.model.objects.create(
                     name='world_{}'.format(_), user=another_user,
-                    site_type=self.model.WORLD, owner=another_user
+                    site_type=self.enum.WORLD, owner=another_user
                 )
             )
 
@@ -74,7 +75,7 @@ class TestWorldListView(TestCase):
                     name='another_user_world_{}'.format(_),
                     user=another_user,
                     owner=another_user,
-                    site_type=self.model.WORLD
+                    site_type=self.enum.WORLD
                 )
             )
 
@@ -82,7 +83,7 @@ class TestWorldListView(TestCase):
         for _ in range(0, self.pagination):
             user_entries.append(
                 self.model.objects.create(
-                    name='user_world_{}'.format(_), user=self.user, site_type=self.model.WORLD, owner=self.user
+                    name='user_world_{}'.format(_), user=self.user, site_type=self.enum.WORLD, owner=self.user
                 )
             )
 
@@ -104,7 +105,7 @@ class TestWorldListView(TestCase):
             another_user_entries.append(
                 self.model.objects.create(
                     name=self.faker.name(), user=another_user,
-                    site_type=self.model.WORLD, owner=another_user
+                    site_type=self.enum.WORLD, owner=another_user
                 )
             )
 
@@ -113,11 +114,11 @@ class TestWorldListView(TestCase):
             entries.append(
                 self.model.objects.create(
                     name='user_world_{}'.format(_), user=self.user,
-                    site_type=self.model.WORLD, owner=self.user
+                    site_type=self.enum.WORLD, owner=self.user
                 )
             )
             entries.append(
-                self.model.objects.create(name='world_{}'.format(_), site_type=self.model.WORLD)
+                self.model.objects.create(name='world_{}'.format(_), site_type=self.enum.WORLD)
             )
 
         self.client.force_login(self.user)
@@ -137,7 +138,7 @@ class TestWorldListView(TestCase):
 
     def test_correct_community_worlds_are_paginated_ok(self):
         for i in range(0, self.pagination + 1):
-            self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD)
+            self.model.objects.create(name='world_{}'.format(i), site_type=self.enum.WORLD)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?page=1')
         context = response.context
@@ -165,7 +166,7 @@ class TestWorldListView(TestCase):
     def test_correct_user_worlds_are_paginated_ok(self):
         for _ in range(0, self.pagination + 1):
             self.model.objects.create(
-                name='world_{}'.format(_), site_type=self.model.WORLD,
+                name='world_{}'.format(_), site_type=self.enum.WORLD,
                 user=self.user, owner=self.user
             )
         self.client.force_login(self.user)
@@ -192,13 +193,13 @@ class TestWorldListView(TestCase):
         for i in range(0, self.pagination + 1):
             user_worlds.append(
                 self.model.objects.create(
-                    name='world_{}'.format(i), site_type=self.model.WORLD,
+                    name='world_{}'.format(i), site_type=self.enum.WORLD,
                     user=self.user, owner=self.user
                 )
             )
         for _ in range(0, self.pagination):
             community_worlds.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.WORLD)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1&page=1'.format(self.view.user_worlds_page_kwarg))
@@ -230,7 +231,7 @@ class TestWorldListView(TestCase):
 
     def test_last_page_ok(self):
         for i in range(0, self.pagination + 1):
-            self.model.objects.create(name='world_{}'.format(i), site_type=self.model.WORLD)
+            self.model.objects.create(name='world_{}'.format(i), site_type=self.enum.WORLD)
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?page=last')
         context = response.context
@@ -242,6 +243,7 @@ class TestWorldListView(TestCase):
 
 
 class TestWorldCreateView(TestCase):
+    enum = enums.SiteTypes
     model = models.Place
     view = views.WorldCreateView
 
@@ -300,7 +302,7 @@ class TestWorldCreateView(TestCase):
 
         self.assertEqual(data['name'], entry.name)
         self.assertEqual(data['description'], entry.description)
-        self.assertEqual(self.model.WORLD, entry.site_type)
+        self.assertEqual(self.enum.WORLD, entry.site_type)
         self.assertEqual(self.user, entry.owner)
         self.assertIsNone(entry.user)
         self.assertIsNotNone(entry.image)
@@ -321,7 +323,7 @@ class TestWorldCreateView(TestCase):
 
         self.assertEqual(data['name'], entry.name)
         self.assertEqual(data['description'], entry.description)
-        self.assertEqual(self.model.WORLD, entry.site_type)
+        self.assertEqual(self.enum.WORLD, entry.site_type)
         self.assertEqual(self.user, entry.owner)
         self.assertEqual(self.user, entry.user)
         self.assertIsNotNone(entry.image)
