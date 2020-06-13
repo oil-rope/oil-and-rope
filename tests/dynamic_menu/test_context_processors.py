@@ -5,6 +5,7 @@ from faker import Faker
 from model_bakery import baker
 
 from dynamic_menu.models import DynamicMenu
+from dynamic_menu.enums import MenuTypes
 
 
 class TestMenuContextProcessor(TestCase):
@@ -25,14 +26,14 @@ class TestMenuContextProcessor(TestCase):
         self.assertIn('context_menus', response.context, 'Variable \'context_menus\' not found in context.')
 
     def test_context_processor_content_ok(self):
-        main_menus = baker.make(DynamicMenu, 3, menu_type=DynamicMenu.MAIN_MENU)
+        main_menus = baker.make(DynamicMenu, 3, menu_type=MenuTypes.MAIN_MENU)
         response = self.client.get(self.url, follow=True)
         expected = response.context['menus']
         for main_menu in main_menus:
             self.assertIn(main_menu, expected)
 
         parent = main_menus[0]
-        context_menus = baker.make(DynamicMenu, 3, menu_type=DynamicMenu.CONTEXT_MENU, parent=parent)
+        context_menus = baker.make(DynamicMenu, 3, menu_type=MenuTypes.CONTEXT_MENU, parent=parent)
         self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': parent.id})
         response = self.client.get(self.url, follow=True)
         expected = response.context['context_menus']
@@ -40,8 +41,8 @@ class TestMenuContextProcessor(TestCase):
             self.assertIn(context_menu, expected)
 
     def test_access_wrong_menu_referrer_ko(self):
-        main_menu = baker.make(DynamicMenu, menu_type=DynamicMenu.MAIN_MENU)
-        baker.make(DynamicMenu, menu_type=DynamicMenu.CONTEXT_MENU, parent=main_menu)
+        main_menu = baker.make(DynamicMenu, menu_type=MenuTypes.MAIN_MENU)
+        baker.make(DynamicMenu, menu_type=MenuTypes.CONTEXT_MENU, parent=main_menu)
         self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': self.faker.random_int(3, 20)})
         request = self.client.get(self.url, follow=True).wsgi_request
         self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])

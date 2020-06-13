@@ -9,6 +9,7 @@ from django.test import TestCase
 from faker import Faker
 
 from dynamic_menu.models import DynamicMenu
+from dynamic_menu.enums import MenuTypes
 
 
 class TestLoadMenuCommand(TestCase):
@@ -20,17 +21,17 @@ class TestLoadMenuCommand(TestCase):
                 'name': 'First Menu',
                 'name_en': 'First Menu',
                 'name_es': 'Primer Menú',
-                'menu_type': DynamicMenu.MAIN_MENU,
+                'menu_type': MenuTypes.MAIN_MENU,
                 'children': [{
                         'name': 'First Submenu',
                         'name_en': 'First Submenu',
                         'name_es': 'Primer Submenú',
-                        'menu_type': DynamicMenu.MAIN_MENU,
+                        'menu_type': MenuTypes.MAIN_MENU,
                         'children': [{
                             'name': 'First Context Menu',
                             'name_en': 'First Context Menu',
                             'name_es': 'Primer Menú Contextual',
-                            'menu_type': DynamicMenu.CONTEXT_MENU
+                            'menu_type': MenuTypes.CONTEXT_MENU
                         }]
                 }]
             },
@@ -38,7 +39,7 @@ class TestLoadMenuCommand(TestCase):
                 'name': 'Second Menu',
                 'name_en': 'Second Menu',
                 'name_es': 'Segundo Menú',
-                'menu_type': DynamicMenu.MAIN_MENU,
+                'menu_type': MenuTypes.MAIN_MENU,
             }
         ]
 
