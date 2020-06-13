@@ -6,6 +6,7 @@ from faker import Faker
 from model_bakery import baker
 
 from roleplay import models
+from roleplay.enums import DomainTypes
 
 
 class TestDomainManager(TestCase):
@@ -15,9 +16,9 @@ class TestDomainManager(TestCase):
         self.model = models.Domain
 
         self.number_of_domains = self.faker.pyint(min_value=1, max_value=100)
-        baker.make(self.model, self.number_of_domains, domain_type=self.model.DOMAIN)
+        baker.make(self.model, self.number_of_domains, domain_type=DomainTypes.DOMAIN)
         self.number_of_subdomains = self.faker.pyint(min_value=1, max_value=100)
-        baker.make(self.model, self.number_of_subdomains, domain_type=self.model.SUBDOMAIN)
+        baker.make(self.model, self.number_of_subdomains, domain_type=DomainTypes.SUBDOMAIN)
 
     def test_all_ok(self):
         total = self.number_of_domains + self.number_of_subdomains

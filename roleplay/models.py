@@ -9,6 +9,7 @@ from common.validators import validate_file_size
 from core.models import TracingMixin
 
 from . import managers
+from .enums import DomainTypes
 
 
 class Domain(TracingMixin):
@@ -23,28 +24,21 @@ class Domain(TracingMixin):
         Little description about what involves this domain.
     """
 
-    DOMAIN = 0
-    SUBDOMAIN = 1
-    DOMAIN_TYPES = (
-        (DOMAIN, _('Domain')),
-        (SUBDOMAIN, _('Subdomain'))
-    )
-
     name = models.CharField(verbose_name=_('Name'), max_length=25, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    domain_type = models.PositiveSmallIntegerField(verbose_name=_('Domain type'), choices=DOMAIN_TYPES, default=DOMAIN,
-                                                   null=False, blank=False)
+    domain_type = models.PositiveSmallIntegerField(verbose_name=_('Domain type'), choices=DomainTypes.choices,
+                                                   default=DomainTypes.DOMAIN, null=False, blank=False)
     image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
 
     objects = managers.DomainManager()
 
     @property
     def is_domain(self):
-        return self.domain_type == self.DOMAIN
+        return self.domain_type == DomainTypes.DOMAIN
 
     @property
     def is_subdomain(self):
-        return self.domain_type == self.SUBDOMAIN
+        return self.domain_type == DomainTypes.SUBDOMAIN
 
     class Meta:
         verbose_name = _('Domain')

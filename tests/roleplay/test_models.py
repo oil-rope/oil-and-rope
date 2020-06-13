@@ -14,6 +14,7 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from roleplay import models
+from roleplay.enums import DomainTypes
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -64,19 +65,19 @@ class TestDomain(TestCase):
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
 
     def test_is_domain_ok(self):
-        instance = baker.make(self.model, domain_type=self.model.DOMAIN)
+        instance = baker.make(self.model, domain_type=DomainTypes.DOMAIN)
         self.assertTrue(instance.is_domain)
 
     def test_is_domain_ko(self):
-        instance = baker.make(self.model, domain_type=self.model.SUBDOMAIN)
+        instance = baker.make(self.model, domain_type=DomainTypes.SUBDOMAIN)
         self.assertFalse(instance.is_domain)
 
     def test_is_subdomain_ok(self):
-        instance = baker.make(self.model, domain_type=self.model.SUBDOMAIN)
+        instance = baker.make(self.model, domain_type=DomainTypes.SUBDOMAIN)
         self.assertTrue(instance.is_subdomain)
 
     def test_is_subdomain_ko(self):
-        instance = baker.make(self.model, domain_type=self.model.DOMAIN)
+        instance = baker.make(self.model, domain_type=DomainTypes.DOMAIN)
         self.assertFalse(instance.is_subdomain)
 
 

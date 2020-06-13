@@ -2,14 +2,16 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from mptt.models import TreeManager
 
+from .enums import DomainTypes
+
 
 class DomainManager(models.Manager):
 
     def subdomains(self):
-        return super().get_queryset().filter(domain_type=self.model.SUBDOMAIN)
+        return super().get_queryset().filter(domain_type=DomainTypes.SUBDOMAIN)
 
     def domains(self):
-        return super().get_queryset().filter(domain_type=self.model.DOMAIN)
+        return super().get_queryset().filter(domain_type=DomainTypes.DOMAIN)
 
 
 class PlaceManager(TreeManager):
