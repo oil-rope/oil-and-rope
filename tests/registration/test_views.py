@@ -160,7 +160,7 @@ class TestSignUpView(TestCase):
         data_ko = self.data_ok.copy()
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)
-        self.assertFormError(response, 'form', 'password2', 'The two password fields didn\'t match.')
+        self.assertFormError(response, 'form', 'password2', 'The two password fields didn’t match.')
 
     def test_wrong_discord_id_ko(self):
         data_ko = self.data_ok.copy()
