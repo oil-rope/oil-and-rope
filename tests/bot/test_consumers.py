@@ -3,11 +3,15 @@
 written as top-level functions.
 """
 
+
 import faker
 import pytest
+from channels.db import database_sync_to_async as sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.shortcuts import reverse
+from model_bakery import baker
 
+from bot import models
 from bot.consumers import BotConsumer
 
 fake = faker.Faker()
@@ -47,16 +51,20 @@ async def test_discord_user_does_not_exist(url):
 
 @pytest.mark.django_db
 @pytest.mark.asyncio
-async def test_discord_user_exists(url, discord_user):
+async def test_discord_user_exists(url):
+    discord_user = baker.make(models.DiscordUser)
     communicator = WebsocketCommunicator(BotConsumer, url)
+
     data = {
         'type': 'check_user',
         'discord_id': discord_user.id
     }
     await communicator.send_json_to(data)
     response = await communicator.receive_json_from()
+
     assert 'exists' in response, 'Key \'exists\' does not exist.'
     assert response['exists'], 'Discord ID check as non existent.'
 
     # Disconnect WebSocket to avoid pending tasks
     await communicator.disconnect()
+    await sync_to_async(discord_user.delete)()
