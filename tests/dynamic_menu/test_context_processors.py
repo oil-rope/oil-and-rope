@@ -4,8 +4,8 @@ from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
-from dynamic_menu.models import DynamicMenu
 from dynamic_menu.enums import MenuTypes
+from dynamic_menu.models import DynamicMenu
 
 
 class TestMenuContextProcessor(TestCase):

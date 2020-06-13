@@ -9,7 +9,7 @@ from common.validators import validate_file_size
 from core.models import TracingMixin
 
 from . import managers
-from .enums import DomainTypes, SiteTypes, ICON_RESOLVERS
+from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
 
 
 class Domain(TracingMixin):

@@ -8,8 +8,8 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from faker import Faker
 
-from dynamic_menu.models import DynamicMenu
 from dynamic_menu.enums import MenuTypes
+from dynamic_menu.models import DynamicMenu
 
 
 class TestLoadMenuCommand(TestCase):

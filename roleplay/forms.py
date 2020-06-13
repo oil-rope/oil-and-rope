@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 
-from . import models, enums
+from . import enums, models
 
 
 class WorldForm(forms.ModelForm):

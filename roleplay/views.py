@@ -10,7 +10,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
 
-from . import forms, models, enums
+from . import enums, forms, models
 
 LOGGER = logging.getLogger(__name__)
 

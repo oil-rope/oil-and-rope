@@ -10,7 +10,7 @@ from faker import Faker
 from model_bakery import baker
 from PIL import Image
 
-from roleplay import models, views, enums
+from roleplay import enums, models, views
 
 
 class TestWorldListView(TestCase):

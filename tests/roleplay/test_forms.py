@@ -8,7 +8,7 @@ from faker import Faker
 from model_bakery import baker
 from PIL import Image
 
-from roleplay import forms, models, enums
+from roleplay import enums, forms, models
 
 
 class TestWorldForm(TestCase):
