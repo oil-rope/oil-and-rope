@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from mptt.models import TreeManager
 
-from .enums import DomainTypes
+from .enums import DomainTypes, SiteTypes
 
 
 class DomainManager(models.Manager):
@@ -36,55 +36,55 @@ class PlaceManager(TreeManager):
         return super().get_queryset().filter(user__isnull=True)
 
     def houses(self):
-        return super().get_queryset().filter(site_type=self.model.HOUSE)
+        return super().get_queryset().filter(site_type=SiteTypes.HOUSE)
 
     def towns(self):
-        return super().get_queryset().filter(site_type=self.model.TOWN)
+        return super().get_queryset().filter(site_type=SiteTypes.TOWN)
 
     def villages(self):
-        return super().get_queryset().filter(site_type=self.model.VILLAGE)
+        return super().get_queryset().filter(site_type=SiteTypes.VILLAGE)
 
     def cities(self):
-        return super().get_queryset().filter(site_type=self.model.CITY)
+        return super().get_queryset().filter(site_type=SiteTypes.CITY)
 
     def metropolis(self):
-        return super().get_queryset().filter(site_type=self.model.METROPOLIS)
+        return super().get_queryset().filter(site_type=SiteTypes.METROPOLIS)
 
     def forests(self):
-        return super().get_queryset().filter(site_type=self.model.FOREST)
+        return super().get_queryset().filter(site_type=SiteTypes.FOREST)
 
     def hills(self):
-        return super().get_queryset().filter(site_type=self.model.HILLS)
+        return super().get_queryset().filter(site_type=SiteTypes.HILLS)
 
     def mountains(self):
-        return super().get_queryset().filter(site_type=self.model.MOUNTAINS)
+        return super().get_queryset().filter(site_type=SiteTypes.MOUNTAINS)
 
     def mines(self):
-        return super().get_queryset().filter(site_type=self.model.MINES)
+        return super().get_queryset().filter(site_type=SiteTypes.MINES)
 
     def rivers(self):
-        return super().get_queryset().filter(site_type=self.model.RIVER)
+        return super().get_queryset().filter(site_type=SiteTypes.RIVER)
 
     def seas(self):
-        return super().get_queryset().filter(site_type=self.model.SEA)
+        return super().get_queryset().filter(site_type=SiteTypes.SEA)
 
     def deserts(self):
-        return super().get_queryset().filter(site_type=self.model.DESERT)
+        return super().get_queryset().filter(site_type=SiteTypes.DESERT)
 
     def tundras(self):
-        return super().get_queryset().filter(site_type=self.model.TUNDRA)
+        return super().get_queryset().filter(site_type=SiteTypes.TUNDRA)
 
     def unusuals(self):
-        return super().get_queryset().filter(site_type=self.model.UNUSUAL)
+        return super().get_queryset().filter(site_type=SiteTypes.UNUSUAL)
 
     def islands(self):
-        return super().get_queryset().filter(site_type=self.model.ISLAND)
+        return super().get_queryset().filter(site_type=SiteTypes.ISLAND)
 
     def countries(self):
-        return super().get_queryset().filter(site_type=self.model.COUNTRY)
+        return super().get_queryset().filter(site_type=SiteTypes.COUNTRY)
 
     def continents(self):
-        return super().get_queryset().filter(site_type=self.model.CONTINENT)
+        return super().get_queryset().filter(site_type=SiteTypes.CONTINENT)
 
     def worlds(self):
-        return super().get_queryset().filter(site_type=self.model.WORLD)
+        return super().get_queryset().filter(site_type=SiteTypes.WORLD)

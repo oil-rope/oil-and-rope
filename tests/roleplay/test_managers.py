@@ -6,7 +6,7 @@ from faker import Faker
 from model_bakery import baker
 
 from roleplay import models
-from roleplay.enums import DomainTypes
+from roleplay.enums import DomainTypes, SiteTypes
 
 
 class TestDomainManager(TestCase):
@@ -33,6 +33,8 @@ class TestDomainManager(TestCase):
 
 class TestPlaceManager(TestCase):
 
+    enum = SiteTypes
+
     def setUp(self):
         self.faker = Faker()
         self.model = models.Place
@@ -40,41 +42,41 @@ class TestPlaceManager(TestCase):
         random_int = functools.partial(self.faker.pyint, min_value=1, max_value=100)
 
         self.number_of_houses = random_int()
-        baker.make(self.model, self.number_of_houses, site_type=self.model.HOUSE)
+        baker.make(self.model, self.number_of_houses, site_type=self.enum.HOUSE)
         self.number_of_towns = random_int()
-        baker.make(self.model, self.number_of_towns, site_type=self.model.TOWN)
+        baker.make(self.model, self.number_of_towns, site_type=self.enum.TOWN)
         self.number_of_villages = random_int()
-        baker.make(self.model, self.number_of_villages, site_type=self.model.VILLAGE)
+        baker.make(self.model, self.number_of_villages, site_type=self.enum.VILLAGE)
         self.number_of_cities = random_int()
-        baker.make(self.model, self.number_of_cities, site_type=self.model.CITY)
+        baker.make(self.model, self.number_of_cities, site_type=self.enum.CITY)
         self.number_of_metropolis = random_int()
-        baker.make(self.model, self.number_of_metropolis, site_type=self.model.METROPOLIS)
+        baker.make(self.model, self.number_of_metropolis, site_type=self.enum.METROPOLIS)
         self.number_of_forests = random_int()
-        baker.make(self.model, self.number_of_forests, site_type=self.model.FOREST)
+        baker.make(self.model, self.number_of_forests, site_type=self.enum.FOREST)
         self.number_of_hills = random_int()
-        baker.make(self.model, self.number_of_hills, site_type=self.model.HILLS)
+        baker.make(self.model, self.number_of_hills, site_type=self.enum.HILLS)
         self.number_of_mountains = random_int()
-        baker.make(self.model, self.number_of_mountains, site_type=self.model.MOUNTAINS)
+        baker.make(self.model, self.number_of_mountains, site_type=self.enum.MOUNTAINS)
         self.number_of_mines = random_int()
-        baker.make(self.model, self.number_of_mines, site_type=self.model.MINES)
+        baker.make(self.model, self.number_of_mines, site_type=self.enum.MINES)
         self.number_of_rivers = random_int()
-        baker.make(self.model, self.number_of_rivers, site_type=self.model.RIVER)
+        baker.make(self.model, self.number_of_rivers, site_type=self.enum.RIVER)
         self.number_of_seas = random_int()
-        baker.make(self.model, self.number_of_seas, site_type=self.model.SEA)
+        baker.make(self.model, self.number_of_seas, site_type=self.enum.SEA)
         self.number_of_deserts = random_int()
-        baker.make(self.model, self.number_of_deserts, site_type=self.model.DESERT)
+        baker.make(self.model, self.number_of_deserts, site_type=self.enum.DESERT)
         self.number_of_tundras = random_int()
-        baker.make(self.model, self.number_of_tundras, site_type=self.model.TUNDRA)
+        baker.make(self.model, self.number_of_tundras, site_type=self.enum.TUNDRA)
         self.number_of_unusuals = random_int()
-        baker.make(self.model, self.number_of_unusuals, site_type=self.model.UNUSUAL)
+        baker.make(self.model, self.number_of_unusuals, site_type=self.enum.UNUSUAL)
         self.number_of_islands = random_int()
-        baker.make(self.model, self.number_of_islands, site_type=self.model.ISLAND)
+        baker.make(self.model, self.number_of_islands, site_type=self.enum.ISLAND)
         self.number_of_countries = random_int()
-        baker.make(self.model, self.number_of_countries, site_type=self.model.COUNTRY)
+        baker.make(self.model, self.number_of_countries, site_type=self.enum.COUNTRY)
         self.number_of_continents = random_int()
-        baker.make(self.model, self.number_of_continents, site_type=self.model.CONTINENT)
+        baker.make(self.model, self.number_of_continents, site_type=self.enum.CONTINENT)
         self.number_of_worlds = random_int()
-        baker.make(self.model, self.number_of_worlds, site_type=self.model.WORLD)
+        baker.make(self.model, self.number_of_worlds, site_type=self.enum.WORLD)
 
         self.total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
             + self.number_of_metropolis + self.number_of_forests + self.number_of_hills \

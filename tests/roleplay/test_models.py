@@ -14,7 +14,7 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from roleplay import models
-from roleplay.enums import DomainTypes
+from roleplay.enums import DomainTypes, SiteTypes
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -82,6 +82,7 @@ class TestDomain(TestCase):
 
 
 class TestPlace(TestCase):
+    enum = SiteTypes
 
     def setUp(self):
         self.faker = Faker()
@@ -142,15 +143,15 @@ class TestPlace(TestCase):
 
     # TODO: Refactor this test so is not that complex
     def test_nested_world_ok(self):  # noqa
-        universe = self.model.objects.create(name='Universe', site_type=self.model.WORLD)
-        world = self.model.objects.create(name='World', site_type=self.model.WORLD, parent_site=universe)
+        universe = self.model.objects.create(name='Universe', site_type=self.enum.WORLD)
+        world = self.model.objects.create(name='World', site_type=self.enum.WORLD, parent_site=universe)
 
         self.assertIn(world, universe.get_worlds())
 
         continents = []
         for _ in range(0, 3):
             continents.append(
-                self.model.objects.create(name=self.faker.country(), site_type=self.model.CONTINENT, parent_site=world)
+                self.model.objects.create(name=self.faker.country(), site_type=self.enum.CONTINENT, parent_site=world)
             )
 
         countries = []
@@ -161,17 +162,17 @@ class TestPlace(TestCase):
             self.assertIn(continent, world.get_continents())
             countries.append(
                 self.model.objects.create(
-                    name=self.faker.country(), site_type=self.model.COUNTRY, parent_site=continent
+                    name=self.faker.country(), site_type=self.enum.COUNTRY, parent_site=continent
                 )
             )
             seas.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.SEA, parent_site=continent)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.SEA, parent_site=continent)
             )
             rivers.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.RIVER, parent_site=continent)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.RIVER, parent_site=continent)
             )
             unusuals.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.UNUSUAL, parent_site=continent)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.UNUSUAL, parent_site=continent)
             )
 
         for sea in seas:
@@ -194,37 +195,37 @@ class TestPlace(TestCase):
         for country in countries:
             self.assertIn(country, world.get_countries())
             islands.append(
-                self.model.objects.create(name=self.faker.country(), site_type=self.model.ISLAND, parent_site=country)
+                self.model.objects.create(name=self.faker.country(), site_type=self.enum.ISLAND, parent_site=country)
             )
             cities.append(
-                self.model.objects.create(name=self.faker.city(), site_type=self.model.CITY, parent_site=country)
+                self.model.objects.create(name=self.faker.city(), site_type=self.enum.CITY, parent_site=country)
             )
             mountains.append(
                 self.model.objects.create(
-                    name=self.faker.country(), site_type=self.model.MOUNTAINS, parent_site=country
+                    name=self.faker.country(), site_type=self.enum.MOUNTAINS, parent_site=country
                 )
             )
             deserts.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.DESERT, parent_site=country)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.DESERT, parent_site=country)
             )
             hills.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.HILLS, parent_site=country)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.HILLS, parent_site=country)
             )
             tundras.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.TUNDRA, parent_site=country)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.TUNDRA, parent_site=country)
             )
             mines.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.MINES, parent_site=country)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.MINES, parent_site=country)
             )
             metropolis.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.METROPOLIS, parent_site=country)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.METROPOLIS, parent_site=country)
             )
 
         forests = []
         for island in islands:
             self.assertIn(island, world.get_islands())
             forests.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.model.FOREST, parent_site=island)
+                self.model.objects.create(name=self.faker.name(), site_type=self.enum.FOREST, parent_site=island)
             )
 
         for m in metropolis:
@@ -235,17 +236,17 @@ class TestPlace(TestCase):
         for city in cities:
             self.assertIn(city, world.get_cities())
             villages.append(
-                self.model.objects.create(name=self.faker.city(), site_type=self.model.VILLAGE, parent_site=city)
+                self.model.objects.create(name=self.faker.city(), site_type=self.enum.VILLAGE, parent_site=city)
             )
             towns.append(
-                self.model.objects.create(name=self.faker.city(), site_type=self.model.TOWN, parent_site=city)
+                self.model.objects.create(name=self.faker.city(), site_type=self.enum.TOWN, parent_site=city)
             )
 
         houses = []
         for village in villages:
             self.assertIn(village, world.get_villages())
             houses.append(
-                self.model.objects.create(name=self.faker.city(), site_type=self.model.HOUSE, parent_site=village)
+                self.model.objects.create(name=self.faker.city(), site_type=self.enum.HOUSE, parent_site=village)
             )
 
         for town in towns:
@@ -285,75 +286,75 @@ class TestPlace(TestCase):
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
 
     def test_is_house_ok(self):
-        place = baker.make(self.model, site_type=self.model.HOUSE)
+        place = baker.make(self.model, site_type=self.enum.HOUSE)
         self.assertTrue(place.is_house)
 
     def test_is_town_ok(self):
-        place = baker.make(self.model, site_type=self.model.TOWN)
+        place = baker.make(self.model, site_type=self.enum.TOWN)
         self.assertTrue(place.is_town)
 
     def test_is_village_ok(self):
-        place = baker.make(self.model, site_type=self.model.VILLAGE)
+        place = baker.make(self.model, site_type=self.enum.VILLAGE)
         self.assertTrue(place.is_village)
 
     def test_is_city_ok(self):
-        place = baker.make(self.model, site_type=self.model.CITY)
+        place = baker.make(self.model, site_type=self.enum.CITY)
         self.assertTrue(place.is_city)
 
     def test_is_metropolis_ok(self):
-        place = baker.make(self.model, site_type=self.model.METROPOLIS)
+        place = baker.make(self.model, site_type=self.enum.METROPOLIS)
         self.assertTrue(place.is_metropolis)
 
     def test_is_forest_ok(self):
-        place = baker.make(self.model, site_type=self.model.FOREST)
+        place = baker.make(self.model, site_type=self.enum.FOREST)
         self.assertTrue(place.is_forest)
 
     def test_is_hills_ok(self):
-        place = baker.make(self.model, site_type=self.model.HILLS)
+        place = baker.make(self.model, site_type=self.enum.HILLS)
         self.assertTrue(place.is_hills)
 
     def test_is_mountains_ok(self):
-        place = baker.make(self.model, site_type=self.model.MOUNTAINS)
+        place = baker.make(self.model, site_type=self.enum.MOUNTAINS)
         self.assertTrue(place.is_mountains)
 
     def test_is_mines_ok(self):
-        place = baker.make(self.model, site_type=self.model.MINES)
+        place = baker.make(self.model, site_type=self.enum.MINES)
         self.assertTrue(place.is_mines)
 
     def test_is_river_ok(self):
-        place = baker.make(self.model, site_type=self.model.RIVER)
+        place = baker.make(self.model, site_type=self.enum.RIVER)
         self.assertTrue(place.is_river)
 
     def test_is_sea_ok(self):
-        place = baker.make(self.model, site_type=self.model.SEA)
+        place = baker.make(self.model, site_type=self.enum.SEA)
         self.assertTrue(place.is_sea)
 
     def test_is_desert_ok(self):
-        place = baker.make(self.model, site_type=self.model.DESERT)
+        place = baker.make(self.model, site_type=self.enum.DESERT)
         self.assertTrue(place.is_desert)
 
     def test_is_tundra_ok(self):
-        place = baker.make(self.model, site_type=self.model.TUNDRA)
+        place = baker.make(self.model, site_type=self.enum.TUNDRA)
         self.assertTrue(place.is_tundra)
 
     def test_is_unusual_ok(self):
-        place = baker.make(self.model, site_type=self.model.UNUSUAL)
+        place = baker.make(self.model, site_type=self.enum.UNUSUAL)
         self.assertTrue(place.is_unusual)
 
     def test_is_island_ok(self):
-        place = baker.make(self.model, site_type=self.model.ISLAND)
+        place = baker.make(self.model, site_type=self.enum.ISLAND)
         self.assertTrue(place.is_island)
 
     def test_is_country_ok(self):
-        place = baker.make(self.model, site_type=self.model.COUNTRY)
+        place = baker.make(self.model, site_type=self.enum.COUNTRY)
         self.assertTrue(place.is_country)
 
     def test_is_continent_ok(self):
-        place = baker.make(self.model, site_type=self.model.CONTINENT)
+        place = baker.make(self.model, site_type=self.enum.CONTINENT)
         self.assertTrue(place.is_continent)
 
     def test_is_world_ok(self):
-        place = baker.make(self.model, site_type=self.model.WORLD)
+        place = baker.make(self.model, site_type=self.enum.WORLD)
         self.assertTrue(place.is_world)
 
     def test_resolve_icon(self):
