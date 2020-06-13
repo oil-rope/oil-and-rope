@@ -9,7 +9,7 @@ from common.validators import validate_file_size
 from core.models import TracingMixin
 
 from . import managers
-from .enums import DomainTypes, SiteTypes
+from .enums import DomainTypes, SiteTypes, ICON_RESOLVERS
 
 
 class Domain(TracingMixin):
@@ -72,26 +72,7 @@ class Place(MPTTModel, TracingMixin):
         The person who created this map.
     """
 
-    ICON_RESOLVERS = {
-        SiteTypes.HOUSE: '',
-        SiteTypes.TOWN: 'ic-town',
-        SiteTypes.VILLAGE: '',
-        SiteTypes.CITY: 'ic-city',
-        SiteTypes.METROPOLIS: '',
-        SiteTypes.FOREST: '',
-        SiteTypes.HILLS: '',
-        SiteTypes.MOUNTAINS: '',
-        SiteTypes.MINES: '',
-        SiteTypes.RIVER: '',
-        SiteTypes.SEA: '',
-        SiteTypes.DESERT: '',
-        SiteTypes.TUNDRA: '',
-        SiteTypes.UNUSUAL: '',
-        SiteTypes.ISLAND: '',
-        SiteTypes.COUNTRY: 'ic-flag',
-        SiteTypes.CONTINENT: '',
-        SiteTypes.WORLD: 'ic-world'
-    }
+    ICON_RESOLVERS = ICON_RESOLVERS
 
     name = models.CharField(verbose_name=_('Name'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)

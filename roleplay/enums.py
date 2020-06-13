@@ -26,3 +26,25 @@ class SiteTypes(models.IntegerChoices):
     COUNTRY = 15, _('Country')
     CONTINENT = 16, _('Continent')
     WORLD = 17, _('World')
+
+
+ICON_RESOLVERS = {
+    SiteTypes.HOUSE: '',
+    SiteTypes.TOWN: 'ic-town',
+    SiteTypes.VILLAGE: '',
+    SiteTypes.CITY: 'ic-city',
+    SiteTypes.METROPOLIS: '',
+    SiteTypes.FOREST: '',
+    SiteTypes.HILLS: '',
+    SiteTypes.MOUNTAINS: '',
+    SiteTypes.MINES: '',
+    SiteTypes.RIVER: '',
+    SiteTypes.SEA: '',
+    SiteTypes.DESERT: '',
+    SiteTypes.TUNDRA: '',
+    SiteTypes.UNUSUAL: '',
+    SiteTypes.ISLAND: '',
+    SiteTypes.COUNTRY: 'ic-flag',
+    SiteTypes.CONTINENT: '',
+    SiteTypes.WORLD: 'ic-world'
+}
