@@ -3,11 +3,12 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, ButtonHolder, Column, Div, Field, Layout, Row, Submit
+from crispy_forms.layout import HTML, Column, Div, Layout, Row, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
+from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
+                                       UsernameField)
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
@@ -278,15 +279,17 @@ class ResendEmailForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.form_class = 'container-fluid'
         self.helper.layout = Layout(
             Row(
-                Field('email', css_class=self.custom_classes),
-                css_class='justify-content-sm-center'
+                Column('email', css_class='col-12 col-xl-8'),
+                css_class='justify-content-around'
             ),
-            ButtonHolder(
-                Submit('submit', _('Resend email'), css_class=self.submit_classes + ' col-12 col-sm-6'),
-                css_class='d-sm-flex justify-content-sm-center'
+            Row(
+                Column(
+                    Submit('submit', _('Resend email'), css_class='w-100'),
+                    css_class='col-md-10 col-lg-6'
+                ),
+                css_class='justify-content-md-around'
             )
         )
 

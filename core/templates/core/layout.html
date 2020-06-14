@@ -73,6 +73,16 @@
     });
   });
 </script>
+<!-- Dismiss alerts -->
+<script>
+  $(() => {
+    // Dismiss alert after X seconds
+    var dismissibleSeconds = 6;
+    setTimeout(() => {
+      $('.alert.alert-dismissible.timed').alert('close');
+    }, dismissibleSeconds * 1000);
+  });
+</script>
 
 <!-- JavaScript -->
 {% block javascript %}
