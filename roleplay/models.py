@@ -246,3 +246,32 @@ class Place(MPTTModel, TracingMixin):
 
     def __str__(self):
         return self.name
+
+
+class Race(TracingMixin):
+    """
+    Model to manage Races.
+
+    Parameters
+    ----------
+    name: :class:`str`
+        Name of the race.
+    description: :class:`str`
+        About the creature.
+    strength: :class:`int`
+        Modifier for strength.
+    dexterity: :class:`int`
+        Modifier for dexterity.
+    constitution: :class:`int`
+        Modifier for constitution.
+    intelligence: :class:`int`
+        Modifier for intelligence.
+    wisdom: :class:`int`
+        Modifier for wisdom.
+    charisma: :class:`int`
+        Modfier for charisma.
+    affected_by_armor: :class:`boolean`
+        Declares if this race is affected by any penalty that armor can give.
+    image: :class:`file`
+        Image for the race.
+    """
