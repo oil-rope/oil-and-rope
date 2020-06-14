@@ -3,7 +3,7 @@ import pytest
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from django.urls import path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from core.consumers import HandlerJsonWebsocketConsumer
 
@@ -33,7 +33,7 @@ async def test_websocket_sends_error():
 
 
 @pytest.mark.asyncio
-async def test_websocket_handler_inexistent_function():
+async def test_websocket_handler_non_existent_function():
     communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer, 'testws/')
     data = {
         'type': fake.word()
@@ -42,7 +42,7 @@ async def test_websocket_handler_inexistent_function():
     response = await communicator.receive_json_from()
 
     error_response = {
-        'error': _('Inexistent type') + '.'
+        'error': _('Non existent type') + '.'
     }
     assert response == error_response, 'Incorrect response.'
 

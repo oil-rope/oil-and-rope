@@ -44,6 +44,6 @@ module.exports = {
 		extensions: [".js", ".jsx", ".scss", ".sass"],
 	},
 	externals: {
-		jquery: 'jQuery'
-	}
+		jquery: "jQuery",
+	},
 };

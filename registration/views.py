@@ -8,7 +8,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView
 
 from . import forms
@@ -36,7 +36,7 @@ class LoginView(auth_views.LoginView):
                 )
                 messages.warning(self.request, warn_message)
         except get_user_model().DoesNotExist:
-            LOGGER.warning('Attemp to access an inexistent user, we assume username is just incorrect.')
+            LOGGER.warning('Attempt to access a non existent user, we assume username is just incorrect.')
         finally:
             return response
 
@@ -49,7 +49,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     model = get_user_model()
     form_class = forms.SignUpForm
     template_name = 'registration/register.html'
-    succes_message = None
+    success_message = None
     success_url = reverse_lazy('registration:login')
 
     def get_context_data(self, **kwargs):
@@ -57,13 +57,13 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return context
 
     def get_success_message(self) -> str:
-        if self.succes_message:  # pragma: no cover
-            return self.succes_message
-        succes_message = '{}! {}.'.format(
+        if self.success_message:  # pragma: no cover
+            return self.success_message
+        success_message = '{}! {}.'.format(
             _('User created'),
             _('Please confirm your email')
         )
-        return succes_message
+        return success_message
 
     def get_form_kwargs(self):
         kwargs = super(SignUpView, self).get_form_kwargs()

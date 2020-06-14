@@ -44,21 +44,21 @@ class TestDynamicMenuModel(TestCase):
         appended_text = '<i class="fa fa-user"></i>'
         self.instance.appended_text = appended_text
         self.instance.save()
-        expected = prepended_text + self.instance.name + appended_text
+        expected = prepended_text + '  ' + self.instance.name + '  ' + appended_text
         self.assertEqual(expected, str(self.instance))
 
     def test_str_with_prepended_text_ok(self):
         prepended_text = '<i class="fa fa-user"></i>'
         self.instance.prepended_text = prepended_text
         self.instance.save()
-        expected = prepended_text + self.instance.name
+        expected = prepended_text + '  ' + self.instance.name
         self.assertEqual(expected, str(self.instance))
 
     def test_str_with_appended_text_ok(self):
         appended_text = '<i class="fa fa-user"></i>'
         self.instance.appended_text = appended_text
         self.instance.save()
-        expected = self.instance.name + appended_text
+        expected = self.instance.name + '  ' + appended_text
         self.assertEqual(expected, str(self.instance))
 
     def test_url_property_ko(self):

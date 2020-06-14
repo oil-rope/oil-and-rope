@@ -25,14 +25,18 @@ indent_style = tab
 insert_final_newline = true
 
 # Use 2 spaces on HTML
-[*.html, *.yml]
+[*.html]
+indent_style = space
 indent_size = 2
 
 # The JSON files contain newlines inconsistently
-[*.json, *.yml]
+[*.json]
 indent_style = space
 indent_size = 2
-insert_final_newline = ignore
+
+[*.yml]
+indent_style = space
+indent_size = 2
 
 # Makefiles always use tabs for indentation
 [Makefile]

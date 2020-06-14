@@ -40,6 +40,8 @@ urlpatterns += i18n_patterns(
     path('chat/', include('chat.urls')),
     # React FrontEnd
     path('frontend/', include('frontend.urls')),
+    # Roleplay
+    path('roleplay/', include('roleplay.urls')),
 )
 
 if settings.DEBUG:  # pragma: no cover

@@ -1,7 +1,7 @@
 {% spaceless %}
-{% load static %}
-{% load i18n %}
-{% get_current_language as LANGUAGE_CODE %}
+  {% load static %}
+  {% load i18n %}
+  {% get_current_language as LANGUAGE_CODE %}
 {% endspaceless %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 
@@ -14,14 +14,14 @@
   {% include 'core/includes/opengraph_protocol.html' %}
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="{% static 'img/oil-and-rope.jpg' %}" type="image/x-icon">
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
 
-  <!-- Bootstrap Styles -->
-  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-  <!-- Fontawesome -->
-  <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+  <!-- Icons -->
+  <link rel="stylesheet" href="{% static 'icons/style.min.css' %}">
+  <!-- Fonts -->
+  <link rel="stylesheet" href="{% static 'fonts/fonts.min.css' %}">
   <!-- Oil & Rope Styles -->
-  <link rel="stylesheet" href="{% static 'core/css/oilandrope-theme.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/oilandrope-theme.min.css' %}">
   <!-- Extra Styles -->
   {% block css %}{% endblock css %}
 
@@ -30,9 +30,12 @@
 </head>
 
 <body>
-  {% language lan %}
+{% language lan %}
 
-  {% include 'core/includes/menu.html' %}
+  <div class="navigator sticky-top">
+    {% include 'core/includes/menu.html' %}
+    {% block breadcrumb %}{% endblock breadcrumb %}
+  </div>
 
   {% comment %} Messages System {% endcomment %}
   {% include 'core/includes/messages.html' %}
@@ -41,39 +44,39 @@
   {% block body_content %}
   {% endblock body_content %}
 
-  {% endlanguage %}
+{% endlanguage %}
 
-  <!-- JavaScript translation -->
-  <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-  <!-- JQuery -->
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-          crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+<!-- JavaScript translation -->
+<script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+<!-- JQuery -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
-  <!-- Bootstrap -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+<!-- Bootstrap -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
-  <!-- JS Cookie -->
-  <script type="module" src="{% static 'dynamic_menu/external_libs/js_cookie/js_cookie.min.js' %}"></script>
-  <!-- Dynamic Menu -->
-  <script type="text/javascript" src="{% static 'dynamic_menu/tracking/js/tracking.js' %}"></script>
-  <!-- Tracking -->
-  <script>
+<!-- JS Cookie -->
+<script type="module" src="{% static 'dynamic_menu/external_libs/js_cookie/js_cookie.min.js' %}"></script>
+<!-- Dynamic Menu -->
+<script type="text/javascript" src="{% static 'dynamic_menu/tracking/js/tracking.js' %}"></script>
+<!-- Tracking -->
+<script>
   $(() => {
-      // Checking menu
-      $('.dynamic-menu-track').click((e) => {
-          let referrer = Number($(e.target).data("menu-referrer"));
-          setMenuReferrer(referrer);
-      });
+    // Checking menu
+    $('.dynamic-menu-track').click((e) => {
+      let referrer = Number($(e.target).data("menu-referrer"));
+      setMenuReferrer(referrer);
+    });
   });
-  </script>
+</script>
 
-  <!-- JavaScript -->
-  {% block javascript %}
-  {% endblock javascript %}
+<!-- JavaScript -->
+{% block javascript %}
+{% endblock javascript %}
 
 </body>
 

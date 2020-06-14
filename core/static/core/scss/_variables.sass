@@ -1,0 +1,49 @@
+// Color Palette
+$color-1: #1A202C !default
+$color-2: #a3c0bb !default
+$color-3: #EDCA76 !default
+$color-4: #DEDBA7 !default
+$color-5: #EE7A55 !default
+
+// Basic colors
+$white: #fff !default
+$black: #000 !default
+
+$body-bg: $color-4 !default
+
+$theme-colors: ("primary": $color-5, "secondary": $color-1, "info": $color-2, "extra": $color-3)
+
+$sizes: ()
+@for $i from 1 through 10
+  $sizes: map_merge($sizes, ("#{$i * 10}vw": $i * 10vw))
+  $sizes: map_merge($sizes, ("#{$i * 10}vh": $i * 10vh))
+
+// Inherited from Bootstrap
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+
+$spacer: 1rem !default
+$spacers: () !default
+// stylelint-disable-next-line scss/dollar-variable-default
+$spacers: map_merge($spacers, (0: 0, 1: ($spacer * .25), 2: ($spacer * .5), 3: $spacer, 4: ($spacer * 1.5), 5: ($spacer * 3)))
+
+// Tables
+$tree-list-separation: map-get($spacers, 4)
+
+// Fonts
+$font-ds-regular: 'Dancing Script', cursive !default
+
+// Forms
+$input-bg: transparent !default
+
+$input-border-color: map_get($theme-colors, "secondary") !default
+
+$input-border-radius: none !default
+$input-border-radius-lg: none !default
+$input-border-radius-sm: none !default
+
+$input-focus-border-color: map_get($theme-colors, "primary") !default
+$input-focus-box-shadow: none !default

@@ -3,11 +3,13 @@ import logging
 from django.db import models
 from django.shortcuts import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from core.models import TracingMixin
+
+from .enums import MenuTypes
 
 PERMISSION_CLASS = 'auth.Permission'
 MODEL_MANAGER_CLASS = 'contenttypes.ContentType'
@@ -50,7 +52,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
     extra_urls_args: Optional[:class:`str`]
         Extra information or params to add to URL.
         >>> # Whatever PKs uses
-        >>> obj = DinamyMenu.objects.get(pk=pk)
+        >>> obj = DynamicMenu.objects.get(pk=1)
         >>> param = '?extra_param=true'
         >>> obj.extra_url_args = param
         >>> obj.save()
@@ -109,15 +111,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
     related_model = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_("Related Model"),
                                            related_name='menus', blank=True)
 
-    MAIN_MENU = 0
-    CONTEXT_MENU = 1
-    MENU_CHOICES = (
-        (MAIN_MENU, _('Standard Menu')),
-        (CONTEXT_MENU, _('Context Menu')),
-    )
-
-    menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MAIN_MENU,
-                                                 choices=MENU_CHOICES)
+    menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
+                                                 choices=MenuTypes.choices)
 
     @property
     def url(self) -> str:
@@ -143,20 +138,20 @@ class DynamicMenu(MPTTModel, TracingMixin):
             return url
 
     class Meta:
-        verbose_name = _("Dynamic Menu")
-        verbose_name_plural = _("Dynamic Menus")
+        verbose_name = _('Dynamic Menu')
+        verbose_name_plural = _('Dynamic Menus')
 
     def __str__(self):
         menu_str = ''
 
         # Adding prepended_text
         if self.prepended_text:
-            menu_str = mark_safe(self.prepended_text)
+            menu_str = mark_safe(self.prepended_text) + '  '
         # Menu name
         menu_str += self.name
         # Adding appended_text
         if self.appended_text:
-            menu_str += mark_safe(self.appended_text)
+            menu_str += '  ' + mark_safe(self.appended_text)
 
         return menu_str
 

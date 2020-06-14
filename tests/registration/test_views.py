@@ -5,7 +5,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from faker import Faker
 from model_bakery import baker
 
@@ -156,11 +156,11 @@ class TestSignUpView(TestCase):
             self.client.post(self.url, data=self.data_ok, follow=True)
             self.assertTrue(len(mail.outbox) == 1, 'Email wasn\'t sent.')
 
-    def test_wrong_confim_password(self):
+    def test_wrong_confirm_password(self):
         data_ko = self.data_ok.copy()
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)
-        self.assertFormError(response, 'form', 'password2', 'The two password fields didn\'t match.')
+        self.assertFormError(response, 'form', 'password2', 'The two password fields didn’t match.')
 
     def test_wrong_discord_id_ko(self):
         data_ko = self.data_ok.copy()

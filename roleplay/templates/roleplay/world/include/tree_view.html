@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="accordion overflow-hidden w-100" id="worldListAccordion">
+  <div class="card w-100 bg-transparent">
+    <div class="card-header" id="worldTreeHeader">
+      <h2 class="mb-0">
+        <button class="btn btn-link btn-block text-center" type="button" data-toggle="collapse" data-target="#worldTree" aria-expanded="true" aria-controls="worldTree">
+          {% trans "Show" %}/{% trans "Hide" %} {% trans "World structure" %}
+        </button>
+      </h2>
+    </div>
+
+    <!-- SVG -->
+    <div id="worldTree" class="collapse show" aria-labelledby="worldTreeHeader" data-parent="#worldListAccordion">
+      <div class="card-body">
+        <svg id="treeView"></svg>
+      </div>
+    </div>
+  </div>
+</div>

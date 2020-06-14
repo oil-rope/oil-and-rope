@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class HandlerJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
@@ -13,7 +13,7 @@ class HandlerJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
         func = content['type']
         if not hasattr(self, func):
             content = {
-                'error': _('Inexistent type') + '.'
+                'error': _('Non existent type') + '.'
             }
             await super().send_json(content, True)
         else:

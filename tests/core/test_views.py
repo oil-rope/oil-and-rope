@@ -5,7 +5,7 @@ from django.test import TestCase
 class TestIndexView(TestCase):
 
     def setUp(self):
-        self.url = reverse('core:home')
+        self.url = reverse('core:index')
 
     def test_access_ok(self):
         response = self.client.get(self.url)

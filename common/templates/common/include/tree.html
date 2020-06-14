@@ -1,0 +1,40 @@
+{% load mptt_tags %}
+
+{% recursetree tree %}
+  {% if node.is_leaf_node and node.get_ancestors.exists %}
+    <li class="tree-element">
+      <a href="javascript:" class="tree-node">
+        {{ node.resolve_icon|safe }}
+        {{ node }}
+      </a>
+    </li>
+  {% elif not node.get_ancestors.exists %}
+    <div class="tree-container tree-responsive">
+      <ul class="tree-list">
+        <li class="tree-element">
+          <a href="javascript:" class="tree-node">
+            {{ node.resolve_icon|safe }}
+            {{ node }}
+          </a>
+          {% if node.get_children.exists %}
+            <ul class="tree-list">
+              {{ children }}
+            </ul>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  {% elif not node.is_leaf_node and node.get_ancestors.exists %}
+    <li class="tree-element">
+      <a href="javascript:" class="tree-node">
+        {{ node.resolve_icon|safe }}
+        {{ node }}
+      </a>
+      {% if node.get_children.exists %}
+        <ul class="tree-list">
+          {{ children }}
+        </ul>
+      {% endif %}
+    </li>
+  {% endif %}
+{% endrecursetree %}
