@@ -7,8 +7,7 @@ from crispy_forms.layout import HTML, Column, Div, Layout, Row, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import (AuthenticationForm, UserCreationForm,
-                                       UsernameField)
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
