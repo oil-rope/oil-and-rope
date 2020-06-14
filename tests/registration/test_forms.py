@@ -152,3 +152,72 @@ class TestResendEmailForm(TestCase):
         self.data_ko['email'] = self.faker.email()
         form = forms.ResendEmailForm(data=self.data_ko)
         self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
+
+
+class TestPasswordResetForm(TestCase):
+    form_class = forms.PasswordResetForm
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.data_ok = {
+            'email': self.user.email
+        }
+
+    def test_form_ok(self):
+        form = self.form_class(data=self.data_ok)
+        self.assertTrue(form.is_valid(), 'Form is taken as invalid but it shouldn\'t.')
+
+    def test_form_required_fields_are_not_supplied(self):
+        self.data_ko = self.data_ok.copy()
+        del self.data_ko['email']
+        form = self.form_class(data=self.data_ko)
+        self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
+
+    def test_email_does_not_exist(self):
+        self.data_ko = self.data_ok.copy()
+        self.data_ko['email'] = self.faker.email()
+        form = self.form_class(data=self.data_ko)
+        self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
+
+
+class TestSetPasswordForm(TestCase):
+    form_class = forms.SetPasswordForm
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.password = 'a_p4ssw0rd@'
+        self.data_ok = {
+            'new_password1': self.password,
+            'new_password2': self.password
+        }
+
+    def test_form_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok)
+        self.assertTrue(form.is_valid(), 'Form is taken as invalid but it shouldn\'t.')
+
+    def test_wrong_confirm_password_ko(self):
+        data_wrong_password = self.data_ok.copy()
+        data_wrong_password['new_password2'] = 'random_p4ssw0rd@'
+        form = self.form_class(user=self.user, data=data_wrong_password)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+    def test_required_fields_not_supplied_ko(self):
+        data_without_password1 = self.data_ok.copy()
+        del data_without_password1['new_password1']
+        form = self.form_class(user=self.user, data=data_without_password1)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+        data_without_password2 = self.data_ok.copy()
+        del data_without_password2['new_password2']
+        form = self.form_class(user=self.user, data=data_without_password2)
+        self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
+
+    def test_password_changed_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok)
+        form.is_valid()
+        form.save()
+        self.client.login(username=self.user.username, password=self.password)
+
+        self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')

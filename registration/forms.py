@@ -324,6 +324,13 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
     def add_help_text(self, field, help_text):
         self.fields[field].help_text = help_text
 
+    def clean_email(self):
+        data = self.cleaned_data.get('email')
+        if not get_user_model().objects.filter(email=data).exists():
+            msg = _('This email doesn\'t belong to a user') + '.'
+            self.add_error('email', msg)
+        return data
+
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
     """

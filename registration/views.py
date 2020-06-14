@@ -202,7 +202,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
             return super().form_invalid(form)
 
 
-class ResetPasswordView(auth_views.PasswordResetView):
+class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordResetView):
     """
     Allow user to reset its password.
     """
@@ -220,7 +220,7 @@ class ResetPasswordView(auth_views.PasswordResetView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        msg = '{}.'.format(_('Password reset send'))
+        msg = '{}'.format(_('Email for password reset request sent!'))
         messages.success(self.request, msg)
         return response
 
@@ -235,7 +235,6 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     template_name = 'registration/password_change.html'
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        msg = '{}!'.format('Password changed successfully')
+        msg = '{}'.format(_('Password changed successfully!'))
         messages.success(self.request, msg)
-        return response
+        return super().form_valid(form)

@@ -14,4 +14,4 @@ class RedirectAuthenticatedUserMixin:
         user = request.user
         if self.redirect_authenticated_user and user.is_authenticated:
             return redirect(self.redirect_url)
-        return super(RedirectAuthenticatedUserMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

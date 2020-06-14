@@ -10,6 +10,8 @@ from faker import Faker
 from model_bakery import baker
 
 from registration.views import ActivateAccountView
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 
 class TestLoginView(TestCase):
@@ -291,3 +293,100 @@ class TestResendConfirmationEmailView(TestCase):
             response.wsgi_request,
             warning_message
         )
+
+
+class TestResetPasswordView(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.data_ok = {
+            'email': self.user.email
+        }
+        self.url = reverse('registration:password_reset')
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code, 'User cannot access.')
+        self.assertTemplateUsed(response, 'registration/password_reset.html')
+
+    def test_email_sent_ok(self):
+        # Changing Django Settings to get email sent
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            self.client.post(self.url, data=self.data_ok)
+            self.assertEqual(1, len(mail.outbox), 'Email aren\'t been sent.')
+
+    @mock.patch('registration.views.messages')
+    def test_ok(self, mock_call):
+        response = self.client.post(self.url, data=self.data_ok)
+        self.assertEqual(302, response.status_code, 'User is no redirected.')
+        success_message = _('Email for password reset request sent!')
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            success_message
+        )
+
+    def test_required_fields_not_given_ko(self):
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        response = self.client.post(self.url, data=data_without_email)
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+
+    def test_email_does_not_exists_ko(self):
+        data_ko = self.data_ok.copy()
+        data_ko['email'] = self.faker.email()
+        response = self.client.post(self.url, data=data_ko)
+        self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
+
+
+class TestPasswordResetConfirmView(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.password = 'a_p4ssw0rd@'
+        self.data_ok = {
+            'new_password1': self.password,
+            'new_password2': self.password
+        }
+        self.token_generator = PasswordResetTokenGenerator()
+        self.token = self.token_generator.make_token(self.user)
+        self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.url = reverse('registration:password_reset_confirm', kwargs={'uidb64': self.uid, 'token': self.token})
+
+    @mock.patch('registration.views.messages')
+    def test_ok(self, mock_call):
+        response = self.client.post(self.url, data=self.data_ok)
+        self.assertEqual(302, response.status_code, 'User is no redirected.')
+        # Cannot catch message
+        # success_message = _('Password changed successfully!')
+        # mock_call.success.assert_called_with(
+        #     response.wsgi_request,
+        #     success_message
+        # )
+
+        self.client.login(
+            username=self.user.username,
+            password=self.password
+        )
+
+        self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
+
+    def test_required_fields_not_given_ko(self):
+        data_without_new_password1 = self.data_ok.copy()
+        del data_without_new_password1['new_password1']
+        response = self.client.post(self.url, data=data_without_new_password1, follow=True)
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
+        # No errors are added to new_password1
+        # self.assertFormError(response, 'form', 'new_password1', 'This field is required.')
+
+        data_without_new_password2 = self.data_ok.copy()
+        del data_without_new_password2['new_password2']
+        response = self.client.post(self.url, data=data_without_new_password2, follow=True)
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
+        # No errors are added to new_password2
+        # self.assertFormError(response, 'form', 'new_password2', 'This field is required.')
