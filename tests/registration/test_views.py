@@ -306,7 +306,6 @@ class TestResetPasswordView(TestCase):
         self.url = reverse('registration:password_reset')
 
     def test_access_ok(self):
-        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code, 'User cannot access.')
@@ -356,16 +355,51 @@ class TestPasswordResetConfirmView(TestCase):
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.url = reverse('registration:password_reset_confirm', kwargs={'uidb64': self.uid, 'token': self.token})
 
+    def test_access_ok(self):
+        response = self.client.get(self.url)
+        self.assertEqual(302, response.status_code, 'User is not redirected.')
+
+        url = response.url
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code, 'User cannot access.')
+        self.assertTemplateUsed(response, 'registration/password_change.html')
+
     @mock.patch('registration.views.messages')
     def test_ok(self, mock_call):
-        response = self.client.post(self.url, data=self.data_ok)
+        response = self.client.get(self.url)
+        # Unencrypted URL
+        url = response.url
+        response = self.client.post(url, data=self.data_ok)
         self.assertEqual(302, response.status_code, 'User is no redirected.')
-        # Cannot catch message
-        # success_message = _('Password changed successfully!')
-        # mock_call.success.assert_called_with(
-        #     response.wsgi_request,
-        #     success_message
-        # )
+        success_message = _('Password changed successfully!')
+        mock_call.success.assert_called_with(
+            response.wsgi_request,
+            success_message
+        )
+
+    def test_required_fields_not_given_ko(self):
+        response = self.client.get(self.url)
+        url = response.url
+
+        data_without_new_password1 = self.data_ok.copy()
+        del data_without_new_password1['new_password1']
+        response = self.client.post(url, data=data_without_new_password1, follow=True)
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
+        self.assertFormError(response, 'form', 'new_password1', 'This field is required.')
+
+        data_without_new_password2 = self.data_ok.copy()
+        del data_without_new_password2['new_password2']
+        response = self.client.post(url, data=data_without_new_password2, follow=True)
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
+        self.assertFormError(response, 'form', 'new_password2', 'This field is required.')
+
+    def test_user_can_login_with_new_password_ok(self):
+        response = self.client.get(self.url)
+        # Encrypted URL
+        url = response.url
+        response = self.client.post(url, data=self.data_ok)
 
         self.client.login(
             username=self.user.username,
@@ -373,20 +407,3 @@ class TestPasswordResetConfirmView(TestCase):
         )
 
         self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
-
-    def test_required_fields_not_given_ko(self):
-        data_without_new_password1 = self.data_ok.copy()
-        del data_without_new_password1['new_password1']
-        response = self.client.post(self.url, data=data_without_new_password1, follow=True)
-        form = response.context['form']
-        self.assertFalse(form.is_valid())
-        # No errors are added to new_password1
-        # self.assertFormError(response, 'form', 'new_password1', 'This field is required.')
-
-        data_without_new_password2 = self.data_ok.copy()
-        del data_without_new_password2['new_password2']
-        response = self.client.post(self.url, data=data_without_new_password2, follow=True)
-        form = response.context['form']
-        self.assertFalse(form.is_valid())
-        # No errors are added to new_password2
-        # self.assertFormError(response, 'form', 'new_password2', 'This field is required.')
