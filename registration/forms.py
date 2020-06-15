@@ -6,8 +6,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Column, Div, Layout, Row, Submit
 from django import forms
 from django.conf import settings
+from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
@@ -18,7 +18,7 @@ from bot.models import DiscordUser
 LOGGER = logging.getLogger(__name__)
 
 
-class LoginForm(AuthenticationForm):
+class LoginForm(auth_forms.AuthenticationForm):
     """
     Custom form to render with Crispy.
     """
@@ -44,7 +44,7 @@ class LoginForm(AuthenticationForm):
                         Row(
                             HTML(
                                 '<a class="mr-lg-5" href="{url}">{text}</a>'.format(
-                                    url='#no-url',
+                                    url=reverse('registration:password_reset'),
                                     text=_('Forgot password?')
                                 )
                             ),
@@ -65,7 +65,7 @@ class LoginForm(AuthenticationForm):
         )
 
 
-class SignUpForm(UserCreationForm):
+class SignUpForm(auth_forms.UserCreationForm):
     """
     User registration form.
     """
@@ -255,7 +255,7 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email')
-        field_classes = {'username': UsernameField}
+        field_classes = {'username': auth_forms.UsernameField}
         help_texts = {
             'email': _('We will send you an email to confirm your account') + '.'
         }
@@ -298,3 +298,59 @@ class ResendEmailForm(forms.Form):
             msg = _('This email doesn\'t belong to a user') + '.'
             self.add_error('email', msg)
         return data
+
+
+class PasswordResetForm(auth_forms.PasswordResetForm):
+    """
+    This forms allows a user to resets its password.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        msg = '{}.'.format(_('We will send you a recovery link to this email'))
+        self.add_help_text('email', msg)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column('email')
+            ),
+            Row(
+                Column(
+                    Submit('submit', _('Send email'), css_class='w-100')
+                )
+            )
+        )
+
+    def add_help_text(self, field, help_text):
+        self.fields[field].help_text = help_text
+
+    def clean_email(self):
+        data = self.cleaned_data.get('email')
+        if not get_user_model().objects.filter(email=data).exists():
+            msg = _('This email doesn\'t belong to a user') + '.'
+            self.add_error('email', msg)
+        return data
+
+
+class SetPasswordForm(auth_forms.SetPasswordForm):
+    """
+    Allows the user to change the password.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column('new_password1', css_class='col-12 col-lg-5'),
+                Column('new_password2', css_class='col-12 col-lg-5'),
+                css_class='justify-content-around'
+            ),
+            Row(
+                Column(
+                    Submit('submit', _('Change password'), css_class='w-100'),
+                    css_class='col-12 col-lg-6'
+                ),
+                css_class='justify-content-around'
+            )
+        )

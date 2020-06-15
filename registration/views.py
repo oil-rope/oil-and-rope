@@ -200,3 +200,41 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         except get_user_model().MultipleObjectsReturned:
             messages.warning(self.request, _('Multiple users with same email, please contact our developers'))
             return super().form_invalid(form)
+
+
+class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordResetView):
+    """
+    Allow user to reset its password.
+    """
+
+    # Error non-reverse matching if no declared
+    email_template_name = 'email_templates/password_reset_email.html'
+
+    extra_email_context = {
+        'title': _('Password reset')
+    }
+    form_class = forms.PasswordResetForm
+    html_email_template_name = 'email_templates/password_reset_email.html'
+    success_url = reverse_lazy('registration:login')
+    template_name = 'registration/password_reset.html'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        msg = '{}'.format(_('Email for password reset request sent!'))
+        messages.success(self.request, msg)
+        return response
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """
+    Allows the user to set a new password.
+    """
+
+    form_class = forms.SetPasswordForm
+    success_url = reverse_lazy('registration:login')
+    template_name = 'registration/password_change.html'
+
+    def form_valid(self, form):
+        msg = '{}'.format(_('Password changed successfully!'))
+        messages.success(self.request, msg)
+        return super().form_valid(form)
