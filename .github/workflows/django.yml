@@ -22,7 +22,6 @@ jobs:
       DB_USER: oilandrope
       DJANGO_SETTINGS_MODULE: oilandrope.settings
       SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
-      DJANGO_ALLOW_ASYNC_UNSAFE: true
 
     # Set up Postgres
     services:
@@ -91,7 +90,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
-      DJANGO_ALLOW_ASYNC_UNSAFE: true
 
     strategy:
       max-parallel: 4
