@@ -69,7 +69,7 @@ jobs:
 
       - name: Pytest
         run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov pytest-env
           pytest --cov ./ --cov-report xml
 
       - name: Django Check
@@ -121,7 +121,7 @@ jobs:
 
       - name: Pytest
         run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov pytest-env
           pytest --cov ./ --cov-report xml
 
       - name: Django Check
