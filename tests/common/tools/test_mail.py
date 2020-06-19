@@ -48,7 +48,7 @@ class HtmlThreadMail(TestCase):
     def test_email_sent_ok(self):
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.email.send()
-            while self.email.is_alive():
+            while self.email.is_alive():  # pragma: no cover
                 print("Thread no done yet.")
                 time.sleep(.5)
             self.assertEqual(1, len(mail.outbox), 'Email has not been sent.')
