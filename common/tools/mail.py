@@ -1,6 +1,5 @@
 import threading
 
-from django.contrib.sites.shortcuts import get_current_site
 from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -13,7 +12,8 @@ class ThreadMail(threading.Thread):
                  reply_to=None):
         super().__init__()
         self.fail_silently = False
-        self.mail = mail.EmailMessage(subject, body, from_email, to, bcc, connection, attachments, headers, cc, reply_to)
+        self.mail = mail.EmailMessage(subject, body, from_email, to, bcc,
+                                      connection, attachments, headers, cc, reply_to)
 
     def run(self):
         self.mail.send(self.fail_silently)
@@ -38,8 +38,8 @@ class HtmlThreadMail(threading.Thread):
         self.plain_message = strip_tags(self.body)
 
     def run(self):
-        mail.send_mail(subject=self.subject, message=self.plain_message, from_email=self.from_email, recipient_list=self.to,
-                       html_message=self.body)
+        mail.send_mail(subject=self.subject, message=self.plain_message, from_email=self.from_email,
+                       recipient_list=self.to, html_message=self.body)
 
     def send(self):
         self.start()

@@ -1,7 +1,6 @@
 import time
 
 from django.core import mail
-from django.template.loader import render_to_string
 from django.test import TestCase
 from faker import Faker
 
