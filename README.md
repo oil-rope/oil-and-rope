@@ -10,9 +10,9 @@ The goald of this project is to make online roleplay easier and intuitive.
 
 You can try now at our website [Oil & Rope Web](https://oilandrope-project.com/).
 
-- [The Project](#the-project)
-- [Installation](#installation)
-- [Docker](#docker)
+-   [The Project](#the-project)
+-   [Installation](#installation)
+-   [Docker](#docker)
 
 ## The Project
 
@@ -21,10 +21,10 @@ Since a lot of people often use Discord for roleplay gaming we thought it might 
 
 The project is based on four fundamental technologies:
 
-- [Web with Django](#web)
-- [ASGI with Channels](#asgi)
-- [WebSocket components with React](#react-components)
-- [Discord Bot with Discord.py](#discord)
+-   [Web with Django](#web)
+-   [ASGI with Channels](#asgi)
+-   [WebSocket components with React](#react-components)
+-   [Discord Bot with Discord.py](#discord)
 
 ### Web
 
@@ -45,10 +45,10 @@ The web is directly linked to [Oil &amp; Rope Bot](https://discord.com/oauth2/au
 
 ## Installation
 
-- [Web](#setup-web)
-- [ASGI](#setup-channels)
-- [React](#setup-react)
-- [Discord](#setup-bot)
+-   [Web](#setup-web)
+-   [ASGI](#setup-channels)
+-   [React](#setup-react)
+-   [Discord](#setup-bot)
 
 First of all we need to clone this repository `git clone https://github.com/oil-rope/oil-and-rope.git`.  
 The dependencies are managed by [poetry](https://python-poetry.org/) and are easily installed by `poetry install`.  
@@ -64,24 +64,24 @@ The dependencies are managed by [poetry](https://python-poetry.org/) and are eas
 
 > There're a couple of *environment variables* that might be helpful when developing or even deploying the app. A list of this variables can be found either in `.env.example` or `.envrc.example`.
 
-1. Run migrations: `python manage.py migrate --settings oilandrope.dev_settings`.
-2. *(Recommended) Run tests: `pytest`. Pytest it directly pointing to `dev_settings` in `setup.cfg`*
-3. Run server: `python manage.py runserver --settings oilandrope.dev_settings`.
+1.  Run migrations: `python manage.py migrate --settings oilandrope.dev_settings`.
+2.  *(Recommended) Run tests: `pytest`. Pytest it directly pointing to `dev_settings` in `setup.cfg`*
+3.  Run server: `python manage.py runserver --settings oilandrope.dev_settings`.
 
 ### Setup Channels
 
 We use Docker to simulate a Redis machine that manage ASGI requests.
 
-1. Run `docker run --rm -p 6739:6739 --name redis redis`. This docker machine will manage all ASGI requests if you are running the web with `dev_settings.py`.
+1.  Run `docker run --rm -p 6739:6739 --name redis redis`. This docker machine will manage all ASGI requests if you are running the web with `dev_settings.py`.
 
 ### Setup React
 
 For dealing with React Components we use [Node.js](https://nodejs.org/es/), [npm](https://www.npmjs.com/get-npm) and [webpack](https://www.npmjs.com/get-npm).  
 There are two simple runs: `dev` for development and `build` for compiling production JS.
 
-1. Install dependencies: `npm install`.
-2. *(Recommended) Run tests: `npm run test`.*
-3. Compile JS: `npm run dev` for development (with watch) or `npm run build` for production.
+1.  Install dependencies: `npm install`.
+2.  *(Recommended) Run tests: `npm run test`.*
+3.  Compile JS: `npm run dev` for development (with watch) or `npm run build` for production.
 
 JS bundles are stored in `frontend/static/frontend/dist/` and can be called by Django with `{% static %}`.
 
@@ -93,14 +93,13 @@ In order the bot to run you need some *environment variables* such as token and 
 
 All extra environment variables can be found either in `.env.example` or `.envrc.example`.
 
-1. Run `python manage.py runbot --settings oilandrope.dev_settings`.
+1.  Run `python manage.py runbot --settings oilandrope.dev_settings`.
 
 ## Docker
 
 You can setup a production-like environment with [Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/).  
 The configuration file is `docker-compose.yml` and includes a PostgreSQL Database, ASGI machine with Daphne, WSGI machine with Gunicorn and Nginx.
 
-1. Run `docker-compose up`. This will run an nginx in your [localhost:8000](http://localhost:8000) internally pointing to 80.
+1.  Run `docker-compose up`. This will run an nginx in your [localhost:8000](http://localhost:8000) internally pointing to 80.
 
 > Alternative you can run `docker-compose up -d` to avoid having logs of every started machine in your output.
-
