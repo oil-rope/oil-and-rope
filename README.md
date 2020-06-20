@@ -10,8 +10,9 @@ The goald of this project is to make online roleplay easier and intuitive.
 
 You can try now at our website [Oil & Rope Web](https://oilandrope-project.com/).
 
-- [The Project](##the-project)
-- [Installation](##installation)
+- [The Project](#the-project)
+- [Installation](#installation)
+- [Docker](#docker)
 
 ## The Project
 
@@ -20,10 +21,10 @@ Since a lot of people often use Discord for roleplay gaming we thought it might 
 
 The project is based on four fundamental technologies:
 
-- [Web with Django](###web)
-- [ASGI with Channels](###asgi)
-- [WebSocket components with React](###react-components)
-- [Discord Bot with Discord.py](###discord)
+- [Web with Django](#web)
+- [ASGI with Channels](#asgi)
+- [WebSocket components with React](#react-components)
+- [Discord Bot with Discord.py](#discord)
 
 ### Web
 
@@ -44,6 +45,11 @@ The web is directly linked to [Oil &amp; Rope Bot](https://discord.com/oauth2/au
 
 ## Installation
 
+- [Web](#setup-web)
+- [ASGI](#setup-channels)
+- [React](#setup-react)
+- [Discord](#setup-bot)
+
 First of all we need to clone this repository `git clone https://github.com/oil-rope/oil-and-rope.git`.  
 The dependencies are managed by [poetry](https://python-poetry.org/) and are easily installed by `poetry install`.  
 
@@ -59,7 +65,7 @@ The dependencies are managed by [poetry](https://python-poetry.org/) and are eas
 > There're a couple of *environment variables* that might be helpful when developing or even deploying the app. A list of this variables can be found either in `.env.example` or `.envrc.example`.
 
 1. Run migrations: `python manage.py migrate --settings oilandrope.dev_settings`.
-2. *(Recommended) Run tests: `pytest`.*
+2. *(Recommended) Run tests: `pytest`. Pytest it directly pointing to `dev_settings` in `setup.cfg`*
 3. Run server: `python manage.py runserver --settings oilandrope.dev_settings`.
 
 ### Setup Channels
@@ -81,5 +87,20 @@ JS bundles are stored in `frontend/static/frontend/dist/` and can be called by D
 
 ### Setup Bot
 
-In order the bot to run you need some *environment variables* such as token and command.
+In order the bot to run you need some *environment variables* such as token and command.  
+`BOT_TOKEN` is used to connect [discord.py](https://github.com/Rapptz/discord.py) to your bot via Discord bot's token.  
+`BOT_COMMAND` is used as the command to call the bot.  
+
+All extra environment variables can be found either in `.env.example` or `.envrc.example`.
+
+1. Run `python manage.py runbot --settings oilandrope.dev_settings`.
+
+## Docker
+
+You can setup a production-like environment with [Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/).  
+The configuration file is `docker-compose.yml` and includes a PostgreSQL Database, ASGI machine with Daphne, WSGI machine with Gunicorn and Nginx.
+
+1. Run `docker-compose up`. This will run an nginx in your [localhost:8000](http://localhost:8000) internally pointing to 80.
+
+> Alternative you can run `docker-compose up -d` to avoid having logs of every started machine in your output.
 
