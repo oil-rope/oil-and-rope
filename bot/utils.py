@@ -7,8 +7,6 @@ from django.utils.timezone import is_naive, make_aware
 
 from common.tools.sync import async_get, async_get_or_create
 
-from . import exceptions
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -26,9 +24,6 @@ async def get_or_create_discord_user(member):
     user: :class:`models.DiscordUser`
         The user fetched.
     """
-
-    if not member:
-        raise exceptions.OilAndRopeException('Discord User cannot be None.')
 
     if not hasattr(member, 'premium_since'):  # pragma: no cover
         premium_since = None

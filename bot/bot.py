@@ -61,7 +61,7 @@ class OilAndRopeBot(commands.Bot):
 
         if not env_file.exists():
             raise OilAndRopeException(_('Env file does not exist') + '.')
-        load_dotenv(env_file.as_posix())
+        load_dotenv(env_file.as_posix(), verbose=True, override=True)
 
     def load_commands(self):
         """
