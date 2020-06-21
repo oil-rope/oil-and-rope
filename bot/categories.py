@@ -2,13 +2,14 @@ import logging
 import re
 from random import randint
 
-from asgiref.sync import sync_to_async
 from discord.ext.commands import Cog, command
 from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 
-from common.tools.sync import async_get, async_add
-from . import utils
+from common.tools.sync import async_add, async_get
+
+from . import enums, utils
+from .commands.roleplay import world_delete, world_list
 
 LOGGER = logging.getLogger(__name__)
 
@@ -110,6 +111,39 @@ class RoleplayCog(Cog, name='Roleplay'):
         )
         await ctx.send(message)
 
+    @command()
+    async def worlds(self, ctx, action=enums.Actions.list, second_action=None):
+        """
+        Gives you information about your worlds.
+        If it's called without action it just lists all your worlds.
+
+        Parameters
+        ----------
+        action:
+            Can be `list`, `create`, `edit` or `remove`.
+        second_action:
+            For `list` can be `public` or `private`.
+        """
+
+        if action not in enums.Actions:
+            options = ', '.join(f'`{action.value}`' for action in enums.Actions)
+            msg = _('Invalid option. Supported options are {}').format(options) + '.'
+            await ctx.channel.send(msg)
+
+        author = ctx.author
+        bot = ctx.bot
+
+        if action == enums.Actions.list:
+            second_action = 'private' if not second_action else second_action
+            if second_action == 'public':
+                await world_list(author, public=True)
+            elif second_action == 'private':
+                await world_list(author)
+            else:
+                await author.send_help(self.worlds)
+        if action == enums.Actions.delete:
+            await world_delete(author, bot)
+
 
 class MiscellaneousCog(Cog, name='Miscellaneous'):
     """
@@ -121,7 +155,7 @@ class MiscellaneousCog(Cog, name='Miscellaneous'):
     @command()
     async def shutdown(self, ctx):
         """
-        If owner invokes this command bot will be shutted down.
+        If owner invokes this command bot will be shuttled down.
         """
 
         is_owner = await ctx.bot.is_owner(ctx.author)
@@ -162,4 +196,4 @@ class UserCog(Cog, name='User'):
             bot = ctx.bot
             await bot.confirm_user(author.id)
         else:
-            await author.send(_('You are part of the full experience already' + '!'))
+            await author.send(_('You are part of the full experience already') + '!')

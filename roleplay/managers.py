@@ -26,6 +26,15 @@ class PlaceManager(TreeManager):
             user = user.id
         return super().get_queryset().filter(user_id=user)
 
+    def own_places(self, user):
+        """
+        Return places where user is owner.
+        """
+
+        if isinstance(user, get_user_model()):
+            user = user.id
+        return super().get_queryset().filter(owner_id=user)
+
     def community_places(self):
         """
         Union places without user (community).

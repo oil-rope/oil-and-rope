@@ -1,12 +1,12 @@
 import logging
 
-import discord
-from discord import abc
 from django.apps import apps
 from django.conf import settings
+from django.shortcuts import reverse
 from django.utils.timezone import is_naive, make_aware
 
-from common.tools.sync import async_get_or_create
+from common.tools.sync import async_get, async_get_or_create
+
 from . import exceptions
 
 LOGGER = logging.getLogger(__name__)
@@ -136,3 +136,20 @@ async def get_or_create_discord_text_channel(channel, guild):
         logging.info('Text Channel %s created', text_channel)
 
     return text_channel
+
+
+async def get_url_from(resolver, site_id=settings.SITE_ID, secure=settings.DEBUG, kwargs=None):
+    """
+    Constructs absolute URL from given params.
+    """
+
+    Site = apps.get_model('sites.Site')
+    site = await async_get(Site, pk=site_id)
+    http_protocol = 'http://' if secure else 'http://'
+    if kwargs:
+        reverse_url = reverse(resolver, kwargs=kwargs)
+    else:
+        reverse_url = reverse(resolver)
+    url = f'{http_protocol}{site.domain}{reverse_url}'
+
+    return url
