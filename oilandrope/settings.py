@@ -282,9 +282,16 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
 
+# Discord
+
+DISCORD_API_URL = 'https://discord.com/api/'
+
 # Bot Settings
 
 BOT_INVITATION = os.getenv(
     'BOT_INVITATION',
     'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
 )
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
+BOT_DESCRIPTION = os.getenv('BOT_DESCRIPTION', 'Oil & Rope Bot: Managing sessions was never this easy!')
