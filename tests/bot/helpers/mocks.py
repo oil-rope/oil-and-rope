@@ -20,6 +20,10 @@ class MemberMock(mock.MagicMock):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **self.data, **kwargs)
 
+    async def send(self, content=None, *, tts=False, embed=None, file=None, files=None,
+                   delete_after=None, nonce=None, allowed_mentions=None):
+        return content
+
 
 class RegionMock(mock.MagicMock):
 
