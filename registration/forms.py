@@ -237,13 +237,13 @@ class SignUpForm(auth_forms.UserCreationForm):
         """
 
         instance = super().save(commit=False)
-        # Set active to False until user acitvates email
+        # Set active to False until user activates email
         instance.is_active = False
         # Checks for DiscordUser
         discord_user = self.get_discord_user()
         if commit:
             instance.save()
-            # Adds foreing key if exists
+            # Adds foreign key if exists
             if discord_user:
                 discord_user.user = instance
                 discord_user.save()
@@ -265,9 +265,6 @@ class ResendEmailForm(forms.Form):
     """
     Checks for given email in database.
     """
-
-    custom_classes = 'bg-transparent border-extra border-top-0 border-right-0 border-left-0 border-bottom rounded-0'
-    submit_classes = 'btn btn-extra btn-lg'
 
     email = forms.EmailField(
         label=_('Email address'),
