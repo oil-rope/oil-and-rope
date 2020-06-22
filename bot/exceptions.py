@@ -47,7 +47,7 @@ class HelpfulError(OilAndRopeException):
     """
 
     def __init__(self, issue, solution, *, preface="An error ocurred", footnote="", expire_in=0):
-        super(HelpfulError, self).__init__(issue, expire_in=expire_in)
+        super().__init__(issue, expire_in=expire_in)
         self.issue = issue
         self.solution = solution
         self.preface = preface
@@ -72,3 +72,15 @@ class HelpfulErrorWarning(HelpfulError):
     """
     Warning instead of error.
     """
+
+
+class DiscordApiException(HelpfulError):
+    """
+    Handles error to give a possible solution.
+    """
+
+    def __init__(self, error_code):
+        self.handle_error_code(error_code)
+
+    def handle_error_code(self, error_code):
+        pass
