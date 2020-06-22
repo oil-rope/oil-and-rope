@@ -25,6 +25,7 @@ Pillow = "^7"
 psycopg2-binary = "^2"
 python-dateutil = "^2"
 python-dotenv = "^0"
+requests = "^2.24.0"
 Twisted = {extras = ["tls", "http2"], version = "^20"}
 xlrd = "^1"
 
