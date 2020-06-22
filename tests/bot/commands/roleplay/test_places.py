@@ -2,19 +2,19 @@ from unittest import mock
 
 import pytest
 from django.apps import apps
-from django.conf import settings
 from model_bakery import baker
 
 from bot.commands.roleplay import world_list
 from bot.commands.roleplay.places import world_delete
 from bot.models import DiscordUser
 from bot.utils import get_url_from
+from common.constants.models import PLACE_MODEL, USER_MODEL
 from common.tools.sync import async_manager_func
 from common.tools.sync.models import async_get
 from tests.bot.helpers import mocks
 
-Place = apps.get_model('roleplay.Place')
-User = apps.get_model(settings.AUTH_USER_MODEL)
+Place = apps.get_model(PLACE_MODEL)
+User = apps.get_model(USER_MODEL)
 
 
 @pytest.fixture(scope='function')
@@ -116,7 +116,7 @@ async def test_world_delete_ok(mock_call, registered_author):
 @mock.patch('tests.bot.helpers.mocks.MemberMock.send')
 async def test_world_delete_empty(mock_call, registered_author):
     author = registered_author
-    bot = mocks.ClientMock(ignore_check_wait_for=True, wait_for_default=str(1))
+    bot = mocks.ClientMock()
     await world_delete(author, bot)
 
     all_calls = mock_call.mock_calls
