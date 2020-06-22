@@ -12,6 +12,10 @@ export SECRET_KEY="de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo"
 export ALLOWED_HOSTS=*
 export WS_HOST=localhost:8000
 export DEBUG=True
+export EMAIL_HOST=smtp.mailtrap.io
+export EMAIL_HOST_USER=user@mailtrap
+export EMAIL_HOST_PASSWORD=mailtrap_p4ssw0rd
+export EMAIL_PORT=2525
 
 # Gunicorn
 export GUNICORN_ACCESS_LOGFILE=/var/log/gunicorn/oilandrope_access.log
