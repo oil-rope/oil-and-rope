@@ -10,6 +10,7 @@ from bot.models import DiscordUser
 from common.tools.sync import async_manager_func
 from common.tools.sync.models import async_get
 from tests.bot.helpers import mocks
+from bot.commands.roleplay.places import world_delete
 
 Place = apps.get_model('roleplay.Place')
 User = apps.get_model(settings.AUTH_USER_MODEL)
@@ -80,3 +81,21 @@ async def test_world_list_public_ok(mock_call, registered_author):
         mock.call(worlds_expected),
         mock.call(info_msg_expected),
     ])
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+@mock.patch('tests.bot.helpers.mocks.MemberMock.send')
+async def test_world_delete(mock_call, registered_author):
+    author = registered_author
+    # We use 1 for convetion (to make check == 1 -> True), is indeed NOT RECOMMENDED
+    deleted_world = 1
+    bot = mocks.ClientMock(ignore_check_wait_for=True, wait_for_default=str(1))
+    user = await async_get(User, discord_user__id=author.id)
+    worlds = baker.make(Place, 2, user=user, owner=user)
+    worlds = await async_manager_func(Place, 'own_places', user=user)
+    deleted_world = worlds[1]
+
+    await world_delete(author, bot)
+    with pytest.raises(Place.DoesNotExist):
+        await async_get(Place, pk=deleted_world.pk)

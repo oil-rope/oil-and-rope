@@ -1,11 +1,12 @@
 from unittest import mock
 
 from faker import Faker
+import asyncio
 
 fake = Faker()
 
 
-class MemberMock(mock.MagicMock):
+class ClientMock(mock.MagicMock):
 
     data = {
         'id': fake.random_int(),
@@ -19,6 +20,22 @@ class MemberMock(mock.MagicMock):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **self.data, **kwargs)
+        self.ignore_check_wait_for = kwargs.pop('ignore_check_wait_for', False)
+        self.wait_for_default = kwargs.pop('wait_for_default', fake.paragraph())
+
+    async def _wait_for(self, event, *, check=None):
+        message = mock.MagicMock()
+        message.content = self.wait_for_default
+
+        if self.ignore_check_wait_for:
+            return message
+
+    async def wait_for(self, event, *, check=None, timeout=None):
+        msg = await asyncio.wait_for(self._wait_for(event, check=check), timeout=timeout)
+        return msg
+
+
+class MemberMock(ClientMock):
 
     async def send(self, content=None, *, tts=False, embed=None, file=None, files=None,
                    delete_after=None, nonce=None, allowed_mentions=None):
