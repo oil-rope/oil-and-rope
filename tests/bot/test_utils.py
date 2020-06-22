@@ -25,6 +25,8 @@ async def test_get_or_create_discord_user_ok():
 @pytest.mark.asyncio
 async def test_get_or_create_discord_server_ok():
     guild = mocks.GuildMock()
+    member = guild.owner
+    await get_or_create_discord_user(member)
 
     discord_server = await get_or_create_discord_server(guild)
     await async_get(DiscordServer, pk=discord_server.pk)
@@ -33,9 +35,11 @@ async def test_get_or_create_discord_server_ok():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_get_or_create_discord_text_channel_ok():
-    guild = mocks.GuildMock()
-    await get_or_create_discord_server(guild)
     channel = mocks.TextChannelMock()
+    guild = channel.guild
+    member = guild.owner
+    await get_or_create_discord_user(member)
+    await get_or_create_discord_server(guild)
 
     discord_text_channel = await get_or_create_discord_text_channel(channel, guild)
     await async_get(DiscordTextChannel, pk=discord_text_channel.pk)
