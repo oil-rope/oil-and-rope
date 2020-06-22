@@ -34,3 +34,8 @@ export DAPHNE_ERROR_LOGFILE=/var/log/daphne/oilandrope_error.log
 export DAPHNE_ASGI_MODULE=oilandrope.asgi
 export DAPHNE_PORT=80
 export DAPHNE_SOCKET=/var/run/daphne/oilandrope.sock
+
+# Bot
+export BOT_TOKEN="your bot token"
+export BOT_COMMAND_PREFIX=">"
+export BOT_PREFIX="Oil & Rope Bot"
