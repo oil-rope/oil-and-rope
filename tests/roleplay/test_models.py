@@ -3,6 +3,7 @@ import pathlib
 import tempfile
 import unittest
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -13,6 +14,7 @@ from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
 
+from common.constants import models as constants
 from roleplay import models
 from roleplay.enums import DomainTypes, SiteTypes
 
@@ -387,3 +389,44 @@ class TestPlace(TestCase):
         self.assertIn('user', ex.error_dict)
         message = ex.error_dict['user'][0].message
         self.assertEqual(message, 'A private world must have owner.')
+
+
+class TestRace(TestCase):
+    model = apps.get_model(constants.RACE_MODEL)
+    m2m_model = apps.get_model(constants.USER_RACE_RELATION)
+
+    def setUp(self):
+        self.faker = Faker()
+
+    def test_create_ok(self):
+        instance = self.model.objects.create(name=self.faker.word(), description=self.faker.paragraph())
+        self.model.objects.get(pk=instance.pk)
+
+    def test_create_with_owner_ok(self):
+        instance = self.model.objects.create(name=self.faker.word(), description=self.faker.paragraph())
+        users = baker.make(constants.USER_MODEL, 3)
+        instance.add_owners(*users)
+
+        owners = instance.owners
+        result = all(user in owners for user in users)
+        self.assertTrue(result)
+
+    def test_str_ok(self):
+        instance = self.model.objects.create(name=self.faker.word(), description=self.faker.paragraph())
+        expected = f'{instance.name} [{instance.pk}]'
+
+        self.assertEqual(expected, str(instance))
+
+
+class TestRaceUser(TestCase):
+    model = apps.get_model(constants.USER_RACE_RELATION)
+
+    def setUp(self):
+        self.user = baker.make(constants.USER_MODEL)
+        self.race = baker.make(constants.RACE_MODEL)
+
+    def test_str_ok(self):
+        instance = self.model.objects.create(user=self.user, race=self.race)
+        expected = f'{instance.user.username} <-> {instance.race.name}'
+
+        self.assertEqual(expected, str(instance))

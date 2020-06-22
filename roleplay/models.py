@@ -1,9 +1,11 @@
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from common.constants import models as constants
 from common.files.upload import default_upload_to
 from common.validators import validate_file_size
 from core.models import TracingMixin
@@ -246,3 +248,95 @@ class Place(MPTTModel, TracingMixin):
 
     def __str__(self):
         return self.name
+
+
+class Race(TracingMixin):
+    """
+    Model to manage Races.
+
+    Parameters
+    ----------
+    name: :class:`str`
+        Name of the race.
+    description: :class:`str`
+        About the creature.
+    strength: :class:`int`
+        Modifier for strength.
+    dexterity: :class:`int`
+        Modifier for dexterity.
+    constitution: :class:`int`
+        Modifier for constitution.
+    intelligence: :class:`int`
+        Modifier for intelligence.
+    wisdom: :class:`int`
+        Modifier for wisdom.
+    charisma: :class:`int`
+        Modfier for charisma.
+    affected_by_armor: :class:`boolean`
+        Declares if this race is affected by any penalty that armor can give.
+    image: :class:`file`
+        Image for the race.
+    users: :class:`User`
+        Users that have this race.
+    """
+
+    name = models.CharField(verbose_name=_('Name'), max_length=50)
+    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    strength = models.SmallIntegerField(verbose_name=_('Strength'), default=0)
+    dexterity = models.SmallIntegerField(verbose_name=_('Dexterity'), default=0)
+    constitution = models.SmallIntegerField(verbose_name=_('Constitution'), default=0)
+    intelligence = models.SmallIntegerField(verbose_name=_('Intelligence'), default=0)
+    wisdom = models.SmallIntegerField(verbose_name=_('Wisdom'), default=0)
+    charisma = models.SmallIntegerField(verbose_name=_('Charisma'), default=0)
+    affected_by_armor = models.BooleanField(verbose_name=_('Affected by armor'), default=True,
+                                            help_text=_('Declares if this race is affected by armor penalties'))
+    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, validators=[validate_file_size],
+                              null=True, blank=True)
+    users = models.ManyToManyField(verbose_name=_('Users'), to=constants.USER_MODEL, related_name='race_set',
+                                   db_index=True, through=constants.USER_RACE_RELATION)
+
+    @property
+    def owners(self):
+        qs = self.users.filter(m2m_race_set__is_owner=True)
+        return qs
+
+    def add_owners(self, *users):
+        # Getting RaceUser model
+        model = apps.get_model(constants.USER_RACE_RELATION)
+        new_entries = []
+        for user in users:
+            entry = model(user=user, race=self, is_owner=True)
+            new_entries.append(entry.save())
+        return model.objects.filter(pk__in=new_entries)
+
+    class Meta:
+        verbose_name = _('Race')
+        verbose_name_plural = _('Races')
+        ordering = ['-entry_created_at', 'name']
+
+    def __str__(self):
+        return f'{self.name} [{self.pk}]'
+
+
+class RaceUser(TracingMixin):
+    """
+    This class manage M2M for :class:`Race` and :class:`User`.
+
+    Parameters
+    ----------
+    user: :class:`User`
+        Related user.
+    race: :class:`Race`
+        Related race.
+    is_owner: :class:`boolean`
+        Declares if the related user is owner.
+    """
+
+    user = models.ForeignKey(verbose_name=_('User'), to=constants.USER_MODEL, related_name='m2m_race_set',
+                             on_delete=models.CASCADE, db_index=True)
+    race = models.ForeignKey(verbose_name=_('Race'), to=constants.RACE_MODEL, related_name='m2m_race_set',
+                             on_delete=models.CASCADE, db_index=True)
+    is_owner = models.BooleanField(verbose_name=_('Ownership'), default=False)
+
+    def __str__(self):
+        return f'{self.user.username} <-> {self.race.name}'
