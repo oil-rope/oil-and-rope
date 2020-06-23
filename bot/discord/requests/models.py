@@ -1,8 +1,9 @@
 from django.conf import settings
 
+from bot.exceptions import HelpfulError
+
 from .enums import ChannelTypes, MessageTypes
 from .utils import discord_api_get, discord_api_post
-from bot.exceptions import HelpfulError
 
 
 class ApiMixin:
@@ -14,7 +15,7 @@ class ApiMixin:
         self.url = self.get_url(url)
 
         if not self.url:
-            raise HelpfulError('URL canno be None.', 'Please declare a url or overwrite `get_url` method.')
+            raise HelpfulError('URL cannot be None.', 'Please declare a url or overwrite `get_url` method.')
 
         if response:
             self.response = response
@@ -60,7 +61,7 @@ class User(ApiMixin):
         data = {
             'recipient_id': self.id
         }
-        response = discord_api_post(url, data=data)
+        response = discord_api_post(url, data)
         json_response = response.json()
         channel_id = json_response['id']
 
@@ -103,7 +104,7 @@ class Channel(ApiMixin):
         data = {
             'content': content
         }
-        response = discord_api_post(url, data=data)
+        response = discord_api_post(url, data)
         msg_id = response.json()['id']
 
         # Creating message from given response should be faster
@@ -127,15 +128,13 @@ class Message(ApiMixin):
     base_url = f'{settings.DISCORD_API_URL}channels/'
 
     def __init__(self, channel, id, *, response=None):
-        self.id = id
-
         if isinstance(channel, Channel):
             self.channel = channel
         else:
             self.channel = Channel(channel)
-
         self.base_url = f'{self.base_url}{self.channel.id}/messages'
 
+        self.id = id
         super().__init__(self.get_url(), response=response)
         self.type = MessageTypes(self.type)
 
