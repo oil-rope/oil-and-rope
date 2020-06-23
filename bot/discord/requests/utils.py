@@ -44,7 +44,7 @@ def discord_api_post(url, data=None):
     response = discord_api_request(url=url, method=HttpMethods.POST, data=data)
 
     if response.status_code != 200:
-        raise DiscordApiException(response.status_code)
+        raise DiscordApiException(response)
 
     return response
 
@@ -57,6 +57,6 @@ def discord_api_get(url, data=None):
     response = discord_api_request(url=url, method=HttpMethods.GET, data=data)
 
     if response.status_code != 200:
-        raise DiscordApiException(response.status_code)
+        raise DiscordApiException(response)
 
     return response

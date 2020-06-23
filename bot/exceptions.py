@@ -53,14 +53,14 @@ class HelpfulError(OilAndRopeException):
         self.preface = preface
         self.footnote = footnote
         self.expire_in = expire_in
-        self._message_fmt = "\n{preface}\n{problem}\n\n{solution}\n\n{footnote}"
+        self._message_fmt = '\n{preface}\n{problem}\n\n{solution}\n\n{footnote}'
 
     @property
     def message(self):
         return self._message_fmt.format(
             preface=self.preface,
-            problem="\tProblem: %(problem)s" % {'problem': self.issue},
-            solution="\tSolution: %(solution)s" % {'solution': self.solution},
+            problem=f'\tProblem: {self.issue}',
+            solution=f'\tSolution: {self.solution}',
             footnote=self.footnote
         )
 
@@ -79,8 +79,17 @@ class DiscordApiException(HelpfulError):
     Handles error to give a possible solution.
     """
 
-    def __init__(self, error_code):
-        self.handle_error_code(error_code)
+    def __init__(self, response):
+        self.response = response
+        self.handle_error_code(self.response)
+        super().__init__(issue=self.issue, solution=self.solution, preface=self.preface, footnote=self.footnote)
 
-    def handle_error_code(self, error_code):
-        pass
+    def handle_error_code(self, response):
+        msg = response.json()['message']
+        status_code = response.status_code
+        self.preface = f'[{response.status_code}] {msg}'
+
+        if status_code == 400:
+            self.issue = f'Bad Request [{status_code}]'
+            self.solution = 'Maybe your data is bad formatted or you are trying to perform a forbidden action.'
+            self.footnote = 'Please note that a bot cannot interact with itself.'
