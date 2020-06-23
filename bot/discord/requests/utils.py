@@ -1,19 +1,10 @@
-import enum
 import json
 
 import requests
 from django.conf import settings
 
 from ...exceptions import DiscordApiException
-
-
-class HttpMethods(enum.Enum):
-    """
-    Declares supported methods.
-    """
-
-    GET = 'GET'
-    POST = 'POST'
+from .enums import HttpMethods
 
 
 def discord_api_request(url, method=HttpMethods.GET, data=None):
