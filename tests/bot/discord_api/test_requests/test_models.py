@@ -2,11 +2,12 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from faker import Faker
 
-from bot.discord.requests import models
-from bot.discord.requests.utils import discord_api_get
+from bot.discord_api import models
+from bot.discord_api.utils import discord_api_get
 from bot.exceptions import DiscordApiException
-from tests.bot.helpers.constants import (DUMMY_USER_WITH_DIFFERENT_SERVER, DUMMY_USER_WITH_SAME_SERVER,
-                                         LITECORD_API_URL, LITECORD_TOKEN)
+
+from ...helpers.constants import (DUMMY_USER_WITH_DIFFERENT_SERVER, DUMMY_USER_WITH_SAME_SERVER, LITECORD_API_URL,
+                                  LITECORD_TOKEN)
 
 
 class TestUser(TestCase):

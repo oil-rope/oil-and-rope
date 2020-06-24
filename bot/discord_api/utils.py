@@ -1,9 +1,10 @@
 import json
 
-import requests
 from django.conf import settings
 
-from ...exceptions import DiscordApiException
+import requests
+
+from ..exceptions import DiscordApiException
 from .enums import HttpMethods
 
 NO_ERROR_STATUS = (200, 201, 202, 100, 101)
