@@ -1,17 +1,12 @@
-import os
-
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from faker import Faker
 
 from bot.discord.requests import models
 from bot.discord.requests.utils import discord_api_get
 from bot.exceptions import DiscordApiException
-
-LITECORD_API_URL = os.getenv('LITECORD_API_URL', 'http://litecord.oilandrope-project.com/api/v6/')
-LITECORD_TOKEN = os.getenv('LITECORD_TOKEN', 'NzI1Mzg0MzQ4ODY1NTMxOTA1.XvPgHg.JjHlJl9Z8StR1nKCDyUVMY6qlw4')
-DUMMY_USER_WITH_SAME_SERVER = 725386995634933762
-DUMMY_USER_WITH_DIFFERENT_SERVER = 725383237609852928
+from tests.bot.helpers.constants import (DUMMY_USER_WITH_DIFFERENT_SERVER, DUMMY_USER_WITH_SAME_SERVER,
+                                         LITECORD_API_URL, LITECORD_TOKEN)
 
 
 class TestUser(TestCase):
@@ -38,26 +33,26 @@ class TestUser(TestCase):
         with self.assertRaises(DiscordApiException):
             user.create_dm()
 
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_create_dm_ok(self):
-        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
-            user = self.api_class(DUMMY_USER_WITH_SAME_SERVER)
-            dm = user.create_dm()
+        user = self.api_class(DUMMY_USER_WITH_SAME_SERVER)
+        dm = user.create_dm()
 
-            self.assertTrue(isinstance(dm, models.Channel))
+        self.assertTrue(isinstance(dm, models.Channel))
 
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_ok(self):
-        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
-            user = self.api_class(DUMMY_USER_WITH_SAME_SERVER)
-            msg = user.send_message(self.faker.word())
+        user = self.api_class(DUMMY_USER_WITH_SAME_SERVER)
+        msg = user.send_message(self.faker.word())
 
-            self.assertTrue(isinstance(msg, models.Message))
+        self.assertTrue(isinstance(msg, models.Message))
 
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_ko(self):
-        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
-            user = self.api_class(DUMMY_USER_WITH_DIFFERENT_SERVER)
+        user = self.api_class(DUMMY_USER_WITH_DIFFERENT_SERVER)
 
-            with self.assertRaises(DiscordApiException):
-                user.send_message(self.faker.word())
+        with self.assertRaises(DiscordApiException):
+            user.send_message(self.faker.word())
 
     def test_str_ok(self):
         user = self.api_class(self.id)
@@ -65,3 +60,23 @@ class TestUser(TestCase):
         result = repr(user)
 
         self.assertEqual(expected, result)
+
+
+@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+class TestChannel(TestCase):
+    api_class = models.Channel
+
+    def setUp(self):
+        user = models.User(DUMMY_USER_WITH_SAME_SERVER)
+        self.channel = user.create_dm()
+
+    def test_loads_ok(self):
+        channel_has_attrs = all([hasattr(self.channel, attr)] for attr in self.channel.json_response.keys())
+
+        self.assertTrue(channel_has_attrs)
+
+    def test_loads_from_response_ok(self):
+        channel = self.api_class(self.id, response=self.channel.response)
+        channel_has_attrs = all([hasattr(channel, attr)] for attr in channel.json_response.keys())
+
+        self.assertTrue(channel_has_attrs)
