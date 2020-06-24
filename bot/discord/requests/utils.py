@@ -6,6 +6,8 @@ from django.conf import settings
 from ...exceptions import DiscordApiException
 from .enums import HttpMethods
 
+NO_ERROR_STATUS = (200, 201, 202, 100, 101)
+
 
 def discord_api_request(url, method=HttpMethods.GET, data=None):
     """
@@ -34,7 +36,7 @@ def discord_api_post(url, data=None):
 
     response = discord_api_request(url=url, method=HttpMethods.POST, data=data)
 
-    if response.status_code != 200:
+    if response.status_code not in NO_ERROR_STATUS:
         raise DiscordApiException(response)
 
     return response
@@ -47,7 +49,7 @@ def discord_api_get(url, data=None):
 
     response = discord_api_request(url=url, method=HttpMethods.GET, data=data)
 
-    if response.status_code != 200:
+    if response.status_code not in NO_ERROR_STATUS:
         raise DiscordApiException(response)
 
     return response

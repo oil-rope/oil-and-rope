@@ -42,8 +42,6 @@ class ChannelTypes(enum.IntEnum):
 
 
 class MessageTypes(enum.IntEnum):
-    """
-    """
 
     DEFAULT = 0
     RECIPIENT_ADD = 1

@@ -27,6 +27,10 @@ class ApiMixin:
         for key, value in self.json_response.items():
             setattr(self, key, value)
 
+        # Turning ID into int again
+        # This will about some parsing issues
+        self.id = int(self.id)
+
     def get_url(self, url=None):
         return url
 
@@ -36,18 +40,21 @@ class User(ApiMixin):
     Represents a Discord User.
     """
 
-    base_url = f'{settings.DISCORD_API_URL}users/'
-
     def __init__(self, id, *, response=None):
         self.id = id
+        self.base_url = self.get_base_url()
         super().__init__(self.get_url(), response=response)
 
     @classmethod
     def from_bot(cls):
-        url = f'{cls.base_url}@me'
+        url = f'{cls.get_base_url()}@me'
         response = discord_api_get(url)
         response_json = response.json()
         return cls(response_json['id'], response=response)
+
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}users/'
 
     def get_url(self, url=None):
         return f'{self.base_url}{self.id}'
@@ -89,12 +96,16 @@ class Channel(ApiMixin):
     Represents a Discord Channel.
     """
 
-    base_url = f'{settings.DISCORD_API_URL}channels/'
-
     def __init__(self, id, *, response=None):
         self.id = id
+        self.base_url = self.get_base_url()
+
         super().__init__(self.get_url(), response=response)
         self.type = ChannelTypes(self.type)
+
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}channels/'
 
     def get_url(self, url=None):
         return f'{self.base_url}{self.id}'
@@ -125,18 +136,21 @@ class Message(ApiMixin):
     Represents a Discord Message.
     """
 
-    base_url = f'{settings.DISCORD_API_URL}channels/'
-
     def __init__(self, channel, id, *, response=None):
+        self.base_url = self.get_base_url()
         if isinstance(channel, Channel):
             self.channel = channel
         else:
             self.channel = Channel(channel)
         self.base_url = f'{self.base_url}{self.channel.id}/messages'
-
         self.id = id
+
         super().__init__(self.get_url(), response=response)
         self.type = MessageTypes(self.type)
+
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}channels/'
 
     def get_url(self, url=None):
         return f'{self.base_url}/{self.id}'

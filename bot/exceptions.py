@@ -93,6 +93,10 @@ class DiscordApiException(HelpfulError):
             self.issue = f'Bad Request [{status_code}]'
             self.solution = 'Maybe your data is bad formatted or you are trying to perform a forbidden action.'
             self.footnote = 'Please note that a bot cannot interact with itself.'
+        elif status_code == 401:
+            self.issue = f'Unauthorized [{status_code}]'
+            self.solution = 'Maybe you are trying to connect a user that is not sharing server with our bot.'
+            self.footnote = 'Please note that user and bot must share at least one server.'
         elif status_code == 403:
             self.issue = f'Forbidden [{status_code}]'
             self.solution = 'This action is forbidden. Maybe you need permissions?'
