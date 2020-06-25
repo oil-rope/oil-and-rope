@@ -6,8 +6,9 @@ from bot.discord_api import models
 from bot.discord_api.utils import discord_api_get
 from bot.exceptions import DiscordApiException, HelpfulError
 
-from ...helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
-                                  USER_WITH_SAME_SERVER)
+from ..helpers.constants import (
+    CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER, USER_WITH_SAME_SERVER
+)
 
 
 class TestApiMixin(TestCase):
@@ -138,7 +139,7 @@ class TestMessage(TestCase):
         msg = self.message.edit(text)
 
         self.assertEqual(text, msg.content)
-        # Message still the same
+        # Check if message is the same
         self.assertEqual(self.message.id, msg.id)
 
     def test_str_ok(self):
