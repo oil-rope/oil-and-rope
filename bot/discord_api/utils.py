@@ -28,6 +28,9 @@ def discord_api_request(url, method=HttpMethods.GET, data=None):
     if method == HttpMethods.POST:
         response = requests.post(url, headers=headers, data=data)
         return response
+    if method == HttpMethods.PATCH:
+        response = requests.patch(url, headers=headers, data=data)
+        return response
 
 
 def discord_api_post(url, data=None):
@@ -43,12 +46,25 @@ def discord_api_post(url, data=None):
     return response
 
 
-def discord_api_get(url, data=None):
+def discord_api_get(url):
     """
-    Makes a GET rquest to the given URL.
+    Makes a GET request to the given URL.
     """
 
-    response = discord_api_request(url=url, method=HttpMethods.GET, data=data)
+    response = discord_api_request(url=url, method=HttpMethods.GET)
+
+    if response.status_code not in NO_ERROR_STATUS:
+        raise DiscordApiException(response)
+
+    return response
+
+
+def discord_api_patch(url, data=None):
+    """
+    Makes a PATCH request to the given URL.
+    """
+
+    response = discord_api_request(url=url, method=HttpMethods.PATCH, data=data)
 
     if response.status_code not in NO_ERROR_STATUS:
         raise DiscordApiException(response)

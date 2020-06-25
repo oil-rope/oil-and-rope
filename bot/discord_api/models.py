@@ -3,7 +3,7 @@ from django.conf import settings
 from bot.exceptions import HelpfulError
 
 from .enums import ChannelTypes, MessageTypes
-from .utils import discord_api_get, discord_api_post
+from .utils import discord_api_get, discord_api_patch, discord_api_post
 
 
 class ApiMixin:
@@ -134,6 +134,15 @@ class Channel(ApiMixin):
 class Message(ApiMixin):
     """
     Represents a Discord Message.
+
+    Parameters
+    ----------
+    channel: :class:`Channel` or :class:`str` or :class:`int`
+        Instance of channel or ID.
+    id: :class:`str` or :class:`int`
+        ID of the message.
+    response: :class:`requests.models.Response`
+        Response attached to this message.
     """
 
     def __init__(self, channel, id, *, response=None):
@@ -147,6 +156,19 @@ class Message(ApiMixin):
 
         super().__init__(self.get_url(), response=response)
         self.type = MessageTypes(self.type)
+
+    def edit(self, content):
+        """
+        Edits the given message.
+        """
+
+        url = f'{self.base_url}/{self.id}'
+        data = {
+            'content': content
+        }
+        response = discord_api_patch(url, data)
+
+        return Message(self.channel, self.id, response=response)
 
     @classmethod
     def get_base_url(cls):

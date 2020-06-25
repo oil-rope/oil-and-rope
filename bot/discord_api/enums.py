@@ -8,6 +8,7 @@ class HttpMethods(enum.Enum):
 
     GET = 'GET'
     POST = 'POST'
+    PATCH = 'PATCH'
 
 
 class ChannelTypes(enum.IntEnum):

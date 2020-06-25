@@ -101,6 +101,10 @@ class DiscordApiException(HelpfulError):
             self.issue = f'Forbidden [{status_code}]'
             self.solution = 'This action is forbidden. Maybe you need permissions?'
             self.footnote = ''
+        elif status_code == 404:
+            self.issue = f'Not found [{status_code}]'
+            self.solution = 'The resource you are looking for does not exist. Is URL correct?'
+            self.footnote = ''
         else:
             self.issue = f'Error [{status_code}]'
             self.solution = ''
