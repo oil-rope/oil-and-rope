@@ -75,13 +75,13 @@ class User(ApiMixin):
         # Creating object from response should be faster
         return Channel(channel_id, response=response)
 
-    def send_message(self, content):
+    def send_message(self, content, embed=None):
         """
         Sends a message to this user.
         """
 
         dm = self.create_dm()
-        response = dm.send_message(content)
+        response = dm.send_message(content, embed=embed)
         return response
 
     def __str__(self):
@@ -110,16 +110,20 @@ class Channel(ApiMixin):
     def get_url(self, url=None):
         return f'{self.base_url}{self.id}'
 
-    def send_message(self, content):
+    def send_message(self, content, embed=None):
         url = f'{self.url}/messages'
         data = {
             'content': content
         }
+
+        if embed:
+            data['embed'] = embed.data
+
         response = discord_api_post(url, data)
         msg_id = response.json()['id']
 
         # Creating message from given response should be faster
-        msg = Message(self, msg_id, response=response)
+        msg = Message(self, msg_id, embed=embed, response=response)
         return msg
 
     def __str__(self):
@@ -145,7 +149,7 @@ class Message(ApiMixin):
         Response attached to this message.
     """
 
-    def __init__(self, channel, id, *, response=None):
+    def __init__(self, channel, id, *, embed=None, response=None):
         self.base_url = self.get_base_url()
         if isinstance(channel, Channel):
             self.channel = channel
@@ -153,6 +157,7 @@ class Message(ApiMixin):
             self.channel = Channel(channel)
         self.base_url = f'{self.base_url}{self.channel.id}/messages'
         self.id = id
+        self.embed = embed
 
         super().__init__(self.get_url(), response=response)
         self.type = MessageTypes(self.type)

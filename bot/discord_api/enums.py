@@ -59,3 +59,29 @@ class MessageTypes(enum.IntEnum):
     CHANNEL_FOLLOW_ADD = 12
     GUILD_DISCOVERY_DISQUALIFIED = 14
     GUILD_DISCOVERY_REQUALIFIED = 15
+
+
+class EmbedTypes(enum.Enum):
+    """
+    Supported types:
+    ----------------
+    rich:
+        Generic embed rendered from embed attributes.
+    image:
+        Image embed.
+    video:
+        Video embed.
+    gifv:
+        Animated gif image embed rendered as a video embed.
+    article:
+        Article embed.
+    link:
+        Link embed.
+    """
+
+    RICH = 'rich'
+    IMAGE = 'image'
+    VIDEO = 'video'
+    GIF = 'gifv'
+    ARTICLE = 'article'
+    LINK = 'link'

@@ -1,14 +1,16 @@
+import json
+
 from django.conf import settings
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from faker import Faker
 
-from bot.discord_api import models
+from bot.discord_api import embeds, models
 from bot.discord_api.utils import discord_api_get
 from bot.exceptions import DiscordApiException, HelpfulError
 
-from ..helpers.constants import (
-    CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER, USER_WITH_SAME_SERVER
-)
+from ..helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
+                                 USER_WITH_SAME_SERVER)
 
 
 class TestApiMixin(TestCase):
@@ -16,6 +18,63 @@ class TestApiMixin(TestCase):
     def test_raises_error_with_empty_url_ko(self):
         with self.assertRaises(HelpfulError):
             models.ApiMixin()
+
+
+class TestEmbed(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+        self.title = self.faker.word()
+        self.description = self.faker.paragraph()
+        self.url = self.faker.url()
+        self.timestamp = timezone.now()
+        self.color = self.faker.pyint(max_value=10)
+
+    def test_to_json(self):
+        embed = embeds.Embed(title=self.title, description=self.description, url=self.url,
+                             timestamp=self.timestamp, color=self.color)
+        data = {
+            'title': embed.title,
+            'type': embed.embed_type.value,
+            'description': embed.description,
+            'url': embed.url,
+            'timestamp': str(embed.timestamp),
+            'color': embed.color
+        }
+        expected = json.dumps(data)
+        result = embed.to_json()
+
+        self.assertEqual(expected, result)
+
+    def test_with_footer(self):
+        footer = embeds.EmbedFooter(text=self.faker.word(), icon_url=self.faker.url())
+        embed = embeds.Embed(title=self.title, description=self.description, url=self.url,
+                             timestamp=self.timestamp, color=self.color, footer=footer)
+
+        self.assertTrue(isinstance(embed.footer, embeds.EmbedFooter))
+        self.assertEqual(footer, embed.footer)
+
+
+class TestEmbedFooter(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+
+        self.text = self.faker.word()
+        self.icon_url = self.faker.url()
+        self.proxy_icon_url = self.faker.url()
+
+    def test_to_json(self):
+        footer = embeds.EmbedFooter(text=self.text, icon_url=self.icon_url, proxy_icon_url=self.proxy_icon_url)
+        data = {
+            'text': self.text,
+            'icon_url': self.icon_url,
+            'proxy_icon_url': self.proxy_icon_url
+        }
+        expected = json.dumps(data)
+        result = footer.to_json()
+
+        self.assertEqual(expected, result)
 
 
 class TestUser(TestCase):
@@ -29,6 +88,8 @@ class TestUser(TestCase):
         self.id = int(self.id)
 
         self.faker = Faker()
+        self.embed = embeds.Embed(title=self.faker.word(), description=self.faker.paragraph(),
+                                  url=self.faker.url(), color=self.faker.pyint(max_value=10))
 
     def test_from_bot_ok(self):
         user = self.api_class.from_bot()
@@ -55,6 +116,14 @@ class TestUser(TestCase):
         msg = user.send_message(self.faker.word())
 
         self.assertTrue(isinstance(msg, models.Message))
+
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_send_message_with_embed_ok(self):
+        user = self.api_class(USER_WITH_SAME_SERVER)
+        msg = user.send_message(self.faker.word(), embed=self.embed)
+
+        self.assertTrue(isinstance(msg, models.Message))
+        self.assertEqual(self.embed, msg.embed)
 
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_ko(self):
