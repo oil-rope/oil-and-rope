@@ -100,12 +100,12 @@ jobs:
       DJANGO_ALLOW_ASYNC_UNSAFE: true
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-      # Redis
-      services:
-        redis:
-          image: redis
-          ports:
-            - 6379:6379
+    # Redis
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     strategy:
       max-parallel: 4
