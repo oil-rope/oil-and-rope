@@ -1,3 +1,3 @@
-from .places import world_delete, world_list
+from .places import WorldsCommand
 
-__all__ = ['world_list', 'world_delete']
+__all__ = ['WorldsCommand']
