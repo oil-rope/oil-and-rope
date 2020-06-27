@@ -1,9 +1,10 @@
 from django.shortcuts import reverse
 from django.test import TestCase, override_settings
+from faker.proxy import Faker
+
+from bot.discord_api.models import Channel, Message
 
 from .helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
-from faker.proxy import Faker
-from bot.discord_api.models import Channel, Message
 
 
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
@@ -13,9 +14,10 @@ class TestSendMessageToDiscordUserView(TestCase):
         self.discord_user = USER_WITH_SAME_SERVER
         self.faker = Faker()
         self.data = {
-            'message_content': self.faker.word()
+            'discord_user_id': self.discord_user,
+            'message_content': self.faker.word(),
         }
-        self.url = reverse('bot:utils:send_message', kwargs={'discord_user': self.discord_user})
+        self.url = reverse('bot:utils:send_message')
 
     def test_post_ok(self):
         response = self.client.post(self.url, data=self.data)
@@ -45,3 +47,24 @@ class TestSendMessageToDiscordUserView(TestCase):
         msg = Message(channel, response.json()['id'])
 
         self.assertEqual(response.json(), msg.json_response)
+
+
+@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+class TestSendInvitationView(TestCase):
+
+    def setUp(self):
+        self.discord_user = USER_WITH_SAME_SERVER
+        self.data = {
+            'discord_user_id': self.discord_user
+        }
+        self.url = reverse('bot:utils:send_invitation')
+
+    def test_post_ok(self):
+        response = self.client.post(self.url, data=self.data)
+
+        self.assertEqual(201, response.status_code)
+
+    def test_post_missing_data_ko(self):
+        response = self.client.post(self.url, data={})
+
+        self.assertEqual(400, response.status_code)

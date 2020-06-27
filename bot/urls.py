@@ -12,7 +12,8 @@ router.register(r'discord_voice_channel', viewsets.DiscordVoiceChannelViewSet)
 app_name = 'bot'
 
 BOT_UTILS = [
-    path('send_message/<int:discord_user>/', views.SendMessageToDiscordUserView.as_view(), name='send_message'),
+    path('send_message/', views.SendMessageToDiscordUserView.as_view(), name='send_message'),
+    path('send_invitation/', views.SendInvitationView.as_view(), name='send_invitation')
 ]
 
 urlpatterns = [

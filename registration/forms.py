@@ -82,6 +82,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         self.request = request
         self.setup()
         self.consumer_url = self._resolve_consumer_url()
+        self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
         self.helper.form_class = 'container-fluid'
@@ -118,6 +119,7 @@ class SignUpForm(auth_forms.UserCreationForm):
                         # Refers to ReactComponent `UserCheckButton`
                         data_consumer_url=self.consumer_url,
                         data_invitation_url=settings.BOT_INVITATION,
+                        data_send_invitation_url=self.send_invitation_url,
                         data_related_field='id_discord_id',
                         css_id='discord_check_user'
                     ),
