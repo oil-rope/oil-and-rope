@@ -1,9 +1,11 @@
 from collections import defaultdict
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from django.http import HttpResponseForbidden
 
 from bot.discord_api.models import User
 
@@ -13,9 +15,19 @@ class SendMessageToDiscordUserView(View):
     required_arguments = ['message_content']
 
     def dispatch(self, request, *args, **kwargs):
-        breakpoint()
-        response = super().dispatch(request, *args, **kwargs)
-        return response
+        if '*' in settings.ALLOWED_HOSTS:
+            return super().dispatch(request, *args, **kwargs)
+
+        # We will allow requests only from ALLOWED_HOSTS
+        try:
+            client_ip = request.META['REMOTE_ADDR']
+        except KeyError:  # pragma: no cover
+            client_ip = request.META.get('HTTP_X_FORWARDED_FOR')
+        finally:
+            if not client_ip or client_ip not in (settings.ALLOWED_HOSTS):
+                return HttpResponseForbidden()
+
+        return super().dispatch(request, *args, **kwargs)
 
     def handle_post_data(self):
         """

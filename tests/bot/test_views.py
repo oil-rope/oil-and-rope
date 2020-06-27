@@ -27,6 +27,18 @@ class TestSendMessageToDiscordUserView(TestCase):
 
         self.assertEqual(400, response.status_code)
 
+    @override_settings(ALLOWED_HOSTS=['localhost', 'testserver', '127.0.0.1'])
+    def test_post_from_outer_ko(self):
+        response = self.client.post(self.url, data=self.data, REMOTE_ADDR=self.faker.ipv4())
+
+        self.assertEqual(403, response.status_code)
+
+    @override_settings(ALLOWED_HOSTS=['develop.oilandrope-project.com', 'testserver'])
+    def test_post_from_outer_ok(self):
+        response = self.client.post(self.url, data=self.data, REMOTE_ADDR='develop.oilandrope-project.com')
+
+        self.assertEqual(201, response.status_code)
+
     def test_post_msg_created_ok(self):
         response = self.client.post(self.url, data=self.data)
         channel = Channel(response.json()['channel_id'])
