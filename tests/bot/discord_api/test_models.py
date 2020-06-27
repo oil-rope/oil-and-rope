@@ -54,6 +54,9 @@ class TestEmbed(TestCase):
         self.assertTrue(isinstance(embed.footer, embeds.EmbedFooter))
         self.assertEqual(footer, embed.footer)
 
+        data = embed.data
+        self.assertEqual(footer.data, data['footer'])
+
 
 class TestEmbedFooter(TestCase):
 

@@ -1,3 +1,5 @@
+from json import JSONDecodeError
+
 """
 Bot Exceptions
 ~~~~~~~~~~~~~~
@@ -85,27 +87,30 @@ class DiscordApiException(HelpfulError):
         super().__init__(issue=self.issue, solution=self.solution, preface=self.preface, footnote=self.footnote)
 
     def handle_error_code(self, response):
-        msg = response.json()['message']
-        status_code = response.status_code
+        try:
+            msg = response.json()['message']
+        except JSONDecodeError:
+            msg = f'Impossible to format response as JSON.\n{response.text}'
+        self.error_code = response.status_code
         self.preface = f'[{response.status_code}] {msg}'
 
-        if status_code == 400:
-            self.issue = f'Bad Request [{status_code}]'
+        if self.error_code == 400:
+            self.issue = f'Bad Request [{self.error_code}]'
             self.solution = 'Maybe your data is bad formatted or you are trying to perform a forbidden action.'
             self.footnote = 'Please note that a bot cannot interact with itself.'
-        elif status_code == 401:
-            self.issue = f'Unauthorized [{status_code}]'
+        elif self.error_code == 401:
+            self.issue = f'Unauthorized [{self.error_code}]'
             self.solution = 'Maybe you are trying to connect a user that is not sharing server with our bot.'
             self.footnote = 'Please note that user and bot must share at least one server.'
-        elif status_code == 403:
-            self.issue = f'Forbidden [{status_code}]'
+        elif self.error_code == 403:
+            self.issue = f'Forbidden [{self.error_code}]'
             self.solution = 'This action is forbidden. Maybe you need permissions?'
             self.footnote = ''
-        elif status_code == 404:
-            self.issue = f'Not found [{status_code}]'
+        elif self.error_code == 404:
+            self.issue = f'Not found [{self.error_code}]'
             self.solution = 'The resource you are looking for does not exist. Is URL correct?'
             self.footnote = ''
         else:
-            self.issue = f'Error [{status_code}]'
+            self.issue = f'Error [{self.error_code}]'
             self.solution = ''
             self.footnote = ''
