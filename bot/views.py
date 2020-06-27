@@ -12,6 +12,11 @@ class SendMessageToDiscordUserView(View):
     http_method_names = ['post']
     required_arguments = ['message_content']
 
+    def dispatch(self, request, *args, **kwargs):
+        breakpoint()
+        response = super().dispatch(request, *args, **kwargs)
+        return response
+
     def handle_post_data(self):
         """
         Check if all required arguments are in POST data.
