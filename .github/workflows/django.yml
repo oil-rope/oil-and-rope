@@ -25,7 +25,7 @@ jobs:
       SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-    # Set up Postgres
+    # Set up Postgres and Redis
     services:
       postgres:
         image: postgres:11.7
@@ -40,6 +40,11 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     strategy:
       max-parallel: 4
@@ -94,6 +99,13 @@ jobs:
       DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
       DJANGO_ALLOW_ASYNC_UNSAFE: true
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      # Redis
+      services:
+        redis:
+          image: redis
+          ports:
+            - 6379:6379
 
     strategy:
       max-parallel: 4
