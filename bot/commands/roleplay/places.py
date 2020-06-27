@@ -6,12 +6,13 @@ import discord
 from asgiref.sync import sync_to_async
 from django.apps import apps
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from bot import utils
 from bot.utils import get_url_from
-from common.tools.sync import async_get, async_manager_func
+from common.tools.sync import async_create, async_get, async_manager_func
 
 
 async def world_list(author, public=False):
@@ -61,7 +62,15 @@ async def world_delete(author, bot):  # noqa
     Place = apps.get_model('roleplay.Place')
     User = apps.get_model(settings.AUTH_USER_MODEL)
     discord_user = await utils.get_or_create_discord_user(author)
-    web_user = await utils.async_get(User, pk=discord_user.user_id)
+    try:
+        web_user = await utils.async_get(User, pk=discord_user.user_id)
+    except User.DoesNotExist:
+        msg = _('Seems like you don\' have a user.')
+        await author.send(msg)
+        url = await get_url_from('registration:register')
+        msg = _('You can register on the website {}').format(url)
+        await author.send(msg)
+        return
 
     # Since we need to deal with async funcs this mess is needed.
     user_worlds = await async_manager_func(Place, 'own_places', user=web_user)
@@ -127,3 +136,72 @@ async def world_delete(author, bot):  # noqa
                 else:
                     msg = _('Okay!')
                     await author.send(msg)
+
+
+# TODO: Refactor this, please
+async def world_create(author, bot, second_action='private'):  # noqa
+    """
+    Allows the user to create a world.
+    """
+
+    Place = apps.get_model('roleplay.Place')
+    User = apps.get_model(settings.AUTH_USER_MODEL)
+    discord_user = await utils.get_or_create_discord_user(author)
+    try:
+        web_user = await utils.async_get(User, pk=discord_user.user_id)
+    except User.DoesNotExist:
+        msg = _('Seems like you don\' have a user.')
+        await author.send(msg)
+        url = await get_url_from('registration:register')
+        msg = _('You can register on the website {}').format(url)
+        await author.send(msg)
+        return
+
+    data = {
+        'user': web_user if second_action == 'private' else None,
+        'owner': web_user
+    }
+
+    def check_author(m): return m.author == author
+
+    url = await get_url_from('roleplay:world_create')
+    msg = _('Remember you can perform this action via web: {}').format(url)
+    msg = _('First we need a name')
+    await author.send(msg)
+    try:
+        msg = await bot.wait_for('message', check=check_author, timeout=60.0)
+        data['name'] = msg.content
+    except asyncio.TimeoutError:
+        msg = _('Sorry you took too long to reply') + '.'
+        await author.send(msg)
+        return
+
+    msg = _('Now tell us about your world, a description (You can avoid this by writting \'no\')')
+    await author.send(msg)
+    try:
+        msg = await bot.wait_for('message', check=check_author, timeout=60.0)
+        if msg.content not in ('n', 'no', 'f', 'false', 'off', '0'):
+            data['description'] = msg.content
+    except asyncio.TimeoutError:
+        msg = _('Sorry you took too long to reply') + '.'
+        await author.send(msg)
+        return
+
+    msg = _('Maybe an image? (You can avoid this by writting \'no\')')
+    await author.send(msg)
+    try:
+        msg = await bot.wait_for('message', check=check_author, timeout=60.0)
+        if msg.content not in ('n', 'no', 'f', 'false', 'off', '0'):
+            image = msg.attachments[0]
+            if image.size > settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
+                await author.send(_('Image too big') + '.')
+            data['image'] = ContentFile(await image.read(), name=image.filename)
+    except asyncio.TimeoutError:
+        msg = _('Sorry you took too long to reply') + '.'
+        await author.send(msg)
+        return
+
+    world = await async_create(Place, **data)
+    await author.send(_('Congrats! Your world have been created!'))
+    url = await get_url_from('roleplay:world_detail', kwargs={'pk': world.pk})
+    await author.send(_('Check it out here: {}').format(url))

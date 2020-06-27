@@ -2,6 +2,7 @@
 import pytest
 from django.contrib.sites.models import Site
 from django.shortcuts import reverse
+from model_bakery import baker
 
 from bot.models import DiscordServer, DiscordTextChannel, DiscordUser
 from bot.utils import (get_or_create_discord_server, get_or_create_discord_text_channel, get_or_create_discord_user,
@@ -9,7 +10,6 @@ from bot.utils import (get_or_create_discord_server, get_or_create_discord_text_
 from common.tools.sync import async_get
 
 from .helpers import mocks
-from model_bakery import baker
 
 
 @pytest.mark.django_db(transaction=True)

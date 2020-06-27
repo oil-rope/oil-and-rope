@@ -9,5 +9,4 @@ class Actions(models.TextChoices):
 
     list = 'list', _('List')
     create = 'create', _('Create')
-    update = 'edit', _('Edit')
     delete = 'remove', _('Remove')

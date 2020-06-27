@@ -127,7 +127,7 @@ async def test_world_delete_empty(mock_call, registered_author):
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 @mock.patch('tests.bot.helpers.mocks.MemberMock.send')
-async def test_world_delete_ok(mock_call, registered_author):
+async def test_world_delete_reject_ok(mock_call, registered_author):
     author = registered_author
     # We use 1 for convention (to make check == 1 -> True), is indeed NOT RECOMMENDED
     deleted_world = 0
@@ -146,5 +146,5 @@ async def test_world_delete_ok(mock_call, registered_author):
     del_url = await get_url_from('roleplay:world_delete', kwargs={'pk': deleted_world.pk})
     info_msg = f'You can perform this action via web: {del_url}'
     assert mock.call(info_msg) in all_calls
-    del_msg = f'Okay!'
+    del_msg = 'Okay!'
     assert mock.call(del_msg) in all_calls

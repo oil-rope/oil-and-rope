@@ -1,7 +1,7 @@
+import asyncio
 from unittest import mock
 
 from faker import Faker
-import asyncio
 
 fake = Faker()
 

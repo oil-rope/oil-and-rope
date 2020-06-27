@@ -33,6 +33,14 @@ def async_get_or_create(model, **kwargs):
     return async_manager_func(model, 'get_or_create', **kwargs)
 
 
+def async_create(model, **kwargs):
+    """
+    Returns `model.objects.create(**kwargs)` as an async func so it can be called by `await`.
+    """
+
+    return async_manager_func(model, 'create', **kwargs)
+
+
 def async_filter(model, **kwargs):
     """
     Returns `model.objects.filter(**kwargs)` as an async func so it can be called by `await`.

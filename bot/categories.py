@@ -6,6 +6,7 @@ from discord.ext.commands import Cog, command
 from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 
+from bot.commands.roleplay.places import world_create
 from common.tools.sync import async_add, async_get
 
 from . import enums, utils
@@ -120,9 +121,10 @@ class RoleplayCog(Cog, name='Roleplay'):
         Parameters
         ----------
         action:
-            Can be `list`, `create`, `edit` or `remove`.
+            Can be `list`, `create` or `remove`.
         second_action:
             For `list` can be `public` or `private`.
+            For `create` can be `public` or `private`.
         """
 
         if action not in enums.Actions:
@@ -133,14 +135,16 @@ class RoleplayCog(Cog, name='Roleplay'):
         author = ctx.author
         bot = ctx.bot
 
+        second_action = 'private' if not second_action else second_action
         if action == enums.Actions.list:
-            second_action = 'private' if not second_action else second_action
             if second_action == 'public':
                 await world_list(author, public=True)
             elif second_action == 'private':
                 await world_list(author)
             else:
                 await author.send_help(self.worlds)
+        if action == enums.Actions.create:
+            await world_create(author, bot, second_action)
         if action == enums.Actions.delete:
             await world_delete(author, bot)
 

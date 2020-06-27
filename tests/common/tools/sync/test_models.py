@@ -5,8 +5,8 @@ from django.conf import settings
 from faker import Faker
 from model_bakery import baker
 
-from common.tools.sync import async_manager_func, async_get, async_get_or_create
-from common.tools.sync.models import async_filter, async_add
+from common.tools.sync import async_get, async_get_or_create, async_manager_func
+from common.tools.sync.models import async_add, async_filter
 
 User = apps.get_model(settings.AUTH_USER_MODEL)
 Group = apps.get_model('auth.Group')
