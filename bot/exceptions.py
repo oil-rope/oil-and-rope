@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 
+
 """
 Bot Exceptions
 ~~~~~~~~~~~~~~
