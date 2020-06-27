@@ -40,7 +40,7 @@ class PermissionsError(OilAndRopeException):
 
     @property
     def message(self):
-        return "You don't have permission to use that command.\nMore info: %(message)s" % {'message': self._message}
+        return f'You don\'t have permission to use that command.\nMore info: {self._message}'
 
 
 class HelpfulError(OilAndRopeException):
