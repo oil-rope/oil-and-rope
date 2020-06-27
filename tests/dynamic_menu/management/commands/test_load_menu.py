@@ -57,8 +57,9 @@ class TestLoadMenuCommand(TestCase):
         out = StringIO()
         json_file = self.json_file
         call_command('load_menu', json_file, stdout=out)
-        msg = 'Menu initialized.\n'
-        self.assertEqual(msg, out.getvalue())
+        msg = 'Menu initialized.'
+        # Since it returns colors we better just get if our message is in the final output
+        self.assertIn(msg, out.getvalue())
 
     def test_load_data_ok(self):
         call_command('load_menu', self.json_file)
