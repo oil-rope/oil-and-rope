@@ -1,5 +1,7 @@
 import json
+import logging
 from collections import defaultdict
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.http import HttpResponseForbidden, JsonResponse, RawPostDataException
@@ -8,6 +10,8 @@ from django.views.generic import View
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from bot.discord_api.models import User
+
+LOGGER = logging.getLogger(__name__)
 
 
 class SendMessageToDiscordUserView(View):
@@ -20,13 +24,15 @@ class SendMessageToDiscordUserView(View):
             return super().dispatch(request, *args, **kwargs)
 
         # We will allow requests only from ALLOWED_HOSTS
-        try:
-            client_ip = request.META['REMOTE_ADDR']
-        except KeyError:  # pragma: no cover
-            client_ip = request.META.get('HTTP_X_FORWARDED_FOR')
-        finally:
-            if not client_ip or client_ip not in (settings.ALLOWED_HOSTS):
-                return HttpResponseForbidden()
+        origin_ip = request.headers.get('Origin')
+        if origin_ip:
+            origin_ip = urlparse(origin_ip).netloc
+        if not origin_ip or origin_ip not in (settings.ALLOWED_HOSTS):
+            if origin_ip:
+                LOGGER.info('Access denied from %s.', origin_ip)
+            else:
+                LOGGER.info('Not Origin header given.')
+            return HttpResponseForbidden()
 
         return super().dispatch(request, *args, **kwargs)
 

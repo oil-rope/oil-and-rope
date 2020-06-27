@@ -40,7 +40,7 @@ class TestSendMessageToDiscordUserView(TestCase):
 
     @override_settings(ALLOWED_HOSTS=['develop.oilandrope-project.com', 'testserver'])
     def test_post_from_outer_ok(self):
-        response = self.client.post(self.url, data=self.data, REMOTE_ADDR='develop.oilandrope-project.com')
+        response = self.client.post(self.url, data=self.data, HTTP_ORIGIN='http://develop.oilandrope-project.com')
 
         self.assertEqual(201, response.status_code)
 
