@@ -19,6 +19,7 @@ if (checkUserButton != null && checkUserButton != undefined) {
 					<UserCheckButton
 						url={jCheckUserButton.data("consumer-url")}
 						invitationURL={jCheckUserButton.data("invitation-url")}
+						sendInvitationURL={jCheckUserButton.data("send-invitation-url")}
 						relatedField={jInput}
 					/>
 				</Suspense>
