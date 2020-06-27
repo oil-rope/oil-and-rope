@@ -7,7 +7,10 @@ from bot.discord_api.models import Channel, Message
 from .helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 
-@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+@override_settings(
+    DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN,
+    ALLOWED_HOSTS=['*', 'testserver']
+)
 class TestSendMessageToDiscordUserView(TestCase):
 
     def setUp(self):
@@ -49,7 +52,10 @@ class TestSendMessageToDiscordUserView(TestCase):
         self.assertEqual(response.json(), msg.json_response)
 
 
-@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+@override_settings(
+    DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN,
+    ALLOWED_HOSTS=['*', 'testserver']
+)
 class TestSendInvitationView(TestCase):
 
     def setUp(self):
