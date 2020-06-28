@@ -112,7 +112,7 @@ class RoleplayCog(Cog, name='Roleplay'):
         await ctx.send(message)
 
     @command()
-    async def worlds(self, ctx, action=enums.Actions.list, second_action=None):
+    async def worlds(self, ctx, action='list', second_action=None):
         """
         Gives you information about your worlds.
         If it's called without action it just lists all your worlds.

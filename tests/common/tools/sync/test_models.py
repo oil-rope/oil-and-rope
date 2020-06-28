@@ -5,8 +5,7 @@ from django.conf import settings
 from faker import Faker
 from model_bakery import baker
 
-from common.tools.sync import async_get, async_get_or_create, async_manager_func
-from common.tools.sync.models import async_add, async_filter
+from common.tools.sync import async_add, async_create, async_filter, async_get, async_get_or_create, async_manager_func
 
 User = apps.get_model(settings.AUTH_USER_MODEL)
 Group = apps.get_model('auth.Group')
@@ -55,6 +54,21 @@ async def test_async_get_or_create_ok():
     user_retrieved, created = await async_get_or_create(User, **kwargs)
     assert not created
     assert user_created == user_retrieved
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_async_create_ok():
+    # Creates
+    kwargs = {
+        'username': fake.user_name(),
+        'password': fake.password(),
+        'email': fake.email()
+    }
+    user_created = await async_create(User, **kwargs)
+
+    assert user_created.username == kwargs['username']
+    assert user_created.email == kwargs['email']
 
 
 @pytest.mark.django_db(transaction=True)

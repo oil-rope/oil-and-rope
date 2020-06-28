@@ -1,6 +1,7 @@
 import asyncio
 from unittest import mock
 
+from django.conf import settings
 from faker import Faker
 
 fake = Faker()
@@ -39,7 +40,7 @@ class MemberMock(ClientMock):
 
     async def send(self, content=None, *, tts=False, embed=None, file=None, files=None,
                    delete_after=None, nonce=None, allowed_mentions=None):
-        return content
+        return MessageMock(content)
 
 
 class RegionMock(mock.MagicMock):
@@ -84,8 +85,39 @@ class TextChannelMock(mock.MagicMock):
         super().__init__(*args, **self.data, **kwargs)
         self.name = fake.word()
 
+    async def send(self, content=None, *, tts=False, embed=None, file=None, files=None, delete_after=None, nonce=None):
+        return MessageMock(content=content)
+
     def is_nsfw(self):
         return fake.boolean()
 
     def is_news(self):
         return fake.boolean()
+
+
+class MessageMock(mock.MagicMock):
+    data = {
+        'id': fake.random_int(),
+        'author': MemberMock(),
+        'content': fake.word(),
+        'channel': TextChannelMock(),
+        'guild': GuildMock(),
+        'created_at': fake.date_time()
+    }
+
+    def __init__(self, content=None):
+        if content:
+            self.data['content'] = content
+        super().__init__(**self.data)
+
+
+class ContextMock(mock.MagicMock):
+    data = {
+        'author': MemberMock(),
+        'channel': TextChannelMock(),
+        'prefix': settings.BOT_COMMAND_PREFIX,
+        'bot': ClientMock()
+    }
+
+    def __init__(self):
+        super().__init__(**self.data)

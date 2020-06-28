@@ -18,6 +18,18 @@ from ..checkers import answer_in_list, is_author, is_yes_or_no, multiple_checks
 
 
 class WorldsCommand:
+    """
+    This command handles either `list`, `create` and `remove` actions for :class:`Place`.
+
+    Parameters
+    ----------
+    ctx: :class:`discord.ext.commands.Context`
+        The context where command is called.
+    action: :class:`enums.Actions`
+        Action to perform.
+    second_action: :class:`str`
+        Can be either 'public' or 'private'.
+    """
 
     def __init__(self, ctx, action=enums.Actions.list, second_action=None):
         self.ctx = ctx
@@ -33,8 +45,9 @@ class WorldsCommand:
         """
 
         try:
+            self.action = enums.Actions(self.action)
             handler = getattr(self, f'{self.action}')
-        except AttributeError:
+        except (AttributeError, ValueError):
             handler = self.invalid_option
         return handler
 
@@ -52,7 +65,7 @@ class WorldsCommand:
         When user is not found.
         """
 
-        url = await get_url_from('registration_register')
+        url = await get_url_from('registration:register')
         msg = _('Seems like you are not registered. You can do it in 5 minutes {}').format(url)
         await self.ctx.author.send(msg)
 

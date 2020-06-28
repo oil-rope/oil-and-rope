@@ -29,9 +29,9 @@ class SendMessageToDiscordUserView(View):
             origin_ip = urlparse(origin_ip).netloc
         if not origin_ip or origin_ip not in (settings.ALLOWED_HOSTS):
             if origin_ip:
-                LOGGER.info('Access denied from %s.', origin_ip)
+                LOGGER.info('Access denied from %s.', origin_ip)  # pragma: no cover
             else:
-                LOGGER.info('Not Origin header given.')
+                LOGGER.info('Not Origin header given.')  # pragma: no cover
             return HttpResponseForbidden()
 
         return super().dispatch(request, *args, **kwargs)
