@@ -93,7 +93,7 @@ description = "WebSocket client & server library, WAMP real-time framework"
 name = "autobahn"
 optional = false
 python-versions = ">=3.5"
-version = "20.6.1"
+version = "20.6.2"
 
 [package.dependencies]
 cryptography = ">=2.7"
@@ -388,7 +388,7 @@ description = "Django-mptt-admin provides a nice Django Admin interface for Mptt
 name = "django-mptt-admin"
 optional = false
 python-versions = "*"
-version = "1.0.1"
+version = "1.0.2"
 
 [package.dependencies]
 django-mptt = "*"
@@ -476,10 +476,6 @@ mccabe = ">=0.6.0,<0.7.0"
 pycodestyle = ">=2.6.0a1,<2.7.0"
 pyflakes = ">=2.2.0,<2.3.0"
 
-[package.dependencies.importlib-metadata]
-python = "<3.8"
-version = "*"
-
 [[package]]
 category = "dev"
 description = "Let your Python tests travel through time"
@@ -562,23 +558,7 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "2.9"
-
-[[package]]
-category = "dev"
-description = "Read metadata from Python packages"
-marker = "python_version < \"3.8\""
-name = "importlib-metadata"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
-version = "1.6.1"
-
-[package.dependencies]
-zipp = ">=0.5"
-
-[package.extras]
-docs = ["sphinx", "rst.linker"]
-testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
+version = "2.10"
 
 [[package]]
 category = "main"
@@ -597,7 +577,7 @@ description = "IPython-enabled pdb"
 name = "ipdb"
 optional = false
 python-versions = ">=2.7"
-version = "0.13.2"
+version = "0.13.3"
 
 [package.dependencies]
 setuptools = "*"
@@ -613,7 +593,7 @@ marker = "python_version >= \"3.4\""
 name = "ipython"
 optional = false
 python-versions = ">=3.6"
-version = "7.15.0"
+version = "7.16.1"
 
 [package.dependencies]
 appnope = "*"
@@ -782,11 +762,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.13.1"
 
-[package.dependencies]
-[package.dependencies.importlib-metadata]
-python = "<3.8"
-version = ">=0.12"
-
 [package.extras]
 dev = ["pre-commit", "tox"]
 
@@ -833,7 +808,7 @@ description = "library with cross-python path, ini-parsing, io, code, log facili
 name = "py"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.8.2"
+version = "1.9.0"
 
 [[package]]
 category = "main"
@@ -953,10 +928,6 @@ pluggy = ">=0.12,<1.0"
 py = ">=1.5.0"
 wcwidth = "*"
 
-[package.dependencies.importlib-metadata]
-python = "<3.8"
-version = ">=0.12"
-
 [package.extras]
 checkqa-mypy = ["mypy (v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
@@ -967,13 +938,13 @@ description = "Pytest support for asyncio."
 name = "pytest-asyncio"
 optional = false
 python-versions = ">= 3.5"
-version = "0.12.0"
+version = "0.14.0"
 
 [package.dependencies]
 pytest = ">=5.4.0"
 
 [package.extras]
-testing = ["async_generator (>=1.3)", "coverage", "hypothesis (>=5.7.1)"]
+testing = ["async-generator (>=1.3)", "coverage", "hypothesis (>=5.7.1)"]
 
 [[package]]
 category = "dev"
@@ -1021,8 +992,8 @@ category = "dev"
 description = "run tests in isolated forked subprocesses"
 name = "pytest-forked"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.1.3"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "1.2.0"
 
 [package.dependencies]
 pytest = ">=3.1.0"
@@ -1267,7 +1238,7 @@ description = "Measures the displayed width of unicode strings in a terminal"
 name = "wcwidth"
 optional = false
 python-versions = "*"
-version = "0.2.4"
+version = "0.2.5"
 
 [[package]]
 category = "main"
@@ -1310,19 +1281,6 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [[package]]
-category = "dev"
-description = "Backport of pathlib-compatible object wrapper for zip files"
-marker = "python_version < \"3.8\""
-name = "zipp"
-optional = false
-python-versions = ">=3.6"
-version = "3.1.0"
-
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["jaraco.itertools", "func-timeout"]
-
-[[package]]
 category = "main"
 description = "Interfaces for Python"
 name = "zope.interface"
@@ -1339,8 +1297,8 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "a78a21360eed56fddb8cfe04977c7466d8faa899bc51b123f42fddb4e631ab02"
-python-versions = "^3.7"
+content-hash = "021eb2382cd648518bca01d4114efb25dec49fd5d9e4ad92484bb1f888a04ede"
+python-versions = "^3.8"
 
 [metadata.files]
 aiohttp = [
@@ -1386,8 +1344,8 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 autobahn = [
-    {file = "autobahn-20.6.1-py2.py3-none-any.whl", hash = "sha256:aab27f21f87bda0990dcf27e9c6c4f09a3a579b4e259392db5a97a3f20231cd5"},
-    {file = "autobahn-20.6.1.tar.gz", hash = "sha256:848aa77f808edcdc9144706d98f06fccb1c6ac8619f7418617880c27b285a7d0"},
+    {file = "autobahn-20.6.2-py2.py3-none-any.whl", hash = "sha256:4be2466d51cde5e79d98bcc8bf62290e1f0e977b960da887d96c84a5af6f4f86"},
+    {file = "autobahn-20.6.2.tar.gz", hash = "sha256:6ac6b6653b8d20d632b034adccf6a566154d4efbeaa23abf7c3995fd601e9a01"},
 ]
 automat = [
     {file = "Automat-20.2.0-py2.py3-none-any.whl", hash = "sha256:b6feb6455337df834f6c9962d6ccf771515b7d939bca142b29c20c2376bc6111"},
@@ -1548,9 +1506,9 @@ django-mptt = [
     {file = "django_mptt-0.11.0-py2.py3-none-any.whl", hash = "sha256:90eb236eb4f1a92124bd7c37852bbe09c0d21158477cc237556d59842a91c509"},
 ]
 django-mptt-admin = [
-    {file = "django-mptt-admin-1.0.1.tar.gz", hash = "sha256:c5c460281d2c8434587cb2c40f0149616dec9ae541ec4f62d4f252533de08a2d"},
-    {file = "django_mptt_admin-1.0.1-py2.py3-none-any.whl", hash = "sha256:e7c457578e6e2b48c3a39a138ef6be6792d441cbacb7c1a8e77dab1d171e4cc8"},
-    {file = "django_mptt_admin-1.0.1-py3.8.egg", hash = "sha256:2a03964b97886238523c6769dc0d37bc54b9c301fe93da15dfa3b050fd3a23d9"},
+    {file = "django-mptt-admin-1.0.2.tar.gz", hash = "sha256:707607cd266f8bae2fd94bc76c3bd4b2f7bc03d9270fd1296d682ca995c551ee"},
+    {file = "django_mptt_admin-1.0.2-py2.py3-none-any.whl", hash = "sha256:7ba4e4e86ac799e8bc71de43d1fba943b86b9bd37f64edb2033a743ac82edf8f"},
+    {file = "django_mptt_admin-1.0.2-py3.8.egg", hash = "sha256:363e14fc62848f425156718169d8c6daedf016d5d7850bf2cc254bdefb36a5f7"},
 ]
 django-pdb = [
     {file = "django-pdb-0.6.2.tar.gz", hash = "sha256:eb8f4ed1a7f2b9c67944414688fd39a6f38f410dd7461d417512d72359f0472d"},
@@ -1646,23 +1604,19 @@ hyperlink = [
     {file = "hyperlink-19.0.0.tar.gz", hash = "sha256:4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654"},
 ]
 idna = [
-    {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
-    {file = "idna-2.9.tar.gz", hash = "sha256:7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb"},
-]
-importlib-metadata = [
-    {file = "importlib_metadata-1.6.1-py2.py3-none-any.whl", hash = "sha256:15ec6c0fd909e893e3a08b3a7c76ecb149122fb14b7efe1199ddd4c7c57ea958"},
-    {file = "importlib_metadata-1.6.1.tar.gz", hash = "sha256:0505dd08068cfec00f53a74a0ad927676d7757da81b7436a6eefe4c7cf75c545"},
+    {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
+    {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
 ]
 incremental = [
     {file = "incremental-17.5.0-py2.py3-none-any.whl", hash = "sha256:717e12246dddf231a349175f48d74d93e2897244939173b01974ab6661406b9f"},
     {file = "incremental-17.5.0.tar.gz", hash = "sha256:7b751696aaf36eebfab537e458929e194460051ccad279c72b755a167eebd4b3"},
 ]
 ipdb = [
-    {file = "ipdb-0.13.2.tar.gz", hash = "sha256:77fb1c2a6fccdfee0136078c9ed6fe547ab00db00bebff181f1e8c9e13418d49"},
+    {file = "ipdb-0.13.3.tar.gz", hash = "sha256:d6f46d261c45a65e65a2f7ec69288a1c511e16206edb2875e7ec6b2f66997e78"},
 ]
 ipython = [
-    {file = "ipython-7.15.0-py3-none-any.whl", hash = "sha256:1b85d65632211bf5d3e6f1406f3393c8c429a47d7b947b9a87812aa5bce6595c"},
-    {file = "ipython-7.15.0.tar.gz", hash = "sha256:0ef1433879816a960cd3ae1ae1dc82c64732ca75cec8dab5a4e29783fb571d0e"},
+    {file = "ipython-7.16.1-py3-none-any.whl", hash = "sha256:2dbcc8c27ca7d3cfe4fcdff7f45b27f9a8d3edfa70ff8024a71c7a8eb5f09d64"},
+    {file = "ipython-7.16.1.tar.gz", hash = "sha256:9f4fcb31d3b2c533333893b9172264e4821c1ac91839500f31bd43f2c59b3ccf"},
 ]
 ipython-genutils = [
     {file = "ipython_genutils-0.2.0-py2.py3-none-any.whl", hash = "sha256:72dd37233799e619666c9f639a9da83c34013a73e8bbc79a7a6348d93c61fab8"},
@@ -1820,8 +1774,8 @@ ptyprocess = [
     {file = "ptyprocess-0.6.0.tar.gz", hash = "sha256:923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0"},
 ]
 py = [
-    {file = "py-1.8.2-py2.py3-none-any.whl", hash = "sha256:a673fa23d7000440cc885c17dbd34fafcb7d7a6e230b29f6766400de36a33c44"},
-    {file = "py-1.8.2.tar.gz", hash = "sha256:f3b3a4c36512a4c4f024041ab51866f11761cc169670204b235f6b20523d4e6b"},
+    {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},
+    {file = "py-1.9.0.tar.gz", hash = "sha256:9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"},
 ]
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.4.egg", hash = "sha256:fec3e9d8e36808a28efb59b489e4528c10ad0f480e57dcc32b4de5c9d8c9fdf3"},
@@ -1909,7 +1863,8 @@ pytest = [
     {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
 ]
 pytest-asyncio = [
-    {file = "pytest-asyncio-0.12.0.tar.gz", hash = "sha256:475bd2f3dc0bc11d2463656b3cbaafdbec5a47b47508ea0b329ee693040eebd2"},
+    {file = "pytest-asyncio-0.14.0.tar.gz", hash = "sha256:9882c0c6b24429449f5f969a5158b528f39bde47dc32e85b9f0403965017e700"},
+    {file = "pytest_asyncio-0.14.0-py3-none-any.whl", hash = "sha256:2eae1e34f6c68fc0a9dc12d4bea190483843ff4708d24277c41568d6b6044f1d"},
 ]
 pytest-cov = [
     {file = "pytest-cov-2.10.0.tar.gz", hash = "sha256:1a629dc9f48e53512fcbfda6b07de490c374b0c83c55ff7a1720b3fccff0ac87"},
@@ -1923,8 +1878,8 @@ pytest-env = [
     {file = "pytest-env-0.6.2.tar.gz", hash = "sha256:7e94956aef7f2764f3c147d216ce066bf6c42948bb9e293169b1b1c880a580c2"},
 ]
 pytest-forked = [
-    {file = "pytest-forked-1.1.3.tar.gz", hash = "sha256:1805699ed9c9e60cb7a8179b8d4fa2b8898098e82d229b0825d8095f0f261100"},
-    {file = "pytest_forked-1.1.3-py2.py3-none-any.whl", hash = "sha256:1ae25dba8ee2e56fb47311c9638f9e58552691da87e82d25b0ce0e4bf52b7d87"},
+    {file = "pytest-forked-1.2.0.tar.gz", hash = "sha256:65f96334863d9cbe53d21f73e8febc4dd61b8d1fdcac7b487d9af07a5d02a938"},
+    {file = "pytest_forked-1.2.0-py2.py3-none-any.whl", hash = "sha256:42a438336731465c5bd76ab38e1645647ac55914a08b507efbabe8783a08aa6c"},
 ]
 pytest-mock = [
     {file = "pytest-mock-3.1.1.tar.gz", hash = "sha256:636e792f7dd9e2c80657e174c04bf7aa92672350090736d82e97e92ce8f68737"},
@@ -2012,8 +1967,8 @@ urllib3 = [
     {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
 ]
 wcwidth = [
-    {file = "wcwidth-0.2.4-py2.py3-none-any.whl", hash = "sha256:79375666b9954d4a1a10739315816324c3e73110af9d0e102d906fdb0aec009f"},
-    {file = "wcwidth-0.2.4.tar.gz", hash = "sha256:8c6b5b6ee1360b842645f336d9e5d68c55817c26d3050f46b235ef2bc650e48f"},
+    {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
+    {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
 ]
 websockets = [
     {file = "websockets-8.1-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:3762791ab8b38948f0c4d281c8b2ddfa99b7e510e46bd8dfa942a5fff621068c"},
@@ -2065,10 +2020,6 @@ yarl = [
     {file = "yarl-1.4.2-cp38-cp38-win32.whl", hash = "sha256:6faa19d3824c21bcbfdfce5171e193c8b4ddafdf0ac3f129ccf0cdfcb083e462"},
     {file = "yarl-1.4.2-cp38-cp38-win_amd64.whl", hash = "sha256:0ca2f395591bbd85ddd50a82eb1fde9c1066fafe888c5c7cc1d810cf03fd3cc6"},
     {file = "yarl-1.4.2.tar.gz", hash = "sha256:58cd9c469eced558cd81aa3f484b2924e8897049e06889e8ff2510435b7ef74b"},
-]
-zipp = [
-    {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
-    {file = "zipp-3.1.0.tar.gz", hash = "sha256:c599e4d75c98f6798c509911d08a22e6c021d074469042177c8c86fb92eefd96"},
 ]
 "zope.interface" = [
     {file = "zope.interface-5.1.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:645a7092b77fdbc3f68d3cc98f9d3e71510e419f54019d6e282328c0dd140dcd"},
