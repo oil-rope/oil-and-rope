@@ -13,7 +13,7 @@ def is_author(author):
 
 def is_yes_or_no():
     """
-    Checks if the author's response is affirmative.
+    Checks if the response is type yes or no.
     """
 
     def check(m):
@@ -21,6 +21,40 @@ def is_yes_or_no():
             # strtobool returns 0 or 1, here we make sure answer are yes, no, n, y, true, false...
             result = to_bool(m.content)
             result = result in (0, 1)
+            return result
+        # If value is something unexpected strtobool throws ValueError
+        except ValueError:
+            return False
+    return check
+
+
+def is_yes():
+    """
+    Checks if affirmative.
+    """
+
+    def check(m):
+        try:
+            # strtobool returns 0 or 1, here we make sure answer are yes, no, n, y, true, false...
+            result = to_bool(m.content)
+            result = result == 1
+            return result
+        # If value is something unexpected strtobool throws ValueError
+        except ValueError:
+            return False
+    return check
+
+
+def is_no():
+    """
+    Checks if negative.
+    """
+
+    def check(m):
+        try:
+            # strtobool returns 0 or 1, here we make sure answer are yes, no, n, y, true, false...
+            result = to_bool(m.content)
+            result = result == 0
             return result
         # If value is something unexpected strtobool throws ValueError
         except ValueError:

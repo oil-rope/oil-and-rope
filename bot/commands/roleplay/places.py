@@ -10,11 +10,12 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from bot import utils
+from bot.exceptions import OilAndRopeException
 from bot.utils import get_url_from
 from roleplay.enums import SiteTypes
 
 from ... import enums
-from ..checkers import answer_in_list, is_author, is_yes_or_no, multiple_checks
+from ..checkers import answer_in_list, is_author, is_no, is_yes_or_no, multiple_checks
 
 
 class WorldsCommand:
@@ -145,11 +146,22 @@ class WorldsCommand:
         await author.send(_('Check it out here: {}').format(url))
 
     async def get_image_from_message(self, message, author):
+        if len(message.attachments) == 0:
+            await author.send(_('You didn\t send an image') + '.')
+            raise OilAndRopeException('Image no sent.')
         image = message.attachments[0]
         if image.size > settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
             await author.send(_('Image too big') + '.')
+            raise OilAndRopeException('Image is too big.')
         else:
             return ContentFile(await image.read(), name=image.filename)
+
+    async def _handle_image(self, msg):
+        author = msg.author
+        if not is_no()(msg):
+            image = await self.get_image_from_message(msg, author)
+            return image
+        return None
 
     async def list(self):
         """
@@ -268,20 +280,22 @@ class WorldsCommand:
         await author.send(msg)
         try:
             msg = await bot.wait_for('message', check=is_author(author), timeout=60.0)
-            if msg.content not in ('n', 'no', 'f', 'false', 'off', '0'):
+            if not is_no()(msg):
                 data['description'] = msg.content
         except asyncio.TimeoutError:
-            await self.time_out()
+            await self.time_out(author)
             return
 
         msg = _('Maybe an image? (You can avoid this by writting \'no\')')
         await author.send(msg)
         try:
             msg = await bot.wait_for('message', check=is_author(author), timeout=60.0)
-            if msg.content not in ('n', 'no', 'f', 'false', 'off', '0'):
-                data['image'] = await self.get_image_from_message(msg, author)
+            image = await self._handle_image(msg)
+            data['image'] = image
         except asyncio.TimeoutError:
-            await self.time_out()
+            await self.time_out(author)
+            return
+        except OilAndRopeException:
             return
 
         data['site_type'] = SiteTypes.WORLD

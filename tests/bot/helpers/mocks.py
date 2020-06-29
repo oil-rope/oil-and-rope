@@ -1,6 +1,9 @@
 import asyncio
+from io import IOBase
 from unittest import mock
 
+from asgiref.sync import async_to_sync
+from discord import Attachment
 from django.conf import settings
 from faker import Faker
 
@@ -31,9 +34,15 @@ class ClientMock(mock.MagicMock):
 
     async def _get_wait_for_answer(self):
         try:
-            return self.wait_for_anwsers.pop(0)
+            content = self.wait_for_anwsers.pop(0)
+            if isinstance(content, str):
+                content = MessageMock(content=content)
+            elif isinstance(content, IOBase):
+                content = MessageMock(file=content)
+            return content
         except TypeError:
-            return fake.word()
+            content = MessageMock(content=fake.word())
+            return content
 
     async def _get_raise_timeout(self):
         try:
@@ -47,7 +56,7 @@ class ClientMock(mock.MagicMock):
 
         if event == 'message':
             answer = await self._get_wait_for_answer()
-            event = MessageMock(content=answer)
+            return answer
 
         if self.ignore_checks:
             return event
@@ -125,13 +134,42 @@ class MessageMock(mock.MagicMock):
         'created_at': fake.date_time()
     }
 
-    def __init__(self, content=None, *, embed=None):
+    def __init__(self, content=None, *, embed=None, file=[], files=[]):
         if content:
             self.data['content'] = content
         self.data.update({
-            'embed': embed
+            'embed': embed,
+            'files': file + files
         })
         super().__init__(**self.data)
+
+    @property
+    def attachments(self):
+        attachments = []
+        for f in self.files:
+            f = ContextAttachment(f=f, size=f.size)
+            attachments.append(f)
+        return attachments
+
+
+class ContextAttachment(mock.MagicMock):
+    data = {
+        'id': fake.random_int(),
+        'url': fake.url(),
+        'proxy_url': fake.url()
+    }
+
+    def __init__(self, *, f=None, size=None):
+        self.data['file'] = f
+        if not size:
+            size = f.size
+        self.data['size'] = size
+        self.data['filename'] = f.name
+
+        super().__init__(**self.data)
+
+    async def read(self, *, use_cached=False):
+        return self.file.read()
 
 
 class ContextMock(mock.MagicMock):

@@ -1,7 +1,14 @@
+import os
+from tempfile import NamedTemporaryFile
+
 import pytest
+from asgiref.sync import sync_to_async
 from django.apps import apps
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from faker.proxy import Faker
 from model_bakery import baker
+from PIL import Image
 
 from bot.commands.roleplay import WorldsCommand
 from bot.models import DiscordUser
@@ -45,6 +52,17 @@ class TestWorldsCommand:
     def ctx(self):
         ctx = mocks.ContextMock()
         return ctx
+
+    @pytest.fixture(scope='function')
+    def image(self):
+        tmp_file = NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        image_file = tmp_file.name
+        Image.new('RGB', (30, 60), color='red').save(image_file)
+
+        with open(image_file, 'rb') as image_content:
+            image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
+        os.remove(image_file)
+        return image
 
     def test_dispatch_list_ok(self, ctx):
         command = self.command(ctx, 'list')
@@ -315,3 +333,147 @@ class TestWorldsCommand:
         # `Embed`, `confirmation`, `web message`, `timeout`
         assert mocks.MemberMock.send.call_count == 4
         mocks.MemberMock.send.assert_called_with(timeout_msg)
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_public_ok(self, ctx, registered_author, image, mocker):
+        ctx.author = registered_author
+        name = fake.word()
+        description = fake.paragraph()
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=[
+                mocks.MessageMock(content=name),
+                mocks.MessageMock(content=description),
+                mocks.MessageMock(files=[image])
+            ]
+        )
+        command = self.command(ctx, 'create', 'public')
+        await command.run()
+
+        world_create = await sync_to_async(Place.objects.first)()
+        create_url = await get_url_from('roleplay:world_create')
+        edit_url = await get_url_from('roleplay:world_detail', kwargs={'pk': world_create.pk})
+        calls = [
+            mocker.call(f'Remember you can perform this action via web: {create_url}'),
+            mocker.call('First we need a name'),
+            mocker.call('Now tell us about your world, a description (You can avoid this by writting \'no\')'),
+            mocker.call('Maybe an image? (You can avoid this by writting \'no\')'),
+            mocker.call('Congrats! Your world have been created!'),
+            mocker.call(f'Check it out here: {edit_url}'),
+        ]
+        assert mocks.MemberMock.send.call_count == 6
+        assert all(call in mocks.MemberMock.send.mock_calls for call in calls)
+
+        assert world_create.name == name
+        assert world_create.description == description
+        assert world_create.user is None
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_public_unregistered_ko(self, ctx, mocker):
+        command = self.command(ctx, 'create', 'public')
+        await command.run()
+
+        url = await get_url_from('registration:register')
+        unregistered_msg = f'Seems like you are not registered. You can do it in 5 minutes {url}'
+
+        assert mocks.MemberMock.send.call_count == 1
+        mocks.MemberMock.send.assert_called_with(unregistered_msg)
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_timeouts_ko(self, ctx, registered_author):
+        ctx.author = registered_author
+        answers = [fake.word(), 'no', 'no']
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=answers,
+            raise_timeout=[True]
+        )
+        timeout_msg = 'Sorry, you took so long to reply.'
+        command = self.command(ctx, 'create')
+        await command.run()
+
+        # `web`, `name`, `timeout`
+        assert mocks.MemberMock.send.call_count == 3
+        mocks.MemberMock.send.assert_called_with(timeout_msg)
+
+        # Reset calls
+        mocks.MemberMock.send.call_count = 0
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=answers,
+            raise_timeout=[False, True]
+        )
+        command = self.command(ctx, 'create')
+        await command.run()
+
+        # `web`, `name`, `description`, `timeout`
+        assert mocks.MemberMock.send.call_count == 4
+        mocks.MemberMock.send.assert_called_with(timeout_msg)
+
+        # Reset calls
+        mocks.MemberMock.send.call_count = 0
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=answers,
+            raise_timeout=[False, False, True]
+        )
+        command = self.command(ctx, 'create')
+        await command.run()
+
+        # `web`, `name`, `description`, `image`, `timeout`
+        assert mocks.MemberMock.send.call_count == 5
+        mocks.MemberMock.send.assert_called_with(timeout_msg)
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_image_too_big_ko(self, ctx, registered_author, image):
+        image.size = settings.FILE_UPLOAD_MAX_MEMORY_SIZE + fake.random_int()
+        ctx.author = registered_author
+        name = fake.word()
+        description = fake.paragraph()
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=[
+                mocks.MessageMock(content=name),
+                mocks.MessageMock(content=description),
+                mocks.MessageMock(files=[image])
+            ]
+        )
+        command = self.command(ctx, 'create', 'public')
+        await command.run()
+
+        image_too_big_msg = 'Image too big.'
+        mocks.MemberMock.send.assert_called_with(image_too_big_msg)
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_image_not_sent_ko(self, ctx, registered_author, image):
+        ctx.author = registered_author
+        name = fake.word()
+        description = fake.paragraph()
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=[
+                mocks.MessageMock(content=name),
+                mocks.MessageMock(content=description),
+                mocks.MessageMock(content=fake.word())
+            ]
+        )
+        command = self.command(ctx, 'create', 'public')
+        await command.run()
+
+        image_too_big_msg = 'You didn\t send an image.'
+        mocks.MemberMock.send.assert_called_with(image_too_big_msg)
+
+    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.asyncio
+    async def test_create_only_name_ok(self, ctx, registered_author):
+        ctx.author = registered_author
+        name = fake.word()
+        ctx.bot = mocks.ClientMock(
+            wait_for_anwsers=[mocks.MessageMock(content=name), 'no', 'no']
+        )
+        command = self.command(ctx, 'create', 'public')
+        await command.run()
+        created_world = await sync_to_async(Place.objects.first)()
+
+        assert created_world.name == name
+        assert created_world.description is None
+        assert bool(created_world.image) is False
