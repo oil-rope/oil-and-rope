@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.tools.sync import async_add, async_get
 
-from . import enums, utils
+from . import utils
 from .commands.roleplay import WorldsCommand
 
 LOGGER = logging.getLogger(__name__)

@@ -2,8 +2,6 @@ import asyncio
 from io import IOBase
 from unittest import mock
 
-from asgiref.sync import async_to_sync
-from discord import Attachment
 from django.conf import settings
 from faker import Faker
 
