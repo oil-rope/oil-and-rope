@@ -19,28 +19,48 @@ class ClientMock(mock.MagicMock):
         'created_at': fake.date_time_this_century(),
     }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **self.data, **kwargs)
-        self.ignore_check_wait_for = kwargs.pop('ignore_check_wait_for', False)
-        self.wait_for_default = kwargs.pop('wait_for_default', fake.paragraph())
+    def __init__(self, *, wait_for_anwsers=[], ignore_checks=True, raise_timeout=False):
+        super().__init__(**self.data)
+        self.wait_for_anwsers = wait_for_anwsers
+        self.ignore_checks = ignore_checks
 
-    async def _wait_for(self, event, *, check=None):
-        message = mock.MagicMock()
-        message.content = self.wait_for_default
+        # Setup false to every answer
+        if not raise_timeout:
+            raise_timeout = [False for answer in self.wait_for_anwsers]
+        self.raise_timeout = raise_timeout
 
-        if self.ignore_check_wait_for:
-            return message
+    async def _get_wait_for_answer(self):
+        try:
+            return self.wait_for_anwsers.pop(0)
+        except TypeError:
+            return fake.word()
+
+    async def _get_raise_timeout(self):
+        try:
+            return self.raise_timeout.pop(0)
+        except TypeError:
+            return False
 
     async def wait_for(self, event, *, check=None, timeout=None):
-        msg = await asyncio.wait_for(self._wait_for(event, check=check), timeout=timeout)
-        return msg
+        if await self._get_raise_timeout():
+            raise asyncio.TimeoutError
+
+        if event == 'message':
+            answer = await self._get_wait_for_answer()
+            event = MessageMock(content=answer)
+
+        if self.ignore_checks:
+            return event
+
+        if check(event):
+            return event
 
 
 class MemberMock(ClientMock):
 
     async def send(self, content=None, *, tts=False, embed=None, file=None, files=None,
                    delete_after=None, nonce=None, allowed_mentions=None):
-        return MessageMock(content)
+        return MessageMock(content, embed=embed)
 
 
 class RegionMock(mock.MagicMock):
@@ -105,9 +125,12 @@ class MessageMock(mock.MagicMock):
         'created_at': fake.date_time()
     }
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, *, embed=None):
         if content:
             self.data['content'] = content
+        self.data.update({
+            'embed': embed
+        })
         super().__init__(**self.data)
 
 

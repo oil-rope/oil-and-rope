@@ -79,13 +79,13 @@ class WorldsCommand:
     @database_sync_to_async
     def get_community_worlds(self):
         Place = apps.get_model('roleplay.Place')
-        worlds = Place.objects.community_places().filter(site_type=SiteTypes.WORLD)
+        worlds = Place.objects.community_places().filter(site_type=SiteTypes.WORLD).order_by('name')
         return worlds
 
     @database_sync_to_async
     def get_private_worlds(self, user):
         Place = apps.get_model('roleplay.Place')
-        worlds = Place.objects.user_places(user)
+        worlds = Place.objects.user_places(user).order_by('name')
         return worlds
 
     @database_sync_to_async
