@@ -96,6 +96,14 @@ class TestPlaceManager(TestCase):
             result = self.model.objects.user_places(user=self.user)
             self.assertEqual(quantity, result.count())
 
+    def test_own_places(self):
+        quantity = 5
+        expected_queries = 1
+        baker.make(self.model, quantity, user=self.user, owner=self.user)
+        with self.assertNumQueries(expected_queries):
+            result = self.model.objects.own_places(self.user)
+            self.assertEqual(quantity, result.count())
+
     def test_community_places(self):
         expected_queries = 1
         with self.assertNumQueries(expected_queries):
