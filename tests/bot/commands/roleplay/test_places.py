@@ -14,7 +14,7 @@ from bot.commands.roleplay import WorldsCommand
 from bot.models import DiscordUser
 from bot.utils import get_url_from
 from common.constants.models import PLACE_MODEL, USER_MODEL
-from common.tools.sync import async_get
+from common.tools.sync import async_create, async_get
 from roleplay.enums import SiteTypes
 from tests.bot.helpers import mocks
 
@@ -226,7 +226,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_remove_ok(self, ctx, registered_author, user, mocker):
-        baker.make(Place, user=user, owner=user)
+        await async_create(Place, user=user, owner=user, site_type=SiteTypes.WORLD)
         ctx.author = registered_author
         # `Select world to remove`, `confirm?`
         ctx.bot = mocks.ClientMock(wait_for_anwsers=['0', 'yes'])
@@ -241,7 +241,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_remove_ko(self, ctx, registered_author, user, mocker):
-        baker.make(Place, 3, user=user, owner=user)
+        await async_create(Place, user=user, owner=user, site_type=SiteTypes.WORLD)
         ctx.author = registered_author
         # `Select world to remove`, `confirm?`
         ctx.bot = mocks.ClientMock(wait_for_anwsers=['0', 'no'])
@@ -255,7 +255,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_remove_messages_ok(self, ctx, registered_author, user, mocker):
-        baker.make(Place, 3, user=user, owner=user)
+        await async_create(Place, user=user, owner=user, site_type=SiteTypes.WORLD)
         ctx.author = registered_author
         # `Select world to remove`, `confirm?`
         ctx.bot = mocks.ClientMock(wait_for_anwsers=['0', 'yes'])
@@ -280,7 +280,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_remove_messages_ko(self, ctx, registered_author, user, mocker):
-        baker.make(Place, 3, user=user, owner=user)
+        await async_create(Place, user=user, owner=user, site_type=SiteTypes.WORLD)
         ctx.author = registered_author
         # `Select world to remove`, `confirm?`
         ctx.bot = mocks.ClientMock(wait_for_anwsers=['0', 'no'])
