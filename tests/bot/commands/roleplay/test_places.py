@@ -226,7 +226,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_remove_ok(self, ctx, registered_author, user, mocker):
-        baker.make(Place, 3, user=user, owner=user)
+        baker.make(Place, user=user, owner=user)
         ctx.author = registered_author
         # `Select world to remove`, `confirm?`
         ctx.bot = mocks.ClientMock(wait_for_anwsers=['0', 'yes'])
