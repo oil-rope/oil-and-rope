@@ -71,7 +71,7 @@ jobs:
 
       - name: Check iSort
         run: |
-          pip install -U isort
+          pip install isort
           isort -rc -sp setup.cfg -c -df
 
       - name: Pytest
@@ -132,7 +132,7 @@ jobs:
 
       - name: Check iSort
         run: |
-          pip install -U isort
+          pip install isort
           isort -rc -sp setup.cfg -c -df
 
       - name: Pytest
