@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-12 11:24+0200\n"
+"POT-Creation-Date: 2020-07-12 16:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -706,26 +706,25 @@ msgstr ""
 
 #: .\email\templates\email_templates\confirm_email.html:12
 msgid ""
-"\n"
-"        Before you start, please make sure to activate your account by "
-"clicking in the link below.\n"
-"      "
+"Before you start, please make sure to activate your account by clicking in "
+"the link below"
 msgstr ""
 
-#: .\email\templates\email_templates\confirm_email.html:19
+#: .\email\templates\email_templates\confirm_email.html:17
 msgid "Activate account"
 msgstr ""
 
 #: .\email\templates\email_templates\password_reset_email.html:13
 msgid ""
-"\n"
-"          You've received this email because your account has been requested "
-"for a password reset.<br>\n"
-"          To accomplish the requested task please click on link below.\n"
-"        "
+"You've received this email because your account has been requested for a "
+"password reset"
 msgstr ""
 
-#: .\email\templates\email_templates\password_reset_email.html:19
+#: .\email\templates\email_templates\password_reset_email.html:14
+msgid "To accomplish the requested task please click on link below"
+msgstr ""
+
+#: .\email\templates\email_templates\password_reset_email.html:17
 msgid "Reset password"
 msgstr ""
 
@@ -1087,7 +1086,7 @@ msgid "View details"
 msgstr ""
 
 #: .\roleplay\templates\roleplay\include\world_card.html:26
-#: .\roleplay\templates\roleplay\world\world_detail.html:71
+#: .\roleplay\templates\roleplay\world\world_detail.html:69
 #: .\roleplay\templates\roleplay\world\world_update.html:5
 msgid "Edit"
 msgstr ""
@@ -1106,7 +1105,7 @@ msgstr ""
 
 #: .\roleplay\templates\roleplay\include\world_card.html:51
 #: .\roleplay\templates\roleplay\world\world_confirm_delete.html:3
-#: .\roleplay\templates\roleplay\world\world_detail.html:77
+#: .\roleplay\templates\roleplay\world\world_detail.html:75
 msgid "Delete"
 msgstr ""
 
@@ -1116,14 +1115,8 @@ msgstr ""
 
 #: .\roleplay\templates\roleplay\include\world_card.html:63
 #, python-format
-msgid ""
-"\n"
-"          Used in %(sessions)s session\n"
-"        "
-msgid_plural ""
-"\n"
-"          Used in %(sessions)s sessions\n"
-"        "
+msgid "Used in %(sessions)s session"
+msgid_plural "Used in %(sessions)s sessions"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1169,10 +1162,7 @@ msgstr ""
 
 #: .\roleplay\templates\roleplay\world\world_detail.html:44
 #, python-format
-msgid ""
-"\n"
-"        Created by %(creator)s (%(created)s)\n"
-"      "
+msgid "Created by %(creator)s (%(created)s)"
 msgstr ""
 
 #: .\roleplay\templates\roleplay\world\world_list.html:4
@@ -1188,56 +1178,44 @@ msgid "Create one"
 msgstr ""
 
 #: .\roleplay\templates\roleplay\world\world_list.html:21
-#: .\roleplay\templates\roleplay\world\world_list.html:60
+#: .\roleplay\templates\roleplay\world\world_list.html:56
 msgid "Create world"
 msgstr ""
 
 #: .\roleplay\templates\roleplay\world\world_list.html:26
-msgid ""
-"\n"
-"          Your world\n"
-"        "
-msgid_plural ""
-"\n"
-"          Your worlds\n"
-"        "
+msgid "Your world"
+msgid_plural "Your worlds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:31
+#: .\roleplay\templates\roleplay\world\world_list.html:27
 msgid "Create new world"
 msgstr ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:49
+#: .\roleplay\templates\roleplay\world\world_list.html:45
 msgid "Create private world"
 msgstr ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:56
+#: .\roleplay\templates\roleplay\world\world_list.html:52
 msgid "Seems like we don't have comunity worlds"
 msgstr ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:57
+#: .\roleplay\templates\roleplay\world\world_list.html:53
 msgid "Would you like to create one?"
 msgstr ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:64
+#: .\roleplay\templates\roleplay\world\world_list.html:60
 #, python-format
-msgid ""
-"\n"
-"          Checkout our community world\n"
-"        "
-msgid_plural ""
-"\n"
-"          Checkout our %(counter)s community worlds\n"
-"        "
+msgid "Checkout our community world"
+msgid_plural "Checkout our %(counter)s community worlds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:69
+#: .\roleplay\templates\roleplay\world\world_list.html:61
 msgid "Create community world"
 msgstr ""
 
-#: .\roleplay\templates\roleplay\world\world_list.html:87
+#: .\roleplay\templates\roleplay\world\world_list.html:79
 msgid "Create public world"
 msgstr ""
 

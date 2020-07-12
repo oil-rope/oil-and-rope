@@ -23,11 +23,7 @@
       <div class="w-100 my-5"></div>
     {% else %}
       <h2 class="display-4 text-center">
-        {% blocktrans count counter=user_worlds_full.count %}
-          Your world
-        {% plural %}
-          Your worlds
-        {% endblocktrans %}
+        {% blocktrans count counter=user_worlds_full.count %}Your world{% plural %}Your worlds{% endblocktrans %}
         <a title="{% trans 'Create new world' %}" href="{% url 'roleplay:world_create' %}?user"
            class="btn btn-lg btn-primary">
           <span class="ic-plus"></span>
@@ -61,11 +57,7 @@
       </div>
     {% else %}
       <h2 class="display-4 text-center">
-        {% blocktrans count counter=object_list_full.count %}
-          Checkout our community world
-        {% plural %}
-          Checkout our {{ counter }} community worlds
-        {% endblocktrans %}
+        {% blocktrans count counter=object_list_full.count %}Checkout our community world{% plural %}Checkout our {{ counter }} community worlds{% endblocktrans %}
         <a title="{% trans 'Create community world' %}" href="{% url 'roleplay:world_create' %}"
            class="btn btn-lg btn-secondary">
           <span class="ic-plus"></span>
