@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # LeCuay <suso.becerra98@gmail.com>, 2020.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-12 16:03+0200\n"
+"POT-Creation-Date: 2020-07-12 16:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,233 +20,234 @@ msgstr ""
 
 #: .\bot\bot.py:63
 msgid "Env file does not exist"
-msgstr ""
+msgstr "El archivo Env no existe"
 
 #: .\bot\bot.py:123
 msgid "Incorrect format"
-msgstr ""
+msgstr "Formato incorrecto"
 
 #: .\bot\bot.py:142
 #, python-format
 msgid "Hello traveller! To confirm your account please type %(token)s"
-msgstr ""
+msgstr "¡Buenas viajero! Para confirmar su cuenta por favor escriba %(token)s"
 
 #: .\bot\bot.py:157
 msgid "Token has timed out!"
-msgstr ""
+msgstr "¡El token ha expirado!"
 
 #: .\bot\bot.py:160
 msgid "Your user has been confirmed"
-msgstr ""
+msgstr "Tu usuario ha sido confirmado"
 
 #: .\bot\categories.py:22
 msgid "Roleplay"
-msgstr ""
+msgstr "Roleplay"
 
 #: .\bot\categories.py:103
 msgid "The roll must follow the correct pattern"
-msgstr ""
+msgstr "La tirada debe tener el formato adecuado"
 
 #: .\bot\categories.py:107
 #, python-format
 msgid "%(user)s rolled"
-msgstr ""
+msgstr "%(user)s ha sacado"
 
 #: .\bot\categories.py:135
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Misceláneo"
 
 #: .\bot\categories.py:148
 msgid "Shutting down"
-msgstr ""
+msgstr "Apagando"
 
 #: .\bot\categories.py:157 .\bot\models.py:30 .\chat\models.py:50
 #: .\registration\models.py:59 .\roleplay\models.py:87
 #: .\roleplay\models.py:335
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
 #: .\bot\categories.py:181
 msgid "You are part of the full experience already"
-msgstr ""
+msgstr "Ya eres parte de la experiencia completa"
 
 #: .\bot\commands\roleplay\places.py:61
 #, python-format
 msgid "Invalid option. Supported options are %(options)s"
-msgstr ""
+msgstr "Opción inválida. Las opciones soportadas son %(options)s"
 
 #: .\bot\commands\roleplay\places.py:70
 #, python-format
 msgid "Seems like you are not registered. You can do it in 5 minutes %(url)s"
 msgstr ""
+"Parece que no estás registrado. Puedes registrarte en 5 minutos %(url)s"
 
 #: .\bot\commands\roleplay\places.py:78
 msgid "Sorry, you took so long to reply"
-msgstr ""
+msgstr "Lo siento, has tardado demasiado en responder"
 
 #: .\bot\commands\roleplay\places.py:128
 msgid "Which world would you like to delete?"
-msgstr ""
+msgstr "¿Qué mundo te gustaría borrar?"
 
 #: .\bot\commands\roleplay\places.py:136
 #, python-format
 msgid "You can perform this action via web: %(url)s"
-msgstr ""
+msgstr "Puedes realizar esta acción via web: %(url)s"
 
 #: .\bot\commands\roleplay\places.py:141
 #, python-format
 msgid "Remember you can perform this action via web: %(url)s"
-msgstr ""
+msgstr "Recuerda que puedes realizar esta acción via web: %(url)s"
 
 #: .\bot\commands\roleplay\places.py:146
 #, python-format
 msgid "Check it out here: %(url)s"
-msgstr ""
+msgstr "Míralo aquí: %(url)s"
 
 #: .\bot\commands\roleplay\places.py:151
-msgid "You didn\t send an image"
-msgstr ""
+msgid "You didn't send an image"
+msgstr "No has enviado una imagen"
 
-#: .\bot\commands\roleplay\places.py:155
+#: .\bot\commands\roleplay\places.py:156
 msgid "Image too big"
-msgstr ""
+msgstr "La imagen es muy grande"
 
-#: .\bot\commands\roleplay\places.py:188
+#: .\bot\commands\roleplay\places.py:189
 #, python-format
 msgid "Here's a list of your worlds: %(worlds)s"
-msgstr ""
+msgstr "Aquí tienes una lista de tus mundos: %(worlds)s"
 
-#: .\bot\commands\roleplay\places.py:190
+#: .\bot\commands\roleplay\places.py:191
 msgid "Seems like there isn't any world yet"
-msgstr ""
+msgstr "Parece que no hay ningún mundo aún"
 
-#: .\bot\commands\roleplay\places.py:210
+#: .\bot\commands\roleplay\places.py:211
 msgid "Seems like you don't have any world yet"
-msgstr ""
+msgstr "Parece que no tienes ningún mundo aún"
 
-#: .\bot\commands\roleplay\places.py:229
+#: .\bot\commands\roleplay\places.py:230
 #, python-format
 msgid "Are you sure you want to delete %(place)s?"
-msgstr ""
+msgstr "¿Estás seguro de que quieres borrar %(place)s?"
 
-#: .\bot\commands\roleplay\places.py:230
+#: .\bot\commands\roleplay\places.py:231
 msgid "yes"
-msgstr ""
+msgstr "sí"
 
-#: .\bot\commands\roleplay\places.py:230
+#: .\bot\commands\roleplay\places.py:231
 msgid "no"
-msgstr ""
+msgstr "no"
 
-#: .\bot\commands\roleplay\places.py:245
+#: .\bot\commands\roleplay\places.py:246
 #, python-format
 msgid "%(place)s deleted"
-msgstr ""
+msgstr "%(place)s borrado"
 
-#: .\bot\commands\roleplay\places.py:248
+#: .\bot\commands\roleplay\places.py:249
 msgid "Okay!"
-msgstr ""
+msgstr "¡Listo!"
 
-#: .\bot\commands\roleplay\places.py:271
+#: .\bot\commands\roleplay\places.py:272
 msgid "First we need a name"
-msgstr ""
+msgstr "Primero necesitamos un nombre"
 
-#: .\bot\commands\roleplay\places.py:280
+#: .\bot\commands\roleplay\places.py:281
 msgid ""
 "Now tell us about your world, a description (You can avoid this by writting "
 "'no')"
-msgstr ""
+msgstr "Ahora descríbenos tu mundo (Puedes evitar esto escribiendo 'no')"
 
-#: .\bot\commands\roleplay\places.py:290
+#: .\bot\commands\roleplay\places.py:291
 msgid "Maybe an image? (You can avoid this by writting 'no')"
-msgstr ""
+msgstr "¿A lo mejor una imagen?"
 
-#: .\bot\commands\roleplay\places.py:304
+#: .\bot\commands\roleplay\places.py:305
 msgid "Congrats! Your world have been created!"
-msgstr ""
+msgstr "¡Felicidades! ¡Tu mundo ha sido creado!"
 
 #: .\bot\enums.py:10
 msgid "List"
-msgstr ""
+msgstr "Listado"
 
 #: .\bot\enums.py:11 .\roleplay\forms.py:13
 #: .\roleplay\templates\roleplay\world\world_create.html:5
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: .\bot\enums.py:12
 msgid "Remove"
-msgstr ""
+msgstr "Borrar"
 
 #: .\bot\models.py:29 .\bot\models.py:74 .\bot\models.py:111
 msgid "Identifier"
-msgstr ""
+msgstr "Identificador"
 
 #: .\bot\models.py:32
 msgid "Nick"
-msgstr ""
+msgstr "Nick"
 
 #: .\bot\models.py:33
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: .\bot\models.py:34
 msgid "Avatar URL"
-msgstr ""
+msgstr "Avatar URL"
 
 #: .\bot\models.py:35
 msgid "Locale"
-msgstr ""
+msgstr "Locale"
 
 #: .\bot\models.py:36
 msgid "Premium"
-msgstr ""
+msgstr "Premium"
 
 #: .\bot\models.py:37 .\bot\models.py:82 .\bot\models.py:114
 msgid "Created at"
-msgstr ""
+msgstr "Creado el"
 
 #: .\bot\models.py:40
 msgid "Discord User"
-msgstr ""
+msgstr "Usuario de Discord"
 
 #: .\bot\models.py:41 .\bot\models.py:83 .\bot\models.py:151
 #: .\bot\models.py:188
 msgid "Discord Users"
-msgstr ""
+msgstr "Usuarios de Discord"
 
 #: .\bot\models.py:75 .\bot\models.py:112 .\dynamic_menu\models.py:90
 #: .\roleplay\models.py:29 .\roleplay\models.py:79 .\roleplay\models.py:283
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #: .\bot\models.py:76
 msgid "Region"
-msgstr ""
+msgstr "Región"
 
 #: .\bot\models.py:77
 msgid "Icon URL"
-msgstr ""
+msgstr "URL del Icono"
 
 #: .\bot\models.py:78 .\roleplay\models.py:90
 msgid "Owner"
-msgstr ""
+msgstr "Dueño"
 
 #: .\bot\models.py:80 .\dynamic_menu\models.py:91 .\roleplay\models.py:30
 #: .\roleplay\models.py:80 .\roleplay\models.py:284
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: .\bot\models.py:81
 msgid "Member count"
-msgstr ""
+msgstr "Número de miembros"
 
 #: .\bot\models.py:87 .\bot\models.py:149 .\bot\models.py:186
 msgid "Discord Server"
-msgstr ""
+msgstr "Servidor de Discord"
 
 #: .\bot\models.py:88
 msgid "Discord Servers"
-msgstr ""
+msgstr "Servidores de Discord"
 
 #: .\bot\models.py:113
 msgid "Position"

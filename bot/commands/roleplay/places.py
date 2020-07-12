@@ -148,7 +148,8 @@ class WorldsCommand:
 
     async def get_image_from_message(self, message, author):
         if len(message.attachments) == 0:
-            await author.send(_('You didn\t send an image') + '.')
+            msg = _('You didn\'t send an image')
+            await author.send(f'{msg}.')
             raise OilAndRopeException('Image no sent.')
         image = message.attachments[0]
         if image.size > settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
