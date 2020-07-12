@@ -58,8 +58,8 @@ class WorldsCommand:
         """
 
         options = ', '.join(f'`{action.value}`' for action in enums.Actions)
-        msg = _('Invalid option. Supported options are {}').format(options) + '.'
-        await self.ctx.channel.send(msg)
+        msg = _('Invalid option. Supported options are %(options)s') % {'options': options}
+        await self.ctx.channel.send(f'{msg}.')
 
     async def unregistered_user(self):
         """
@@ -67,7 +67,7 @@ class WorldsCommand:
         """
 
         url = await get_url_from('registration:register')
-        msg = _('Seems like you are not registered. You can do it in 5 minutes {}').format(url)
+        msg = _('Seems like you are not registered. You can do it in 5 minutes %(url)s') % {'url': url}
         await self.ctx.author.send(msg)
 
     async def time_out(self, author):
@@ -133,17 +133,18 @@ class WorldsCommand:
 
     async def send_web_remove_message(self, pk, author):
         url = await get_url_from('roleplay:world_delete', kwargs={'pk': pk})
-        msg = _('You can perform this action via web: {}').format(url)
+        msg = _('You can perform this action via web: %(url)s') % {'url': url}
         await author.send(msg)
 
     async def send_web_create_message(self, author):
         url = await get_url_from('roleplay:world_create')
-        msg = _('Remember you can perform this action via web: {}').format(url)
+        msg = _('Remember you can perform this action via web: %(url)s') % {'url': url}
         await author.send(msg)
 
     async def send_web_detail_message(self, author, pk):
         url = await get_url_from('roleplay:world_detail', kwargs={'pk': pk})
-        await author.send(_('Check it out here: {}').format(url))
+        msg = _('Check it out here: %(url)s') % {'url': url}
+        await author.send(msg)
 
     async def get_image_from_message(self, message, author):
         if len(message.attachments) == 0:
@@ -184,10 +185,10 @@ class WorldsCommand:
         worlds_existance = await self.check_world_existance(worlds)
         if worlds_existance:
             list_of_worlds = await self.get_list_of_worlds_as_string(worlds)
-            msg = _('Here\'s a list of your worlds: {}').format(list_of_worlds) + '.'
+            msg = _('Here\'s a list of your worlds: %(worlds)s') % {'worlds': list_of_worlds}
         else:
-            msg = _('Seems like there isn\'t any world yet') + '.'
-        await author.send(msg)
+            msg = _('Seems like there isn\'t any world yet')
+        await author.send(f'{msg}.')
 
     async def remove(self):
         """
@@ -225,7 +226,7 @@ class WorldsCommand:
         index = msg.content
         pk = worlds[index]
         selected_place = await self.get_world(pk)
-        msg = _('Are you sure you want to delete {}?').format(selected_place)
+        msg = _('Are you sure you want to delete %(place)s?') % {'place': selected_place}
         msg += ' [{}/{}]'.format(_('yes'), _('no'))
         await author.send(msg)
 
@@ -241,8 +242,8 @@ class WorldsCommand:
         proceed_delete = to_bool(msg.content) == 1
         if proceed_delete:
             await self.delete_world(selected_place.pk)
-            msg = _('{} deleted').format(selected_place) + '.'
-            await author.send(msg)
+            msg = _('%(place)s deleted') % {'place': selected_place}
+            await author.send(f'{msg}.')
         else:
             msg = _('Okay!')
             await author.send(msg)

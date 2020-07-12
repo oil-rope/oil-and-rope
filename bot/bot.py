@@ -139,7 +139,8 @@ class OilAndRopeBot(commands.Bot):
 
         user = self.get_user(user_id)
         token = fake.password(length=10, special_chars=False, digits=True, upper_case=True, lower_case=True)
-        await user.send(_('Hello traveller! To confirm your account please type `{token}`').format(token=token))
+        msg = _('Hello traveller! To confirm your account please type %(token)s') % {'token': '`{}`'.format(token)}
+        await user.send(msg)
 
         def check(m):
             """
