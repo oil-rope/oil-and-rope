@@ -213,7 +213,7 @@ class SignUpForm(auth_forms.UserCreationForm):
 
         if data:
             if not DiscordUser.objects.filter(pk=data).exists():
-                msg = '{} {}'.format(_('User not found.'), _('Have you requested invitation?'))
+                msg = '{}. {}'.format(_('User not found'), _('Have you requested invitation?'))
                 self.add_error('discord_id', msg)
         return data
 
