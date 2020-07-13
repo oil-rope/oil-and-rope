@@ -251,459 +251,459 @@ msgstr "Servidores de Discord"
 
 #: .\bot\models.py:113
 msgid "Position"
-msgstr ""
+msgstr "Posición"
 
 #: .\bot\models.py:146
 msgid "NSFW"
-msgstr ""
+msgstr "NSFW"
 
 #: .\bot\models.py:147
 msgid "Topic"
-msgstr ""
+msgstr "Tema"
 
 #: .\bot\models.py:148
 msgid "News"
-msgstr ""
+msgstr "Noticias"
 
 #: .\bot\models.py:155
 msgid "Discord Text Channel"
-msgstr ""
+msgstr "Canal de Texto de Discord"
 
 #: .\bot\models.py:156
 msgid "Discord Text Channels"
-msgstr ""
+msgstr "Canales de Texto de Discord"
 
 #: .\bot\models.py:185
 msgid "Bitrate"
-msgstr ""
+msgstr "Bitrate"
 
 #: .\bot\models.py:192
 msgid "Discord Voice Channel"
-msgstr ""
+msgstr "Canal de Voz de Discord"
 
 #: .\bot\models.py:193
 msgid "Discord Voice Channels"
-msgstr ""
+msgstr "Canales de Voz de Discord"
 
 #: .\bot\views.py:57
 #, python-format
 msgid "Please set %(argument)s"
-msgstr ""
+msgstr "Por favor indique %(argument)s"
 
 #: .\bot\views.py:104
 msgid "You are almost ready to start your adventure"
-msgstr ""
+msgstr "Ya casi estás listo para empezar tu aventura"
 
 #: .\bot\views.py:106
 #, python-format
 msgid "Type %(command)s to get your invitation"
-msgstr ""
+msgstr "Escribe %(command)s para obtener tu invitación"
 
 #: .\chat\models.py:21
 msgid "Chat name"
-msgstr ""
+msgstr "Nombre del chat"
 
 #: .\chat\models.py:23 .\roleplay\models.py:295
 msgid "Users"
-msgstr ""
+msgstr "Usuarios"
 
 #: .\chat\models.py:26 .\chat\models.py:47
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
 #: .\chat\models.py:27
 msgid "Chats"
-msgstr ""
+msgstr "Chats"
 
 #: .\chat\models.py:49
 msgid "Message"
-msgstr ""
+msgstr "Mensaje"
 
 #: .\chat\models.py:55 .\core\models.py:17
 msgid "Entry created at"
-msgstr ""
+msgstr "Registro creado el"
 
 #: .\chat\models.py:59
 msgid "Chat Message"
-msgstr ""
+msgstr "Mensaje del Chat"
 
 #: .\chat\models.py:60
 msgid "Chat Messages"
-msgstr ""
+msgstr "Mensajes del Chat"
 
 #: .\common\templates\common\include\breadcrumb.html:10
 #: .\common\templates\common\include\breadcrumb.html:15
 #: .\core\templates\core\index.html:4
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
 #: .\common\templates\common\include\paginator.html:4
 #, python-format
 msgid "Pagination for %(model)s"
-msgstr ""
+msgstr "Paginación para %(model)s"
 
 #: .\common\templates\common\include\paginator.html:7
 msgid "First"
-msgstr ""
+msgstr "Primero"
 
 #: .\common\templates\common\include\paginator.html:14
 #: .\common\templates\common\include\paginator.html:19
 #: .\roleplay\templates\roleplay\include\world_image_carousel.html:21
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: .\common\templates\common\include\paginator.html:26
 msgid "current"
-msgstr ""
+msgstr "actual"
 
 #: .\common\templates\common\include\paginator.html:32
 #: .\common\templates\common\include\paginator.html:36
 #: .\roleplay\templates\roleplay\include\world_image_carousel.html:25
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: .\common\templates\common\include\paginator.html:40
 msgid "Last"
-msgstr ""
+msgstr "Último"
 
 #: .\common\templates\errors\403.html:4
 msgid "Forbidden"
-msgstr ""
+msgstr "Prohibido"
 
 #: .\common\templates\errors\403.html:8
 msgid "You shall not pass!"
-msgstr ""
+msgstr "¡No puedes pasar!"
 
 #: .\common\templates\errors\403.html:9
 msgid "'cause page returned 403"
-msgstr ""
+msgstr "porque la web ha dado error 403"
 
 #: .\common\templates\errors\403.html:14
 msgid ""
 "It seems you are trying to perform an action for which you are not allowed"
-msgstr ""
+msgstr "Parece que estás intentando realizar un acción para la que no tienes permiso"
 
 #: .\common\templates\errors\403.html:15
 msgid "Maybe you should"
-msgstr ""
+msgstr "A lo mejor deberías"
 
 #: .\common\templates\errors\403.html:15 .\common\templates\errors\500.html:17
 msgid "go back"
-msgstr ""
+msgstr "volver"
 
 #: .\common\templates\errors\404.html:4
 msgid "Mistery"
-msgstr ""
+msgstr "Misterio"
 
 #: .\common\templates\errors\404.html:8
 msgid "Seems like the resource you are looking for is missing"
-msgstr ""
+msgstr "Parece que lo que estás buscando ha desaparecido"
 
 #: .\common\templates\errors\404.html:9
 msgid "Don't worry, our best man is on case"
-msgstr ""
+msgstr "No te preocupes, nuestro mejor hombre está en el caso"
 
 #: .\common\templates\errors\404.html:14
 msgid "Meanwhile what about"
-msgstr ""
+msgstr "Mientras tanto qué tal so"
 
 #: .\common\templates\errors\404.html:14
 msgid "going back"
-msgstr ""
+msgstr "volvemos"
 
 #: .\common\templates\errors\500.html:4
 msgid "Boom"
-msgstr ""
+msgstr "Boom"
 
 #: .\common\templates\errors\500.html:8
 msgid "One of our robots have just exploded"
-msgstr ""
+msgstr "Uno de nuestros robots acaba de explotar"
 
 #: .\common\templates\errors\500.html:10
 msgid ""
 "But don't panic, it's not like they're gonna reveal against us... Right?"
-msgstr ""
+msgstr "Pero no te preocupes, no es como que se vayan a revelar contra la humanidad... ¿Verdad?"
 
 #: .\common\templates\errors\500.html:16
 msgid "Meanwhile why don't you try to escap... I mean"
-msgstr ""
+msgstr "Mientras porqué no tratas de escap- ... Quiero decir"
 
 #: .\common\validators\files.py:16
 #, python-format
 msgid "Size should not exceed %(megabytes)s MiB"
-msgstr ""
+msgstr "El tamaño no debe exceder los %(megabytes)s MiB"
 
 #: .\common\validators\files.py:18
 msgid "File too large"
-msgstr ""
+msgstr "Archivo demasiado grande"
 
 #: .\common\views\list.py:29
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr ""
+msgstr "La página indicada no es “last” ni puede ser convertida en número."
 
 #: .\common\views\list.py:34
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Página inválida (%(page_number)s): %(message)s"
 
 #: .\core\consumers.py:16 .\tests\core\test_consumers.py:45
 msgid "Non existent type"
-msgstr ""
+msgstr "Tipo inexistente"
 
 #: .\core\consumers.py:27 .\tests\core\test_consumers.py:26
 msgid "No type given"
-msgstr ""
+msgstr "No se ha indica el tipo"
 
 #: .\core\models.py:18
 msgid "Entry updated at"
-msgstr ""
+msgstr "Registro actualizado el"
 
 #: .\core\templates\core\includes\about_the_project.html:6
 msgid "About the project"
-msgstr ""
+msgstr "Sobre el proyecto"
 
 #: .\core\templates\core\includes\about_the_project.html:10
 msgid ""
 "Oil &amp; Rope was born from the problem that some websites for managing "
 "roleplay games are quite <i>rough</i>."
-msgstr ""
+msgstr "Oil &amp; Rope nació como solución un problema: la gestión <i>tosca</i> de juegos de mesa en línea."
 
 #: .\core\templates\core\includes\about_the_project.html:12
 msgid "So the very goal of this website is to bring something fresh"
-msgstr ""
+msgstr "El objetivo final de esta web es traer algo nuevo"
 
 #: .\core\templates\core\includes\about_the_project.html:13
 msgid "Something useful"
-msgstr ""
+msgstr "Algo útil"
 
 #: .\core\templates\core\includes\about_the_project.html:14
 msgid "Something intuitive"
-msgstr ""
+msgstr "Algo intuitivo"
 
 #: .\core\templates\core\includes\about_the_project.html:15
 msgid "A web manager made by roleplayers for roleplayers"
-msgstr ""
+msgstr "Un gestor de juegos de mesa para jugadores"
 
 #: .\core\templates\core\includes\about_the_project.html:20
 msgid "Contributing"
-msgstr ""
+msgstr "Contribuir"
 
 #: .\core\templates\core\includes\about_the_project.html:24
 msgid ""
 "Oil &amp; Rope is an open-source project and can be found on <a href="
 "\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white\">GitHub</"
 "a>."
-msgstr ""
+msgstr "Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white\">GitHub</a>."
 
 #: .\core\templates\core\includes\about_the_project.html:26
 msgid ""
 "The best way to contribute with us apart from helping us to code is enjoying "
 "the website itself, sharing with friends, giving us some feedback..."
-msgstr ""
+msgstr "La mejor manera de contribuir sin aportar al código es disfruntando de la web en sí, compartiendo y enviándonos comentarios..."
 
 #: .\core\templates\core\includes\about_the_project.html:28
 msgid "We really appreciate any kind of effort"
-msgstr ""
+msgstr "Apreciamos cualquier tipo de esfuerzo"
 
 #: .\core\templates\core\includes\about_the_project.html:34
 msgid "Begin the experience"
-msgstr ""
+msgstr "Comienza la aventura"
 
 #: .\core\templates\core\includes\about_the_project.html:40
 msgid "Check us out on GitHub"
-msgstr ""
+msgstr "Visítanos en GitHub"
 
 #: .\core\templates\core\includes\about_the_project.html:47
 msgid "Share"
-msgstr ""
+msgstr "Compartir"
 
 #: .\core\templates\core\includes\about_us.html:7
 msgid "About us"
-msgstr ""
+msgstr "Sobre nosotros"
 
 #: .\core\templates\core\includes\about_us.html:11
 msgid ""
 "We are a group of people with different professional profiles (developers, "
 "designers, composers, …) and one thought in common,<br><i class=\"font-"
 "weight-bold\">\"make an incredible experience for roleplaying online!\"</i>."
-msgstr ""
+msgstr "Somos un grupo de personas con diferentes perfiles profesionales (desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
 
 #: .\core\templates\core\includes\about_us.html:18
 msgid "How?"
-msgstr ""
+msgstr "¿Cómo?"
 
 #: .\core\templates\core\includes\about_us.html:20
 msgid "Helping you to"
-msgstr ""
+msgstr "Ayudándote a"
 
 #: .\core\templates\core\includes\about_us.html:31
 msgid "build"
-msgstr ""
+msgstr "construir"
 
 #: .\core\templates\core\includes\about_us.html:32
 msgid "Worlds, cities, races, stories..."
-msgstr ""
+msgstr "Mundos, ciudades, razas, historias..."
 
 #: .\core\templates\core\includes\about_us.html:41
 msgid "play secure"
-msgstr ""
+msgstr "jugar de manera segura"
 
 #: .\core\templates\core\includes\about_us.html:42
 msgid "All your data is stored and encrypted"
-msgstr ""
+msgstr "Todos los datos almacenados son encriptados"
 
 #: .\core\templates\core\includes\about_us.html:51
 msgid "connect"
-msgstr ""
+msgstr "conectar"
 
 #: .\core\templates\core\includes\about_us.html:52
 msgid "Make relationships in-between your world"
-msgstr ""
+msgstr "Organiza las relaciones de tu mundo"
 
 #: .\core\templates\core\includes\about_us.html:61
 msgid "play"
-msgstr ""
+msgstr "jugar"
 
 #: .\core\templates\core\includes\about_us.html:62
 msgid "Create, fight, explore and have fun!"
-msgstr ""
+msgstr "Crear, luchar, explorar ¡y divertirse!"
 
 #: .\core\templates\core\includes\about_us.html:71
 msgid "write"
-msgstr ""
+msgstr "escribir"
 
 #: .\core\templates\core\includes\about_us.html:72
 msgid "Your own story, your epic revolution"
-msgstr ""
+msgstr "Tu propia historia, tu épica revolución"
 
 #: .\core\templates\core\includes\about_us.html:81
 msgid "adapt"
-msgstr ""
+msgstr "adaptarte"
 
 #: .\core\templates\core\includes\about_us.html:82
 msgid "Control your game in every device"
-msgstr ""
+msgstr "Controla tu partida desde cualquier dispositivo"
 
 #: .\core\templates\core\includes\about_us.html:91
 msgid "communicate"
-msgstr ""
+msgstr "comunicar"
 
 #: .\core\templates\core\includes\about_us.html:92
 msgid "Playing in both website and Discord server"
-msgstr ""
+msgstr "Juega tanto en la web como a través de Discord"
 
 #: .\core\templates\core\includes\about_us.html:101
 msgid "share"
-msgstr ""
+msgstr "compartir"
 
 #: .\core\templates\core\includes\about_us.html:102
 msgid "Make amazing worlds for everyone to enjoy"
-msgstr ""
+msgstr "Haz cosas increíbles que todos puedan disfrutar"
 
 #: .\core\templates\core\includes\about_us.html:108
 #: .\registration\templates\registration\login.html:56
 msgid "Join now"
-msgstr ""
+msgstr "¡Únete ahora!"
 
 #: .\core\templates\core\includes\menu.html:10
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 #: .\core\templates\core\includes\menu.html:15
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Activar navegación"
 
 #: .\core\templates\core\includes\menu.html:71 .\registration\forms.py:39
 #: .\registration\templates\registration\login.html:6
 msgid "Login"
-msgstr ""
+msgstr "Acceder"
 
 #: .\core\templates\core\includes\menu.html:78
 #: .\registration\templates\registration\register.html:6
 #: .\registration\templates\registration\register.html:19
 msgid "Create your account"
-msgstr ""
+msgstr "Crea tu cuenta"
 
 #: .\core\templates\core\includes\menu.html:91
 msgid "Admin panel"
-msgstr ""
+msgstr "Panel de Admin"
 
 #: .\core\templates\core\includes\menu.html:105
 msgid "Logout"
-msgstr ""
+msgstr "Salir"
 
 #: .\core\templates\core\includes\opengraph_protocol.html:5
 #: .\core\templates\core\includes\opengraph_protocol.html:16
 msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
-msgstr ""
+msgstr "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
 
 #: .\dynamic_menu\enums.py:6
 msgid "Standard menu"
-msgstr ""
+msgstr "Menú estándar"
 
 #: .\dynamic_menu\enums.py:7
 msgid "Context menu"
-msgstr ""
+msgstr "Menú contextual"
 
 #: .\dynamic_menu\models.py:92
 msgid "Prepended Text"
-msgstr ""
+msgstr "Texto antepuesto"
 
 #: .\dynamic_menu\models.py:94
 msgid "Appended Text"
-msgstr ""
+msgstr "Texto pospuesto"
 
 #: .\dynamic_menu\models.py:97
 msgid "Parent Menu"
-msgstr ""
+msgstr "Menú padre"
 
 #: .\dynamic_menu\models.py:98
 msgid "URL Resolver"
-msgstr ""
+msgstr "Resolutor de URL"
 
 #: .\dynamic_menu\models.py:100
 msgid "Extra URL Parameters"
-msgstr ""
+msgstr "Parámetros extra de URL"
 
 #: .\dynamic_menu\models.py:102
 msgid "Order"
-msgstr ""
+msgstr "Orden"
 
 #: .\dynamic_menu\models.py:105
 msgid "Permissions required"
-msgstr ""
+msgstr "Permisos necesarios"
 
 #: .\dynamic_menu\models.py:106
 msgid "Staff Required"
-msgstr ""
+msgstr "Permiso de Staff"
 
 #: .\dynamic_menu\models.py:107
 msgid "SuperUser Required"
-msgstr ""
+msgstr "Permiso de SuperUsuario"
 
 #: .\dynamic_menu\models.py:109
 msgid "Icon"
-msgstr ""
+msgstr "Icono"
 
 #: .\dynamic_menu\models.py:111
 msgid "Related Model"
-msgstr ""
+msgstr "Modelo Relacionado"
 
 #: .\dynamic_menu\models.py:114
 msgid "Menu Type"
-msgstr ""
+msgstr "Tipo de Menú"
 
 #: .\dynamic_menu\models.py:141
 msgid "Dynamic Menu"
-msgstr ""
+msgstr "Menú Dinámico"
 
 #: .\dynamic_menu\models.py:142
 msgid "Dynamic Menus"
-msgstr ""
+msgstr "Memús Dinámicos"
 
 #: .\email\templates\email_templates\confirm_email.html:6
 msgid "Welcome to Oil &amp; Rope traveller!"
-msgstr ""
+msgstr "¡Bienvenido a Oil &amp; Rope viajero!"
 
 #: .\email\templates\email_templates\confirm_email.html:12
 msgid ""
