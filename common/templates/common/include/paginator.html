@@ -23,7 +23,7 @@
         <li class="page-item{% if page_obj.number == page %} active{% endif %}">
           <a href="{{ path }}?{{ page_kwarg }}={{ page }}" class="page-link">
             {{ page }}
-            <span class="sr-only">({% trans "current" %})</span>
+            <span class="sr-only">({% trans "current"|capfirst %})</span>
           </a>
         </li>
       {% endfor %}

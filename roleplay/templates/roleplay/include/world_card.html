@@ -60,11 +60,7 @@
   <div class="card-footer">
     <p class="text-muted text-center">
       {% with sessions=0 %}
-        {% blocktrans count counter=sessions %}
-          Used in {{ sessions }} session
-        {% plural %}
-          Used in {{ sessions }} sessions
-        {% endblocktrans %}
+        {% blocktrans count counter=sessions %}Used in {{ sessions }} session{% plural %}Used in {{ sessions }} sessions{% endblocktrans %}
       {% endwith %}
     </p>
   </div>

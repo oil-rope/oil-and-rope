@@ -100,15 +100,12 @@ class RoleplayCog(Cog, name='Roleplay'):
 
         roll = roll.strip().replace(' ', '')
         if not self.roll_pattern.match(roll):
-            await ctx.send(_('The roll must follow the correct pattern.'))
+            await ctx.send(_('The roll must follow the correct pattern') + '.')
             await ctx.send_help(self.roll)
             return
         result, roll_message = self._process_roll(roll)
-        message = _('{user} rolled').format(user=ctx.author.name)
-        message += ' **{roll}** *({message})*.'.format(
-            roll=result,
-            message=roll_message
-        )
+        message = _('%(user)s rolled') % {'user': ctx.author.name}
+        message += f' **{roll}** *({roll_message})*.'
         await ctx.send(message)
 
     @command()

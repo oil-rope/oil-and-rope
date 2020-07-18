@@ -459,7 +459,7 @@ class TestWorldsCommand:
         command = self.command(ctx, 'create', 'public')
         await command.run()
 
-        image_too_big_msg = 'You didn\t send an image.'
+        image_too_big_msg = 'You didn\'t send an image.'
         mocks.MemberMock.send.assert_called_with(image_too_big_msg)
 
     @pytest.mark.django_db(transaction=True)
