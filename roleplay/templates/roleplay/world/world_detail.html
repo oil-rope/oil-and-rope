@@ -41,9 +41,7 @@
       {{ object.name }}
     </h3>
     <small class="text-center text-muted d-block">
-      {% blocktrans with creator=object.owner.username|default:"Oil & Rope" created=object.entry_created_at %}
-        Created by {{ creator }} ({{ created }})
-      {% endblocktrans %}
+      {% blocktrans with creator=object.owner.username|default:"Oil & Rope" created=object.entry_created_at %}Created by {{ creator }} ({{ created }}){% endblocktrans %}
     </small>
     <hr class="mx-2">
 

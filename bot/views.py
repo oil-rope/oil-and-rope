@@ -53,7 +53,9 @@ class SendMessageToDiscordUserView(View):
 
         for argument in self.required_arguments:
             if argument not in self.content:
-                data['errors'].append(_('Please set \'{}\'').format(argument) + '.')
+                argument = f'\'{argument}\''
+                msg = _('Please set %(argument)s') % {'argument': argument}
+                data['errors'].append(f'{msg}.')
 
         return data
 
@@ -99,8 +101,7 @@ class SendInvitationView(SendMessageToDiscordUserView):
     required_arguments = ['discord_user_id']
 
     def get_message(self):
-        msg = _('You are almost ready to start your adventure.') + '\n'
-        msg += _('Type {command} to get your invitation').format(
-            command=f'`{settings.BOT_COMMAND_PREFIX}invite`'
-        )
+        msg = _('You are almost ready to start your adventure') + '.\n'
+        invite_command = f'`{settings.BOT_COMMAND_PREFIX}invite`'
+        msg += _('Type %(command)s to get your invitation') % {'command': invite_command}
         return msg

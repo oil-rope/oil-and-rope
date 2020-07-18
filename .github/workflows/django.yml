@@ -71,8 +71,8 @@ jobs:
 
       - name: Check iSort
         run: |
-          pip install isort
-          isort -rc -sp setup.cfg -c -df
+          pip install -U isort
+          isort . --check --diff
 
       - name: Pytest
         run: |
@@ -132,8 +132,8 @@ jobs:
 
       - name: Check iSort
         run: |
-          pip install isort
-          isort -rc -sp setup.cfg -c -df
+          pip install -U isort
+          isort . --check --diff
 
       - name: Pytest
         run: |
