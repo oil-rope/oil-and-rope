@@ -1,8 +1,0 @@
-# Graph libraries
-graphviz libgraphviz-dev
-
-# Translation libraries
-locales locales-all gettext
-
-# Voice Support
-libffi-dev libnacl-dev python3-dev
