@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-13 08:25+0200\n"
+"POT-Creation-Date: 2020-07-18 21:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -810,7 +810,8 @@ msgstr "Dirección de Email"
 
 #: .\registration\forms.py:273
 msgid "Enter your email address and we'll resend you the confirmation email"
-msgstr "Introduce tu dirección de email y te reenviareos el email de confirmación"
+msgstr ""
+"Introduce tu dirección de email y te reenviareos el email de confirmación"
 
 #: .\registration\forms.py:297 .\registration\forms.py:329
 msgid "This email doesn't belong to a user"
@@ -920,7 +921,9 @@ msgstr "Tu email de confirmación ha sido enviado"
 
 #: .\registration\views.py:201 .\tests\registration\test_views.py:291
 msgid "Multiple users with same email, please contact our developers"
-msgstr "Múltiples usuarios tienen el mismo email, por favor contacta con nuestro equipo"
+msgstr ""
+"Múltiples usuarios tienen el mismo email, por favor contacta con nuestro "
+"equipo"
 
 #: .\registration\views.py:214
 msgid "Password reset"
