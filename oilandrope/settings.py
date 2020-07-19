@@ -227,7 +227,7 @@ MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 # The maximum size (in bytes)
 # https://docs.djangoproject.com/en/3.0/ref/settings/#file-upload-max-memory-size
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 3145728
+FILE_UPLOAD_MAX_MEMORY_SIZE = 6291456
 
 # The maximum size in bytes that a request body may be
 # https://docs.djangoproject.com/en/3.0/ref/settings/#data-upload-max-memory-size

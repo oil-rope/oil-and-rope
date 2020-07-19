@@ -26,4 +26,6 @@ def validate_music_file(value):
     """
 
     extensions = [key for key, value in mimetypes.types_map.items() if 'audio/' in value]
-    breakpoint()
+    if not value.name.endswith(tuple(extensions)):
+        msg = _('File is not an audio')
+        raise ValidationError(f'{msg}.')

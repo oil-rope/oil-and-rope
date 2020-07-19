@@ -22,3 +22,18 @@ class PlaceAdmin(DraggableMPTTAdmin):
     list_filter = ('site_type',)
     readonly_fields = ('entry_created_at', 'entry_updated_at')
     search_fields = ['name__icontains']
+
+
+@admin.register(models.Music)
+class MusicAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'entry_created_at',
+        'entry_updated_at',
+        'title',
+        'description',
+        'file',
+        'content_type',
+        'object_id',
+    )
+    list_filter = ('entry_created_at', 'entry_updated_at', 'content_type')
