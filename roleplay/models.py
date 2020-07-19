@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +8,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from common.constants import models as constants
 from common.files.upload import default_upload_to
-from common.validators import validate_file_size
+from common.validators import validate_file_size, validate_music_file
 from core.models import TracingMixin
 
 from . import managers
@@ -340,3 +341,65 @@ class RaceUser(TracingMixin):
 
     def __str__(self):
         return f'{self.user.username} <-> {self.race.name}'
+
+
+class Music(TracingMixin):
+    """
+    This class manages the music for the game.
+
+    Parameters
+    ----------
+    title: :class:`str`
+        The title of the song.
+    description: Optional[:class:`str`]
+        Description for the song if needed.
+    file: :class:`file`
+        The song uploaded.
+    users: :class:`MusicUser`
+        Users that have this song.
+    """
+
+    title = models.CharField(verbose_name=_('Title'), max_length=50)
+    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    file = models.FileField(verbose_name=_('File'), upload_to=default_upload_to,
+                            validators=[validate_file_size, validate_music_file])
+    users = models.ManyToManyField(verbose_name=_('Users'), to=constants.USER_MODEL, related_name='music_set',
+                                   db_index=True, through=constants.USER_MUSIC_RELATION)
+
+    limit = models.Q(app_label='roleplay', model__in=['race', 'place'])
+    content_type = models.ForeignKey(to=constants.CONTENT_TYPE, verbose_name=_('Asociación'), limit_choices_to=limit,
+                                     blank=True, null=True, on_delete=models.CASCADE)
+    object_id = models.IntegerField(verbose_name=_('Identifier'), null=True, blank=True)
+    association = GenericForeignKey(ct_field='content_type', fk_field='object_id')
+
+    class Meta:
+        verbose_name = _('Music')
+        verbose_name_plural = _('Music')
+        ordering = ['title', '-entry_created_at']
+
+    def __str__(self):
+        return f'{self.title} ({self.file})'
+
+
+class MusicUser(TracingMixin):
+    """
+    This class manage M2M for :class:`Music` and :class:`User`.
+
+    Parameters
+    ----------
+    user: :class:`User`
+        Related user.
+    music: :class:`Music`
+        Related music.
+    is_owner: :class:`boolean`
+        Declares if the related user is owner.
+    """
+
+    user = models.ForeignKey(verbose_name=_('User'), to=constants.USER_MODEL, related_name='m2m_music_set',
+                             on_delete=models.CASCADE, db_index=True)
+    music = models.ForeignKey(verbose_name=_('Music'), to=constants.MUSIC_MODEL, related_name='m2m_music_set',
+                              on_delete=models.CASCADE, db_index=True)
+    is_owner = models.BooleanField(verbose_name=_('Ownership'), default=False)
+
+    def __str__(self):
+        return f'{self.user.username} <-> {self.race.title}'
