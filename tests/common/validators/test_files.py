@@ -19,3 +19,6 @@ class TestFileValidators(TestCase):
             files.validate_file_size(self.file_mock)
         exception = ex.exception
         self.assertRegex(exception.message, '.*File too large.*')
+
+    def test_validate_music_file(self):
+        files.validate_music_file(self.file_mock)
