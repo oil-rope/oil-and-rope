@@ -1,5 +1,6 @@
 import logging
 
+from django.apps import apps
 from django.db import models
 from django.shortcuts import reverse
 from django.utils.safestring import mark_safe
@@ -7,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
+from common.constants import models as constants
 from core.models import TracingMixin
 
 from .enums import MenuTypes
@@ -136,6 +138,52 @@ class DynamicMenu(MPTTModel, TracingMixin):
             logging.error('%s', ex)
         finally:
             return url
+
+    def add_permissions(self, *objs):
+        """
+        Takes a list of perms either :class:`str` (`app_label.codename`) or :class:`auth.Permission` instance.
+        """
+
+        Permission = apps.get_model(constants.PERMISSION_MODEL)
+        parsed_objs = []
+
+        for obj in objs:
+            if isinstance(obj, str):
+                # Perms are parsed from 'app_label.perm'
+                app_label, codename = obj.split('.', 1)
+                parsed_objs.append(
+                    Permission.objects.get(content_type__app_label=app_label, codename=codename)
+                )
+            else:
+                parsed_objs.append(obj)
+
+        self.permissions_required.add(*parsed_objs)
+
+    def add_models(self, *objs):
+        """
+        Takes a list of model either in :class:`str` (`app_label.model`)
+        or :class:`contenttypes.ContentType` instance format.
+        """
+
+        ContentType = apps.get_model(constants.CONTENT_TYPE_MODEL)
+        parsed_objs = []
+
+        for obj in objs:
+            if isinstance(obj, str):
+                # Models are parsed from 'app_label.model'
+                app_label, model = obj.lower().split('.', 1)
+                parsed_objs.append(
+                    ContentType.objects.get(app_label=app_label, model=model)
+                )
+            elif hasattr(obj, '_meta') and issubclass(obj._meta.model, models.Model):
+                app_label, model = obj._meta.label.lower().split('.', 1)
+                parsed_objs.append(
+                    ContentType.objects.get(app_label=app_label, model=model)
+                )
+            else:
+                parsed_objs.append(obj)
+
+        self.related_models.add(*parsed_objs)
 
     class Meta:
         verbose_name = _('Dynamic Menu')

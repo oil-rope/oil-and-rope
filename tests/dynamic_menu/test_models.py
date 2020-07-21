@@ -1,10 +1,13 @@
-
+from django.apps import apps
 from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
+from common.constants import models as constants
 from dynamic_menu.models import DynamicMenu, dynamic_menu_path
+
+Permission = apps.get_model(constants.PERMISSION_MODEL)
 
 
 class TestDynamicMenuModel(TestCase):
@@ -66,3 +69,15 @@ class TestDynamicMenuModel(TestCase):
         self.instance.save()
         expected_url = '#no-url'
         self.assertEqual(expected_url, self.instance.url)
+
+    def test_add_permissions_with_instances_ok(self):
+        auth_permissions = Permission.objects.filter(
+            content_type__app_label='auth',
+            content_type__model='user'
+        )
+        self.instance.add_permissions(*auth_permissions)
+        menu_permissions = self.instance.permissions_required.values_list('pk', flat=True)
+        auth_permissions = auth_permissions.values_list('pk', flat=True)
+        all_perms = all([perm in auth_permissions for perm in menu_permissions])
+
+        self.assertTrue(all_perms)
