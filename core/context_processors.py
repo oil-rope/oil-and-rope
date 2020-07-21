@@ -10,14 +10,22 @@ def language(request):
     """
 
     language = get_language_from_request(request)
+    user = request.user
     content = {
         'lan': language if language else settings.LANGUAGE_CODE,
         'languages': dict(settings.LANGUAGES).keys(),
     }
 
-    if request.user.is_authenticated:
-        # Optimizacion of language selector
-        language = Profile.objects.filter(user_id=request.user.id).values_list('language', flat=True).first()
-        content['lan'] = language
+    if not user.is_authenticated:
         return content
+
+    if 'session_language' in request.session:
+        content['lan'] = request.session['session_language']
+        return content
+
+    # Optimizacion of language selector
+    language = Profile.objects.filter(user_id=user.id).values_list('language', flat=True).first()
+    request.session['session_language'] = language
+    content['lan'] = language
+
     return content

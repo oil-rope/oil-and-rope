@@ -430,3 +430,9 @@ class TestRaceUser(TestCase):
         expected = f'{instance.user.username} <-> {instance.race.name}'
 
         self.assertEqual(expected, str(instance))
+
+
+class TestMusicUser(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
