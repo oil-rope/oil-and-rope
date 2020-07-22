@@ -110,8 +110,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
                                              default=False)
     icon = models.FileField(verbose_name=_('Icon'), upload_to=dynamic_menu_path,
                             max_length=254, blank=True, null=True)
-    related_model = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_("Related Model"),
-                                           related_name='menus', blank=True)
+    related_models = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_('Related Model'),
+                                            related_name='menus', blank=True)
 
     menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
                                                  choices=MenuTypes.choices)
@@ -139,6 +139,42 @@ class DynamicMenu(MPTTModel, TracingMixin):
         finally:
             return url
 
+    @property
+    def permissions(self) -> set:
+        """
+        Returns a set of permissions for this menu.
+        """
+
+        if hasattr(self, '_permissions_cache'):
+            return self._permissions_cache
+
+        permissions = self.permissions_required.values_list(
+            'content_type__app_label',
+            'codename'
+        )
+        permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
+        setattr(self, '_permissions_cache', permissions)
+
+        return self._permissions_cache
+
+    @property
+    def models(self) -> set:
+        """
+        Returns a set of models related to this menu.
+        """
+
+        if hasattr(self, '_models_cache'):
+            return self._models_cache
+
+        models = self.related_models.values_list(
+            'app_label',
+            'model'
+        )
+        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
+        setattr(self, '_models_cache', models)
+
+        return self._models_cache
+
     def add_permissions(self, *objs):
         """
         Takes a list of perms either :class:`str` (`app_label.codename`) or :class:`auth.Permission` instance.
@@ -161,7 +197,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
 
     def add_models(self, *objs):
         """
-        Takes a list of model either in :class:`str` (`app_label.model`)
+        Takes a list of model either in :class:`str` (`app_label.model`), :class:`models.Model` subclass
         or :class:`contenttypes.ContentType` instance format.
         """
 
@@ -175,13 +211,13 @@ class DynamicMenu(MPTTModel, TracingMixin):
                 parsed_objs.append(
                     ContentType.objects.get(app_label=app_label, model=model)
                 )
+            elif isinstance(obj, ContentType):
+                parsed_objs.append(obj)
             elif hasattr(obj, '_meta') and issubclass(obj._meta.model, models.Model):
                 app_label, model = obj._meta.label.lower().split('.', 1)
                 parsed_objs.append(
                     ContentType.objects.get(app_label=app_label, model=model)
                 )
-            else:
-                parsed_objs.append(obj)
 
         self.related_models.add(*parsed_objs)
 

@@ -5,6 +5,9 @@ USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
+# Content Types+
+CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
+
 # Roleplay
 DOMAIN_MODEL = 'roleplay.Domain'
 PLACE_MODEL = 'roleplay.Place'
