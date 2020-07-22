@@ -1,48 +1,108 @@
-from django.contrib.auth import get_user_model
-from django.http.cookie import SimpleCookie
-from django.test import TestCase
+from django.apps import apps
+from django.test import RequestFactory, TestCase
 from faker import Faker
 from model_bakery import baker
 
+from common.constants import models as constants
+from dynamic_menu import context_processors, models
 from dynamic_menu.enums import MenuTypes
-from dynamic_menu.models import DynamicMenu
+
+Permission = apps.get_model(constants.PERMISSION_MODEL)
 
 
 class TestMenuContextProcessor(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        self.user = baker.make(get_user_model())
-        self.url = '/'
+        self.user = baker.make(constants.USER_MODEL)
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.perms = Permission.objects.filter(
+            content_type__app_label='auth',
+            codename__in=['view_user', 'delete_user']
+        )
+        self.user.user_permissions.add(*self.perms)
 
     def test_context_processor_exists_ok(self):
-        response = self.client.get(self.url, follow=True)
-        self.assertIn('menus', response.context, 'Variable \'menus\' not found in context.')
-        self.assertIn('context_menus', response.context, 'Variable \'context_menus\' not found in context.')
+        count = 2
+        for _ in range(0, count):
+            models.DynamicMenu.objects.create(
+                name=self.faker.word(),
+                menu_type=MenuTypes.MAIN_MENU
+            )
+        menus = context_processors.menus(self.request)
 
-        self.client.force_login(self.user)
-        response = self.client.get(self.url, follow=True)
-        self.assertIn('menus', response.context, 'Variable \'menus\' not found in context.')
-        self.assertIn('context_menus', response.context, 'Variable \'context_menus\' not found in context.')
+        self.assertEqual(2, menus['menus'].count())
 
-    def test_context_processor_content_ok(self):
-        main_menus = baker.make(DynamicMenu, 3, menu_type=MenuTypes.MAIN_MENU)
-        response = self.client.get(self.url, follow=True)
-        expected = response.context['menus']
-        for main_menu in main_menus:
-            self.assertIn(main_menu, expected)
+    def test_user_with_permissions_lists_all_menus_ok(self):
+        # Random menu
+        models.DynamicMenu.objects.create(
+            name=self.faker.word(),
+            menu_type=MenuTypes.MAIN_MENU
+        )
+        # Menu with permissions
+        count = 2
+        for _ in range(0, count):
+            menu = models.DynamicMenu.objects.create(
+                name=self.faker.word(),
+                menu_type=MenuTypes.MAIN_MENU
+            )
+            menu.add_permissions(*self.perms)
+        menus = context_processors.menus(self.request)
 
-        parent = main_menus[0]
-        context_menus = baker.make(DynamicMenu, 3, menu_type=MenuTypes.CONTEXT_MENU, parent=parent)
-        self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': parent.id})
-        response = self.client.get(self.url, follow=True)
-        expected = response.context['context_menus']
-        for context_menu in context_menus:
-            self.assertIn(context_menu, expected)
+        self.assertEqual(3, menus['menus'].count())
 
-    def test_access_wrong_menu_referrer_ko(self):
-        main_menu = baker.make(DynamicMenu, menu_type=MenuTypes.MAIN_MENU)
-        baker.make(DynamicMenu, menu_type=MenuTypes.CONTEXT_MENU, parent=main_menu)
-        self.client.cookies = SimpleCookie({'_auth_user_menu_referrer': self.faker.random_int(3, 20)})
-        request = self.client.get(self.url, follow=True).wsgi_request
-        self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])
+    def test_user_without_permissions_lists_all_menus_ko(self):
+        # Random user
+        user = baker.make(constants.USER_MODEL)
+        user.user_permissions.add(
+            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+        )
+        # Random menu
+        models.DynamicMenu.objects.create(
+            name=self.faker.word(),
+            menu_type=MenuTypes.MAIN_MENU
+        )
+        # Menu with permissions
+        for _ in range(0, 2):
+            menu = models.DynamicMenu.objects.create(
+                name=self.faker.word(),
+                menu_type=MenuTypes.MAIN_MENU
+            )
+            menu.add_permissions(*self.perms)
+        request = RequestFactory().get('/')
+        request.user = user
+        menus = context_processors.menus(request)
+
+        self.assertEqual(1, menus['menus'].count())
+
+    def test_optimized_queries_ok(self):
+        models.DynamicMenu.objects.create(
+            name=self.faker.word(),
+            menu_type=MenuTypes.MAIN_MENU
+        )
+        for _ in range(0, 3):
+            menu = models.DynamicMenu.objects.create(
+                name=self.faker.word(),
+                menu_type=MenuTypes.MAIN_MENU
+            )
+            menu.add_permissions(*self.perms)
+        user = baker.make(constants.USER_MODEL)
+        user.user_permissions.add(
+            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+        )
+        request = RequestFactory().get('/')
+        request.user = user
+        queries = (
+            'Menus exists',
+            'User Permissions',
+            'Group Permissions',
+            'Select all menus',
+            'First menu',
+            'Second menu',
+            'Third menu',
+            'Fourth menu'
+        )
+
+        with self.assertNumQueries(len(queries)):
+            context_processors.menus(request)

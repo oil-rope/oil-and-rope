@@ -139,6 +139,14 @@ class DynamicMenu(MPTTModel, TracingMixin):
         finally:
             return url
 
+    def _get_permissions(self) -> set:
+        permissions = self.permissions_required.values_list(
+            'content_type__app_label',
+            'codename'
+        )
+        permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
+        return permissions
+
     @property
     def permissions(self) -> set:
         """
@@ -146,13 +154,11 @@ class DynamicMenu(MPTTModel, TracingMixin):
         """
 
         if hasattr(self, '_permissions_cache'):
+            if not self._permissions_cache and self.permissions_required.exists():
+                self._permissions_cache = self._get_permissions()
             return self._permissions_cache
 
-        permissions = self.permissions_required.values_list(
-            'content_type__app_label',
-            'codename'
-        )
-        permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
+        permissions = self._get_permissions()
         setattr(self, '_permissions_cache', permissions)
 
         return self._permissions_cache
