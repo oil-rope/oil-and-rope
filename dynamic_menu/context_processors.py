@@ -14,6 +14,13 @@ def filter_menus(menus, user):
     exclude_menus = []
     for menu in menus:
         menu_permissions = menu.permissions
+        # Removing if staff or superuser are not accomplished
+        if menu.staff_required and not user.is_staff:
+            exclude_menus.append(menu.pk)
+            continue
+        if menu.superuser_required and not user.is_superuser:
+            exclude_menus.append(menu.pk)
+            continue
         # If menu has no permissions there's no need to further check
         if not menu_permissions:
             continue
@@ -22,15 +29,8 @@ def filter_menus(menus, user):
             exclude_menus.append(menu.pk)
             continue
         # User must have all permissions in order to access a menu
-        for perm in menu_permissions:
-            if perm not in user_perms:
-                exclude_menus.append(menu.pk)
-                break
-        # Removing if staff or superuser are not accomplished
-        if menu.staff_required and not user.is_staff:
-            exclude_menus.append(menu.pk)
-            continue
-        if menu.superuser_required and not user.is_superuser:
+        user_has_all_needed_perms = all([perm in user_perms for perm in menu_permissions])
+        if not user_has_all_needed_perms:
             exclude_menus.append(menu.pk)
             continue
 
@@ -75,28 +75,24 @@ def menus(request) -> dict:
         return menus_dict
 
     qs = filter_menus(qs, user)
+    menus_dict['menus'] = qs
 
     # Getting referrer
     menu_referrer = request.COOKIES.get('_auth_user_menu_referrer', None)
-    if menu_referrer and menu_referrer != 'None':  # Because of JavaScript
-        try:
-            menu_parent = models.DynamicMenu.objects.get(pk=menu_referrer)
-            context_menus = menu_parent.get_children().filter(
-                menu_type=MenuTypes.CONTEXT_MENU
-            )
-            context_menus = filter_menus(context_menus, user)
-        except models.DynamicMenu.DoesNotExist as ex:
-            request.COOKIES['_auth_user_menu_referrer'] = None
-            context_menus = models.DynamicMenu.objects.none()
-            logging.warning('Trying to access an non-existent menu.\n%s', ex)
-        except ValueError as ex:
-            request.COOKIES['_auth_user_menu_referrer'] = None
-            context_menus = models.DynamicMenu.objects.none()
-            logging.warning('Trying to access an non-existent menu.\n%s', ex)
-    else:
-        context_menus = models.DynamicMenu.objects.none()
+    if not menu_referrer or menu_referrer == 'None':  # Because of JavaScript
+        return menus_dict
 
-    menus_dict['menus'] = qs
+    try:
+        menu_parent = models.DynamicMenu.objects.get(pk=menu_referrer)
+        context_menus = menu_parent.get_children().filter(
+            menu_type=MenuTypes.CONTEXT_MENU
+        )
+        context_menus = filter_menus(context_menus, user)
+    except models.DynamicMenu.DoesNotExist as ex:
+        request.COOKIES['_auth_user_menu_referrer'] = None
+        context_menus = models.DynamicMenu.objects.none()
+        logging.warning('Trying to access an non-existent menu.\n%s', ex)
+
     menus_dict['context_menus'] = context_menus
 
     return menus_dict

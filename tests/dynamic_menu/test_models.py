@@ -180,6 +180,14 @@ class TestDynamicMenuModel(TestCase):
             self.assertTrue(all_perms)
             self.assertTrue(hasattr(self.instance, '_permissions_cache'))
 
+    def test_reset_cache_ok(self):
+        self.instance.permissions
+        perms = ['auth.add_user', 'auth.change_user', 'auth.delete_user', 'auth.view_user']
+        self.instance.add_permissions(*perms)
+        all_perms = all([perm in perms for perm in self.instance.permissions])
+
+        self.assertTrue(all_perms)
+
     def test_models_ok(self):
         models = ['auth.User', 'auth.Group']
         self.instance.add_models(*models)
