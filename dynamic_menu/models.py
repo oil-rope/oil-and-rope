@@ -110,7 +110,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
                                              default=False)
     icon = models.FileField(verbose_name=_('Icon'), upload_to=dynamic_menu_path,
                             max_length=254, blank=True, null=True)
-    related_models = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_('Related Model'),
+    related_models = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_('Related Models'),
                                             related_name='menus', blank=True)
 
     menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
