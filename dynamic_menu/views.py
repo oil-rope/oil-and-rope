@@ -10,3 +10,9 @@ class DynamicMenuCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     model = models.DynamicMenu
     form_class = forms.DynamicMenuForm
     template_name = 'dynamic_menu/dynamic_menu/create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = context['form']
+        context['name_container_display_id'] = form.display_name_container_id
+        return context

@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
 
@@ -10,15 +11,23 @@
 
 
 {% block body_content %}
-<main class="container py-5">
-  <h2 class="display-4 text-center">
-    {% trans "Create" %} {% trans "Menu" %}
-  </h2>
-  <hr class="mx-5">
-  <div class="row">
-    <div class="col-12">
-      {% crispy form %}
+  <main class="container py-5">
+    <h1 class="text-center font-weight-lighter">
+      {% trans "Create" %} {% trans "Menu" %}
+    </h2>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col-12">
+        {% crispy form %}
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 {% endblock body_content %}
+
+{% block javascript %}
+  <script
+    src="{% static 'dynamic_menu/js/createMenu.js' %}"
+    data-form-id="{{ form.helper.form_id }}"
+    data-name-container-id="{{ name_container_display_id }}"
+  ></script>
+{% endblock javascript %}

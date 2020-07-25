@@ -1,4 +1,5 @@
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Column, Row, Submit, Div
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.forms import TranslationModelForm
 from mptt.forms import TreeNodeChoiceField
@@ -19,6 +20,22 @@ class DynamicMenuForm(TranslationModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
+        self.helper.form_id = 'createMenuForm'
+        self.display_name_container_id = 'menuDisplayNameContainer'
+        self.helper.layout = Layout(
+            Row(
+                Column('prepended_text'),
+                Column('name'),
+                Column('appended_text'),
+                Div(css_id=self.display_name_container_id),
+                css_class='justify-content-around'
+            ),
+            Row(
+                Column('url_resolver'),
+                Column('extra_urls_args'),
+                css_class='justify-content-around'
+            )
+        )
 
     class Meta:
         model = models.DynamicMenu
