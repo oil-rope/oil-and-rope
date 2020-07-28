@@ -28,14 +28,14 @@
           {% if node.get_ancestors and node.is_leaf_node %}
             <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}"
                class="dropdown-item dynamic-menu-track text-uppercase{% if actual_url|startswith:node.url %} active{% endif %}">
-              {{ node|safe }}
+              {{ node.display_menu_name|safe }}
             </a>
             {% comment %} Leaf Node outside a Dropdown {% endcomment %}
           {% elif not node.get_ancestors and node.is_leaf_node %}
             <li class="nav-item">
               <a data-menu-referrer="{{ node.pk }}" href="{{ node.url }}"
                  class="nav-link dynamic-menu-track text-uppercase{% if actual_url|startswith:node.url %} active{% endif %}">
-                {{ node|safe }}
+                {{ node.display_menu_name|safe }}
               </a>
             </li>
             {% comment %} A Dropdown {% endcomment %}
@@ -45,7 +45,7 @@
                  class="nav-link dynamic-menu-track dropdown-toggle text-uppercase{% if actual_url|startswith:node.url %} active{% endif %}"
                  href="javascript:" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown"
                  aria-haspopup="true" aria-expanded="false">
-                {{ node|safe }}
+                {{ node.display_menu_name|safe }}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown_{{ node.pk }}">
                 {{ children }}

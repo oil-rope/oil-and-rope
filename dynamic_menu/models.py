@@ -181,6 +181,21 @@ class DynamicMenu(MPTTModel, TracingMixin):
 
         return self._models_cache
 
+    @property
+    def display_menu_name(self):
+        menu_str = ''
+
+        # Adding prepended_text
+        if self.prepended_text:
+            menu_str = mark_safe(self.prepended_text) + '  '
+        # Menu name
+        menu_str += self.name
+        # Adding appended_text
+        if self.appended_text:
+            menu_str += '  ' + mark_safe(self.appended_text)
+
+        return menu_str
+
     def add_permissions(self, *objs):
         """
         Takes a list of perms either :class:`str` (`app_label.codename`) or :class:`auth.Permission` instance.
@@ -232,18 +247,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
         verbose_name_plural = _('Dynamic Menus')
 
     def __str__(self):
-        menu_str = ''
-
-        # Adding prepended_text
-        if self.prepended_text:
-            menu_str = mark_safe(self.prepended_text) + '  '
-        # Menu name
-        menu_str += self.name
-        # Adding appended_text
-        if self.appended_text:
-            menu_str += '  ' + mark_safe(self.appended_text)
-
-        return menu_str
+        return self.name
 
     def get_absolute_url(self):
         return self.url
