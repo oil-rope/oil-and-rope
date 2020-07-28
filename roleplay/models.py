@@ -367,8 +367,8 @@ class Music(TracingMixin):
                                    db_index=True, through=constants.USER_MUSIC_RELATION)
 
     limit = models.Q(app_label='roleplay', model__in=['race', 'place'])
-    content_type = models.ForeignKey(to=constants.CONTENT_TYPE, verbose_name=_('Asociación'), limit_choices_to=limit,
-                                     blank=True, null=True, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(to=constants.CONTENT_TYPE_MODEL, verbose_name=_('Asociación'),
+                                     limit_choices_to=limit, blank=True, null=True, on_delete=models.CASCADE)
     object_id = models.IntegerField(verbose_name=_('Identifier'), null=True, blank=True)
     association = GenericForeignKey(ct_field='content_type', fk_field='object_id')
 
