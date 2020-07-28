@@ -1,7 +1,8 @@
 import json
+
 from django.http import JsonResponse
-from django.views.generic import View
 from django.shortcuts import reverse
+from django.views.generic import View
 
 
 class ResolverView(View):

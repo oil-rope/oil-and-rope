@@ -246,6 +246,9 @@ class DynamicMenu(MPTTModel, TracingMixin):
         verbose_name = _('Dynamic Menu')
         verbose_name_plural = _('Dynamic Menus')
 
+    class MPTTMeta:
+        order_insertion_by = ['order', 'name']
+
     def __str__(self):
         return self.name
 
