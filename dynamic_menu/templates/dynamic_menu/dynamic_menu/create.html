@@ -25,6 +25,7 @@
 {% endblock body_content %}
 
 {% block javascript %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script
     src="{% static 'dynamic_menu/js/createMenu.js' %}"
     data-form-id="{{ form.helper.form_id }}"

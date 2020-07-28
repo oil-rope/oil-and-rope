@@ -1,5 +1,3 @@
-import json
-
 from django.http import JsonResponse
 from django.shortcuts import reverse
 from django.views.generic import View
@@ -13,7 +11,7 @@ class ResolverView(View):
     http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
+        data = request.POST
 
         try:
             url_resolver = data.get('url_resolver', '')

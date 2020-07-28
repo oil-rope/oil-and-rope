@@ -41,19 +41,22 @@ $(() => {
 	 */
 	const handleGetURL = () => {
 		let data = { url_resolver: urlResolverInput.value };
-		fetch(getResolverURL, {
-			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"Content-Type": "application/json",
-				"X-CSRFToken": Cookies.get("csrftoken"),
-			},
-		})
-			.then((res) => res.json())
-			.then((response) => {
+		let headers = {
+			"X-CSRFToken": Cookies.get("csrftoken"),
+		};
+
+		$.ajax({
+			url: getResolverURL,
+			type: "POST",
+			data: data,
+			headers: headers,
+			success: (response) => {
 				changeUrlDisplay(response.url);
-			})
-			.catch((err) => console.error(err));
+			},
+			error: (err) => {
+				console.error(err);
+			},
+		});
 	};
 
 	/**
