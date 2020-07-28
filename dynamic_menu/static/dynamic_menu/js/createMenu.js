@@ -1,46 +1,88 @@
-let createMenuForm = document.currentScript.getAttribute("data-form-id");
-let nameDisplayDiv = document.currentScript.getAttribute(
-	"data-name-container-id"
+let currentScript = document.currentScript;
+let createMenuForm = currentScript.getAttribute("data-form-id");
+let nameDisplayDiv = currentScript.getAttribute("data-name-container-id");
+let getResolverURL = currentScript.getAttribute("data-url-resolver");
+let displayURLDiv = currentScript.getAttribute(
+	"data-url-resolver-container-id"
 );
-let createMenuFormTimeOut = null;
-
-const returnSafeHTMLFromInput = (input) => {
-	if (input.value) {
-		return $(input.value)[0].outerHTML;
-	}
-	return "";
-};
 
 $(() => {
 	createMenuForm = document.getElementById(createMenuForm);
 	nameDisplayDiv = document.getElementById(nameDisplayDiv);
+	displayURLDiv = document.getElementById(displayURLDiv);
 
-	let prependedTextInput = document.querySelector(
-		`#${createMenuForm.id} input#id_prepended_text`
-	);
-	let nameTextInput = document.querySelector(
-		`#${createMenuForm.id} input#id_name`
-	);
-	let appendedTextInput = document.querySelector(
-		`#${createMenuForm.id} input#id_appended_text`
-	);
-	prependedTextInput.addEventListener("keyup", (e) => {
-		if (e.key == "/") {
-			let input = e.target;
-			input.value = `${input.value}/`;
+	let prependedSelect = document.getElementById("id_prepended_text");
+	let nameInput = document.getElementById("id_name");
+	let appendedSelect = document.getElementById("id_appended_text");
+
+	let urlResolverInput = document.getElementById("id_url_resolver");
+	let extraURLInput = document.getElementById("id_extra_urls_args");
+
+	/**
+	 * Changes the display name of the menu.
+	 */
+	const changeDisplayName = () => {
+		nameDisplayDiv.innerHTML = `<p class="text-center">${
+			prependedSelect.value || ""
+		} ${nameInput.value || ""} ${appendedSelect.value || ""}</p>`;
+	};
+
+	/**
+	 * Changes the URL to display.
+	 *
+	 * @param {string} url
+	 */
+	const changeUrlDisplay = (url) => {
+		displayURLDiv.innerHTML = `<p class="text-center">${url}${extraURLInput.value}</p>`;
+	};
+
+	/**
+	 * Attacks the ResolverView
+	 */
+	const handleGetURL = () => {
+		let data = { url_resolver: urlResolverInput.value };
+		fetch(getResolverURL, {
+			method: "POST",
+			body: JSON.stringify(data),
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRFToken": Cookies.get("csrftoken"),
+			},
+		})
+			.then((res) => res.json())
+			.then((response) => {
+				changeUrlDisplay(response.url);
+			})
+			.catch((err) => console.error(err));
+	};
+
+	/**
+	 * Checks for changes on inputs.
+	 *
+	 * @param {*} e
+	 */
+	const handleChangeEvent = (e) => {
+		let el = e.target;
+		if (
+			el === prependedSelect ||
+			el === nameInput ||
+			el === appendedSelect
+		) {
+			displayName = `${prependedSelect.value || ""} ${
+				nameInput.value || ""
+			} ${appendedSelect.value || ""}`;
+			changeDisplayName();
 		}
-	});
-	appendedTextInput.addEventListener("keyup", (e) => {
-		if (e.key == "/") {
-			let input = e.target;
-			input.value = `${input.value}/`;
+
+		if (el === urlResolverInput || el === extraURLInput) {
+			handleGetURL();
 		}
-	});
+	};
 
 	createMenuForm.addEventListener("change", (e) => {
-		clearTimeout(createMenuFormTimeOut);
-		createMenuFormTimeOut = setTimeout(() => {
-			nameDisplayDiv.innerHTML = `${prependedTextInput.value} ${nameTextInput.value} ${appendedTextInput.value}`;
-		}, 800);
+		handleChangeEvent(e);
 	});
+
+	changeDisplayName();
+	handleGetURL();
 });
