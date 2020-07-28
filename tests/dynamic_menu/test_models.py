@@ -38,31 +38,36 @@ class TestDynamicMenuModel(TestCase):
         expected_url = reverse('core:home')
         self.assertEqual(expected_url, self.instance.get_absolute_url())
 
-    def test_str_without_extra_text_ok(self):
+    def test_display_menu_name_without_extra_text_ok(self):
         expected = self.instance.name
-        self.assertEqual(expected, str(self.instance))
+        self.assertEqual(expected, self.instance.display_menu_name)
 
-    def test_str_with_extra_text_ok(self):
+    def test_display_menu_name_with_extra_text_ok(self):
         prepended_text = '<i class="fa fa-user"></i>'
         self.instance.prepended_text = prepended_text
         appended_text = '<i class="fa fa-user"></i>'
         self.instance.appended_text = appended_text
         self.instance.save()
         expected = prepended_text + '  ' + self.instance.name + '  ' + appended_text
-        self.assertEqual(expected, str(self.instance))
+        self.assertEqual(expected, self.instance.display_menu_name)
 
-    def test_str_with_prepended_text_ok(self):
+    def test_display_menu_name_with_prepended_text_ok(self):
         prepended_text = '<i class="fa fa-user"></i>'
         self.instance.prepended_text = prepended_text
         self.instance.save()
         expected = prepended_text + '  ' + self.instance.name
-        self.assertEqual(expected, str(self.instance))
+        self.assertEqual(expected, self.instance.display_menu_name)
 
-    def test_str_with_appended_text_ok(self):
+    def test_display_menu_name_with_appended_text_ok(self):
         appended_text = '<i class="fa fa-user"></i>'
         self.instance.appended_text = appended_text
         self.instance.save()
         expected = self.instance.name + '  ' + appended_text
+        self.assertEqual(expected, self.instance.display_menu_name)
+
+    def test_str_ok(self):
+        expected = self.instance.name
+
         self.assertEqual(expected, str(self.instance))
 
     def test_url_property_ko(self):
