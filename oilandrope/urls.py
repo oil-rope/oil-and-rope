@@ -32,12 +32,16 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
+    # Common
+    path('common/', include('common.urls')),
     # Auth system
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),
     # Chat
     path('chat/', include('chat.urls')),
+    # Dynamic Menu
+    path('dynamic_menu/', include('dynamic_menu.urls')),
     # React FrontEnd
     path('frontend/', include('frontend.urls')),
     # Roleplay
