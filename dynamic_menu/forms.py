@@ -18,6 +18,7 @@ class DynamicMenuForm(TranslationModelForm):
     parent = TreeNodeChoiceField(
         label=_('Parent menu'),
         queryset=models.DynamicMenu.objects.all(),
+        required=False
     )
 
     prepended_text = forms.ChoiceField(
@@ -142,7 +143,16 @@ class DynamicMenuForm(TranslationModelForm):
         return data
 
     def save(self, commit=True):
-        return super().save(commit=commit)
+        super().save(commit=False)
+
+        if commit:
+            self.instance.save()
+            perms = self.cleaned_data['permissions_required']
+            self.instance.add_permissions(*perms)
+            models = self.cleaned_data['related_models']
+            self.instance.add_models(*models)
+
+        return self.instance
 
     class Meta:
         model = models.DynamicMenu
