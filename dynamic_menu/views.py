@@ -15,4 +15,5 @@ class DynamicMenuCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         form = context['form']
         context['name_container_display_id'] = form.display_name_container_id
+        context['display_url_resolver_id'] = form.display_url_resolver_id
         return context
