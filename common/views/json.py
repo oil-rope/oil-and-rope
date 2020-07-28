@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.views.generic import View
 
 
@@ -16,7 +17,7 @@ class ResolverView(View):
         try:
             url_resolver = data.get('url_resolver', '')
             json_data = {'url': reverse(url_resolver)}
-        except Exception:
+        except NoReverseMatch:
             json_data = {'url': '#no-url'}
 
         return JsonResponse(data=json_data)

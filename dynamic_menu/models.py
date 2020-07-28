@@ -3,6 +3,7 @@ import logging
 from django.apps import apps
 from django.db import models
 from django.shortcuts import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
@@ -132,7 +133,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
             # Checking for extra args
             if self.extra_urls_args:
                 url += self.extra_urls_args
-        except Exception as ex:
+        except NoReverseMatch as ex:
             logging.warning('Resolver for \'%s\' may not exists.',
                             self.url_resolver)
             logging.error('%s', ex)
