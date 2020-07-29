@@ -170,7 +170,7 @@ class TestDynamicMenuModel(TestCase):
     def test_permissions_ok(self):
         perms = ['auth.add_user', 'auth.change_user', 'auth.delete_user', 'auth.view_user']
         self.instance.add_permissions(*perms)
-        all_perms = all([perm in perms for perm in self.instance.permissions])
+        all_perms = all([perm in self.instance.permissions for perm in perms])
 
         self.assertTrue(all_perms)
 
@@ -180,23 +180,23 @@ class TestDynamicMenuModel(TestCase):
 
         with self.assertNumQueries(1):
             self.instance.permissions
-            all_perms = all([perm in perms for perm in self.instance.permissions])
+            all_perms = all([perm in self.instance.permissions for perm in perms])
 
             self.assertTrue(all_perms)
-            self.assertTrue(hasattr(self.instance, '_permissions_cache'))
 
-    def test_reset_cache_ok(self):
+    def test_reset_permissions_cache_ok(self):
         self.instance.permissions
         perms = ['auth.add_user', 'auth.change_user', 'auth.delete_user', 'auth.view_user']
         self.instance.add_permissions(*perms)
-        all_perms = all([perm in perms for perm in self.instance.permissions])
+        self.instance.get_permissions()
+        all_perms = all([perm in self.instance.get_permissions() for perm in perms])
 
         self.assertTrue(all_perms)
 
     def test_models_ok(self):
         models = ['auth.User', 'auth.Group']
         self.instance.add_models(*models)
-        all_models = all([model in models for model in self.instance.models])
+        all_models = all([model in self.instance.models for model in models])
 
         self.assertTrue(all_models)
 
@@ -206,7 +206,15 @@ class TestDynamicMenuModel(TestCase):
 
         with self.assertNumQueries(1):
             self.instance.models
-            all_models = all([model in models for model in self.instance.models])
+            all_models = all([model in self.instance.models for model in models])
 
             self.assertTrue(all_models)
-            self.assertTrue(hasattr(self.instance, '_models_cache'))
+
+    def test_reset_models_cache_ok(self):
+        self.instance.models
+        models = ['auth.User', 'auth.Group']
+        self.instance.add_models(*models)
+        self.instance.get_models()
+        all_models = all([model in self.instance.get_models() for model in models])
+
+        self.assertTrue(all_models)

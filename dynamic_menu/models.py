@@ -165,23 +165,23 @@ class DynamicMenu(MPTTModel, TracingMixin):
         models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
         return models
 
-    @cached_property
-    def permissions(self) -> set:
+    def get_permissions(self) -> set:
         """
         Returns a set of permissions for this menu.
         """
 
         permissions = self._get_permissions()
         return permissions
+    permissions = cached_property(get_permissions, name='permissions')
 
-    @cached_property
-    def models(self) -> set:
+    def get_models(self) -> set:
         """
         Returns a set of models related to this menu.
         """
 
         models = self._get_models()
         return models
+    models = cached_property(get_models, name='models')
 
     @property
     def display_menu_name(self):

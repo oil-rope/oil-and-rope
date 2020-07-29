@@ -137,7 +137,7 @@ class TestPlace(TestCase):
             place.save()
             parent = place
 
-        obj_images = self.model.objects.first().images()
+        obj_images = self.model.objects.first().images
         self.assertEqual(len(images), len(obj_images))
 
         for place in self.model.objects.all():
