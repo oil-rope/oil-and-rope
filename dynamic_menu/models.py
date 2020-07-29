@@ -142,6 +142,10 @@ class DynamicMenu(MPTTModel, TracingMixin):
             return url
 
     def _get_permissions(self) -> set:
+        """
+        Executes Query to get related permissions.
+        """
+
         permissions = self.permissions_required.values_list(
             'content_type__app_label',
             'codename'
@@ -149,21 +153,26 @@ class DynamicMenu(MPTTModel, TracingMixin):
         permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
         return permissions
 
+    def _get_models(self) -> set:
+        """
+        Executes Query to get related models.
+        """
+
+        models = self.related_models.values_list(
+            'app_label',
+            'model'
+        )
+        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
+        return models
+
     @cached_property
     def permissions(self) -> set:
         """
         Returns a set of permissions for this menu.
         """
 
-        if hasattr(self, '_permissions_cache'):
-            if not self._permissions_cache and self.permissions_required.exists():
-                self._permissions_cache = self._get_permissions()
-            return self._permissions_cache
-
         permissions = self._get_permissions()
-        setattr(self, '_permissions_cache', permissions)
-
-        return self._permissions_cache
+        return permissions
 
     @cached_property
     def models(self) -> set:
@@ -171,17 +180,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
         Returns a set of models related to this menu.
         """
 
-        if hasattr(self, '_models_cache'):
-            return self._models_cache
-
-        models = self.related_models.values_list(
-            'app_label',
-            'model'
-        )
-        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
-        setattr(self, '_models_cache', models)
-
-        return self._models_cache
+        models = self._get_models()
+        return models
 
     @property
     def display_menu_name(self):
