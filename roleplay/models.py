@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -92,6 +93,7 @@ class Place(MPTTModel, TracingMixin):
 
     objects = managers.PlaceManager()
 
+    @cached_property
     def images(self):
         images = []
         if self.image:
@@ -103,58 +105,112 @@ class Place(MPTTModel, TracingMixin):
         return '<span class="{}"></span>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
 
     def get_houses(self):
-        return self.get_descendants().filter(site_type=SiteTypes.HOUSE)
+        houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
+        houses = list(houses)
+        return houses
+    houses = cached_property(get_houses, name='houses')
 
     def get_towns(self):
-        return self.get_descendants().filter(site_type=SiteTypes.TOWN)
+        towns = self.get_descendants().filter(site_type=SiteTypes.TOWN)
+        towns = list(towns)
+        return towns
+    towns = cached_property(get_towns, name='towns')
 
     def get_villages(self):
-        return self.get_descendants().filter(site_type=SiteTypes.VILLAGE)
+        villages = self.get_descendants().filter(site_type=SiteTypes.VILLAGE)
+        villages = list(villages)
+        return villages
+    villages = cached_property(get_villages, name='villages')
 
     def get_cities(self):
-        return self.get_descendants().filter(site_type=SiteTypes.CITY)
+        cities = self.get_descendants().filter(site_type=SiteTypes.CITY)
+        cities = list(cities)
+        return cities
+    cities = cached_property(get_cities, name='cities')
 
     def get_metropolis(self):
-        return self.get_descendants().filter(site_type=SiteTypes.METROPOLIS)
+        metropolis = self.get_descendants().filter(site_type=SiteTypes.METROPOLIS)
+        metropolis = list(metropolis)
+        return metropolis
+    metropolis = cached_property(get_metropolis, name='metropolis')
 
     def get_forests(self):
-        return self.get_descendants().filter(site_type=SiteTypes.FOREST)
+        forests = self.get_descendants().filter(site_type=SiteTypes.FOREST)
+        forests = list(forests)
+        return forests
+    forests = cached_property(get_forests, name='forests')
 
     def get_hills(self):
-        return self.get_descendants().filter(site_type=SiteTypes.HILLS)
+        hills = self.get_descendants().filter(site_type=SiteTypes.HILLS)
+        hills = list(hills)
+        return hills
+    hills = cached_property(get_hills, name='hills')
 
     def get_mountains(self):
-        return self.get_descendants().filter(site_type=SiteTypes.MOUNTAINS)
+        mountains = self.get_descendants().filter(site_type=SiteTypes.MOUNTAINS)
+        mountains = list(mountains)
+        return mountains
+    mountains = cached_property(get_mountains, name='mountains')
 
     def get_mines(self):
-        return self.get_descendants().filter(site_type=SiteTypes.MINES)
+        mines = self.get_descendants().filter(site_type=SiteTypes.MINES)
+        mines = list(mines)
+        return mines
+    mines = cached_property(get_mines, name='mines')
 
     def get_rivers(self):
-        return self.get_descendants().filter(site_type=SiteTypes.RIVER)
+        rivers = self.get_descendants().filter(site_type=SiteTypes.RIVER)
+        rivers = list(rivers)
+        return rivers
+    rivers = cached_property(get_rivers, name='rivers')
 
     def get_seas(self):
-        return self.get_descendants().filter(site_type=SiteTypes.SEA)
+        seas = self.get_descendants().filter(site_type=SiteTypes.SEA)
+        seas = list(seas)
+        return seas
+    seas = cached_property(get_seas, name='seas')
 
     def get_deserts(self):
-        return self.get_descendants().filter(site_type=SiteTypes.DESERT)
+        deserts = self.get_descendants().filter(site_type=SiteTypes.DESERT)
+        deserts = list(deserts)
+        return deserts
+    deserts = cached_property(get_deserts, name='deserts')
 
     def get_tundras(self):
-        return self.get_descendants().filter(site_type=SiteTypes.TUNDRA)
+        tundras = self.get_descendants().filter(site_type=SiteTypes.TUNDRA)
+        tundras = list(tundras)
+        return tundras
+    tundras = cached_property(get_tundras, name='tundras')
 
     def get_unusuals(self):
-        return self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
+        unusuals = self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
+        unusuals = list(unusuals)
+        return unusuals
+    unusuals = cached_property(get_unusuals, name='unusuals')
 
     def get_islands(self):
-        return self.get_descendants().filter(site_type=SiteTypes.ISLAND)
+        islands = self.get_descendants().filter(site_type=SiteTypes.ISLAND)
+        islands = list(islands)
+        return islands
+    islands = cached_property(get_islands, name='islands')
 
     def get_countries(self):
-        return self.get_descendants().filter(site_type=SiteTypes.COUNTRY)
+        countries = self.get_descendants().filter(site_type=SiteTypes.COUNTRY)
+        countries = list(countries)
+        return countries
+    countries = cached_property(get_countries, name='countries')
 
     def get_continents(self):
-        return self.get_descendants().filter(site_type=SiteTypes.CONTINENT)
+        continents = self.get_descendants().filter(site_type=SiteTypes.CONTINENT)
+        continents = list(continents)
+        return continents
+    continents = cached_property(get_continents, name='continents')
 
     def get_worlds(self):
-        return self.get_descendants().filter(site_type=SiteTypes.WORLD)
+        worlds = self.get_descendants().filter(site_type=SiteTypes.WORLD)
+        worlds = list(worlds)
+        return worlds
+    worlds = cached_property(get_worlds, name='worlds')
 
     @property
     def is_house(self):
