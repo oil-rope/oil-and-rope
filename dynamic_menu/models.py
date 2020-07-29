@@ -4,6 +4,7 @@ from django.apps import apps
 from django.db import models
 from django.shortcuts import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
@@ -148,7 +149,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
         permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
         return permissions
 
-    @property
+    @cached_property
     def permissions(self) -> set:
         """
         Returns a set of permissions for this menu.
@@ -164,7 +165,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
 
         return self._permissions_cache
 
-    @property
+    @cached_property
     def models(self) -> set:
         """
         Returns a set of models related to this menu.

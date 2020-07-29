@@ -6,7 +6,7 @@ from common.files import utils
 class TestFileUtils(TestCase):
 
     def test_max_size_file_mb(self):
-        expected = 3
+        expected = 6
         result = utils.max_size_file_mb()
 
         self.assertEqual(expected, result)
