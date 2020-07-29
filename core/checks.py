@@ -43,6 +43,9 @@ def check_model(model):
         try:
             # Node is a field
             field = model._meta.get_field(field_name)
+            # GenericForeignKeys do not have verbose_name
+            if field.__class__.__name__ == 'GenericForeignKey':
+                continue
         except FieldDoesNotExist:
             continue
 

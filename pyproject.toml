@@ -48,6 +48,7 @@ pytest-mock = "^3"
 pytest-xdist = "^1"
 selenium = "^3"
 werkzeug = "^1"
+django-debug-toolbar = "^2.2"
 
 [build-system]
 requires = ["poetry>=0.12"]

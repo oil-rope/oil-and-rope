@@ -24,9 +24,17 @@ DATABASES = {
     },
 }
 
-INSTALLED_APPS.insert(0, 'django_pdb')
-INSTALLED_APPS.append('django_extensions', )
+INSTALLED_APPS.extend([
+    'django_extensions',
+    'debug_toolbar',
+])
 
+MIDDLEWARE.extend([
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+])
+
+# Django PDB has special behaviour
+INSTALLED_APPS.insert(0, 'django_pdb')
 MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
 
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mailtrap.io')
