@@ -432,7 +432,27 @@ class TestRaceUser(TestCase):
         self.assertEqual(expected, str(instance))
 
 
+class TestMusic(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+        self.instance = baker.make(models.Music)
+
+    def test_str_ok(self):
+        expected = f'{self.instance.title}'
+        result = str(self.instance)
+
+        self.assertEqual(expected, result)
+
+
 class TestMusicUser(TestCase):
 
     def setUp(self):
         self.faker = Faker()
+        self.instance = baker.make(models.MusicUser)
+
+    def test_str_ok(self):
+        expected = f'{self.instance.user.username} <-> {self.instance.music.title}'
+        result = str(self.instance)
+
+        self.assertEqual(expected, result)

@@ -423,8 +423,10 @@ class Music(TracingMixin):
                                    db_index=True, through=constants.USER_MUSIC_RELATION)
 
     limit = models.Q(app_label='roleplay', model__in=['race', 'place'])
-    content_type = models.ForeignKey(to=constants.CONTENT_TYPE_MODEL, verbose_name=_('Asociación'),
-                                     limit_choices_to=limit, blank=True, null=True, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(
+        to=constants.CONTENT_TYPE_MODEL, verbose_name=_('Asociación'), limit_choices_to=limit,
+        blank=True, null=True, on_delete=models.CASCADE, db_index=True
+    )
     object_id = models.IntegerField(verbose_name=_('Identifier'), null=True, blank=True)
     association = GenericForeignKey(ct_field='content_type', fk_field='object_id')
 
@@ -434,7 +436,7 @@ class Music(TracingMixin):
         ordering = ['title', '-entry_created_at']
 
     def __str__(self):
-        return f'{self.title} ({self.file})'
+        return f'{self.title}'
 
 
 class MusicUser(TracingMixin):
@@ -458,4 +460,4 @@ class MusicUser(TracingMixin):
     is_owner = models.BooleanField(verbose_name=_('Ownership'), default=False)
 
     def __str__(self):
-        return f'{self.user.username} <-> {self.race.title}'
+        return f'{self.user.username} <-> {self.music.title}'
