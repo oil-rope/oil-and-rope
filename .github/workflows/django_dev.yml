@@ -1,4 +1,4 @@
-name: Feature checker
+name: Feature Checker
 
 on:
   push:
