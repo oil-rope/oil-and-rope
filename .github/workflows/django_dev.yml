@@ -1,0 +1,81 @@
+name: Feature checker
+
+on:
+  push:
+    branches:
+      - feature/*
+
+jobs:
+  python-build-without-postgres:
+    name: Python Build
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
+      DJANGO_ALLOW_ASYNC_UNSAFE: true
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+    # Redis
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip poetry
+          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
+          pip install -r /tmp/requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --config=setup.cfg
+
+      - name: Check iSort
+        run: |
+          pip install -U isort
+          isort . --check --diff
+
+      - name: Pytest
+        run: |
+          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov pytest-env
+          pytest --cov ./ --cov-report xml
+
+      - name: Django Check
+        run: |
+          python manage.py migrate
+          python manage.py check
+
+  node-build:
+    name: Node Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
