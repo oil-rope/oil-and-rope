@@ -1,5 +1,6 @@
 from ckeditor.fields import RichTextField
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 from django.conf import settings
 from django.conf.global_settings import LANGUAGES
 from django.contrib.auth.models import User
@@ -7,8 +8,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from common.constants import models as constants
 from core.models import TracingMixin
 
 
@@ -70,6 +73,38 @@ class Profile(TracingMixin):
     web = models.URLField(verbose_name=_('Website'), max_length=200, blank=True, null=True)
     image = models.ImageField(verbose_name=_('Avatar'), upload_to=user_directory_path,
                               blank=True, null=True)
+
+    def get_menus(self):
+        """
+        Gets all user's menus by its permissions.
+        """
+
+        DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
+        Permission = apps.get_model(constants.PERMISSION_MODEL)
+
+        # Filtering by permissions
+        user = self.user
+        if user.is_superuser:
+            menus_pks = Permission.objects.values_list('menus', flat=True)
+        else:
+            menus_pks = user.user_permissions.values_list('menus', flat=True)
+        menus_pks = [menu for menu in menus_pks if menu is not None]
+
+        menus = DynamicMenu.objects.filter(
+            models.Q(pk__in=menus_pks) | models.Q(permissions_required__isnull=True)
+        )
+        # Getting uniques
+        menus = set(menus)
+
+        # Filtering by staff required
+        if not user.is_staff:
+            menus = {menu for menu in menus if not menu.staff_required}
+        # Filtering by superuser
+        if not user.is_superuser:
+            menus = {menu for menu in menus if not menu.superuser_required}
+
+        return list(menus)
+    menus = cached_property(get_menus, name='menus')
 
     @property
     def age(self):
