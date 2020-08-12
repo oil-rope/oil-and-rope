@@ -14,6 +14,7 @@ from common.constants import models as constants
 from core.models import TracingMixin
 
 from .enums import MenuTypes
+from . import managers
 
 PERMISSION_CLASS = 'auth.Permission'
 MODEL_MANAGER_CLASS = 'contenttypes.ContentType'
@@ -117,6 +118,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
 
     menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
                                                  choices=MenuTypes.choices)
+
+    objects = managers.DynamicMenuManager()
 
     @property
     def url(self) -> str:
