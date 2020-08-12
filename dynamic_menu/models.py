@@ -13,8 +13,8 @@ from mptt.models import MPTTModel
 from common.constants import models as constants
 from core.models import TracingMixin
 
-from .enums import MenuTypes
 from . import managers
+from .enums import MenuTypes
 
 PERMISSION_CLASS = 'auth.Permission'
 MODEL_MANAGER_CLASS = 'contenttypes.ContentType'
