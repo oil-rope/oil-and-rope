@@ -1,4 +1,4 @@
-from . import models
+from . import models, enums
 
 
 def menus(request) -> dict:
@@ -25,11 +25,8 @@ def menus(request) -> dict:
 
     profile = user.profile
     menus = profile.menus
+    context_menus = profile.get_context_menus(request)
     menus_dict['menus'] = menus
-
-    # Getting referrer
-    menu_referrer = request.COOKIES.get('_auth_user_menu_referrer', None)
-    if not menu_referrer or menu_referrer == 'None':  # Because of JavaScript
-        return menus_dict
+    menus_dict['context_menus'] = context_menus
 
     return menus_dict

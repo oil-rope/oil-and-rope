@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.constants import models as constants
 from core.models import TracingMixin
+from dynamic_menu.enums import MenuTypes
 
 
 def user_directory_path(instance, filename: str) -> str:
@@ -92,6 +93,8 @@ class Profile(TracingMixin):
 
         menus = DynamicMenu.objects.filter(
             models.Q(pk__in=menus_pks) | models.Q(permissions_required__isnull=True)
+        ).filter(
+            menu_type=MenuTypes.MAIN_MENU
         )
         # Getting uniques
         menus = set(menus)
@@ -105,6 +108,19 @@ class Profile(TracingMixin):
 
         return list(menus)
     menus = cached_property(get_menus, name='menus')
+
+    def get_context_menus(self, request):
+        DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
+
+        menu_referrer = request.COOKIES.get('_auth_user_menu_referrer', None)
+        if not menu_referrer or menu_referrer == 'None':  # Because of JavaScript
+            return list()
+
+        context_menus = DynamicMenu.objects.filter(
+            parent_id=menu_referrer,
+            menu_type=MenuTypes.CONTEXT_MENU
+        )
+        return list(context_menus)
 
     @property
     def age(self):
