@@ -1,0 +1,23 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Chat" %}{% endblock title %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row">
+      <div class="col-12">
+        <div id="chatReactRenderer"></div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script
+    src="{% static 'frontend/dist/Chat.bundle.js' %}"
+    data-renderer="#chatReactRenderer"
+    data-socket="{% url 'chat_ws:connect' %}"
+  ></script>
+{% endblock javascript %}
