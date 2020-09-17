@@ -20,7 +20,6 @@ class DynamicMenuMiddleware:
             return response
 
         try:
-            import ipdb; ipdb.set_trace()
             self.model.objects.get(pk=request.COOKIES['_auth_user_menu_referrer'])
         except self.model.DoesNotExist:
             response.set_cookie('_auth_user_menu_referrer', None)

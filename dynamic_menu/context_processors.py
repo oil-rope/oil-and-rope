@@ -1,4 +1,4 @@
-from . import models, enums
+from . import models
 
 
 def menus(request) -> dict:
