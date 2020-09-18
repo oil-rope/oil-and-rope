@@ -12,18 +12,18 @@ const App = ({ socketURL, chatURL, userURL }) => {
 	const [user, setUser] = useState(null);
 
 	/**
-	 * Substides onMessage func.
+	 * substitutes onMessage func.
 	 *
-	 * @param {Function} func Function to substitude onMessage.
+	 * @param {Function} func Function to substitute onMessage.
 	 */
 	const setWebSocketOnMessage = (func) => {
 		webSocket.onmessage = func;
 	};
 
 	/**
-	 * Substitudes onOpen func.
+	 * substitutes onOpen func.
 	 *
-	 * @param {Function} func Function to substide onOpen.
+	 * @param {Function} func Function to substitute onOpen.
 	 */
 	const setWebSocketOnOpen = (func) => {
 		webSocket.onopen = func;
@@ -51,12 +51,32 @@ const App = ({ socketURL, chatURL, userURL }) => {
 			.catch((err) => console.error(err));
 	};
 
+	const assignChatToWebSocket = () => {
+		let data = JSON.stringify({
+			type: "setup_channel_layer",
+			chat: chat.id,
+		});
+		webSocket.send(data);
+	};
+
+	const setUpWebSocket = () => {
+		setWebSocket(new WebSocket(socketURL));
+	};
+
 	useEffect(() => {
-		let webSocket = new WebSocket(socketURL);
-		setWebSocket(webSocket);
 		loadChat();
 		loadUser();
+		setUpWebSocket();
 	}, []);
+
+	useEffect(() => {
+		if (Boolean(chat) && Boolean(webSocket)) {
+			webSocket.onopen = assignChatToWebSocket;
+			webSocket.onclose = () => {
+				setUpWebSocket();
+			};
+		}
+	}, [chat, webSocket]);
 
 	const defaultContextValue = {
 		webSocket: webSocket,

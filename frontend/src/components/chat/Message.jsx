@@ -16,7 +16,8 @@ const Message = ({ message }) => {
 					className="bg-extra border"
 					style={{ borderRadius: "10px" }}
 				>
-					<span>{message.message}</span>
+					<small className="text-muted">{message.author}</small>
+					<p>{message.message}</p>
 				</Col>
 			</Row>
 		);
@@ -29,7 +30,8 @@ const Message = ({ message }) => {
 					className="bg-info border"
 					style={{ borderRadius: "10px" }}
 				>
-					<span>{message.message}</span>
+					<small className="text-muted">{message.author}</small>
+					<p>{message.message}</p>
 				</Col>
 			</Row>
 		);

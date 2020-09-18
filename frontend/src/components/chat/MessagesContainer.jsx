@@ -16,8 +16,7 @@ const MessagesContainer = () => {
 	 * @param {Object} messageEvent Message received.
 	 */
 	const handleWebSocketOnMessage = (messageEvent) => {
-		let messageResponse = JSON.parse(messageEvent.data);
-		let message = messageResponse.message;
+		let message = JSON.parse(messageEvent.data);
 		setMessages([...messages, message]);
 	};
 
@@ -56,8 +55,8 @@ const MessagesContainer = () => {
 			}}
 		>
 			{userLoaded ? (
-				messages.map((message) => (
-					<Message message={message} key={message.id} />
+				messages.map((message, index) => (
+					<Message message={message} key={index} />
 				))
 			) : (
 				<Loader />

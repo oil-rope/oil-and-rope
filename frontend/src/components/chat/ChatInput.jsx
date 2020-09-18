@@ -29,16 +29,16 @@ const ChatInput = () => {
 	return (
 		<Form onSubmit={handleFormOnSubmit}>
 			<Form.Row>
-				<Col xs={9}>
+				<Col xs={9} lg={10}>
 					<Form.Control
 						type="text"
 						placeholder={`${gettext("Start typing")}...`}
 						onChange={(e) => setMessage(e.target.value)}
 					/>
 				</Col>
-				<Col xs={3}>
+				<Col xs={3} lg={2}>
 					<Button className="w-100" variant="primary" type="submit">
-						<i className="ic ic-send"></i>
+						<i className="ic ic-send"/>
 					</Button>
 				</Col>
 			</Form.Row>
