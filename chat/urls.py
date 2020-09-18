@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from . import viewsets, views
+from . import views, viewsets
 
 app_name = 'chat'
 
