@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Oil-and-Rope';
-  src:  url('fonts/Oil-and-Rope.eot?dtzonh');
-  src:  url('fonts/Oil-and-Rope.eot?dtzonh#iefix') format('embedded-opentype'),
-    url('fonts/Oil-and-Rope.ttf?dtzonh') format('truetype'),
-    url('fonts/Oil-and-Rope.woff?dtzonh') format('woff'),
-    url('fonts/Oil-and-Rope.svg?dtzonh#Oil-and-Rope') format('svg');
+  src:  url('fonts/Oil-and-Rope.eot?l8u2k7');
+  src:  url('fonts/Oil-and-Rope.eot?l8u2k7#iefix') format('embedded-opentype'),
+    url('fonts/Oil-and-Rope.ttf?l8u2k7') format('truetype'),
+    url('fonts/Oil-and-Rope.woff?l8u2k7') format('woff'),
+    url('fonts/Oil-and-Rope.svg?l8u2k7#Oil-and-Rope') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -144,6 +144,9 @@
 }
 .ic-globe:before {
   content: "\e900";
+}
+.ic-send:before {
+  content: "\e92a";
 }
 .ic-dots-horizontal-triple:before {
   content: "\e91b";
