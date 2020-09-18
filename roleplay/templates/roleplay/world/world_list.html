@@ -1,6 +1,14 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
+{% block css %}
+  <style>
+    .dropdown.dropdown-hover:hover>.dropdown-menu {
+      display: block;
+    }
+  </style>
+{% endblock css %}
+
 {% block title %}{% trans 'Worlds' %}{% endblock title %}
 
 {% block breadcrumb %}
@@ -36,7 +44,7 @@
       <div class="row justify-content-around pb-5">
         {% for world in user_worlds_page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
+            {% include 'roleplay/include/world_card.html' with site_types=site_types world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>
@@ -70,7 +78,7 @@
       <div class="row justify-content-around pb-5">
         {% for world in page_obj %}
           <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
+            {% include 'roleplay/include/world_card.html' with site_types=site_types world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>

@@ -79,6 +79,9 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
             context_object_name + '_full': community_worlds
         })
 
+        # Site types
+        context['site_types'] = self.enum.choices
+
         return context
 
 

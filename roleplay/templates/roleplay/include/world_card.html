@@ -37,10 +37,28 @@
               {% trans "Create campaign" %}
             </a>
             {% if world.owner == user %}
-              <a href="#no-url" class="dropdown-item disabled">
-                <span class="ic-city"></span>
-                {% trans "Create city" %}
-              </a>
+              <!-- Create topography -->
+              <div class="dropdown dropdown-hover">
+                <a
+                  href="#no-url"
+                  class="dropdown-item dropdown-toggle"
+                  href="#"
+                  role="button"
+                  id="dropdownCreateTopography{{ world.pk }}"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span class="ic-city"></span>
+                  {% trans "Create" %}...
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownCreateTopography{{ world.pk }}">
+                  {% for value, name in site_types %}
+                    <a class="dropdown-item" href="#{{ value }}">{{ name }}</a>
+                    {{ site_type }}
+                  {% endfor %}
+                </div>
+              </div>
               <a href="#no-url" class="dropdown-item disabled">
                 <span class="ic-cogs"></span>
                 {% trans "Settings" %}
