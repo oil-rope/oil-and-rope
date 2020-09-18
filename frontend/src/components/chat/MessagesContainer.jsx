@@ -1,7 +1,8 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, Suspense } from "react";
 import Loader from "../loader/Loader";
 import ChatContext from "../../contexts/ChatContext";
-import Message from "./Message";
+
+const Message = React.lazy(() => import("./Message"));
 
 const MessagesContainer = () => {
 	const { webSocket, setWebSocketOnMessage, chat, user } = useContext(
@@ -55,9 +56,11 @@ const MessagesContainer = () => {
 			}}
 		>
 			{userLoaded ? (
-				messages.map((message, index) => (
-					<Message message={message} key={index} />
-				))
+				<Suspense fallback={<Loader />}>
+					{messages.map((message, index) => (
+						<Message message={message} key={index} />
+					))}
+				</Suspense>
 			) : (
 				<Loader />
 			)}

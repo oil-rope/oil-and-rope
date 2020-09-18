@@ -3,8 +3,9 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ChatContext from "../../contexts/ChatContext";
 import Loader from "../loader/Loader";
-import Chat from "./Chat";
 import Axios from "axios";
+
+const Chat = React.lazy(() => import("./Chat"));
 
 const App = ({ socketURL, chatURL, userURL }) => {
 	const [webSocket, setWebSocket] = useState(null);
@@ -63,18 +64,43 @@ const App = ({ socketURL, chatURL, userURL }) => {
 		setWebSocket(new WebSocket(socketURL));
 	};
 
+	/**
+	 * Sends a push notification.
+	 *
+	 * @param {String} message The message to send.
+	 */
+	const sendNotification = (message) => {
+		new Notification(message);
+	};
+
+	/**
+	 * Reconnects and notify user on closing webSocket.
+	 *
+	 * @param {CloseEvent} closeEvent
+	 */
+	const handleWebSocketOnClose = (closeEvent) => {
+		setUpWebSocket();
+
+		if (closeEvent.code === 1011) {
+			if (Notification.permission === "granted") {
+				sendNotification(gettext("An error ocurred. Reconnecting to chat"));
+			}
+		}
+	};
+
 	useEffect(() => {
 		loadChat();
 		loadUser();
 		setUpWebSocket();
+
+		// Check for permissions
+		Notification.requestPermission();
 	}, []);
 
 	useEffect(() => {
 		if (Boolean(chat) && Boolean(webSocket)) {
 			webSocket.onopen = assignChatToWebSocket;
-			webSocket.onclose = () => {
-				setUpWebSocket();
-			};
+			webSocket.onclose = handleWebSocketOnClose;
 		}
 	}, [chat, webSocket]);
 

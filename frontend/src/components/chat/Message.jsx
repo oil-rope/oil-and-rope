@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import moment from "moment";
+import React, { useContext, Fragment } from "react";
 import { Row, Col } from "react-bootstrap";
 import ChatContext from "../../contexts/ChatContext";
 
@@ -7,31 +8,63 @@ const Message = ({ message }) => {
 	const colWidthXS = 10;
 	const colWidthMD = 8;
 
-	if (message.author == user.id) {
+	/**
+	 * Transform date into desired format.
+	 *
+	 * @param {Date} date The date to parse.
+	 */
+	const formatDate = (date, format = "DD/MM/YYYY HH:MM:SS") => {
+		return moment(date).format(format);
+	};
+
+	const renderMessage = () => {
 		return (
-			<Row className="justify-content-end m-0" style={{ minHeight: "50px" }}>
+			<Fragment>
+				<p className="mb-0">
+					<small className="text-white font-weight-bold">
+						<u>{message.author.username}</u>
+					</small>
+					<br />
+					{message.message}
+				</p>
+				<p className="text-right mb-0">
+					<small className="text-muted">
+						{gettext("Sent at")} {formatDate(message.created_at)}
+					</small>
+				</p>
+			</Fragment>
+		);
+	};
+
+	if (message.author.id == user.id) {
+		return (
+			<Row
+				className="justify-content-end m-0 mb-2"
+				style={{ minHeight: "50px" }}
+			>
 				<Col
 					xs={colWidthXS}
 					md={colWidthMD}
 					className="bg-extra border"
 					style={{ borderRadius: "10px" }}
 				>
-					<small className="text-muted">{message.author}</small>
-					<p>{message.message}</p>
+					{renderMessage()}
 				</Col>
 			</Row>
 		);
 	} else {
 		return (
-			<Row className="justify-content-start m-0" style={{ minHeight: "50px" }}>
+			<Row
+				className="justify-content-start m-0 mb-2"
+				style={{ minHeight: "50px" }}
+			>
 				<Col
 					xs={colWidthXS}
 					md={colWidthMD}
 					className="bg-info border"
 					style={{ borderRadius: "10px" }}
 				>
-					<small className="text-muted">{message.author}</small>
-					<p>{message.message}</p>
+					{renderMessage()}
 				</Col>
 			</Row>
 		);

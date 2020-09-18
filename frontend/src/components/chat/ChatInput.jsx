@@ -38,7 +38,7 @@ const ChatInput = () => {
 				</Col>
 				<Col xs={3} lg={2}>
 					<Button className="w-100" variant="primary" type="submit">
-						<i className="ic ic-send"/>
+						<i className="ic ic-send" />
 					</Button>
 				</Col>
 			</Form.Row>

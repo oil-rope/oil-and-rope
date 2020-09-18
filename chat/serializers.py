@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
+from registration.serializers import UserSerializer
+
 from . import models
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
+    author = UserSerializer()
 
     class Meta:
         model = models.ChatMessage
