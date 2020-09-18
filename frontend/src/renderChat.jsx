@@ -7,8 +7,14 @@ let element = document.querySelector(
 	currentScript.getAttribute("data-renderer")
 );
 let wsURL = currentScript.getAttribute("data-socket");
+let chatInfoURL = currentScript.getAttribute("data-chat-info");
+let userURL = currentScript.getAttribute("data-user-url");
 
 ReactDOM.render(
-	<App socketURL={`ws://${window.location.host}${wsURL}`} />,
+	<App
+		socketURL={`ws://${window.location.host}${wsURL}`}
+		chatURL={chatInfoURL}
+		userURL={userURL}
+	/>,
 	element
 );

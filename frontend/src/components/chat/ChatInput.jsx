@@ -3,7 +3,7 @@ import { Form, Col, Button } from "react-bootstrap";
 import ChatContext from "../../contexts/ChatContext";
 
 const ChatInput = () => {
-	const { webSocket } = useContext(ChatContext);
+	const { webSocket, chat } = useContext(ChatContext);
 	const [message, setMessage] = useState(null);
 	const func = "send_message";
 
@@ -18,7 +18,8 @@ const ChatInput = () => {
 			webSocket.send(
 				JSON.stringify({
 					type: func,
-					content: message,
+					message: message,
+					chat: chat.id,
 				})
 			);
 			e.currentTarget.reset();
@@ -28,14 +29,14 @@ const ChatInput = () => {
 	return (
 		<Form onSubmit={handleFormOnSubmit}>
 			<Form.Row>
-				<Col xs={10}>
+				<Col xs={9}>
 					<Form.Control
 						type="text"
 						placeholder={`${gettext("Start typing")}...`}
 						onChange={(e) => setMessage(e.target.value)}
 					/>
 				</Col>
-				<Col xs={2}>
+				<Col xs={3}>
 					<Button className="w-100" variant="primary" type="submit">
 						<i className="ic ic-send"></i>
 					</Button>

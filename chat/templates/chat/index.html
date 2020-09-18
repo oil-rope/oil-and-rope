@@ -5,13 +5,13 @@
 {% block title %}{% trans "Chat" %}{% endblock title %}
 
 {% block body_content %}
-  <main class="container py-5">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-12">
         <div id="chatReactRenderer"></div>
       </div>
     </div>
-  </main>
+  </div>
 {% endblock body_content %}
 
 {% block javascript %}
@@ -19,5 +19,7 @@
     src="{% static 'frontend/dist/Chat.bundle.js' %}"
     data-renderer="#chatReactRenderer"
     data-socket="{% url 'chat_ws:connect' %}"
+    data-chat-info="{% url 'chat:api:chat-detail' chat.pk %}"
+    data-user-url="{% url 'registration:api:user-detail' user.pk %}"
   ></script>
 {% endblock javascript %}
