@@ -11,10 +11,6 @@ let chatInfoURL = currentScript.getAttribute("data-chat-info");
 let userURL = currentScript.getAttribute("data-user-url");
 
 ReactDOM.render(
-	<App
-		socketURL={`ws://${window.location.host}${wsURL}`}
-		chatURL={chatInfoURL}
-		userURL={userURL}
-	/>,
+	<App socketURL={wsURL} chatURL={chatInfoURL} userURL={userURL} />,
 	element
 );
