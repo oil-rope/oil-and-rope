@@ -16,16 +16,6 @@ def url():
     return reverse('chat:index')
 
 
-@pytest.mark.asyncio
-async def test_websocket_connect(url):
-    communicator = WebsocketCommunicator(ChatConsumer, url)
-    connected, subprotocol = await communicator.connect()
-    assert connected, 'WebSocket is not connected.'
-
-    # Disconnect WebSocket to avoid pending tasks
-    await communicator.disconnect()
-
-
 @pytest.mark.django_db
 @pytest.mark.asyncio
 async def test_setup_channel_layer(url):
@@ -84,11 +74,12 @@ async def test_send_message(url):
     }
     await communicator.send_json_to(data)
     response = await communicator.receive_json_from()
+    message = response['message']
 
-    assert word == response['message']
-    assert chat.pk == response['chat']
+    assert word == message['message']
+    assert chat.pk == message['chat']
 
-    assert ChatMessage.objects.get(pk=response['id'])
+    assert ChatMessage.objects.get(pk=message['id'])
 
     # Disconnect
     await communicator.disconnect()

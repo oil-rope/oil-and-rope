@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect, Suspense } from "react";
+import React, {
+	useState,
+	useContext,
+	useEffect,
+	useRef,
+	Suspense,
+} from "react";
 import Loader from "../loader/Loader";
 import ChatContext from "../../contexts/ChatContext";
 
@@ -10,6 +16,7 @@ const MessagesContainer = () => {
 	);
 	const [userLoaded, setUserLoaded] = useState(false);
 	const [messages, setMessages] = useState([]);
+	const messageContainerRef = useRef(null);
 
 	/**
 	 * Adds the message to messages.
@@ -17,8 +24,14 @@ const MessagesContainer = () => {
 	 * @param {Object} messageEvent Message received.
 	 */
 	const handleWebSocketOnMessage = (messageEvent) => {
-		let message = JSON.parse(messageEvent.data);
+		let payload = JSON.parse(messageEvent.data);
+		let message = payload.message;
 		setMessages([...messages, message]);
+
+		if (payload.hasOwnProperty("error")) {
+			new Notification(payload.error);
+			scrollToBottom();
+		}
 	};
 
 	/**
@@ -28,6 +41,14 @@ const MessagesContainer = () => {
 		if (Boolean(chat)) {
 			setMessages(chat.chat_message_set);
 		}
+	};
+
+	/**
+	 * Scrolls to bottom.
+	 */
+	const scrollToBottom = () => {
+		let element = messageContainerRef.current;
+		element.scrollTop = element.scrollHeight;
 	};
 
 	useEffect(() => {
@@ -46,14 +67,19 @@ const MessagesContainer = () => {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
+
 	return (
 		<div
 			style={{
-				minHeight: "300px",
 				height: "400px",
 				width: "100%",
 				overflowY: "scroll",
+				scrollBehavior: "smooth",
 			}}
+			ref={messageContainerRef}
 		>
 			{userLoaded ? (
 				<Suspense fallback={<Loader />}>

@@ -1,4 +1,5 @@
 from channels.db import database_sync_to_async
+from django.utils.translation import gettext_lazy as _
 
 from core.consumers import HandlerJsonWebsocketConsumer
 
@@ -32,7 +33,9 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
 
     async def send_message(self, content):
         user = self.scope['user']
-        message = await self.register_message(user.id, content['chat'], content['message'])
+        chat_id = content['chat']
+        msg_text = content['message']
+        message = await self.register_message(user.id, chat_id, msg_text)
         data = serializers.ChatMessageSerializer(message).data
         func = 'group_send_message'
         content = {
@@ -40,8 +43,16 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             'message': data
         }
 
-        await self.channel_layer.group_send(self.chat_group_name, content)
+        try:
+            await self.channel_layer.group_send(self.chat_group_name, content)
+        except TypeError:
+            # We send error message with serialized message and remove
+            await self.send_json(
+                {'error': 'We couldn\'t send your message', 'message': data},
+                close=True
+            )
+            message.delete()
 
     async def group_send_message(self, content):
         message = content['message']
-        await self.send_json(message)
+        await self.send_json({'message': message})

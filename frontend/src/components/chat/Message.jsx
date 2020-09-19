@@ -13,7 +13,7 @@ const Message = ({ message }) => {
 	 *
 	 * @param {Date} date The date to parse.
 	 */
-	const formatDate = (date, format = "DD/MM/YYYY HH:MM:SS") => {
+	const formatDate = (date, format = "DD/MM/YYYY HH:mm:ss") => {
 		return moment(date).format(format);
 	};
 
