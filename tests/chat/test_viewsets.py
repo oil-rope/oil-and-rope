@@ -1,6 +1,7 @@
 from django.shortcuts import reverse
 from django.test import TestCase
 from model_bakery import baker
+from rest_framework.test import APIClient
 
 from common.constants import models
 
@@ -19,6 +20,7 @@ class TestChatViewSet(TestCase):
         cls.chat.users.add(cls.user_with_chat)
 
     def setUp(self):
+        self.client = APIClient()
         self.list_url = reverse(self.resolver_list)
         self.detail_url = reverse(self.resolver_detail, kwargs={'pk': self.chat.pk})
 
