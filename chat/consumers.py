@@ -1,5 +1,4 @@
 from channels.db import database_sync_to_async
-from django.utils.translation import gettext_lazy as _
 
 from core.consumers import HandlerJsonWebsocketConsumer
 
