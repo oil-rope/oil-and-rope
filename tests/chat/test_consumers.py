@@ -5,8 +5,8 @@ from django.shortcuts import reverse
 from model_bakery import baker
 
 from chat.consumers import ChatConsumer
-from common.constants import models
 from chat.models import ChatMessage
+from common.constants import models
 
 fake = faker.Faker()
 
