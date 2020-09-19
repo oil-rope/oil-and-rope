@@ -1,21 +1,20 @@
 from django.conf import settings
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from core.models import TracingMixin
 
-class Chat(models.Model):
+
+class Chat(TracingMixin):
     """
     In-game chat model
 
     Parameters
     ----------
     name: :class:`str`
-    users: :class:`User`
-    private_game: :class:`??????`
-        The private game the users are playing (not like pathfinder)
-    game: :class:`Game`
-        Like pathfinder, dnd...
+        Name of the Chat Room.
+    users: List[:class:`User`]
+        Users in this chat.
     """
 
     name = models.CharField(verbose_name=_('Chat name'), max_length=50)
@@ -30,15 +29,18 @@ class Chat(models.Model):
         return f'{self.name} ({self.pk})'
 
 
-class ChatMessage(models.Model):
+class ChatMessage(TracingMixin):
     """
     Ingame chat messages.
 
     Parameters
     ----------
     chat: :class:`Chat`
+        Chat associated to this message.
     message: :class:`str`
-    user: :class:`User`
+        Message itself.
+    author: :class:`User`
+        Person who sent the message.
     """
 
     chat = models.ForeignKey('chat.Chat', verbose_name=_('Chat'),
@@ -46,18 +48,10 @@ class ChatMessage(models.Model):
     message = models.CharField(verbose_name=_('Message'), max_length=150)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'),
                                on_delete=models.CASCADE, related_name='chat_message_set')
-    created_at = models.DateTimeField(
-        auto_now=False,
-        auto_now_add=True,
-        verbose_name=_('Entry created at'),
-    )
 
     class Meta:
         verbose_name = _('Chat Message')
         verbose_name_plural = _('Chat Messages')
 
     def __str__(self):
-        return self.message
-
-    def get_absolute_url(self):
-        return reverse('chatmessage_detail', kwargs={'pk': self.pk})
+        return f'{self.message} ({self.entry_created_at})'
