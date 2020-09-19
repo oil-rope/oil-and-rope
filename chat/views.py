@@ -11,17 +11,29 @@ class ChatView(LoginRequiredMixin, TemplateView):
     template_name = 'chat/index.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser:
+        user = request.user
+
+        if not user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
-        return HttpResponseForbidden()
+        if not user.is_superuser:
+            return HttpResponseForbidden()
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_websocket_url(self):
         ws_url = 'ws://' if settings.DEBUG else 'wss://'
-        ws_url += settings.WS_HOST + reverse('chat_ws:connect')
+        ws_host = settings.WS_HOST
+        if ws_host:
+            ws_url += ws_host
+        else:
+            ws_url += self.request.get_host()
+        ws_url += reverse('chat_ws:connect')
+
         return ws_url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['chat'] = models.Chat.objects.first()
         context['ws_url'] = self.get_websocket_url()
+
         return context

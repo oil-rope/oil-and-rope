@@ -16,3 +16,7 @@ DOMAIN_MODEL = 'roleplay.Domain'
 PLACE_MODEL = 'roleplay.Place'
 RACE_MODEL = 'roleplay.Race'
 USER_RACE_RELATION = 'roleplay.RaceUser'
+
+# Chat
+CHAT_MODEL = 'chat.Chat'
+CHAT_MESSAGE_MODEL = 'chat.ChatMessage'
