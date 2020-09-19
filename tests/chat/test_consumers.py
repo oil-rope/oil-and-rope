@@ -46,9 +46,12 @@ async def test_send_message_without_setup(url):
         'message': fake.word(),
     }
     await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
 
-    with pytest.raises(TypeError):
-        await communicator.receive_json_from()
+    assert 'error' in response
+
+    # Disconnect
+    await communicator.disconnect()
 
 
 @pytest.mark.django_db
