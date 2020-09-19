@@ -32,8 +32,7 @@ if 'ALLOWED_HOSTS' in os.environ:
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oilandrope-project.com').split(',')
 else:
     ALLOWED_HOSTS = [
-        'oil-and-rope.herokuapp.com',
-        'oilandrope-project.com'
+        'oilandrope-project.com',
     ]
 
 # Defines Admins
@@ -139,6 +138,19 @@ WSGI_APPLICATION = 'oilandrope.wsgi.application'
 # DjangoChannels ASGI Router
 ASGI_APPLICATION = 'oilandrope.routing.application'
 
+# Channel Layers
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                (os.getenv('CHANNEL_LAYER_HOST', ALLOWED_HOSTS[0]), 6379)
+            ],
+        },
+    },
+}
+
+# Host for WebSocket
 WS_HOST = os.getenv('WS_HOST', None)
 
 
