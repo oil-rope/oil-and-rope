@@ -14,7 +14,9 @@ def get_all_websocket_urlpatterns():
 
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(URLRouter(
-        get_all_websocket_urlpatterns()
-    ))
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            get_all_websocket_urlpatterns()
+        )
+    )
 })
