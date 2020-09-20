@@ -1,6 +1,6 @@
 import logging
 
-from channels.auth import get_user, login
+from channels.auth import login
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
