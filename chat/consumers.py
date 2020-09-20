@@ -17,9 +17,9 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         await super().disconnect(code)
 
     @database_sync_to_async
-    def register_message(self, author_id, chat_id, message):
+    def register_message(self, author, chat_id, message):
         message = models.ChatMessage.objects.create(
-            author_id=author_id,
+            author=author,
             chat_id=chat_id,
             message=message,
         )
@@ -34,7 +34,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         user = self.scope['user']
         chat_id = content['chat']
         msg_text = content['message']
-        message = await self.register_message(user.id, chat_id, msg_text)
+        message = await self.register_message(user, chat_id, msg_text)
         data = serializers.ChatMessageSerializer(message).data
         func = 'group_send_message'
         content = {
