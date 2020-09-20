@@ -17,11 +17,9 @@ def get_all_websocket_urlpatterns():
 
 application = ProtocolTypeRouter({
     'websocket': AllowedHostsOriginValidator(
-        SessionMiddleware(
-            AuthMiddlewareStack(
-                URLRouter(
-                    get_all_websocket_urlpatterns()
-                )
+        AuthMiddlewareStack(
+            URLRouter(
+                get_all_websocket_urlpatterns()
             )
         )
     )
