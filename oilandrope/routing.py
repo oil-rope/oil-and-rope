@@ -1,7 +1,6 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
-from channels.sessions import SessionMiddleware
 
 from bot.routing import websocket_urlpatterns as bot_ws_urls
 from chat.routing import websocket_urlpatterns as chat_ws_urls
