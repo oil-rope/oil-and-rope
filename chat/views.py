@@ -21,12 +21,9 @@ class ChatView(LoginRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_websocket_url(self):
-        ws_url = 'ws://' if settings.DEBUG else 'wss://'
-        ws_host = settings.WS_HOST
-        if ws_host:
-            ws_url += ws_host
-        else:
-            ws_url += self.request.get_host()
+        ws_url = 'wss://' if self.request.is_secure() else 'ws://'
+        ws_host = settings.WS_HOST or self.request.get_host()
+        ws_url += ws_host
         ws_url += reverse('chat_ws:connect')
 
         return ws_url
