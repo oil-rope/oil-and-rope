@@ -65,8 +65,6 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 close=True
             )
             message.delete()
-        except Exception:
-            LOGGER.exception('Something went really wrong')
 
     async def group_send_message(self, content):
         message = content['message']
