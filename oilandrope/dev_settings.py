@@ -29,17 +29,17 @@ INSTALLED_APPS.append('django_extensions', )
 
 MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
 
-EMAIL_HOST = 'smtp.mailtrap.io'
-EMAIL_HOST_USER = '1d1194c55c4145'
-EMAIL_HOST_PASSWORD = '768c5e9c7ea2a3'
-EMAIL_PORT = '2525'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mailtrap.io')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'user@mailtrap')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'mailtrap_p4ssw0rd')
+EMAIL_PORT = os.getenv('EMAIL_PORT', '2525')
 EMAIL_USE_TLS = False
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            'hosts': [('127.0.0.1', 6379)],
         },
     },
 }

@@ -18,11 +18,15 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
+import bot.routing
+import chat.routing
+
 urlpatterns = [
-    re_path(r'^ws/bot/', include('bot.routing'))
+    path('', include((bot.routing.websocket_urlpatterns, 'bot_ws'))),
+    path('', include((chat.routing.websocket_urlpatterns, 'chat_ws'))),
 ]
 
 urlpatterns += i18n_patterns(
@@ -32,12 +36,16 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
+    # Common
+    path('common/', include('common.urls')),
     # Auth system
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),
     # Chat
     path('chat/', include('chat.urls')),
+    # Dynamic Menu
+    path('dynamic_menu/', include('dynamic_menu.urls')),
     # React FrontEnd
     path('frontend/', include('frontend.urls')),
     # Roleplay

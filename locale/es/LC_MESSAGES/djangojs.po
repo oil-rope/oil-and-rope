@@ -1,0 +1,73 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-13 08:52+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:12
+msgid "Look for user"
+msgstr "Buscar usuario"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:69
+msgid "Found"
+msgstr "Encontrado"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:75
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:130
+msgid "User not found"
+msgstr "Usuario no encontrado"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:99
+msgid "Once you accept the invitation click here again to search your user"
+msgstr "Una vez aceptes la invitación, haz click aquí otra vez"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:106
+msgid "We couldn't sent you a message"
+msgstr "No hemos podido enviarte un mensaje"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:107
+msgid "Do you share server with our bot?"
+msgstr "¿Compartes servidor con nuestro bot?"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:134
+msgid "Seems like this user doesn't exists"
+msgstr "Parece que este usuario no existe"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:137
+msgid "Have you invited the bot to your server and requested and invitation?"
+msgstr "¿Has invitado al bot a tu servidor y pedido un invitación?"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:142
+msgid "Please note that you have to share at least one server with our bot"
+msgstr "Por favor ten en cuenta que debes compartir al menos un servidor con el bot"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:149
+msgid "Send invitation"
+msgstr "Enviar invitación"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:152
+msgid "Invite Bot"
+msgstr "Invitar Bot"
+
+#: .\frontend\src\components\buttons\discord\user-check-button\UserCheckButton.jsx:155
+msgid "Close"
+msgstr "Cerrar"
+
+#: .\frontend\src\components\loader\Loader.jsx:7
+#: .\frontend\src\components\loader\Loader.jsx:9
+msgid "Loading"
+msgstr "Cargando"

@@ -1,0 +1,36 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Create" %} {% trans "Menu" %}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Menus=dynamic_menu:dynamic_menu:create,Create' %}
+{% endblock breadcrumb %}
+
+
+{% block body_content %}
+  <main class="container py-5">
+    <h1 class="text-center font-weight-lighter">
+      {% trans "Create" %} {% trans "Menu" %}
+    </h2>
+    <hr class="mx-5 mb-5">
+    <div class="row">
+      <div class="col-12">
+        {% crispy form %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script
+    src="{% static 'dynamic_menu/js/createMenu.js' %}"
+    data-form-id="{{ form.helper.form_id }}"
+    data-name-container-id="{{ name_container_display_id }}"
+    data-url-resolver="{% url 'common:utils:get_url' %}"
+    data-url-resolver-container-id="{{ display_url_resolver_id }}"
+  ></script>
+{% endblock javascript %}

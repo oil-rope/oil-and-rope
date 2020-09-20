@@ -7,6 +7,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 from discord.ext.commands import errors
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 from faker import Faker
@@ -30,6 +31,10 @@ class OilAndRopeBot(commands.Bot):
             self.load_env_file(env_file)
         self.load_variables()
         super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
+
+        # Manually registering events
+        # TODO: Search if there's a better way to do this
+        self.event(self.on_guild_join)
 
     def load_variables(self):
         """
@@ -56,7 +61,7 @@ class OilAndRopeBot(commands.Bot):
 
         if not env_file.exists():
             raise OilAndRopeException(_('Env file does not exist') + '.')
-        load_dotenv(env_file.as_posix())
+        load_dotenv(env_file.as_posix(), verbose=True, override=True)
 
     def load_commands(self):
         """
@@ -87,13 +92,29 @@ class OilAndRopeBot(commands.Bot):
         LOGGER.info(init_message)
         print(init_message)
 
+        name = 'awesome sessions!'
+        name += f'Type \'{settings.BOT_COMMAND_PREFIX}help\' for help.'
+        activity = discord.Game(name=name)
+        status = discord.Status.online
+        await self.change_presence(activity=activity, status=status)
+
+    async def on_guild_join(self, guild):
+        owner = guild.owner
+        # Say hello in System's messages channel or first in list
+        greet_channel = guild.system_channel or guild.text_channels[0]
+        async with greet_channel.typing():
+            msg = 'Hello! You are about to experience a brand-new way to manage sessions and play!'
+            msg += f'\nStart by typing `{settings.BOT_COMMAND_PREFIX}invite`.'
+            await greet_channel.send(f'{msg}')
+        await utils.get_or_create_discord_user(owner)
+        await utils.get_or_create_discord_server(guild)
+
     async def on_message(self, message: discord.Message):
         if not message.author.bot and message.content.startswith(self.command_prefix):
-            log_message = '{author} ({id}): {message}'.format(
-                author=message.author.name,
-                id=message.author.id,
-                message=message.content
-            )
+            author = message.author.name
+            author_id = message.author.id
+            message_content = message.content
+            log_message = f'{author} ({author_id}): {message_content}'
             print(log_message)
         await super().on_message(message)
 
@@ -118,7 +139,8 @@ class OilAndRopeBot(commands.Bot):
 
         user = self.get_user(user_id)
         token = fake.password(length=10, special_chars=False, digits=True, upper_case=True, lower_case=True)
-        await user.send(_('Hello traveller! To confirm your account please type `{token}`').format(token=token))
+        msg = _('Hello traveller! To confirm your account please type %(token)s') % {'token': '`{}`'.format(token)}
+        await user.send(msg)
 
         def check(m):
             """
@@ -134,5 +156,5 @@ class OilAndRopeBot(commands.Bot):
         except asyncio.TimeoutError:
             await user.send(_('Token has timed out' + '!'))
         else:
+            await utils.get_or_create_discord_user(user)
             await user.send(_('Your user has been confirmed') + '!')
-            utils.get_or_create_discord_user(user)

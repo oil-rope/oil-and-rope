@@ -8,11 +8,7 @@
     </h2>
     <hr class="mx-md-5 md">
     <p class="lead text-center">
-      {% blocktrans %}
-        We are a group of people with different professional profiles (developers, designers, composers, …) and one
-        thought in common,<br>
-        <i class="font-weight-bold">"make an incredible experience for roleplaying online!"</i>.
-      {% endblocktrans %}
+      {% blocktrans %}We are a group of people with different professional profiles (developers, designers, composers, …) and one thought in common,<br><i class="font-weight-bold">"make an incredible experience for roleplaying online!"</i>.{% endblocktrans %}
     </p>
   </section>
 
@@ -32,10 +28,8 @@
         <i class="display-3 text-white ic ic-hammer"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...build.<br>
-            Worlds, cities, races, stories...
-          {% endblocktrans %}
+          ...{% trans "build" %}.<br>
+          {% trans "Worlds, cities, races, stories..." %}
         </p>
       </div>
 
@@ -44,10 +38,8 @@
         <i class="display-3 text-white ic ic-shield"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...play secure.<br>
-            All your data is stored and encrypted.
-          {% endblocktrans %}
+          ...{% trans "play secure" %}.<br>
+          {% trans "All your data is stored and encrypted" %}.
         </p>
       </div>
 
@@ -56,10 +48,8 @@
         <i class="display-3 text-white ic ic-connect"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...connect.<br>
-            Make relationships in-between your world.
-          {% endblocktrans %}
+          ...{% trans "connect" %}.<br>
+          {% trans "Make relationships in-between your world" %}.
         </p>
       </div>
 
@@ -68,10 +58,8 @@
         <i class="display-3 text-white ic ic-dice"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...play!<br>
-            Create, fight, explore and have fun!
-          {% endblocktrans %}
+          ...{% trans "play" %}!<br>
+          {% trans "Create, fight, explore and have fun!" %}
         </p>
       </div>
 
@@ -80,10 +68,8 @@
         <i class="display-3 text-white ic ic-quill"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...write.<br>
-            Your own story, your epic revolution.
-          {% endblocktrans %}
+            ...{% trans "write" %}.<br>
+            {% trans "Your own story, your epic revolution" %}.
         </p>
       </div>
 
@@ -92,10 +78,8 @@
         <i class="display-3 text-white ic ic-responsive-device"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...adapt.<br>
-            Control your game in every device.
-          {% endblocktrans %}
+            ...{% trans "adapt" %}.<br>
+            {% trans "Control your game in every device" %}.
         </p>
       </div>
 
@@ -104,10 +88,8 @@
         <i class="display-3 text-white ic ic-discord"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...communicate.<br>
-            Playing in both website and Discord server.
-          {% endblocktrans %}
+            ...{% trans "communicate" %}.<br>
+            {% trans "Playing in both website and Discord server" %}.
         </p>
       </div>
 
@@ -116,16 +98,14 @@
         <i class="display-3 text-white ic ic-users"></i>
         <div class="w-100"></div>
         <p class="lead">
-          {% blocktrans %}
-            ...share.<br>
-            Make amazing worlds for everyone to enjoy.
-          {% endblocktrans %}
+            ...{% trans "share" %}.<br>
+            {% trans "Make amazing worlds for everyone to enjoy" %}.
         </p>
       </div>
 
       <a href="{% url 'registration:register' %}" class="btn btn-lg btn-primary col-6 my-lg-5">
         <i class="ic ic-join"></i>
-        {% trans "Join now" %}!
+        {% trans "Join now!" %}
       </a>
     </div>
   </section>

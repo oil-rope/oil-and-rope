@@ -9,12 +9,16 @@ from roleplay import models
 
 class TestPlaceViewSet(TestCase):
     model = models.Place
+    resolver = 'roleplay:place-list'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.world = baker.make(cls.model)
 
     def setUp(self):
         self.client = APIClient()
-        self.user = baker.make(get_user_model())
-        self.world = baker.make(self.model)
-        self.url = reverse('roleplay:place-list')
+        self.url = reverse(self.resolver)
 
     def test_access_ok(self):
         self.client.force_authenticate(user=self.user)

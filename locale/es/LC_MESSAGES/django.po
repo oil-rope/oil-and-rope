@@ -1,0 +1,1262 @@
+# Django Spanish Translation
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# LeCuay <suso.becerra98@gmail.com>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-13 08:25+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\bot\bot.py:63
+msgid "Env file does not exist"
+msgstr "El archivo Env no existe"
+
+#: .\bot\bot.py:123
+msgid "Incorrect format"
+msgstr "Formato incorrecto"
+
+#: .\bot\bot.py:142
+#, python-format
+msgid "Hello traveller! To confirm your account please type %(token)s"
+msgstr "¡Buenas viajero! Para confirmar su cuenta por favor escriba %(token)s"
+
+#: .\bot\bot.py:157
+msgid "Token has timed out!"
+msgstr "¡El token ha expirado!"
+
+#: .\bot\bot.py:160
+msgid "Your user has been confirmed"
+msgstr "Tu usuario ha sido confirmado"
+
+#: .\bot\categories.py:22
+msgid "Roleplay"
+msgstr "Roleplay"
+
+#: .\bot\categories.py:103
+msgid "The roll must follow the correct pattern"
+msgstr "La tirada debe tener el formato adecuado"
+
+#: .\bot\categories.py:107
+#, python-format
+msgid "%(user)s rolled"
+msgstr "%(user)s ha sacado"
+
+#: .\bot\categories.py:135
+msgid "Miscellaneous"
+msgstr "Misceláneo"
+
+#: .\bot\categories.py:148
+msgid "Shutting down"
+msgstr "Apagando"
+
+#: .\bot\categories.py:157 .\bot\models.py:30 .\chat\models.py:50
+#: .\registration\models.py:59 .\roleplay\models.py:87
+#: .\roleplay\models.py:335
+msgid "User"
+msgstr "Usuario"
+
+#: .\bot\categories.py:181
+msgid "You are part of the full experience already"
+msgstr "Ya eres parte de la experiencia completa"
+
+#: .\bot\commands\roleplay\places.py:61
+#, python-format
+msgid "Invalid option. Supported options are %(options)s"
+msgstr "Opción inválida. Las opciones soportadas son %(options)s"
+
+#: .\bot\commands\roleplay\places.py:70
+#, python-format
+msgid "Seems like you are not registered. You can do it in 5 minutes %(url)s"
+msgstr ""
+"Parece que no estás registrado. Puedes registrarte en 5 minutos %(url)s"
+
+#: .\bot\commands\roleplay\places.py:78
+msgid "Sorry, you took so long to reply"
+msgstr "Lo siento, has tardado demasiado en responder"
+
+#: .\bot\commands\roleplay\places.py:128
+msgid "Which world would you like to delete?"
+msgstr "¿Qué mundo te gustaría borrar?"
+
+#: .\bot\commands\roleplay\places.py:136
+#, python-format
+msgid "You can perform this action via web: %(url)s"
+msgstr "Puedes realizar esta acción via web: %(url)s"
+
+#: .\bot\commands\roleplay\places.py:141
+#, python-format
+msgid "Remember you can perform this action via web: %(url)s"
+msgstr "Recuerda que puedes realizar esta acción via web: %(url)s"
+
+#: .\bot\commands\roleplay\places.py:146
+#, python-format
+msgid "Check it out here: %(url)s"
+msgstr "Míralo aquí: %(url)s"
+
+#: .\bot\commands\roleplay\places.py:151
+msgid "You didn't send an image"
+msgstr "No has enviado una imagen"
+
+#: .\bot\commands\roleplay\places.py:156
+msgid "Image too big"
+msgstr "La imagen es muy grande"
+
+#: .\bot\commands\roleplay\places.py:189
+#, python-format
+msgid "Here's a list of your worlds: %(worlds)s"
+msgstr "Aquí tienes una lista de tus mundos: %(worlds)s"
+
+#: .\bot\commands\roleplay\places.py:191
+msgid "Seems like there isn't any world yet"
+msgstr "Parece que no hay ningún mundo aún"
+
+#: .\bot\commands\roleplay\places.py:211
+msgid "Seems like you don't have any world yet"
+msgstr "Parece que no tienes ningún mundo aún"
+
+#: .\bot\commands\roleplay\places.py:230
+#, python-format
+msgid "Are you sure you want to delete %(place)s?"
+msgstr "¿Estás seguro de que quieres borrar %(place)s?"
+
+#: .\bot\commands\roleplay\places.py:231
+msgid "yes"
+msgstr "sí"
+
+#: .\bot\commands\roleplay\places.py:231
+msgid "no"
+msgstr "no"
+
+#: .\bot\commands\roleplay\places.py:246
+#, python-format
+msgid "%(place)s deleted"
+msgstr "%(place)s borrado"
+
+#: .\bot\commands\roleplay\places.py:249
+msgid "Okay!"
+msgstr "¡Listo!"
+
+#: .\bot\commands\roleplay\places.py:272
+msgid "First we need a name"
+msgstr "Primero necesitamos un nombre"
+
+#: .\bot\commands\roleplay\places.py:281
+msgid ""
+"Now tell us about your world, a description (You can avoid this by writting "
+"'no')"
+msgstr "Ahora descríbenos tu mundo (Puedes evitar esto escribiendo 'no')"
+
+#: .\bot\commands\roleplay\places.py:291
+msgid "Maybe an image? (You can avoid this by writting 'no')"
+msgstr "¿A lo mejor una imagen?"
+
+#: .\bot\commands\roleplay\places.py:305
+msgid "Congrats! Your world have been created!"
+msgstr "¡Felicidades! ¡Tu mundo ha sido creado!"
+
+#: .\bot\enums.py:10
+msgid "List"
+msgstr "Listado"
+
+#: .\bot\enums.py:11 .\roleplay\forms.py:13
+#: .\roleplay\templates\roleplay\world\world_create.html:5
+msgid "Create"
+msgstr "Crear"
+
+#: .\bot\enums.py:12
+msgid "Remove"
+msgstr "Borrar"
+
+#: .\bot\models.py:29 .\bot\models.py:74 .\bot\models.py:111
+msgid "Identifier"
+msgstr "Identificador"
+
+#: .\bot\models.py:32
+msgid "Nick"
+msgstr "Nick"
+
+#: .\bot\models.py:33
+msgid "Code"
+msgstr "Código"
+
+#: .\bot\models.py:34
+msgid "Avatar URL"
+msgstr "Avatar URL"
+
+#: .\bot\models.py:35
+msgid "Locale"
+msgstr "Locale"
+
+#: .\bot\models.py:36
+msgid "Premium"
+msgstr "Premium"
+
+#: .\bot\models.py:37 .\bot\models.py:82 .\bot\models.py:114
+msgid "Created at"
+msgstr "Creado el"
+
+#: .\bot\models.py:40
+msgid "Discord User"
+msgstr "Usuario de Discord"
+
+#: .\bot\models.py:41 .\bot\models.py:83 .\bot\models.py:151
+#: .\bot\models.py:188
+msgid "Discord Users"
+msgstr "Usuarios de Discord"
+
+#: .\bot\models.py:75 .\bot\models.py:112 .\dynamic_menu\models.py:90
+#: .\roleplay\models.py:29 .\roleplay\models.py:79 .\roleplay\models.py:283
+msgid "Name"
+msgstr "Nombre"
+
+#: .\bot\models.py:76
+msgid "Region"
+msgstr "Región"
+
+#: .\bot\models.py:77
+msgid "Icon URL"
+msgstr "URL del Icono"
+
+#: .\bot\models.py:78 .\roleplay\models.py:90
+msgid "Owner"
+msgstr "Dueño"
+
+#: .\bot\models.py:80 .\dynamic_menu\models.py:91 .\roleplay\models.py:30
+#: .\roleplay\models.py:80 .\roleplay\models.py:284
+msgid "Description"
+msgstr "Descripción"
+
+#: .\bot\models.py:81
+msgid "Member count"
+msgstr "Número de miembros"
+
+#: .\bot\models.py:87 .\bot\models.py:149 .\bot\models.py:186
+msgid "Discord Server"
+msgstr "Servidor de Discord"
+
+#: .\bot\models.py:88
+msgid "Discord Servers"
+msgstr "Servidores de Discord"
+
+#: .\bot\models.py:113
+msgid "Position"
+msgstr "Posición"
+
+#: .\bot\models.py:146
+msgid "NSFW"
+msgstr "NSFW"
+
+#: .\bot\models.py:147
+msgid "Topic"
+msgstr "Tema"
+
+#: .\bot\models.py:148
+msgid "News"
+msgstr "Noticias"
+
+#: .\bot\models.py:155
+msgid "Discord Text Channel"
+msgstr "Canal de Texto de Discord"
+
+#: .\bot\models.py:156
+msgid "Discord Text Channels"
+msgstr "Canales de Texto de Discord"
+
+#: .\bot\models.py:185
+msgid "Bitrate"
+msgstr "Bitrate"
+
+#: .\bot\models.py:192
+msgid "Discord Voice Channel"
+msgstr "Canal de Voz de Discord"
+
+#: .\bot\models.py:193
+msgid "Discord Voice Channels"
+msgstr "Canales de Voz de Discord"
+
+#: .\bot\views.py:57
+#, python-format
+msgid "Please set %(argument)s"
+msgstr "Por favor indique %(argument)s"
+
+#: .\bot\views.py:104
+msgid "You are almost ready to start your adventure"
+msgstr "Ya casi estás listo para empezar tu aventura"
+
+#: .\bot\views.py:106
+#, python-format
+msgid "Type %(command)s to get your invitation"
+msgstr "Escribe %(command)s para obtener tu invitación"
+
+#: .\chat\models.py:21
+msgid "Chat name"
+msgstr "Nombre del chat"
+
+#: .\chat\models.py:23 .\roleplay\models.py:295
+msgid "Users"
+msgstr "Usuarios"
+
+#: .\chat\models.py:26 .\chat\models.py:47
+msgid "Chat"
+msgstr "Chat"
+
+#: .\chat\models.py:27
+msgid "Chats"
+msgstr "Chats"
+
+#: .\chat\models.py:49
+msgid "Message"
+msgstr "Mensaje"
+
+#: .\chat\models.py:55 .\core\models.py:17
+msgid "Entry created at"
+msgstr "Registro creado el"
+
+#: .\chat\models.py:59
+msgid "Chat Message"
+msgstr "Mensaje del Chat"
+
+#: .\chat\models.py:60
+msgid "Chat Messages"
+msgstr "Mensajes del Chat"
+
+#: .\common\templates\common\include\breadcrumb.html:10
+#: .\common\templates\common\include\breadcrumb.html:15
+#: .\core\templates\core\index.html:4
+msgid "Home"
+msgstr "Inicio"
+
+#: .\common\templates\common\include\paginator.html:4
+#, python-format
+msgid "Pagination for %(model)s"
+msgstr "Paginación para %(model)s"
+
+#: .\common\templates\common\include\paginator.html:7
+msgid "First"
+msgstr "Primero"
+
+#: .\common\templates\common\include\paginator.html:14
+#: .\common\templates\common\include\paginator.html:19
+#: .\roleplay\templates\roleplay\include\world_image_carousel.html:21
+msgid "Previous"
+msgstr "Anterior"
+
+#: .\common\templates\common\include\paginator.html:26
+msgid "current"
+msgstr "actual"
+
+#: .\common\templates\common\include\paginator.html:32
+#: .\common\templates\common\include\paginator.html:36
+#: .\roleplay\templates\roleplay\include\world_image_carousel.html:25
+msgid "Next"
+msgstr "Siguiente"
+
+#: .\common\templates\common\include\paginator.html:40
+msgid "Last"
+msgstr "Último"
+
+#: .\common\templates\errors\403.html:4
+msgid "Forbidden"
+msgstr "Prohibido"
+
+#: .\common\templates\errors\403.html:8
+msgid "You shall not pass!"
+msgstr "¡No puedes pasar!"
+
+#: .\common\templates\errors\403.html:9
+msgid "'cause page returned 403"
+msgstr "porque la web ha dado error 403"
+
+#: .\common\templates\errors\403.html:14
+msgid ""
+"It seems you are trying to perform an action for which you are not allowed"
+msgstr ""
+"Parece que estás intentando realizar un acción para la que no tienes permiso"
+
+#: .\common\templates\errors\403.html:15
+msgid "Maybe you should"
+msgstr "A lo mejor deberías"
+
+#: .\common\templates\errors\403.html:15 .\common\templates\errors\500.html:17
+msgid "go back"
+msgstr "volver"
+
+#: .\common\templates\errors\404.html:4
+msgid "Mistery"
+msgstr "Misterio"
+
+#: .\common\templates\errors\404.html:8
+msgid "Seems like the resource you are looking for is missing"
+msgstr "Parece que lo que estás buscando ha desaparecido"
+
+#: .\common\templates\errors\404.html:9
+msgid "Don't worry, our best man is on case"
+msgstr "No te preocupes, nuestro mejor hombre está en el caso"
+
+#: .\common\templates\errors\404.html:14
+msgid "Meanwhile what about"
+msgstr "Mientras tanto qué tal so"
+
+#: .\common\templates\errors\404.html:14
+msgid "going back"
+msgstr "volvemos"
+
+#: .\common\templates\errors\500.html:4
+msgid "Boom"
+msgstr "Boom"
+
+#: .\common\templates\errors\500.html:8
+msgid "One of our robots have just exploded"
+msgstr "Uno de nuestros robots acaba de explotar"
+
+#: .\common\templates\errors\500.html:10
+msgid ""
+"But don't panic, it's not like they're gonna reveal against us... Right?"
+msgstr ""
+"Pero no te preocupes, no es como que se vayan a revelar contra la "
+"humanidad... ¿Verdad?"
+
+#: .\common\templates\errors\500.html:16
+msgid "Meanwhile why don't you try to escap... I mean"
+msgstr "Mientras porqué no tratas de escap- ... Quiero decir"
+
+#: .\common\validators\files.py:16
+#, python-format
+msgid "Size should not exceed %(megabytes)s MiB"
+msgstr "El tamaño no debe exceder los %(megabytes)s MiB"
+
+#: .\common\validators\files.py:18
+msgid "File too large"
+msgstr "Archivo demasiado grande"
+
+#: .\common\views\list.py:29
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "La página indicada no es “last” ni puede ser convertida en número."
+
+#: .\common\views\list.py:34
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Página inválida (%(page_number)s): %(message)s"
+
+#: .\core\consumers.py:16 .\tests\core\test_consumers.py:45
+msgid "Non existent type"
+msgstr "Tipo inexistente"
+
+#: .\core\consumers.py:27 .\tests\core\test_consumers.py:26
+msgid "No type given"
+msgstr "No se ha indica el tipo"
+
+#: .\core\models.py:18
+msgid "Entry updated at"
+msgstr "Registro actualizado el"
+
+#: .\core\templates\core\includes\about_the_project.html:6
+msgid "About the project"
+msgstr "Sobre el proyecto"
+
+#: .\core\templates\core\includes\about_the_project.html:10
+msgid ""
+"Oil &amp; Rope was born from the problem that some websites for managing "
+"roleplay games are quite <i>rough</i>."
+msgstr ""
+"Oil &amp; Rope nació como solución un problema: la gestión <i>tosca</i> de "
+"juegos de mesa en línea."
+
+#: .\core\templates\core\includes\about_the_project.html:12
+msgid "So the very goal of this website is to bring something fresh"
+msgstr "El objetivo final de esta web es traer algo nuevo"
+
+#: .\core\templates\core\includes\about_the_project.html:13
+msgid "Something useful"
+msgstr "Algo útil"
+
+#: .\core\templates\core\includes\about_the_project.html:14
+msgid "Something intuitive"
+msgstr "Algo intuitivo"
+
+#: .\core\templates\core\includes\about_the_project.html:15
+msgid "A web manager made by roleplayers for roleplayers"
+msgstr "Un gestor de juegos de mesa para jugadores"
+
+#: .\core\templates\core\includes\about_the_project.html:20
+msgid "Contributing"
+msgstr "Contribuir"
+
+#: .\core\templates\core\includes\about_the_project.html:24
+msgid ""
+"Oil &amp; Rope is an open-source project and can be found on <a href="
+"\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white\">GitHub</"
+"a>."
+msgstr ""
+"Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a "
+"href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white"
+"\">GitHub</a>."
+
+#: .\core\templates\core\includes\about_the_project.html:26
+msgid ""
+"The best way to contribute with us apart from helping us to code is enjoying "
+"the website itself, sharing with friends, giving us some feedback..."
+msgstr ""
+"La mejor manera de contribuir sin aportar al código es disfruntando de la "
+"web en sí, compartiendo y enviándonos comentarios..."
+
+#: .\core\templates\core\includes\about_the_project.html:28
+msgid "We really appreciate any kind of effort"
+msgstr "Apreciamos cualquier tipo de esfuerzo"
+
+#: .\core\templates\core\includes\about_the_project.html:34
+#, fuzzy
+#| msgid "Begin the experience"
+msgid "Begin the experience!"
+msgstr "¡Comienza tu aventura!"
+
+#: .\core\templates\core\includes\about_the_project.html:40
+msgid "Check us out on GitHub"
+msgstr "Visítanos en GitHub"
+
+#: .\core\templates\core\includes\about_the_project.html:47
+msgid "Share"
+msgstr "Compartir"
+
+#: .\core\templates\core\includes\about_us.html:7
+msgid "About us"
+msgstr "Sobre nosotros"
+
+#: .\core\templates\core\includes\about_us.html:11
+msgid ""
+"We are a group of people with different professional profiles (developers, "
+"designers, composers, …) and one thought in common,<br><i class=\"font-"
+"weight-bold\">\"make an incredible experience for roleplaying online!\"</i>."
+msgstr ""
+"Somos un grupo de personas con diferentes perfiles profesionales "
+"(desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i "
+"class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
+
+#: .\core\templates\core\includes\about_us.html:18
+msgid "How?"
+msgstr "¿Cómo?"
+
+#: .\core\templates\core\includes\about_us.html:20
+msgid "Helping you to"
+msgstr "Ayudándote a"
+
+#: .\core\templates\core\includes\about_us.html:31
+msgid "build"
+msgstr "construir"
+
+#: .\core\templates\core\includes\about_us.html:32
+msgid "Worlds, cities, races, stories..."
+msgstr "Mundos, ciudades, razas, historias..."
+
+#: .\core\templates\core\includes\about_us.html:41
+msgid "play secure"
+msgstr "jugar de manera segura"
+
+#: .\core\templates\core\includes\about_us.html:42
+msgid "All your data is stored and encrypted"
+msgstr "Todos los datos almacenados son encriptados"
+
+#: .\core\templates\core\includes\about_us.html:51
+msgid "connect"
+msgstr "conectar"
+
+#: .\core\templates\core\includes\about_us.html:52
+msgid "Make relationships in-between your world"
+msgstr "Organiza las relaciones de tu mundo"
+
+#: .\core\templates\core\includes\about_us.html:61
+msgid "play"
+msgstr "jugar"
+
+#: .\core\templates\core\includes\about_us.html:62
+msgid "Create, fight, explore and have fun!"
+msgstr "Crear, luchar, explorar ¡y divertirse!"
+
+#: .\core\templates\core\includes\about_us.html:71
+msgid "write"
+msgstr "escribir"
+
+#: .\core\templates\core\includes\about_us.html:72
+msgid "Your own story, your epic revolution"
+msgstr "Tu propia historia, tu épica revolución"
+
+#: .\core\templates\core\includes\about_us.html:81
+msgid "adapt"
+msgstr "adaptarte"
+
+#: .\core\templates\core\includes\about_us.html:82
+msgid "Control your game in every device"
+msgstr "Controla tu partida desde cualquier dispositivo"
+
+#: .\core\templates\core\includes\about_us.html:91
+msgid "communicate"
+msgstr "comunicar"
+
+#: .\core\templates\core\includes\about_us.html:92
+msgid "Playing in both website and Discord server"
+msgstr "Juega tanto en la web como a través de Discord"
+
+#: .\core\templates\core\includes\about_us.html:101
+msgid "share"
+msgstr "compartir"
+
+#: .\core\templates\core\includes\about_us.html:102
+msgid "Make amazing worlds for everyone to enjoy"
+msgstr "Haz cosas increíbles que todos puedan disfrutar"
+
+#: .\core\templates\core\includes\about_us.html:108
+#, fuzzy
+#| msgid "Join now"
+msgid "Join now!"
+msgstr "¡Únete ahora!"
+
+#: .\core\templates\core\includes\menu.html:10
+msgid "Logo"
+msgstr "Logo"
+
+#: .\core\templates\core\includes\menu.html:15
+msgid "Toggle navigation"
+msgstr "Activar navegación"
+
+#: .\core\templates\core\includes\menu.html:71 .\registration\forms.py:39
+#: .\registration\templates\registration\login.html:6
+msgid "Login"
+msgstr "Acceder"
+
+#: .\core\templates\core\includes\menu.html:78
+#: .\registration\templates\registration\register.html:6
+#: .\registration\templates\registration\register.html:19
+msgid "Create your account"
+msgstr "Crea tu cuenta"
+
+#: .\core\templates\core\includes\menu.html:91
+msgid "Admin panel"
+msgstr "Panel de Admin"
+
+#: .\core\templates\core\includes\menu.html:105
+msgid "Logout"
+msgstr "Salir"
+
+#: .\core\templates\core\includes\opengraph_protocol.html:5
+#: .\core\templates\core\includes\opengraph_protocol.html:16
+msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
+msgstr ""
+"Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
+
+#: .\dynamic_menu\enums.py:6
+msgid "Standard menu"
+msgstr "Menú estándar"
+
+#: .\dynamic_menu\enums.py:7
+msgid "Context menu"
+msgstr "Menú contextual"
+
+#: .\dynamic_menu\models.py:92
+msgid "Prepended Text"
+msgstr "Texto antepuesto"
+
+#: .\dynamic_menu\models.py:94
+msgid "Appended Text"
+msgstr "Texto pospuesto"
+
+#: .\dynamic_menu\models.py:97
+msgid "Parent Menu"
+msgstr "Menú padre"
+
+#: .\dynamic_menu\models.py:98
+msgid "URL Resolver"
+msgstr "Resolutor de URL"
+
+#: .\dynamic_menu\models.py:100
+msgid "Extra URL Parameters"
+msgstr "Parámetros extra de URL"
+
+#: .\dynamic_menu\models.py:102
+msgid "Order"
+msgstr "Orden"
+
+#: .\dynamic_menu\models.py:105
+msgid "Permissions required"
+msgstr "Permisos necesarios"
+
+#: .\dynamic_menu\models.py:106
+msgid "Staff Required"
+msgstr "Permiso de Staff"
+
+#: .\dynamic_menu\models.py:107
+msgid "SuperUser Required"
+msgstr "Permiso de SuperUsuario"
+
+#: .\dynamic_menu\models.py:109
+msgid "Icon"
+msgstr "Icono"
+
+#: .\dynamic_menu\models.py:111
+msgid "Related Model"
+msgstr "Modelo Relacionado"
+
+#: .\dynamic_menu\models.py:114
+msgid "Menu Type"
+msgstr "Tipo de Menú"
+
+#: .\dynamic_menu\models.py:141
+msgid "Dynamic Menu"
+msgstr "Menú Dinámico"
+
+#: .\dynamic_menu\models.py:142
+msgid "Dynamic Menus"
+msgstr "Memús Dinámicos"
+
+#: .\email\templates\email_templates\confirm_email.html:6
+msgid "Welcome to Oil &amp; Rope traveller!"
+msgstr "¡Bienvenido a Oil &amp; Rope viajero!"
+
+#: .\email\templates\email_templates\confirm_email.html:12
+msgid ""
+"Before you start, please make sure to activate your account by clicking in "
+"the link below"
+msgstr ""
+"Antes de empezar, por favor asegúrese de activar su cuenta accediendo al "
+"link de debajo"
+
+#: .\email\templates\email_templates\confirm_email.html:17
+msgid "Activate account"
+msgstr "Activar cuenta"
+
+#: .\email\templates\email_templates\password_reset_email.html:13
+msgid ""
+"You've received this email because your account has been requested for a "
+"password reset"
+msgstr ""
+"Has recibido este email porque se ha pedido un cambio de contraseña para su "
+"cuenta"
+
+#: .\email\templates\email_templates\password_reset_email.html:14
+msgid "To accomplish the requested task please click on link below"
+msgstr "Para realizar dicha tarea has click en el link de debajo"
+
+#: .\email\templates\email_templates\password_reset_email.html:17
+msgid "Reset password"
+msgstr "Restaurar contraseña"
+
+#: .\oilandrope\settings.py:191
+msgid "English"
+msgstr "Inglés"
+
+#: .\oilandrope\settings.py:192
+msgid "Spanish"
+msgstr "Español"
+
+#: .\registration\forms.py:48
+msgid "Forgot password?"
+msgstr "¿Olvidaste la contraseña?"
+
+#: .\registration\forms.py:54 .\registration\forms.py:287
+#: .\registration\templates\registration\resend_email.html:13
+msgid "Resend email"
+msgstr "Reenviar email"
+
+#: .\registration\forms.py:74
+msgid "Discord Identifier"
+msgstr "Identificador de Discord"
+
+#: .\registration\forms.py:77
+msgid ""
+"If you have a Discord Account you want to link with just give us your ID!"
+msgstr ""
+"Si tienes una cuenta de Discord que quieras asociar con la web tan solo "
+"danos el ID"
+
+#: .\registration\forms.py:132
+msgid "Register"
+msgstr "Registrarse"
+
+#: .\registration\forms.py:152
+msgid "This email is already in use"
+msgstr "Este email ya está en uso"
+
+#: .\registration\forms.py:203 .\registration\views.py:189
+msgid "Welcome to Oil & Rope!"
+msgstr "¡Bienvenido a Oil & Rope!"
+
+#: .\registration\forms.py:216
+#, fuzzy
+#| msgid "User not found."
+msgid "User not found"
+msgstr "Usuario no encontrado"
+
+#: .\registration\forms.py:216
+msgid "Have you requested invitation?"
+msgstr "¿Has solicitado una invitación?"
+
+#: .\registration\forms.py:262
+msgid "We will send you an email to confirm your account"
+msgstr "Te enviaremos un email para confirmar tu cuenta"
+
+#: .\registration\forms.py:272
+msgid "Email address"
+msgstr "Dirección de Email"
+
+#: .\registration\forms.py:273
+msgid "Enter your email address and we'll resend you the confirmation email"
+msgstr "Introduce tu dirección de email y te reenviareos el email de confirmación"
+
+#: .\registration\forms.py:297 .\registration\forms.py:329
+msgid "This email doesn't belong to a user"
+msgstr "Este email no pertenece a ningún usuario"
+
+#: .\registration\forms.py:309
+msgid "We will send you a recovery link to this email"
+msgstr "Te enviaremos un link de recuperación a este email"
+
+#: .\registration\forms.py:318
+msgid "Send email"
+msgstr "Enviar email"
+
+#: .\registration\forms.py:350
+msgid "Change password"
+msgstr "Cambiar contraseña"
+
+#: .\registration\models.py:60
+msgid "Biography"
+msgstr "Biografía"
+
+#: .\registration\models.py:61
+msgid "Birthday"
+msgstr "Fecha de nacimiento"
+
+#: .\registration\models.py:67
+msgid "Language"
+msgstr "Idioma"
+
+#: .\registration\models.py:69
+msgid "Alias"
+msgstr "Alias"
+
+#: .\registration\models.py:70
+msgid "Website"
+msgstr "Sitio web"
+
+#: .\registration\models.py:71
+msgid "Avatar"
+msgstr "Avatar"
+
+#: .\registration\models.py:81
+msgid "Profile"
+msgstr "Perfil"
+
+#: .\registration\models.py:82
+msgid "Profiles"
+msgstr "Perfiles"
+
+#: .\registration\templates\registration\login.html:54
+msgid "Don't have an account?"
+msgstr "¿No tienes una cuenta?"
+
+#: .\registration\templates\registration\login.html:56
+msgid "Join now"
+msgstr "¡Únete ahora!"
+
+#: .\registration\templates\registration\password_change.html:6
+msgid "New password"
+msgstr "Nueva contraseña"
+
+#: .\registration\templates\registration\password_reset.html:22
+#: .\registration\templates\registration\resend_email.html:20
+msgid "Go back"
+msgstr "Volver"
+
+#: .\registration\templates\registration\register.html:15
+msgid "Start your adventure"
+msgstr "Comienza tu aventura"
+
+#: .\registration\templates\registration\register.html:19
+msgid "Take the first step"
+msgstr "Da el primer paso"
+
+#: .\registration\templates\registration\register.html:21
+msgid "Your world awaits"
+msgstr "Tu mundo espera"
+
+#: .\registration\templates\registration\resend_email.html:5
+msgid "Resend confirmation email"
+msgstr "Reenviar email de confirmación"
+
+#: .\registration\views.py:34 .\tests\registration\test_views.py:64
+msgid "Seems like this user is inactive"
+msgstr "Parece que este usuario está inactivo"
+
+#: .\registration\views.py:35 .\tests\registration\test_views.py:65
+msgid "Have you confirmed your email?"
+msgstr "¿Has confirmado tu email?"
+
+#: .\registration\views.py:63 .\tests\registration\test_views.py:119
+msgid "User created"
+msgstr "Usuario creado"
+
+#: .\registration\views.py:64 .\tests\registration\test_views.py:120
+#: .\tests\registration\test_views.py:135
+msgid "Please confirm your email"
+msgstr "Por favor confirma tu email"
+
+#: .\registration\views.py:135
+msgid "Your email has been confirmed"
+msgstr "Tu email ha sido confirmado"
+
+#: .\registration\views.py:198 .\tests\registration\test_views.py:262
+msgid "Your confirmation email has been sent"
+msgstr "Tu email de confirmación ha sido enviado"
+
+#: .\registration\views.py:201 .\tests\registration\test_views.py:291
+msgid "Multiple users with same email, please contact our developers"
+msgstr "Múltiples usuarios tienen el mismo email, por favor contacta con nuestro equipo"
+
+#: .\registration\views.py:214
+msgid "Password reset"
+msgstr "Restaurar contraseña"
+
+#: .\registration\views.py:223 .\tests\registration\test_views.py:324
+msgid "Email for password reset request sent!"
+msgstr "Se ha enviado un email con la petición de restauración de contraseña"
+
+#: .\registration\views.py:238 .\tests\registration\test_views.py:374
+msgid "Password changed successfully!"
+msgstr "¡Contraseña cambiada correctamente!"
+
+#: .\roleplay\enums.py:6 .\roleplay\models.py:46
+msgid "Domain"
+msgstr "Dominio"
+
+#: .\roleplay\enums.py:7
+msgid "Subdomain"
+msgstr "Subdominio"
+
+#: .\roleplay\enums.py:11
+msgid "House"
+msgstr "Casa"
+
+#: .\roleplay\enums.py:12
+msgid "Town"
+msgstr "Pueblo"
+
+#: .\roleplay\enums.py:13
+msgid "Village"
+msgstr "Villa"
+
+#: .\roleplay\enums.py:14
+msgid "City"
+msgstr "Ciudad"
+
+#: .\roleplay\enums.py:15
+msgid "Metropolis"
+msgstr "Metrópolis"
+
+#: .\roleplay\enums.py:16
+msgid "Forest"
+msgstr "Bosque"
+
+#: .\roleplay\enums.py:17
+msgid "Hills"
+msgstr "Colinas"
+
+#: .\roleplay\enums.py:18
+msgid "Mountains"
+msgstr "Montañas"
+
+#: .\roleplay\enums.py:19
+msgid "Mines"
+msgstr "Minas"
+
+#: .\roleplay\enums.py:20
+msgid "River"
+msgstr "Río"
+
+#: .\roleplay\enums.py:21
+msgid "Sea"
+msgstr "Mar"
+
+#: .\roleplay\enums.py:22
+msgid "Desert"
+msgstr "Desierto"
+
+#: .\roleplay\enums.py:23
+msgid "Tundra"
+msgstr "Tundra"
+
+#: .\roleplay\enums.py:24
+msgid "Unusual"
+msgstr "Inusual"
+
+#: .\roleplay\enums.py:25
+msgid "Island"
+msgstr "Isla"
+
+#: .\roleplay\enums.py:26
+msgid "Country"
+msgstr "País"
+
+#: .\roleplay\enums.py:27
+msgid "Continent"
+msgstr "Continente"
+
+#: .\roleplay\enums.py:28
+#: .\roleplay\templates\roleplay\world\world_create.html:5
+msgid "World"
+msgstr "Mundo"
+
+#: .\roleplay\forms.py:26
+msgid "Write something about your world, its civilizations, its culture..."
+msgstr "Escribe algo sobre tu mundo, sus civilizaciones, sus culturas..."
+
+#: .\roleplay\forms.py:37
+msgid "Clean"
+msgstr "Limpiar"
+
+#: .\roleplay\forms.py:47
+msgid "A picture is worth a thousand words"
+msgstr "Una imagen vale más que mil palabras"
+
+#: .\roleplay\forms.py:47
+msgid "Max size file"
+msgstr "Tamaño máximo del archivo"
+
+#: .\roleplay\models.py:31
+msgid "Domain type"
+msgstr "Tipo de dominio"
+
+#: .\roleplay\models.py:33 .\roleplay\models.py:83 .\roleplay\models.py:293
+msgid "Image"
+msgstr "Imagen"
+
+#: .\roleplay\models.py:47
+msgid "Domains"
+msgstr "Dominios"
+
+#: .\roleplay\models.py:81
+msgid "Site type"
+msgstr "Tipo de lugar"
+
+#: .\roleplay\models.py:85
+msgid "Parent site"
+msgstr "Lugar padre"
+
+#: .\roleplay\models.py:234
+msgid "Place"
+msgstr "Lugar"
+
+#: .\roleplay\models.py:235
+msgid "Places"
+msgstr "Lugares"
+
+#: .\roleplay\models.py:241 .\roleplay\models.py:246
+msgid "A private world must have owner"
+msgstr "Un mundo privado debe tener propietario"
+
+#: .\roleplay\models.py:285
+msgid "Strength"
+msgstr "Fuerza"
+
+#: .\roleplay\models.py:286
+msgid "Dexterity"
+msgstr "Destreza"
+
+#: .\roleplay\models.py:287
+msgid "Constitution"
+msgstr "Constitución"
+
+#: .\roleplay\models.py:288
+msgid "Intelligence"
+msgstr "Inteligencia"
+
+#: .\roleplay\models.py:289
+msgid "Wisdom"
+msgstr "Sabiduría"
+
+#: .\roleplay\models.py:290
+msgid "Charisma"
+msgstr "Carisma"
+
+#: .\roleplay\models.py:291
+msgid "Affected by armor"
+msgstr "Afectado por la armadura"
+
+#: .\roleplay\models.py:292
+msgid "Declares if this race is affected by armor penalties"
+msgstr "Indica si la raza es afectada por penalizadores al llevar armadura"
+
+#: .\roleplay\models.py:313 .\roleplay\models.py:337
+msgid "Race"
+msgstr "Raza"
+
+#: .\roleplay\models.py:314
+msgid "Races"
+msgstr "Razas"
+
+#: .\roleplay\models.py:339
+msgid "Ownership"
+msgstr "Propiedad"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:12
+msgid "No description provided"
+msgstr "No se ha dado ninguna descripción"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:21
+msgid "View details"
+msgstr "Ver detalles"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:26
+#: .\roleplay\templates\roleplay\world\world_detail.html:69
+#: .\roleplay\templates\roleplay\world\world_update.html:5
+msgid "Edit"
+msgstr "Editar"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:37
+msgid "Create campaign"
+msgstr "Crear campaña"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:42
+msgid "Create city"
+msgstr "Crear ciudad"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:46
+msgid "Settings"
+msgstr "Opciones"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:51
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:3
+#: .\roleplay\templates\roleplay\world\world_detail.html:75
+msgid "Delete"
+msgstr "Borrar"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:51
+msgid "world"
+msgstr "mundo"
+
+#: .\roleplay\templates\roleplay\include\world_card.html:63
+#, python-format
+msgid "Used in %(sessions)s session"
+msgid_plural "Used in %(sessions)s sessions"
+msgstr[0] "Usado en %(sessions)s sesión"
+msgstr[1] "Usado en %(sessions)s sesiones"
+
+#: .\roleplay\templates\roleplay\world\include\tree_view.html:7
+msgid "Show"
+msgstr "Ver"
+
+#: .\roleplay\templates\roleplay\world\include\tree_view.html:7
+msgid "Hide"
+msgstr "Ocultar"
+
+#: .\roleplay\templates\roleplay\world\include\tree_view.html:7
+msgid "World structure"
+msgstr "Estructura del mundo"
+
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:22
+msgid "Are you sure traveller?"
+msgstr "¿Estás seguro viajero?"
+
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:25
+msgid "Do you really want to erase this world and all its inhabitants?"
+msgstr "¿De verdad quieres borrar este mundo y todos su habitantes?"
+
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:26
+msgid "This action cannot be undone"
+msgstr "Esta acción no puede ser deshecha"
+
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:33
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: .\roleplay\templates\roleplay\world\world_confirm_delete.html:35
+msgid "Erase"
+msgstr "Borrar"
+
+#: .\roleplay\templates\roleplay\world\world_create.html:13
+msgid "Create your world"
+msgstr "Crear mundo"
+
+#: .\roleplay\templates\roleplay\world\world_detail.html:32
+msgid "Detail"
+msgstr "Detalle"
+
+#: .\roleplay\templates\roleplay\world\world_detail.html:44
+#, python-format
+msgid "Created by %(creator)s (%(created)s)"
+msgstr "Creado por %(creator)s (%(created)s)"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:4
+msgid "Worlds"
+msgstr "Mundos"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:16
+msgid "Seems like you haven't any world"
+msgstr "Parece que aún no tienes ningún mundo"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:17
+msgid "Create one"
+msgstr "Crear uno"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:21
+#: .\roleplay\templates\roleplay\world\world_list.html:56
+msgid "Create world"
+msgstr "Crear mundo"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:26
+msgid "Your world"
+msgid_plural "Your worlds"
+msgstr[0] "Tu mundo"
+msgstr[1] "Tus mundos"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:27
+msgid "Create new world"
+msgstr "Crear un nuevo mundo"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:45
+msgid "Create private world"
+msgstr "Crear un mundo privado"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:52
+msgid "Seems like we don't have comunity worlds"
+msgstr "Parece que no tenemos mundos comunitarios"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:53
+msgid "Would you like to create one?"
+msgstr "¿Te gustaría crear uno?"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:60
+#, python-format
+msgid "Checkout our community world"
+msgid_plural "Checkout our %(counter)s community worlds"
+msgstr[0] "Échale un ojo a nuestro mundo comunitario"
+msgstr[1] "Échale un ojo a nuestros %(counter)s mundos comunitarios"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:61
+msgid "Create community world"
+msgstr "Crear mundo comunitario"
+
+#: .\roleplay\templates\roleplay\world\world_list.html:79
+msgid "Create public world"
+msgstr "Crear mundo público"
+
+#: .\roleplay\templates\roleplay\world\world_update.html:13
+msgid "Editting"
+msgstr "Editando"
+
+#: .\roleplay\views.py:143
+msgid "Update"
+msgstr "Actualizar"
+
+#: .\tests\registration\test_views.py:134
+msgid "User created!"
+msgstr "¡Usuario creado!"

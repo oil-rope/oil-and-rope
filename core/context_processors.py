@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import get_language_from_request
 
 from registration.models import Profile
 
@@ -8,8 +9,9 @@ def language(request):
     Sets language depending on the profile.
     """
 
+    language = get_language_from_request(request)
     content = {
-        'lan': settings.LANGUAGE_CODE,
+        'lan': language if language else settings.LANGUAGE_CODE,
         'languages': dict(settings.LANGUAGES).keys(),
     }
 

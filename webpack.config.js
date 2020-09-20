@@ -6,6 +6,7 @@ module.exports = {
 	entry: {
 		Calendar: "./frontend/src/renderCalendar.jsx",
 		UserCheckButton: "./frontend/src/renderUserCheckButton.jsx",
+		Chat: "./frontend/src/renderChat.jsx"
 	},
 	output: {
 		publicPath: PUBLIC_PATH,

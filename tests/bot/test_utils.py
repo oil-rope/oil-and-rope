@@ -1,69 +1,70 @@
-from django.test import TestCase
-from faker import Faker
 
-from bot.exceptions import OilAndRopeException
+import pytest
+from django.contrib.sites.models import Site
+from django.shortcuts import reverse
+from model_bakery import baker
+
 from bot.models import DiscordServer, DiscordTextChannel, DiscordUser
-from bot.utils import get_or_create_discord_server, get_or_create_discord_text_channel, get_or_create_discord_user
+from bot.utils import (get_or_create_discord_server, get_or_create_discord_text_channel, get_or_create_discord_user,
+                       get_url_from)
+from common.tools.sync import async_get
 
 from .helpers import mocks
 
 
-class TestBotUtils(TestCase):
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_get_or_create_discord_user_ok():
+    member = mocks.MemberMock()
 
-    def setUp(self):
-        self.faker = Faker()
-        self.member = mocks.MemberMock()
-        self.guild = mocks.GuildMock()
-        self.text_channel = mocks.TextChannelMock()
+    discord_user = await get_or_create_discord_user(member)
+    await async_get(DiscordUser, pk=discord_user.pk)
 
-    def test_get_or_create_discord_user_ok(self):
-        # Unexistent member
-        self.assertFalse(DiscordUser.objects.exists())
-        entry = get_or_create_discord_user(self.member)
-        self.assertEqual(1, DiscordUser.objects.count())
-        self.assertEqual(str(self.member.id), str(entry.id))
 
-        # Existent member
-        entry = get_or_create_discord_user(self.member)
-        self.assertEqual(1, DiscordUser.objects.count())
-        self.assertEqual(str(self.member.id), str(entry.id))
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_get_or_create_discord_server_ok():
+    guild = mocks.GuildMock()
+    member = guild.owner
+    await get_or_create_discord_user(member)
 
-    def test_get_or_create_discord_user_without_member_ko(self):
-        # Unexistent member
-        self.assertFalse(DiscordUser.objects.exists())
-        with self.assertRaises(OilAndRopeException) as ex:
-            get_or_create_discord_user(None)
-        exception_msg = 'Discord User cannot be None.'
-        self.assertEqual(exception_msg, str(ex.exception))
+    discord_server = await get_or_create_discord_server(guild)
+    await async_get(DiscordServer, pk=discord_server.pk)
 
-    def test_get_or_create_discord_server_ok(self):
-        # First we need to create the owner
-        get_or_create_discord_user(self.guild.owner)
 
-        # Unexistent sever
-        self.assertFalse(DiscordServer.objects.exists())
-        entry = get_or_create_discord_server(self.guild)
-        self.assertEqual(1, DiscordServer.objects.count())
-        self.assertEqual(str(self.guild.id), str(entry.id))
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_get_or_create_discord_text_channel_ok():
+    channel = mocks.TextChannelMock()
+    guild = channel.guild
+    member = guild.owner
+    await get_or_create_discord_user(member)
+    await get_or_create_discord_server(guild)
 
-        # Existent sever
-        entry = get_or_create_discord_server(self.guild)
-        self.assertEqual(1, DiscordServer.objects.count())
-        self.assertEqual(str(self.guild.id), str(entry.id))
+    discord_text_channel = await get_or_create_discord_text_channel(channel, guild)
+    await async_get(DiscordTextChannel, pk=discord_text_channel.pk)
 
-    def test_get_or_create_discord_text_channel(self):
-        # First we need to create the server
-        get_or_create_discord_server(self.text_channel.guild)
-        # Then we need to create the owner
-        get_or_create_discord_user(self.text_channel.guild.owner)
 
-        # Unexistent text channel
-        self.assertFalse(DiscordTextChannel.objects.exists())
-        entry = get_or_create_discord_text_channel(self.text_channel, self.text_channel.guild)
-        self.assertEqual(1, DiscordTextChannel.objects.count())
-        self.assertEqual(str(self.text_channel.id), str(entry.id))
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_get_url_from_without_kwargs_ok():
+    site = Site.objects.first()
+    url = reverse('core:home')
+    expected = f'http://{site.domain}{url}'
+    result = await get_url_from('core:home')
 
-        # Existent text channel
-        entry = get_or_create_discord_text_channel(self.text_channel, self.text_channel.guild)
-        self.assertEqual(1, DiscordTextChannel.objects.count())
-        self.assertEqual(str(self.text_channel.id), str(entry.id))
+    assert expected == result
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_get_url_from_with_kwargs_ok():
+    # We setup a world for testing
+    world = baker.make('roleplay.Place')
+    url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+
+    site = Site.objects.first()
+    expected = f'http://{site.domain}{url}'
+    result = await get_url_from('roleplay:world_detail', kwargs={'pk': world.pk})
+
+    assert expected == result

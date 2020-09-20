@@ -23,10 +23,24 @@ class TestOilAndRopeBot(TestCase):
             'BOT_TOKEN': self.faker.password()
         }
         self.env_file = tempfile.NamedTemporaryFile(mode='w', suffix='.env', dir='./tests/', delete=False)
+        self.copy_environ = {}
+
+        # Cleaning up Virtualenvironments
+        key = 'BOT_TOKEN'
+        if key in os.environ:
+            self.copy_environ.update({key: os.environ[key]})
+            del os.environ[key]
+        key = 'BOT_COMMAND_PREFIX'
+        if key in os.environ:
+            self.copy_environ.update({key: os.environ[key]})
+            del os.environ[key]
 
     def tearDown(self):
         self.env_file.close()
         os.unlink(self.env_file.name)
+
+        # Restoring env
+        os.environ.update(self.copy_environ)
 
     def test_init_ok(self):
         with patch.dict('os.environ', self.env_variables):
