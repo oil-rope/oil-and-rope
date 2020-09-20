@@ -53,27 +53,33 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
 
     async def send_message(self, content):
-        user = self.user
-        chat_id = content['chat']
-        msg_text = content['message']
-        message = await self.register_message(user.id, chat_id, msg_text)
-        data = serializers.ChatMessageSerializer(message).data
 
-        func = 'group_send_message'
-        content = {
-            'type': f'{func}',
-            'message': data
-        }
-
-        try:
-            await self.channel_layer.group_send(self.chat_group_name, content)
-        except TypeError:
-            # We send error message with serialized message and remove
+        if not self.user.is_authenticated:
             await self.send_json(
-                {'error': 'We couldn\'t send your message', 'message': data},
+                {'error': 'User is not authenticated.'},
                 close=True
             )
-            message.delete()
+        else:
+            chat_id = content['chat']
+            msg_text = content['message']
+            message = await self.register_message(self.user.id, chat_id, msg_text)
+            data = serializers.ChatMessageSerializer(message).data
+
+            func = 'group_send_message'
+            content = {
+                'type': f'{func}',
+                'message': data
+            }
+
+            try:
+                await self.channel_layer.group_send(self.chat_group_name, content)
+            except TypeError:
+                # We send error message with serialized message and remove
+                await self.send_json(
+                    {'error': 'We couldn\'t send your message', 'message': data},
+                    close=True
+                )
+                message.delete()
 
     async def group_send_message(self, content):
         message = content['message']
