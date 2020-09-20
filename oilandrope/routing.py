@@ -1,5 +1,6 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
 
 from bot.routing import websocket_urlpatterns as bot_ws_urls
 from chat.routing import websocket_urlpatterns as chat_ws_urls
@@ -14,9 +15,11 @@ def get_all_websocket_urlpatterns():
 
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            get_all_websocket_urlpatterns()
+    'websocket': AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter(
+                get_all_websocket_urlpatterns()
+            )
         )
     )
 })
