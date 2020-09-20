@@ -1,13 +1,20 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-from django.urls import re_path
 
-from bot import consumers as bot_consumers
+from bot.routing import websocket_urlpatterns as bot_ws_urls
+from chat.routing import websocket_urlpatterns as chat_ws_urls
+
+
+def get_all_websocket_urlpatterns():
+    """
+    Simple function to get everything inside a list.
+    """
+
+    return bot_ws_urls + chat_ws_urls
+
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
-        URLRouter([
-            re_path(r'^ws/bot/register/$', bot_consumers.BotConsumer)
-        ])
-    )
+    'websocket': AuthMiddlewareStack(URLRouter(
+        get_all_websocket_urlpatterns()
+    ))
 })

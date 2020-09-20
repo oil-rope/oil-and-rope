@@ -1,0 +1,25 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Chat" %}{% endblock title %}
+
+{% block body_content %}
+  <main class="container-fluid py-5">
+    <div class="row">
+      <div class="col-12">
+        <div id="reactChatRenderer"></div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script
+    src="{% static 'frontend/dist/Chat.bundle.js' %}"
+    data-renderer="#reactChatRenderer"
+    data-socket="{{ ws_url }}"
+    data-chat-info="{% url 'chat:api:chat-detail' chat.pk %}"
+    data-user-url="{% url 'registration:api:user-detail' user.pk %}"
+  ></script>
+{% endblock javascript %}
