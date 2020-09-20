@@ -18,8 +18,9 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
 
     @database_sync_to_async
     def register_message(self, author, chat_id, message):
+        author_id = author.id
         message = models.ChatMessage.objects.create(
-            author=author,
+            author_id=author_id,
             chat_id=chat_id,
             message=message,
         )
