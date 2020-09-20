@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 from django.views.generic import TemplateView
 
 from . import models
+import json
 
 
 class ChatView(LoginRequiredMixin, TemplateView):
@@ -31,6 +32,7 @@ class ChatView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['chat'] = models.Chat.objects.first()
+        context['session_key'] = self.request.session.session_key
         context['ws_url'] = self.get_websocket_url()
 
         return context

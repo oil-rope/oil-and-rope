@@ -7,7 +7,7 @@ import Axios from "axios";
 
 const Chat = React.lazy(() => import("./Chat"));
 
-const App = ({ socketURL, chatURL, userURL }) => {
+const App = ({ socketURL, chatURL, userURL, session }) => {
 	const [webSocket, setWebSocket] = useState(null);
 	const [chat, setChat] = useState(null);
 	const [user, setUser] = useState(null);
@@ -56,6 +56,7 @@ const App = ({ socketURL, chatURL, userURL }) => {
 		let data = JSON.stringify({
 			type: "setup_channel_layer",
 			chat: chat.id,
+			session_key: session,
 		});
 		webSocket.send(data);
 	};
@@ -108,6 +109,7 @@ const App = ({ socketURL, chatURL, userURL }) => {
 		webSocket: webSocket,
 		chat: chat,
 		user: user,
+		session: session,
 		setWebSocketOnMessage: setWebSocketOnMessage,
 		setWebSocketOnOpen: setWebSocketOnOpen,
 	};

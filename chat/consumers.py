@@ -1,9 +1,12 @@
 import logging
 
-from channels.auth import get_user
+from channels.auth import get_user, login
 from channels.db import database_sync_to_async
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.models import Session
 
+from common.tools.sync import async_get
 from core.consumers import HandlerJsonWebsocketConsumer
 
 from . import models, serializers
@@ -17,12 +20,6 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
 
     async def connect(self):
         await super().connect()
-        self.user = await get_user(self.scope)
-
-        if self.user.is_authenticated:
-            LOGGER.info('User %s connected.', self.user.username)
-        else:
-            LOGGER.info('Anonymous user connected.')
 
     async def disconnect(self, code):
         if self.chat_group_name:
@@ -39,9 +36,21 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         return message
 
     async def setup_channel_layer(self, content):
-        chat_id = content['chat']
-        self.chat_group_name = f'chat_{chat_id}'
-        await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
+        try:
+            # Since Hosts can be different due to 'live.oilandrope-project.com' we get
+            # user from Session instead from Middleware
+            session = await async_get(Session, pk=content['session_key'])
+            session_data = session.get_decoded()
+            user = await async_get(get_user_model(), pk=session_data['_auth_user_id'])
+            self.user = user
+            await login(self.scope, user)
+            await database_sync_to_async(self.scope["session"].save)()
+        except (Session.DoesNotExist, get_user_model().DoesNotExist, KeyError):
+            self.user = AnonymousUser()
+        finally:
+            chat_id = content['chat']
+            self.chat_group_name = f'chat_{chat_id}'
+            await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
 
     async def send_message(self, content):
         user = self.user

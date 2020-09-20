@@ -9,8 +9,14 @@ let element = document.querySelector(
 let wsURL = currentScript.getAttribute("data-socket");
 let chatInfoURL = currentScript.getAttribute("data-chat-info");
 let userURL = currentScript.getAttribute("data-user-url");
+let sessionKey = currentScript.getAttribute("data-session");
 
 ReactDOM.render(
-	<App socketURL={wsURL} chatURL={chatInfoURL} userURL={userURL} />,
+	<App
+		session={sessionKey}
+		socketURL={wsURL}
+		chatURL={chatInfoURL}
+		userURL={userURL}
+	/>,
 	element
 );
