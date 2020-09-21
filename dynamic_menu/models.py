@@ -1,12 +1,15 @@
 import logging
 
+from django.apps import apps
 from django.db import models
 from django.shortcuts import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
+from common.constants import models as constants
 from core.models import TracingMixin
 
 from .enums import MenuTypes
@@ -108,8 +111,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
                                              default=False)
     icon = models.FileField(verbose_name=_('Icon'), upload_to=dynamic_menu_path,
                             max_length=254, blank=True, null=True)
-    related_model = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_("Related Model"),
-                                           related_name='menus', blank=True)
+    related_models = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_('Related Models'),
+                                            related_name='menus', blank=True)
 
     menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
                                                  choices=MenuTypes.choices)
@@ -130,18 +133,57 @@ class DynamicMenu(MPTTModel, TracingMixin):
             # Checking for extra args
             if self.extra_urls_args:
                 url += self.extra_urls_args
-        except Exception as ex:
+        except NoReverseMatch as ex:
             logging.warning('Resolver for \'%s\' may not exists.',
                             self.url_resolver)
             logging.error('%s', ex)
         finally:
             return url
 
-    class Meta:
-        verbose_name = _('Dynamic Menu')
-        verbose_name_plural = _('Dynamic Menus')
+    def _get_permissions(self) -> set:
+        permissions = self.permissions_required.values_list(
+            'content_type__app_label',
+            'codename'
+        )
+        permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
+        return permissions
 
-    def __str__(self):
+    @property
+    def permissions(self) -> set:
+        """
+        Returns a set of permissions for this menu.
+        """
+
+        if hasattr(self, '_permissions_cache'):
+            if not self._permissions_cache and self.permissions_required.exists():
+                self._permissions_cache = self._get_permissions()
+            return self._permissions_cache
+
+        permissions = self._get_permissions()
+        setattr(self, '_permissions_cache', permissions)
+
+        return self._permissions_cache
+
+    @property
+    def models(self) -> set:
+        """
+        Returns a set of models related to this menu.
+        """
+
+        if hasattr(self, '_models_cache'):
+            return self._models_cache
+
+        models = self.related_models.values_list(
+            'app_label',
+            'model'
+        )
+        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
+        setattr(self, '_models_cache', models)
+
+        return self._models_cache
+
+    @property
+    def display_menu_name(self):
         menu_str = ''
 
         # Adding prepended_text
@@ -154,6 +196,62 @@ class DynamicMenu(MPTTModel, TracingMixin):
             menu_str += '  ' + mark_safe(self.appended_text)
 
         return menu_str
+
+    def add_permissions(self, *objs):
+        """
+        Takes a list of perms either :class:`str` (`app_label.codename`) or :class:`auth.Permission` instance.
+        """
+
+        Permission = apps.get_model(constants.PERMISSION_MODEL)
+        parsed_objs = []
+
+        for obj in objs:
+            if isinstance(obj, str):
+                # Perms are parsed from 'app_label.perm'
+                app_label, codename = obj.split('.', 1)
+                parsed_objs.append(
+                    Permission.objects.get(content_type__app_label=app_label, codename=codename)
+                )
+            else:
+                parsed_objs.append(obj)
+
+        self.permissions_required.add(*parsed_objs)
+
+    def add_models(self, *objs):
+        """
+        Takes a list of model either in :class:`str` (`app_label.model`), :class:`models.Model` subclass
+        or :class:`contenttypes.ContentType` instance format.
+        """
+
+        ContentType = apps.get_model(constants.CONTENT_TYPE_MODEL)
+        parsed_objs = []
+
+        for obj in objs:
+            if isinstance(obj, str):
+                # Models are parsed from 'app_label.model'
+                app_label, model = obj.lower().split('.', 1)
+                parsed_objs.append(
+                    ContentType.objects.get(app_label=app_label, model=model)
+                )
+            elif isinstance(obj, ContentType):
+                parsed_objs.append(obj)
+            elif hasattr(obj, '_meta') and issubclass(obj._meta.model, models.Model):
+                app_label, model = obj._meta.label.lower().split('.', 1)
+                parsed_objs.append(
+                    ContentType.objects.get(app_label=app_label, model=model)
+                )
+
+        self.related_models.add(*parsed_objs)
+
+    class Meta:
+        verbose_name = _('Dynamic Menu')
+        verbose_name_plural = _('Dynamic Menus')
+
+    class MPTTMeta:
+        order_insertion_by = ['order', 'name']
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         return self.url

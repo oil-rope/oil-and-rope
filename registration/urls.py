@@ -11,7 +11,7 @@ router.register(r'profile', viewsets.ProfileViewSet)
 app_name = 'registration'
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('api/', include((router.urls, 'api'))),
     path('login/', views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', views.SignUpView.as_view(), name='register'),

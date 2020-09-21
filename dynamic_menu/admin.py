@@ -39,5 +39,5 @@ class DynamicMenuAdmin(TranslationAdmin):
         'staff_required',
         'superuser_required',
     )
-    raw_id_fields = ('permissions_required', 'related_model')
+    raw_id_fields = ('permissions_required', 'related_models')
     search_fields = ('name',)

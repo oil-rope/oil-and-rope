@@ -36,6 +36,11 @@ services:
       - "gunicorn_sockets:/var/run/gunicorn/"
     working_dir: /app/
 
+  redis:
+    image: redis:latest
+    ports:
+      - "127.0.0.1:6379:6379"
+
   channels:
     image: oil-and-rope:latest
     command: /command.sh
@@ -46,6 +51,8 @@ services:
     entrypoint: /entrypoint.sh
     env_file:
       - ./compose/django/django.env
+    environment:
+      CHANNEL_LAYER_HOST: redis
     expose:
       - "80"
     volumes:
