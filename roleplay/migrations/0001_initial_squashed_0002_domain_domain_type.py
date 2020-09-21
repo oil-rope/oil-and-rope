@@ -5,8 +5,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('roleplay', '0001_initial'), ('roleplay', '0002_domain_domain_type')]
-
     dependencies = [
     ]
 

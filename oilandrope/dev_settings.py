@@ -43,3 +43,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Shell Plus Stuff
+SHELL_PLUS_PRINT_SQL = True
