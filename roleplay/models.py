@@ -373,6 +373,10 @@ class Session(TracingMixin):
         to=constants.USER_MODEL, verbose_name=_('GameMaster'), on_delete=models.CASCADE,
         related_name='gm_session_set', db_index=True
     )
+    world = models.ForeignKey(
+        to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
+        related_name='session_set', db_index=True, limit_choices_to=Place.objects.filter(site_type=SiteTypes.WORLD)
+    )
 
     class Meta:
         verbose_name = _('Session')

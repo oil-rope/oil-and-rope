@@ -440,6 +440,7 @@ class TestSession(TestCase):
     def setUpTestData(cls):
         cls.user = baker.make(constants.USER_MODEL)
         cls.chat = baker.make(constants.CHAT_MODEL)
+        cls.world = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.WORLD)
 
     def test_str_ok(self):
         name = self.fake.word()
@@ -448,6 +449,7 @@ class TestSession(TestCase):
             chat=self.chat,
             game_master=self.user,
             system=RoleplaySystems.PATHFINDER,
+            world=self.world,
         )
         expected = f'{name}'
 
@@ -458,6 +460,7 @@ class TestSession(TestCase):
             name=self.fake.word(),
             game_master=self.user,
             system=RoleplaySystems.PATHFINDER,
+            world=self.world,
         )
         instance.save()
 
