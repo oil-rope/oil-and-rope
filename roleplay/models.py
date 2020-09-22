@@ -12,6 +12,8 @@ from core.models import TracingMixin
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
+from roleplay.enums import RoleplaySystems
+from django.utils import timezone
 
 
 class Domain(TracingMixin):
@@ -357,17 +359,36 @@ class Session(TracingMixin):
     """
 
     name = models.CharField(verbose_name=_('Name'), max_length=100)
+    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
     players = models.ManyToManyField(get_user_model(), verbose_name=_('Players'), related_name='session_set')
     chat = models.ForeignKey(
         to=constants.CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE,
         related_name='session_set', db_index=True, blank=True
     )
+    next_game = models.DateTimeField(
+        verbose_name=_('Next session'), auto_now=False, auto_now_add=False, null=True, blank=True
+    )
+    system = models.PositiveSmallIntegerField(verbose_name=_('System'), choices=RoleplaySystems.choices)
+    game_master = models.ForeignKey(
+        to=constants.USER_MODEL, verbose_name=_('GameMaster'), on_delete=models.CASCADE,
+        related_name='gm_session_set', db_index=True
+    )
+
+    class Meta:
+        verbose_name = _('Session')
+        verbose_name_plural = _('Sessions')
 
     def save(self, *args, **kwargs):
-        if not self.chat:
-            Chat = apps.get_model(constants.CHAT_MESSAGE_MODEL)
-            formatted_date = self.entry_created_at.strftime('%Y%M%D_%H%m%S')
+        try:
+            Chat = apps.get_model(constants.CHAT_MODEL)
+            self.chat
+        except Session.chat.RelatedObjectDoesNotExist:
+            formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
             self.chat = Chat.objects.create(
                 name=f'{self.name}_{formatted_date}'
             )
-        super().save(*args, **kwargs)
+        finally:
+            super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name}'

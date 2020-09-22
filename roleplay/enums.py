@@ -7,6 +7,10 @@ class DomainTypes(models.IntegerChoices):
     SUBDOMAIN = 1, _('Subdomain')
 
 
+class RoleplaySystems(models.IntegerChoices):
+    PATHFINDER = 0, _('Pathfinder')
+
+
 class SiteTypes(models.IntegerChoices):
     HOUSE = 0, _('House')
     TOWN = 1, _('Town')
