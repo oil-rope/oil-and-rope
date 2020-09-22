@@ -340,3 +340,34 @@ class RaceUser(TracingMixin):
 
     def __str__(self):
         return f'{self.user.username} <-> {self.race.name}'
+
+
+class Session(TracingMixin):
+    """
+    This model manages sessions playing by the users.
+
+    Parameters
+    ----------
+    name: :class:`str`
+        Name of the session.
+    players: List[:class:`User`]
+        Players in session.
+    chat: :class:`Chat`
+        Caht used for this session.
+    """
+
+    name = models.CharField(verbose_name=_('Name'), max_length=100)
+    players = models.ManyToManyField(get_user_model(), verbose_name=_('Players'), related_name='session_set')
+    chat = models.ForeignKey(
+        to=constants.CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE,
+        related_name='session_set', db_index=True, blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.chat:
+            Chat = apps.get_model(constants.CHAT_MESSAGE_MODEL)
+            formatted_date = self.entry_created_at.strftime('%Y%M%D_%H%m%S')
+            self.chat = Chat.objects.create(
+                name=f'{self.name}_{formatted_date}'
+            )
+        super().save(*args, **kwargs)
