@@ -34,10 +34,13 @@ async def test_setup_channel_layer(url):
 
 @pytest.mark.django_db
 @pytest.mark.asyncio
-async def test_send_message_without_setup(url):
+async def test_send_message_without_setup(url, client):
     user = baker.make(models.USER_MODEL)
+    client.force_login(user)
+    request = client.get(url).wsgi_request
+
     communicator = WebsocketCommunicator(ChatConsumer, url)
-    communicator.scope['user'] = user
+    communicator.scope['session'] = request.session
 
     chat = baker.make(models.CHAT_MODEL)
     data = {
@@ -56,16 +59,21 @@ async def test_send_message_without_setup(url):
 
 @pytest.mark.django_db
 @pytest.mark.asyncio
-async def test_send_message(url):
+async def test_send_message(url, client):
     user = baker.make(models.USER_MODEL)
+    client.force_login(user)
+    request = client.get(url).wsgi_request
+    session = request.session
+
     communicator = WebsocketCommunicator(ChatConsumer, url)
-    communicator.scope['user'] = user
+    communicator.scope['session'] = session
 
     chat = baker.make(models.CHAT_MODEL)
     # Setup
     data = {
         'type': 'setup_channel_layer',
         'chat': chat.pk,
+        'session_key': session.session_key,
     }
     await communicator.send_json_to(data)
 
