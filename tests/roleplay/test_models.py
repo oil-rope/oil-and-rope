@@ -16,7 +16,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay import models
-from roleplay.enums import DomainTypes, SiteTypes, RoleplaySystems
+from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -451,11 +451,12 @@ class TestSession(TestCase):
             system=RoleplaySystems.PATHFINDER,
             world=self.world,
         )
-        expected = f'{name}'
+        created_at = instance.entry_created_at.strftime('%Y-%m-%d')
+        expected = f'{name} ({created_at})'
 
         self.assertEqual(expected, str(instance))
 
-    def test_save_without_chat(self):
+    def test_save_without_chat_ok(self):
         instance = self.model.objects.create(
             name=self.fake.word(),
             game_master=self.user,
@@ -466,3 +467,13 @@ class TestSession(TestCase):
 
         self.assertIsNotNone(instance.chat)
         self.assertIn(instance.name, instance.chat.name)
+
+    def test_non_world_ko(self):
+        place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
+        with self.assertRaisesRegex(ValidationError, 'World must be a world'):
+            self.model.objects.create(
+                name=self.fake.word(),
+                game_master=self.user,
+                system=RoleplaySystems.PATHFINDER,
+                world=place,
+            )

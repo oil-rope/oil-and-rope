@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -9,11 +10,10 @@ from common.constants import models as constants
 from common.files.upload import default_upload_to
 from common.validators import validate_file_size
 from core.models import TracingMixin
+from roleplay.enums import RoleplaySystems
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
-from roleplay.enums import RoleplaySystems
-from django.utils import timezone
 
 
 class Domain(TracingMixin):
@@ -375,16 +375,25 @@ class Session(TracingMixin):
     )
     world = models.ForeignKey(
         to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
-        related_name='session_set', db_index=True, limit_choices_to=Place.objects.filter(site_type=SiteTypes.WORLD)
+        related_name='session_set', db_index=True, limit_choices_to={'site_type': SiteTypes.WORLD}
     )
 
     class Meta:
         verbose_name = _('Session')
         verbose_name_plural = _('Sessions')
+        ordering = ['-entry_created_at', 'name']
+
+    def clean(self):
+        # Don't allow non Worlds to be world
+        if self.world.site_type != SiteTypes.WORLD:
+            msg = _('World must be a world')
+            raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):
+        Chat = apps.get_model(constants.CHAT_MODEL)
+        self.full_clean()
+
         try:
-            Chat = apps.get_model(constants.CHAT_MODEL)
             self.chat
         except Session.chat.RelatedObjectDoesNotExist:
             formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
@@ -395,4 +404,5 @@ class Session(TracingMixin):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.name}'
+        created_at = self.entry_created_at.strftime('%Y-%m-%d')
+        return f'{self.name} ({created_at})'
