@@ -5,7 +5,6 @@ from django.shortcuts import reverse
 from django.views.generic import TemplateView
 
 from . import models
-import json
 
 
 class ChatView(LoginRequiredMixin, TemplateView):

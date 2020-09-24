@@ -8,7 +8,7 @@ repository = "https://github.com/oil-rope/oil-and-rope/"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-Django = "^3"
+Django = "^3.1"
 channels = "^2"
 "discord.py" = {extras = ["voice"], version = "^1"}
 django-crispy-forms = "^1"
