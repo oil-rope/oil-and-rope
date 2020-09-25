@@ -165,6 +165,20 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         })
         return kwargs
 
+    def get_worlds(self):
+        """
+        Gets either community maps or user's private maps.
+        """
+
+        qs = models.Place.objects.community_places()
+        qs.union(models.Place.objects.user_places(self.request.user))
+        return qs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['world'].queryset = self.get_worlds()
+        return form
+
 
 class SessionDetailView(LoginRequiredMixin, DetailView):
     """

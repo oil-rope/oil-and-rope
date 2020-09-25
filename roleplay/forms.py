@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Field, Layout, Reset, Row, Submit
+from crispy_forms.layout import Column, Field, Fieldset, Layout, Reset, Row, Submit
 from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -75,6 +75,29 @@ class SessionForm(forms.ModelForm):
         self.game_master = request.user
 
         self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column('name'),
+                Column('system'),
+                Column('world'),
+            ),
+            Row(
+                Column('description'),
+            ),
+            Fieldset(
+                _('Next session'),
+                Column('next_game_date', css_class='col-6'),
+                Column('next_game_time', css_class='col-6'),
+                css_class='form-row text-center',
+            ),
+            Row(
+                Column(
+                    Submit('submit', _('Create'), css_class='w-100'),
+                    css_class='col-md-6'
+                ),
+                css_class='justify-content-md-center',
+            ),
+        )
 
     class Meta:
         model = models.Session
