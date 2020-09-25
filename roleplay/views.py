@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
@@ -150,3 +151,39 @@ class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
     success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world/world_confirm_delete.html'
+
+
+class SessionCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.SessionForm
+    model = models.Session
+    template_name = 'roleplay/session/session_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'request': self.request,
+        })
+        return kwargs
+
+
+class SessionDetailView(LoginRequiredMixin, DetailView):
+    """
+    This view controls active session for user.
+    """
+
+    model = models.Session
+    object = None
+    template_name = 'roleplay/session/session_detail.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        self.object = self.get_object()
+        self.players = self.object.players.all()
+        self.game_master = self.object.game_master
+
+        if user not in self.players and user != self.game_master:
+            msg = _('You are not part of this session')
+            messages.error(request, f'{msg}.')
+            return HttpResponseForbidden(content=f'{msg}.')
+
+        return super().dispatch(request, *args, **kwargs)

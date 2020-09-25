@@ -3,7 +3,8 @@ import tempfile
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
+from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
 from PIL import Image
@@ -115,3 +116,30 @@ class TestWorldForm(TestCase):
         self.assertIsNotNone(instance.image)
 
         os.unlink(instance.image.path)
+
+
+class TestSessionForm(TestCase):
+    fake = Faker()
+    form = forms.SessionForm
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+
+    def setUp(self):
+        self.rq = RequestFactory().get('/')
+        self.rq.user = self.user
+        self.data_ok = {
+            'name': self.fake.word(),
+            'description': self.fake.paragraph(),
+            'world': baker.make(models.Place, site_type=enums.SiteTypes.WORLD),
+            'system': enums.RoleplaySystems.PATHFINDER,
+            'next_game_date': timezone.now().date(),
+            'next_game_time': timezone.now().time(),
+        }
+
+    def test_data_ok(self):
+        form = self.form(self.rq, data=self.data_ok)
+        valid = form.is_valid()
+
+        self.assertTrue(valid, f'Errors: {form.errors.values()}')

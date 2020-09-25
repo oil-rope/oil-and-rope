@@ -14,6 +14,7 @@ from roleplay.enums import RoleplaySystems
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
+from django.urls import reverse
 
 
 class Domain(TracingMixin):
@@ -386,13 +387,16 @@ class Session(TracingMixin):
     world = models.ForeignKey(
         to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True,
-        limit_choices_to={'site_type': SiteTypes.WORLD}
+        limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
 
     class Meta:
         verbose_name = _('Session')
         verbose_name_plural = _('Sessions')
         ordering = ['-entry_created_at', 'name']
+
+    def get_absolute_url(self):
+        return reverse('roleplay:session:detail', kwargs={'pk': self.pk})
 
     def clean(self):
         # Don't allow non Worlds to be world

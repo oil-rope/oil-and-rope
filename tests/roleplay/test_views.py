@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
 from PIL import Image
@@ -554,3 +555,48 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(data['description'], self.community_world.description)
         self.assertEqual(self.user, self.community_world.owner)
         self.assertIsNone(self.community_world.user)
+
+
+class TestSessionCreateView(TestCase):
+    fake = Faker()
+    login_url = reverse('registration:login')
+    model = models.Session
+    resolver = 'roleplay:session:create'
+    template = 'roleplay/session/session_create.html'
+    view = views.SessionCreateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+
+    def setUp(self):
+        self.url = reverse(self.resolver)
+        self.data_ok = {
+            'name': self.fake.word(),
+            'description': self.fake.paragraph(),
+            'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
+            'next_game_time': timezone.now().time(),
+            'system': enums.RoleplaySystems.PATHFINDER,
+            'world': baker.make(models.Place, site_type=enums.SiteTypes.WORLD),
+        }
+
+    def test_access_anonymous_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_creates_session_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+        instance = self.model.objects.first()
+
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertEqual(self.data_ok['description'], instance.description)

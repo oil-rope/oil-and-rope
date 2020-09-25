@@ -16,7 +16,13 @@ PLACE_PATTERNS = [
     path('delete/<int:pk>/', views.WorldDeleteView.as_view(), name='world_delete')
 ]
 
+SESSION_PATTERNS = [
+    path('create/', views.SessionCreateView.as_view(), name='create'),
+    path('<int:pk>/', views.SessionDetailView.as_view(), name='detail'),
+]
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('place/', include(PLACE_PATTERNS)),
+    path('session/', include((SESSION_PATTERNS, 'session'))),
 ]
