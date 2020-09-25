@@ -355,15 +355,25 @@ class Session(TracingMixin):
     players: List[:class:`User`]
         Players in session.
     chat: :class:`Chat`
-        Caht used for this session.
+        Chat used for this session.
+    next_game: :class:`datetime.datetime`
+        Next session's date.
+    system: :class:`int`
+        System used.
+    game_master: :class:`auth.User`
+        The GM of the session.
+    world: :class:`roleplay.Place`
+        The world where this session is played.
     """
 
     name = models.CharField(verbose_name=_('Name'), max_length=100)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    players = models.ManyToManyField(get_user_model(), verbose_name=_('Players'), related_name='session_set')
+    players = models.ManyToManyField(
+        get_user_model(), verbose_name=_('Players'), related_name='session_set', related_query_name='session'
+    )
     chat = models.ForeignKey(
         to=constants.CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE,
-        related_name='session_set', db_index=True, blank=True
+        related_name='session_set', related_query_name='session', db_index=True, blank=True
     )
     next_game = models.DateTimeField(
         verbose_name=_('Next session'), auto_now=False, auto_now_add=False, null=True, blank=True
@@ -371,11 +381,12 @@ class Session(TracingMixin):
     system = models.PositiveSmallIntegerField(verbose_name=_('System'), choices=RoleplaySystems.choices)
     game_master = models.ForeignKey(
         to=constants.USER_MODEL, verbose_name=_('GameMaster'), on_delete=models.CASCADE,
-        related_name='gm_session_set', db_index=True
+        related_name='gm_session_set', related_query_name='gm_session', db_index=True
     )
     world = models.ForeignKey(
         to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
-        related_name='session_set', db_index=True, limit_choices_to={'site_type': SiteTypes.WORLD}
+        related_name='session_set', related_query_name='session', db_index=True,
+        limit_choices_to={'site_type': SiteTypes.WORLD}
     )
 
     class Meta:
