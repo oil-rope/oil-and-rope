@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Field, Fieldset, Layout, Reset, Row, Submit
+from crispy_forms.layout import Button, Column, Field, Fieldset, Layout, Reset, Row, Submit
 from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -69,6 +69,17 @@ class SessionForm(forms.ModelForm):
         widget=TimeWidget,
         initial=timezone.now().time().strftime('%H:%M'),
     )
+    invited_players = forms.MultipleChoiceField(
+        label='',
+        choices=(),
+        required=False,
+        help_text=_('Listed players will be notified'),
+    )
+    invite_player_input = forms.EmailField(
+        label='',
+        required=False,
+        help_text=_('Type and email'),
+    )
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,6 +99,16 @@ class SessionForm(forms.ModelForm):
                 _('Next session'),
                 Column('next_game_date', css_class='col-6'),
                 Column('next_game_time', css_class='col-6'),
+                css_class='form-row text-center',
+            ),
+            Fieldset(
+                _('Invite players'),
+                Column(Field('invited_players', id='playersInvitedContainer')),
+                Column(Field('invite_player_input', id='invitePlayerInput')),
+                Column(
+                    Button('', _('Add'), css_class='btn btn-info w-100', css_id='playerAddButton'),
+                    css_class='form-group',
+                ),
                 css_class='form-row text-center',
             ),
             Row(

@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -14,7 +15,6 @@ from roleplay.enums import RoleplaySystems
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
-from django.urls import reverse
 
 
 class Domain(TracingMixin):
@@ -417,6 +417,10 @@ class Session(TracingMixin):
             )
         finally:
             super().save(*args, **kwargs)
+            # We add GM
+            self.chat.users.add(self.game_master)
+            # We add all players
+            self.chat.users.add(*self.players.all())
 
     def __str__(self):
         created_at = self.entry_created_at.strftime('%Y-%m-%d')
