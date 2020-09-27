@@ -10,6 +10,7 @@ from faker import Faker
 from model_bakery import baker
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox import options as firefox_options
 
 from roleplay import enums, models, views
 
@@ -27,7 +28,9 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         self.url = reverse(self.resolver)
         self.url = f'{self.live_server_url}{self.url}'
 
-        self.browser = webdriver.Firefox()
+        self.options = firefox_options.Options()
+        self.options.headless = True
+        self.browser = webdriver.Firefox(options=self.options)
 
         # SetUp for logging user
         self.user = baker.make(get_user_model())
