@@ -27,7 +27,7 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         self.url = reverse(self.resolver)
         self.url = f'{self.live_server_url}{self.url}'
 
-        self.browser = webdriver.Chrome()
+        self.browser = webdriver.Firefox()
 
         # SetUp for logging user
         self.user = baker.make(get_user_model())
@@ -71,12 +71,14 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         # User types next game
         next_game_date = timezone.datetime(2020, 10, 11, 21, 30)
 
-        typed_date = next_game_date.strftime('%d%m%Y')
+        typed_date = next_game_date.strftime('%Y-%m-%d')
         ng_date_input = self.browser.find_element_by_name('next_game_date')
+        ng_date_input.click()
         ng_date_input.send_keys(typed_date)
 
-        typed_time = next_game_date.strftime('%H%M')
+        typed_time = next_game_date.strftime('%H:%M')
         ng_time_input = self.browser.find_element_by_name('next_game_time')
+        ng_time_input.click()
         ng_time_input.send_keys(typed_time)
 
         # Adds email
@@ -88,6 +90,7 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         # Submitting form
         submit_button = self.browser.find_element_by_name('submit')
         self.browser.execute_script('arguments[0].click();', submit_button)
+        time.sleep(.5)  # Waits for the form to be submitted
 
         result = self.model.objects.filter(
             name=name, description=description, system=pathfinder_selection
