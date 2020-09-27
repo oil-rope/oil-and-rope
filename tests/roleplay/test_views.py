@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+from PIL import Image
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -9,7 +10,6 @@ from django.test import TestCase
 from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
-from PIL import Image
 
 from roleplay import enums, models, views
 
@@ -568,6 +568,7 @@ class TestSessionCreateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
         self.url = reverse(self.resolver)
@@ -577,7 +578,7 @@ class TestSessionCreateView(TestCase):
             'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
             'next_game_time': timezone.now().time(),
             'system': enums.RoleplaySystems.PATHFINDER,
-            'world': baker.make(models.Place, site_type=enums.SiteTypes.WORLD),
+            'world': [self.world.pk],
         }
 
     def test_access_anonymous_ko(self):

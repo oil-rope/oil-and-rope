@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
@@ -10,7 +12,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 from roleplay import enums, models, views
-import time
 
 
 class TestSessionCreateView(StaticLiveServerTestCase):
