@@ -177,6 +177,14 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
         form.fields['world'].queryset = self.get_worlds()
+
+        if self.request.method == 'POST':
+            invited_users = self.request.POST.getlist('invited_players')
+            if not invited_users:
+                return form
+            # Little hack to avoid empty choices validation
+            form.fields['invited_players'].choices = ((email, email) for email in invited_users)
+
         return form
 
 

@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 from roleplay import enums, models, views
 
@@ -38,6 +41,7 @@ class TestSessionCreateView(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.close()
 
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
     def test_user_fills_form_ok(self):
         self.browser.get(self.url)
 
@@ -73,6 +77,12 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         ng_time_input = self.browser.find_element_by_name('next_game_time')
         ng_time_input.send_keys(typed_time)
 
+        # Adds email
+        email = self.fake.email()
+        email_input = self.browser.find_element_by_name('invite_player_input')
+        email_input.send_keys(email)
+        email_input.send_keys(Keys.ENTER)  # Enters email
+
         # Submitting form
         submit_button = self.browser.find_element_by_name('submit')
         self.browser.execute_script('arguments[0].click();', submit_button)
@@ -80,4 +90,6 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         result = self.model.objects.filter(
             name=name, description=description, system=pathfinder_selection
         ).count()
-        self.assertTrue(1, result)
+
+        self.assertEqual(1, result, 'Session is not created')
+        self.assertEqual(1, len(mail.outbox), 'Users are not being mailed')
