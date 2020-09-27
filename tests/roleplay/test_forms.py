@@ -1,13 +1,13 @@
 import os
 import tempfile
 
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
-from PIL import Image
 
 from roleplay import enums, forms, models
 
@@ -140,6 +140,54 @@ class TestSessionForm(TestCase):
 
     def test_data_ok(self):
         form = self.form(self.rq, data=self.data_ok)
-        valid = form.is_valid()
 
-        self.assertTrue(valid, f'Errors: {form.errors.values()}')
+        self.assertTrue(form.is_valid(), f'Errors: {form.errors.values()}')
+
+    def test_missing_non_required_data_ok(self):
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        form = self.form(self.rq, data=data_without_description)
+
+        self.assertTrue(form.is_valid())
+
+    def test_missing_required_data_ko(self):
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+        form = self.form(self.rq, data_without_name)
+
+        self.assertFalse(form.is_valid())
+
+        data_without_world = self.data_ok.copy()
+        del data_without_world['world']
+        form = self.form(self.rq, data=data_without_world)
+
+        self.assertFalse(form.is_valid())
+
+        data_without_system = self.data_ok.copy()
+        del data_without_system['system']
+        form = self.form(self.rq, data=data_without_system)
+
+        self.assertFalse(form.is_valid())
+
+        data_without_next_game_date = self.data_ok.copy()
+        del data_without_next_game_date['next_game_date']
+        form = self.form(self.rq, data=data_without_next_game_date)
+
+        self.assertFalse(form.is_valid())
+
+        data_without_next_game_time = self.data_ok.copy()
+        del data_without_next_game_time['next_game_time']
+        form = self.form(self.rq, data=data_without_next_game_time)
+
+        self.assertFalse(form.is_valid())
+
+    def test_next_game_is_correct_ok(self):
+        form = self.form(self.rq, data=self.data_ok)
+        expected_date = timezone.datetime.combine(
+            date=self.data_ok['next_game_date'],
+            time=self.data_ok['next_game_time'],
+            tzinfo=timezone.get_current_timezone(),
+        )
+        instance = form.save()
+
+        self.assertEqual(expected_date, instance.next_game)

@@ -12,7 +12,6 @@ from common.files.upload import default_upload_to
 from common.validators import validate_file_size
 from core.models import TracingMixin
 from roleplay.enums import RoleplaySystems
-
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
 
@@ -400,8 +399,14 @@ class Session(TracingMixin):
 
     def clean(self):
         # Don't allow non Worlds to be world
-        if self.world.site_type != SiteTypes.WORLD:
-            msg = _('World must be a world')
+        try:
+            if self.world.site_type != SiteTypes.WORLD:
+                msg = _('World must be a world')
+                raise ValidationError({'world': f'{msg}.'})
+        except ValidationError as e:
+            raise e
+        except Session.world.RelatedObjectDoesNotExist:
+            msg = _('World is required')
             raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):

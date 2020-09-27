@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import pathlib
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
@@ -13,9 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
-
 from . import enums, models
-import pathlib
 
 LOGGER = logging.getLogger(__name__)
 
@@ -73,11 +72,13 @@ class SessionForm(forms.ModelForm):
         label='',
         widget=DateWidget,
         initial=timezone.now().date(),
+        required=True,
     )
     next_game_time = forms.TimeField(
         label='',
         widget=TimeWidget,
         initial=timezone.now().time().strftime('%H:%M'),
+        required=True,
     )
     invited_players = forms.MultipleChoiceField(
         label='',
@@ -133,7 +134,7 @@ class SessionForm(forms.ModelForm):
 
     class Meta:
         model = models.Session
-        exclude = ('chat', 'game_master', 'next_game', 'players', )
+        exclude = ('chat', 'game_master', 'next_game', 'players',)
 
     async def send_invitations(self):
         css_file = pathlib.Path(f'{settings.STATIC_ROOT}core/css/oilandrope-theme.min.css')
@@ -160,9 +161,25 @@ class SessionForm(forms.ModelForm):
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
+    # noinspection PyAttributeOutsideInit
+    def clean(self):
+        cleaned_data = super().clean()
+
+        next_game_date = cleaned_data.get('next_game_date')
+        next_game_time = cleaned_data.get('next_game_time')
+        if next_game_date and next_game_time:
+            self.next_game = timezone.datetime.combine(
+                date=next_game_date, time=next_game_time, tzinfo=timezone.get_current_timezone()
+            )
+
     def save(self, commit=True):
         self.instance.game_master = self.game_master
         self.instance = super().save(commit)
+
+        self.instance.next_game = self.next_game
+        if commit:
+            self.instance.save()
+
         asyncio.run(self.send_invitations())
 
         return self.instance
