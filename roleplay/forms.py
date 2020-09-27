@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
+
 from . import enums, models
 
 LOGGER = logging.getLogger(__name__)
@@ -137,7 +138,7 @@ class SessionForm(forms.ModelForm):
         exclude = ('chat', 'game_master', 'next_game', 'players',)
 
     async def send_invitations(self):
-        css_file = pathlib.Path(f'{settings.STATIC_ROOT}core/css/oilandrope-theme.min.css')
+        css_file = pathlib.Path(f'{settings.BASE_DIR}/core/static/core/css/oilandrope-theme.min.css')
         html_msg = render_to_string(
             'email_templates/invitation_email.html',
             context={

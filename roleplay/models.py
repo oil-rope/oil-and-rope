@@ -12,6 +12,7 @@ from common.files.upload import default_upload_to
 from common.validators import validate_file_size
 from core.models import TracingMixin
 from roleplay.enums import RoleplaySystems
+
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
 

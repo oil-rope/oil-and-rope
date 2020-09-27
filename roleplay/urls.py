@@ -19,6 +19,7 @@ PLACE_PATTERNS = [
 SESSION_PATTERNS = [
     path('create/', views.SessionCreateView.as_view(), name='create'),
     path('<int:pk>/', views.SessionDetailView.as_view(), name='detail'),
+    path('<int:pk>/join/', views.SessionJoinView.as_view(), name='join'),
 ]
 
 urlpatterns = [

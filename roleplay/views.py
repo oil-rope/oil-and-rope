@@ -6,7 +6,8 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
@@ -188,22 +189,43 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         return form
 
 
+class SessionJoinView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    """
+    Adds the player to the session.
+    """
+
+    model = models.Session
+    pattern_name = 'roleplay:session:detail'
+
+    # noinspection PyAttributeOutsideInit
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        user = request.user
+        self.object.players.add(user)
+        response = super().get(request, *args, **kwargs)
+        return response
+
+
 class SessionDetailView(LoginRequiredMixin, DetailView):
     """
     This view controls active session for user.
     """
 
     model = models.Session
-    object = None
     template_name = 'roleplay/session/session_detail.html'
 
+    # noinspection PyAttributeOutsideInit
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        self.object = self.get_object()
-        self.players = self.object.players.all()
-        self.game_master = self.object.game_master
 
-        if user not in self.players and user != self.game_master:
+        if not user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        self.object = self.get_object()
+        players = self.object.players.all()
+        game_master = self.object.game_master
+
+        if user not in players and user != game_master:
             msg = _('You are not part of this session')
             messages.error(request, f'{msg}.')
             return HttpResponseForbidden(content=f'{msg}.')

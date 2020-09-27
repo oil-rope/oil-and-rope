@@ -1,7 +1,6 @@
 import os
 import tempfile
 
-from PIL import Image
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -10,6 +9,7 @@ from django.test import TestCase
 from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
+from PIL import Image
 
 from roleplay import enums, models, views
 
@@ -601,3 +601,85 @@ class TestSessionCreateView(TestCase):
 
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
+
+
+class TestSessionJoinView(TestCase):
+    model = models.Session
+    resolver = 'roleplay:session:join'
+    view = views.SessionJoinView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.game_master = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+
+    def setUp(self):
+        self.login_url = reverse('registration:login')
+        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        expected_url = reverse('roleplay:session:detail', kwargs={'pk': self.session.pk})
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_is_added_to_players_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertIn(self.user, self.session.players.all())
+
+
+class TestSessionDetailView(TestCase):
+    model = models.Session
+    resolver = 'roleplay:session:detail'
+    template = 'roleplay/session/session_detail.html'
+    view = views.SessionDetailView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.game_master = baker.make(get_user_model())
+        cls.player = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+        cls.session.players.add(cls.player)
+
+    def setUp(self):
+        self.login_url = reverse('registration:login')
+        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_game_master_ok(self):
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_player_ok(self):
+        self.client.force_login(self.player)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_non_player_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
