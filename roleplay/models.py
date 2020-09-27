@@ -418,8 +418,9 @@ class Session(TracingMixin):
             self.chat
         except Session.chat.RelatedObjectDoesNotExist:
             formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
+            chat_name = f'{self.name}_{formatted_date}'
             self.chat = Chat.objects.create(
-                name=f'{self.name}_{formatted_date}'
+                name=chat_name[:Chat.name.field.max_length]
             )
         finally:
             super().save(*args, **kwargs)
