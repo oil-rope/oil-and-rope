@@ -1,6 +1,13 @@
+import asyncio
+import logging
+from smtplib import SMTPAuthenticationError
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Column, Field, Fieldset, Layout, Reset, Row, Submit
 from django import forms
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -8,6 +15,9 @@ from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
 from . import enums, models
+import pathlib
+
+LOGGER = logging.getLogger(__name__)
 
 
 class WorldForm(forms.ModelForm):
@@ -83,6 +93,7 @@ class SessionForm(forms.ModelForm):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.request = request
         self.game_master = request.user
 
         self.helper = FormHelper(self)
@@ -124,6 +135,34 @@ class SessionForm(forms.ModelForm):
         model = models.Session
         exclude = ('chat', 'game_master', 'next_game', 'players', )
 
+    async def send_invitations(self):
+        css_file = pathlib.Path(f'{settings.STATIC_ROOT}core/css/oilandrope-theme.min.css')
+        html_msg = render_to_string(
+            'email_templates/invitation_email.html',
+            context={
+                'style': css_file.read_text(encoding='utf-8'),
+                'protocol': 'https' if self.request.is_secure() else 'http',
+                'domain': self.request.META.get('HTTP_HOST', 'localhost'),
+                'object': self.instance,
+            }
+        )
+        subject = _('You\'ve been invited to %(world)s!') % {'world': self.instance.name}
+        invitations = self.cleaned_data['invited_players']
+
+        try:
+            send_mail(
+                subject=subject,
+                message='',
+                from_email=None,
+                recipient_list=invitations,
+                html_message=html_msg
+            )
+        except SMTPAuthenticationError:  # pragma: no cover
+            LOGGER.exception('Unable to logging email server with given credentials.')
+
     def save(self, commit=True):
         self.instance.game_master = self.game_master
-        return super().save(commit)
+        self.instance = super().save(commit)
+        asyncio.run(self.send_invitations())
+
+        return self.instance

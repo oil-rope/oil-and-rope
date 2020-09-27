@@ -1,0 +1,24 @@
+{% extends 'email_templates/email_layout.html' %}
+{% load i18n %}
+
+{% block style %}
+  <style>
+    {{ style }}
+  </style>
+{% endblock style %}
+
+{% block title %}{% trans "You've been invited!" %}{% endblock title %}
+
+{% block content %}
+<main class="container py-5">
+  <h2 class="display-4 text-center">
+    {% blocktrans with name=object.name %}
+      You've been invited to {{ name }}!
+    {% endblocktrans %}
+  </h2>
+  <hr class="mx-5">
+  <div class="row">
+    <div class="col-12"></div>
+  </div>
+</main>
+{% endblock content %}

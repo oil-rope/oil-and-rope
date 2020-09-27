@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 from roleplay import enums, models, views
+import time
 
 
 class TestSessionCreateView(StaticLiveServerTestCase):
@@ -92,4 +93,5 @@ class TestSessionCreateView(StaticLiveServerTestCase):
         ).count()
 
         self.assertEqual(1, result, 'Session is not created')
+        time.sleep(.5)  # Email may need some time to be sent
         self.assertEqual(1, len(mail.outbox), 'Users are not being mailed')
