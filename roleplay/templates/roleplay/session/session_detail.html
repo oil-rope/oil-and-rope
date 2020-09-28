@@ -1,0 +1,16 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}
+  {% blocktrans with name=object.name %}
+    Playing {{ name }}
+  {% endblocktrans %}
+{% endblock title %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row">
+      <div class="col-12"></div>
+    </div>
+  </main>
+{% endblock body_content %}

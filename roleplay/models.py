@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -386,7 +387,7 @@ class Session(TracingMixin):
     world = models.ForeignKey(
         to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True,
-        limit_choices_to={'site_type': SiteTypes.WORLD}
+        limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
 
     class Meta:
@@ -394,10 +395,19 @@ class Session(TracingMixin):
         verbose_name_plural = _('Sessions')
         ordering = ['-entry_created_at', 'name']
 
+    def get_absolute_url(self):
+        return reverse('roleplay:session:detail', kwargs={'pk': self.pk})
+
     def clean(self):
         # Don't allow non Worlds to be world
-        if self.world.site_type != SiteTypes.WORLD:
-            msg = _('World must be a world')
+        try:
+            if self.world.site_type != SiteTypes.WORLD:
+                msg = _('World must be a world')
+                raise ValidationError({'world': f'{msg}.'})
+        except ValidationError as e:
+            raise e
+        except Session.world.RelatedObjectDoesNotExist:
+            msg = _('World is required')
             raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):
@@ -408,11 +418,16 @@ class Session(TracingMixin):
             self.chat
         except Session.chat.RelatedObjectDoesNotExist:
             formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
+            chat_name = f'{self.name}_{formatted_date}'
             self.chat = Chat.objects.create(
-                name=f'{self.name}_{formatted_date}'
+                name=chat_name[:Chat.name.field.max_length]
             )
         finally:
             super().save(*args, **kwargs)
+            # We add GM
+            self.chat.users.add(self.game_master)
+            # We add all players
+            self.chat.users.add(*self.players.all())
 
     def __str__(self):
         created_at = self.entry_created_at.strftime('%Y-%m-%d')

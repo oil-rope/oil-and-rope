@@ -1,11 +1,13 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
@@ -150,3 +152,82 @@ class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
     success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world/world_confirm_delete.html'
+
+
+class SessionCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.SessionForm
+    model = models.Session
+    template_name = 'roleplay/session/session_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'request': self.request,
+        })
+        return kwargs
+
+    def get_worlds(self):
+        """
+        Gets either community maps or user's private maps.
+        """
+
+        qs = models.Place.objects.community_places()
+        qs.union(models.Place.objects.user_places(self.request.user))
+        return qs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['world'].queryset = self.get_worlds()
+
+        if self.request.method == 'POST':
+            invited_users = self.request.POST.getlist('invited_players')
+            if not invited_users:
+                return form
+            # Little hack to avoid empty choices validation
+            form.fields['invited_players'].choices = ((email, email) for email in invited_users)
+
+        return form
+
+
+class SessionJoinView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    """
+    Adds the player to the session.
+    """
+
+    model = models.Session
+    pattern_name = 'roleplay:session:detail'
+
+    # noinspection PyAttributeOutsideInit
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        user = request.user
+        self.object.players.add(user)
+        response = super().get(request, *args, **kwargs)
+        return response
+
+
+class SessionDetailView(LoginRequiredMixin, DetailView):
+    """
+    This view controls active session for user.
+    """
+
+    model = models.Session
+    template_name = 'roleplay/session/session_detail.html'
+
+    # noinspection PyAttributeOutsideInit
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+
+        if not user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        self.object = self.get_object()
+        players = self.object.players.all()
+        game_master = self.object.game_master
+
+        if user not in players and user != game_master:
+            msg = _('You are not part of this session')
+            messages.error(request, f'{msg}.')
+            return HttpResponseForbidden(content=f'{msg}.')
+
+        return super().dispatch(request, *args, **kwargs)
