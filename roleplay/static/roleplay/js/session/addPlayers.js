@@ -2,16 +2,6 @@ let addPlayersButton = document.querySelector("#playerAddButton");
 let addPlayerInput = document.querySelector("#invitePlayerInput");
 let playersContainer = document.querySelector("#playersInvitedContainer");
 
-document.addEventListener("DOMContentLoaded", () => {
-	addPlayersButton.addEventListener("click", addPlayerToContainer);
-	addPlayerInput.addEventListener("keydown", (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault();
-			addPlayerToContainer();
-		}
-	});
-});
-
 /**
  * Adds a player to the container.
  */
@@ -25,3 +15,13 @@ const addPlayerToContainer = () => {
 		addPlayerInput.value = "";
 	}
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+	addPlayersButton.addEventListener("click", addPlayerToContainer);
+	addPlayerInput.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			addPlayerToContainer();
+		}
+	});
+});
