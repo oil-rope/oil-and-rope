@@ -1,0 +1,8 @@
+# Bundle
+frontend/static/frontend/dist/*
+
+# Webpack
+webpack.config.js
+
+# External libs
+**/external_libs/*

@@ -1,13 +1,13 @@
-let addPlayersButton = document.querySelector("#playerAddButton");
-let addPlayerInput = document.querySelector("#invitePlayerInput");
-let playersContainer = document.querySelector("#playersInvitedContainer");
+const addPlayersButton = document.querySelector("#playerAddButton");
+const addPlayerInput = document.querySelector("#invitePlayerInput");
+const playersContainer = document.querySelector("#playersInvitedContainer");
 
 /**
  * Adds a player to the container.
  */
 const addPlayerToContainer = () => {
 	if (addPlayerInput.checkValidity()) {
-		let option = document.createElement("option");
+		const option = document.createElement("option");
 		option.value = addPlayerInput.value;
 		option.text = addPlayerInput.value;
 		option.selected = true;
@@ -18,9 +18,9 @@ const addPlayerToContainer = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
 	addPlayersButton.addEventListener("click", addPlayerToContainer);
-	addPlayerInput.addEventListener("keydown", (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault();
+	addPlayerInput.addEventListener("keydown", (event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
 			addPlayerToContainer();
 		}
 	});

@@ -71,9 +71,6 @@ $(() => {
 			el === nameInput ||
 			el === appendedSelect
 		) {
-			displayName = `${prependedSelect.value || ""} ${
-				nameInput.value || ""
-			} ${appendedSelect.value || ""}`;
 			changeDisplayName();
 		}
 
