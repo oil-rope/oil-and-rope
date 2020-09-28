@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from django.utils.timezone import datetime
+from django.utils import timezone
 from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
-
-from registration.models import user_directory_path
 
 
 class TestProfileModel(TestCase):
@@ -14,14 +12,8 @@ class TestProfileModel(TestCase):
         self.faker = Faker()
         self.user = baker.make(get_user_model())
         self.profile = self.user.profile
-        self.profile.birthday = datetime(1998, 7, 14).date()
+        self.profile.birthday = timezone.datetime(1998, 7, 14).date()
         self.profile.save()
-
-    def test_user_directory_path_ok(self):
-        file_name = self.faker.file_name(category='image')
-        expected = 'user_{}/{}'.format(self.profile.user.pk, file_name)
-        result = user_directory_path(self.profile, file_name)
-        self.assertEqual(expected, result)
 
     @freeze_time("2020-01-01")
     def test_get_age_ok(self):

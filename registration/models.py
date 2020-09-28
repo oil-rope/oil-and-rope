@@ -2,30 +2,16 @@ from ckeditor.fields import RichTextField
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.conf.global_settings import LANGUAGES
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from common.files.upload import default_upload_to
 from core.models import TracingMixin
-
-
-def user_directory_path(instance, filename: str) -> str:
-    """
-    Helper function to store images in `[...]/user_pk/filename`.
-
-    Parameters
-    ----------
-    instance: :class:`models.Model`
-        The Model instance to get the PrimaryKey.
-    filename: :class:`str`
-        The filename to store.
-    """
-
-    # File will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user_{0}/{1}'.format(instance.user.pk, filename)
 
 
 class Profile(TracingMixin):
@@ -55,20 +41,22 @@ class Profile(TracingMixin):
         User's age.
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE,
-                                related_name='profile', verbose_name=_('User'),)
-    bio = RichTextField(verbose_name=_('Biography'), null=True, blank=True,)
-    birthday = models.DateField(verbose_name=_('Birthday'), null=True, blank=True,)
+    user = models.OneToOneField(
+        get_user_model(), on_delete=models.CASCADE, related_name='profile', verbose_name=_('User')
+    )
+    bio = RichTextField(verbose_name=_('Biography'), null=True, blank=True, )
+    birthday = models.DateField(verbose_name=_('Birthday'), null=True, blank=True, )
+    is_premium = models.BooleanField(verbose_name=_('Premium user'), default=False)
 
     # Translating languages and sorting
     T_LANGUAGES = sorted([(code, _(language))
                           for code, language in LANGUAGES], key=lambda x: x[1])
 
     language = models.CharField(verbose_name=_('Language'), choices=T_LANGUAGES,
-                                default=settings.LANGUAGE_CODE, max_length=30,)
-    alias = models.CharField(verbose_name=_('Alias'), max_length=30, blank=True, null=True,)
+                                default=settings.LANGUAGE_CODE, max_length=30, )
+    alias = models.CharField(verbose_name=_('Alias'), max_length=30, blank=True, null=True, )
     web = models.URLField(verbose_name=_('Website'), max_length=200, blank=True, null=True)
-    image = models.ImageField(verbose_name=_('Avatar'), upload_to=user_directory_path,
+    image = models.ImageField(verbose_name=_('Avatar'), upload_to=default_upload_to,
                               blank=True, null=True)
 
     @property
@@ -86,8 +74,8 @@ class Profile(TracingMixin):
         return 'Profile {}'.format(self.user.username)
 
 
-@receiver(post_save, sender=User)
-def create_profile_post_save_receiver(instance: User, **kwargs):
+@receiver(post_save, sender=get_user_model())
+def create_profile_post_save_receiver(instance, **kwargs):
     """
     Creates a :class:`Profile` once a :class:`auth.User` is created.
     """
