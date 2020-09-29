@@ -43,8 +43,10 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             session_data = session.get_decoded()
             user = await async_get(get_user_model(), pk=session_data['_auth_user_id'])
             self.user = user
-            await login(self.scope, user)
-            await database_sync_to_async(self.scope["session"].save)()
+            backend = session_data['_auth_user_backend']
+            await login(scope=self.scope, user=user, backend=backend)
+            scope_session = self.scope['session']
+            await database_sync_to_async(scope_session.save)()
         except (Session.DoesNotExist, get_user_model().DoesNotExist, KeyError):
             self.user = AnonymousUser()
         finally:
