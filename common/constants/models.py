@@ -5,6 +5,9 @@ USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
+# Bot
+DISCORD_USER_MODEL = 'bot.DiscordUser'
+
 # Content Types
 CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
 
