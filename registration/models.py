@@ -14,6 +14,13 @@ from common.files.upload import default_upload_to
 from core.models import TracingMixin
 
 
+class User(AbstractUser):
+    is_premium = models.BooleanField(verbose_name=_('Premium user'), default=False)
+
+    class Meta:
+        db_table = 'auth_user'
+
+
 class Profile(TracingMixin):
     """
     This model manages User's profile.
@@ -46,7 +53,6 @@ class Profile(TracingMixin):
     )
     bio = RichTextField(verbose_name=_('Biography'), null=True, blank=True, )
     birthday = models.DateField(verbose_name=_('Birthday'), null=True, blank=True, )
-    is_premium = models.BooleanField(verbose_name=_('Premium user'), default=False)
 
     # Translating languages and sorting
     T_LANGUAGES = sorted([(code, _(language))

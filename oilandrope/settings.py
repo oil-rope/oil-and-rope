@@ -190,7 +190,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'auth.User'
+# Model to use for User
+# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-user-model
+AUTH_USER_MODEL = 'registration.User'
 
 
 # Internationalization
