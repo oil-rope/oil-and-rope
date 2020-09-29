@@ -6,7 +6,6 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models
-
 from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 
