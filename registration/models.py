@@ -15,6 +15,7 @@ from core.models import TracingMixin
 
 
 class User(AbstractUser):
+    email = models.EmailField(verbose_name=_('email address'), null=False, blank=False, unique=True)
     is_premium = models.BooleanField(verbose_name=_('Premium user'), default=False)
 
     class Meta:
@@ -49,7 +50,8 @@ class Profile(TracingMixin):
     """
 
     user = models.OneToOneField(
-        get_user_model(), on_delete=models.CASCADE, related_name='profile', verbose_name=_('User')
+        to=get_user_model(), on_delete=models.CASCADE,
+        related_name='profile', verbose_name=_('User')
     )
     bio = RichTextField(verbose_name=_('Biography'), null=True, blank=True, )
     birthday = models.DateField(verbose_name=_('Birthday'), null=True, blank=True, )
