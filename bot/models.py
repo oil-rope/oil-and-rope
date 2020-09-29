@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.constants import models as constants
 from core.models import TracingMixin
 
 
@@ -27,8 +28,10 @@ class DiscordUser(TracingMixin):
     """
 
     id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    user = models.OneToOneField('auth.User', verbose_name=_('User'), on_delete=models.CASCADE,
-                                related_name='discord_user', blank=True, null=True)
+    user = models.OneToOneField(
+        to=constants.USER_MODEL, verbose_name=_('User'), on_delete=models.CASCADE,
+        related_name='discord_user', blank=True, null=True
+    )
     nick = models.CharField(verbose_name=_('Nick'), max_length=50)
     code = models.PositiveSmallIntegerField(verbose_name=_('Code'))
     avatar_url = models.URLField(verbose_name=_('Avatar URL'), max_length=254, null=True, blank=True)

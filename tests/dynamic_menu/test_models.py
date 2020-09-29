@@ -129,7 +129,7 @@ class TestDynamicMenuModel(TestCase):
         self.assertTrue(all_models)
 
     def test_add_models_with_strings_ok(self):
-        models = ['auth.User', 'auth.Group']
+        models = [constants.USER_MODEL, constants.GROUP_MODEL]
         content_types = ContentType.objects.filter(
             app_label='auth',
             model__in=['user', 'group']

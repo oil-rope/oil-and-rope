@@ -1,10 +1,10 @@
 import functools
 
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
+from common.constants import models as constants
 from roleplay import models
 from roleplay.enums import DomainTypes, SiteTypes
 
@@ -38,7 +38,7 @@ class TestPlaceManager(TestCase):
     def setUp(self):
         self.faker = Faker()
         self.model = models.Place
-        self.user = baker.make(get_user_model())
+        self.user = baker.make(constants.USER_MODEL)
         random_int = functools.partial(self.faker.pyint, min_value=1, max_value=100)
 
         self.number_of_houses = random_int()
