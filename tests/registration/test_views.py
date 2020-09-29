@@ -283,17 +283,6 @@ class TestResendConfirmationEmailView(TestCase):
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
 
-    @mock.patch('registration.views.messages')
-    def test_multiple_users_with_same_email_ko(self, mock_call):
-        # First we create a user with same email since this is possible at database-level
-        baker.make(get_user_model(), email=self.data_ok['email'])
-        response = self.client.post(self.url, data=self.data_ok)
-        warning_message = _('Multiple users with same email, please contact our developers')
-        mock_call.warning.assert_called_with(
-            response.wsgi_request,
-            warning_message
-        )
-
 
 class TestResetPasswordView(TestCase):
 
