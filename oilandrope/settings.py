@@ -189,7 +189,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Model to use for User
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-user-model
+
 AUTH_USER_MODEL = 'registration.User'
+
+# Authentication systems
+# https://docs.djangoproject.com/en/3.1/ref/settings/#authentication-backends
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'registration.backends.EmailBacked',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
