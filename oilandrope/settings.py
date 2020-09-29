@@ -18,7 +18,6 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -153,7 +152,6 @@ CHANNEL_LAYERS = {
 # Host for WebSocket
 WS_HOST = os.getenv('WS_HOST', None)
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -170,7 +168,6 @@ DATABASES = {
         },
     },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -193,7 +190,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Model to use for User
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-user-model
 AUTH_USER_MODEL = 'registration.User'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -312,3 +308,19 @@ BOT_INVITATION = os.getenv(
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
 BOT_DESCRIPTION = os.getenv('BOT_DESCRIPTION', 'Oil & Rope Bot: Managing sessions was never this easy!')
+
+# Extra stuff just for fun
+SLOGANS = (
+    'Being Ahead through Natural 20',
+    'I\'m Rollin\' it',
+    'I\'m Oilin\' it',
+    'Rol Runs on Oil&Rope',
+    'Stronger than Rope',
+    'Sheer Rolling Pleasure',
+    'Rol It Your Way',
+    'It keeps rolling... and rolling... and rolling',
+    'The Relentless Pursuit of Oil & Rope',
+    'Taste the Oil',
+    'Just Roll It',
+    'Where\'s the Oil?',
+)

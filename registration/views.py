@@ -1,6 +1,8 @@
 import logging
+import random
 from smtplib import SMTPAuthenticationError
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -39,6 +41,11 @@ class LoginView(auth_views.LoginView):
             LOGGER.warning('Attempt to access a non existent user, we assume username is just incorrect.')
         finally:
             return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['slogan'] = random.choice(settings.SLOGANS)
+        return context
 
 
 class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
