@@ -231,3 +231,14 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
             return HttpResponseForbidden(content=f'{msg}.')
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class RaceListView(LoginRequiredMixin, ListView):
+    """
+    This view lists all races
+    """
+
+    model = Race
+    template_name = 'roleplay/race/race_list.html'
+    paginate_by = 20 # Modify if needed
+        

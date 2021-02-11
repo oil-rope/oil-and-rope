@@ -1,0 +1,14 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Races' %}{% endblock title %}
+
+{% block body_content %}
+  <div class="container-fluid">
+        {% for race in Races %}
+          <div class="col-12 ">
+            <p>{% Race.name %}</p>
+          </div>
+        {% endfor %}
+  </div>
+{% endblock body_content %}
