@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Home" %}{% endblock title %}
@@ -8,14 +9,14 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-<main class="container-fluid bg-info px-0">
-  <div class="row no-gutters">
-    <div class="col-12 col-lg-6">
-      {% include 'core/includes/about_us.html' with no_margin=True %}
+  <main class="container-fluid bg-info px-0">
+    <div class="row no-gutters">
+      <div class="col-12 col-lg-6">
+        {% include 'core/includes/about_us.html' with no_margin=True %}
+      </div>
+      <div class="col-12 col-lg-6">
+        {% include 'core/includes/about_the_project.html' with no_margin=True %}
+      </div>
     </div>
-    <div class="col-12 col-lg-6">
-      {% include 'core/includes/about_the_project.html' with no_margin=True %}
-    </div>
-  </div>
-</main>
+  </main>
 {% endblock body_content %}
