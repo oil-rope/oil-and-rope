@@ -37,3 +37,5 @@ class MusicAdmin(admin.ModelAdmin):
         'object_id',
     )
     list_filter = ('entry_created_at', 'entry_updated_at', 'content_type')
+    readonly_fields = ('entry_created_at', 'entry_updated_at')
+    search_fields = ['tile__icontains']

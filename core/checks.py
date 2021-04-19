@@ -3,7 +3,7 @@ import inspect
 
 from django.apps import apps
 from django.core.checks import Tags, Warning, register
-from django.db.models import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 
 
 def get_argument(node, arg):

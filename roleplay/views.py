@@ -5,7 +5,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView, ListView
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
@@ -150,3 +150,8 @@ class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
     success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world/world_confirm_delete.html'
+
+
+class MusicListView(LoginRequiredMixin, ListView):
+    model = models.Music
+    template_name = 'roleplay/music/music_list.html'

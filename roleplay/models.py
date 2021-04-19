@@ -423,8 +423,9 @@ class Music(TracingMixin):
                                    db_index=True, through=constants.USER_MUSIC_RELATION)
 
     limit = models.Q(app_label='roleplay', model__in=['race', 'place'])
+    # TODO: This should be posible to associate with everything
     content_type = models.ForeignKey(
-        to=constants.CONTENT_TYPE_MODEL, verbose_name=_('Asociación'), limit_choices_to=limit,
+        to=constants.CONTENT_TYPE_MODEL, verbose_name=_('Association'), limit_choices_to=limit,
         blank=True, null=True, on_delete=models.CASCADE, db_index=True
     )
     object_id = models.IntegerField(verbose_name=_('Identifier'), null=True, blank=True)
