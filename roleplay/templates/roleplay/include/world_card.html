@@ -54,7 +54,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="dropdownCreateTopography{{ world.pk }}">
                   {% for value, name in site_types %}
-                    <a class="dropdown-item" href="#{{ value }}">{{ name }}</a>
+                    <a class="dropdown-item" href="{% url 'roleplay:place:create' pk=world.pk site=value %}">{{ name }}</a>
                     {{ site_type }}
                   {% endfor %}
                 </div>

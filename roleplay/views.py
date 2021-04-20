@@ -153,3 +153,14 @@ class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
     success_url = reverse_lazy('roleplay:world_list')
     template_name = 'roleplay/world/world_confirm_delete.html'
+
+
+class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+    model = models.Place
+    template_name = 'roleplay/place/place_create.html'
+
+    def get_object(self, queryset=None):
+        return super().get_object(queryset)
+
+    def get_success_url(self):
+        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
