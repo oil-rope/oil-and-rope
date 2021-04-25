@@ -1,5 +1,5 @@
 from django.shortcuts import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, modify_settings
 from faker.proxy import Faker
 
 from bot.discord_api.models import Channel, Message
@@ -32,15 +32,19 @@ class TestSendMessageToDiscordUserView(TestCase):
 
         self.assertEqual(400, response.status_code)
 
-    @override_settings(ALLOWED_HOSTS=['localhost', 'testserver', '127.0.0.1'])
     def test_post_from_outer_ko(self):
-        response = self.client.post(self.url, data=self.data, REMOTE_ADDR=self.faker.ipv4())
+        with self.settings(
+            ALLOWED_HOSTS=['localhost', 'testserver', '127.0.0.1']
+        ):
+            response = self.client.post(self.url, data=self.data, REMOTE_ADDR=self.faker.ipv4())
 
         self.assertEqual(403, response.status_code)
 
-    @override_settings(ALLOWED_HOSTS=['develop.oilandrope-project.com', 'testserver'])
     def test_post_from_outer_ok(self):
-        response = self.client.post(self.url, data=self.data, HTTP_ORIGIN='http://develop.oilandrope-project.com')
+        with self.settings(
+            ALLOWED_HOSTS=['develop.oilandrope-project.com', 'testserver']
+        ):
+            response = self.client.post(self.url, data=self.data, HTTP_ORIGIN='http://develop.oilandrope-project.com')
 
         self.assertEqual(201, response.status_code)
 

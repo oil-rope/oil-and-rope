@@ -5,8 +5,8 @@ from .models import Place
 
 class PlaceSerializer(serializers.ModelSerializer):
 
-    user = serializers.HyperlinkedRelatedField(view_name='registration:user-detail', read_only=True)
-    owner = serializers.HyperlinkedRelatedField(view_name='registration:user-detail', read_only=True)
+    user = serializers.HyperlinkedRelatedField(view_name='registration:api:user-detail', read_only=True)
+    owner = serializers.HyperlinkedRelatedField(view_name='registration:api:user-detail', read_only=True)
     children = serializers.SerializerMethodField()
 
     class Meta:
