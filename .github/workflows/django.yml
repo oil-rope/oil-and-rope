@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
+          poetry export --dev -f requirements.txt -o /tmp/requirements.txt --without-hashes
           pip install -r /tmp/requirements.txt
 
       - name: Install GeckoDriver
@@ -130,7 +130,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
+          poetry export --dev -f requirements.txt -o /tmp/requirements.txt --without-hashes
           pip install -r /tmp/requirements.txt
 
       - name: Install GeckoDriver
