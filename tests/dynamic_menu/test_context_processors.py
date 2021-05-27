@@ -20,7 +20,7 @@ class TestMenuContextProcessor(TestCase):
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.perms = Permission.objects.filter(
-            content_type__app_label='auth',
+            content_type__app_label='registration',
             codename__in=['view_user', 'delete_user']
         )
         self.user.user_permissions.add(*self.perms)
@@ -76,7 +76,7 @@ class TestMenuContextProcessor(TestCase):
         # Random user
         user = baker.make(constants.USER_MODEL)
         user.user_permissions.add(
-            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+            Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
         # Random menu
         DynamicMenu.objects.create(
@@ -109,7 +109,7 @@ class TestMenuContextProcessor(TestCase):
             menu.add_permissions(*self.perms)
         user = baker.make(constants.USER_MODEL)
         user.user_permissions.add(
-            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+            Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
         request = RequestFactory().get('/')
         request.user = user
@@ -176,7 +176,7 @@ class TestFilterMenus(TestCase):
         self.faker = Faker()
         self.auth_permssions = ['add_user', 'add_group', 'delete_user', 'delete_group']
         self.auth_permssions = Permission.objects.filter(
-            content_type__app_label='auth', codename__in=self.auth_permssions
+            content_type__app_label='registration', codename__in=self.auth_permssions
         )
         self.user = baker.make(constants.USER_MODEL)
         self.staff_user = baker.make(constants.USER_MODEL, is_staff=True)

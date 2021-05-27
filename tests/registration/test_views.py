@@ -19,10 +19,12 @@ class TestLoginView(TestCase):
     Checks LoginView works correctly.
     """
 
+    faker = Faker()
+    resolver = 'registration:login'
+
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
-        self.url = reverse('registration:login')
+        self.url = reverse(self.resolver)
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -42,6 +44,34 @@ class TestLoginView(TestCase):
         self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
         self.client.post(self.url, data=data)
         self.assertTrue(get_user(self.client).is_authenticated, 'User is not logged.')
+
+    def test_user_login_with_email_ok(self):
+        # Change password so we can control input
+        password = self.faker.password()
+        self.user.set_password(password)
+        self.user.save()
+
+        data = {
+            'username': self.user.email,
+            'password': password
+        }
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
+        self.client.post(self.url, data=data)
+        self.assertTrue(get_user(self.client).is_authenticated, 'User is not logged.')
+
+    def test_user_login_with_email_ko(self):
+        # Change password so we can control input
+        password = self.faker.password()
+        self.user.set_password(password)
+        self.user.save()
+
+        data = {
+            'username': self.faker.email(),
+            'password': password
+        }
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
+        self.client.post(self.url, data=data)
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged.')
 
     @mock.patch('registration.views.messages')
     def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
@@ -282,17 +312,6 @@ class TestResendConfirmationEmailView(TestCase):
         data_ko['email'] = self.faker.email()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
-
-    @mock.patch('registration.views.messages')
-    def test_multiple_users_with_same_email_ko(self, mock_call):
-        # First we create a user with same email since this is possible at database-level
-        baker.make(get_user_model(), email=self.data_ok['email'])
-        response = self.client.post(self.url, data=self.data_ok)
-        warning_message = _('Multiple users with same email, please contact our developers')
-        mock_call.warning.assert_called_with(
-            response.wsgi_request,
-            warning_message
-        )
 
 
 class TestResetPasswordView(TestCase):

@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
 from PIL import Image
@@ -554,3 +555,131 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(data['description'], self.community_world.description)
         self.assertEqual(self.user, self.community_world.owner)
         self.assertIsNone(self.community_world.user)
+
+
+class TestSessionCreateView(TestCase):
+    fake = Faker()
+    login_url = reverse('registration:login')
+    model = models.Session
+    resolver = 'roleplay:session:create'
+    template = 'roleplay/session/session_create.html'
+    view = views.SessionCreateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+
+    def setUp(self):
+        self.url = reverse(self.resolver)
+        self.data_ok = {
+            'name': self.fake.word(),
+            'description': self.fake.paragraph(),
+            'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
+            'next_game_time': timezone.now().time(),
+            'system': enums.RoleplaySystems.PATHFINDER,
+            'world': [self.world.pk],
+        }
+
+    def test_access_anonymous_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_creates_session_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+        instance = self.model.objects.first()
+
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertEqual(self.data_ok['description'], instance.description)
+
+
+class TestSessionJoinView(TestCase):
+    model = models.Session
+    resolver = 'roleplay:session:join'
+    view = views.SessionJoinView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.game_master = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+
+    def setUp(self):
+        self.login_url = reverse('registration:login')
+        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        expected_url = reverse('roleplay:session:detail', kwargs={'pk': self.session.pk})
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_is_added_to_players_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertIn(self.user, self.session.players.all())
+
+
+class TestSessionDetailView(TestCase):
+    model = models.Session
+    resolver = 'roleplay:session:detail'
+    template = 'roleplay/session/session_detail.html'
+    view = views.SessionDetailView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.game_master = baker.make(get_user_model())
+        cls.player = baker.make(get_user_model())
+        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+        cls.session.players.add(cls.player)
+
+    def setUp(self):
+        self.login_url = reverse('registration:login')
+        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_game_master_ok(self):
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_player_ok(self):
+        self.client.force_login(self.player)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_non_player_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)

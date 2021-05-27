@@ -5,6 +5,9 @@ USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
+# Bot
+DISCORD_USER_MODEL = 'bot.DiscordUser'
+
 # Content Types
 CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
 
@@ -16,6 +19,7 @@ DOMAIN_MODEL = 'roleplay.Domain'
 PLACE_MODEL = 'roleplay.Place'
 RACE_MODEL = 'roleplay.Race'
 USER_RACE_RELATION = 'roleplay.RaceUser'
+SESSION_MODEL = 'roleplay.Session'
 
 # Chat
 CHAT_MODEL = 'chat.Chat'

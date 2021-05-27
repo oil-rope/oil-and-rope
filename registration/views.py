@@ -1,6 +1,8 @@
 import logging
+import random
 from smtplib import SMTPAuthenticationError
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -39,6 +41,11 @@ class LoginView(auth_views.LoginView):
             LOGGER.warning('Attempt to access a non existent user, we assume username is just incorrect.')
         finally:
             return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['slogan'] = random.choice(settings.SLOGANS)
+        return context
 
 
 class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
@@ -147,12 +154,8 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
     success_url = reverse_lazy('registration:login')
 
     def get_user(self, email):
-        try:
-            user = get_user_model().objects.get(email=email)
-            return user
-        except get_user_model().MultipleObjectsReturned as ex:
-            LOGGER.exception('Multiple users with same email found.')
-            raise ex
+        user = get_user_model().objects.get(email=email)
+        return user
 
     def generate_token(self, user) -> str:
         """
@@ -192,14 +195,10 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
 
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
-        try:
-            user = self.get_user(cleaned_data['email'])
-            self.send_email(user)
-            messages.success(self.request, _('Your confirmation email has been sent') + '!')
-            return super().form_valid(form)
-        except get_user_model().MultipleObjectsReturned:
-            messages.warning(self.request, _('Multiple users with same email, please contact our developers'))
-            return super().form_invalid(form)
+        user = self.get_user(cleaned_data['email'])
+        self.send_email(user)
+        messages.success(self.request, _('Your confirmation email has been sent') + '!')
+        return super().form_valid(form)
 
 
 class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordResetView):

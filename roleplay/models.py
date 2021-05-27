@@ -2,6 +2,8 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -9,6 +11,7 @@ from common.constants import models as constants
 from common.files.upload import default_upload_to
 from common.validators import validate_file_size
 from core.models import TracingMixin
+from roleplay.enums import RoleplaySystems
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
@@ -340,3 +343,92 @@ class RaceUser(TracingMixin):
 
     def __str__(self):
         return f'{self.user.username} <-> {self.race.name}'
+
+
+class Session(TracingMixin):
+    """
+    This model manages sessions playing by the users.
+
+    Parameters
+    ----------
+    name: :class:`str`
+        Name of the session.
+    players: List[:class:`User`]
+        Players in session.
+    chat: :class:`Chat`
+        Chat used for this session.
+    next_game: :class:`datetime.datetime`
+        Next session's date.
+    system: :class:`int`
+        System used.
+    game_master: :class:`auth.User`
+        The GM of the session.
+    world: :class:`roleplay.Place`
+        The world where this session is played.
+    """
+
+    name = models.CharField(verbose_name=_('Name'), max_length=100)
+    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    players = models.ManyToManyField(
+        get_user_model(), verbose_name=_('Players'), related_name='session_set', related_query_name='session'
+    )
+    chat = models.ForeignKey(
+        to=constants.CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE,
+        related_name='session_set', related_query_name='session', db_index=True, blank=True
+    )
+    next_game = models.DateTimeField(
+        verbose_name=_('Next session'), auto_now=False, auto_now_add=False, null=True, blank=True
+    )
+    system = models.PositiveSmallIntegerField(verbose_name=_('System'), choices=RoleplaySystems.choices)
+    game_master = models.ForeignKey(
+        to=constants.USER_MODEL, verbose_name=_('GameMaster'), on_delete=models.CASCADE,
+        related_name='gm_session_set', related_query_name='gm_session', db_index=True
+    )
+    world = models.ForeignKey(
+        to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
+        related_name='session_set', related_query_name='session', db_index=True,
+        limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
+    )
+
+    class Meta:
+        verbose_name = _('Session')
+        verbose_name_plural = _('Sessions')
+        ordering = ['-entry_created_at', 'name']
+
+    def get_absolute_url(self):
+        return reverse('roleplay:session:detail', kwargs={'pk': self.pk})
+
+    def clean(self):
+        # Don't allow non Worlds to be world
+        try:
+            if self.world.site_type != SiteTypes.WORLD:
+                msg = _('World must be a world')
+                raise ValidationError({'world': f'{msg}.'})
+        except ValidationError as e:
+            raise e
+        except Session.world.RelatedObjectDoesNotExist:
+            msg = _('World is required')
+            raise ValidationError({'world': f'{msg}.'})
+
+    def save(self, *args, **kwargs):
+        Chat = apps.get_model(constants.CHAT_MODEL)
+        self.full_clean()
+
+        try:
+            self.chat
+        except Session.chat.RelatedObjectDoesNotExist:
+            formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
+            chat_name = f'{self.name}_{formatted_date}'
+            self.chat = Chat.objects.create(
+                name=chat_name[:Chat.name.field.max_length]
+            )
+        finally:
+            super().save(*args, **kwargs)
+            # We add GM
+            self.chat.users.add(self.game_master)
+            # We add all players
+            self.chat.users.add(*self.players.all())
+
+    def __str__(self):
+        created_at = self.entry_created_at.strftime('%Y-%m-%d')
+        return f'{self.name} ({created_at})'

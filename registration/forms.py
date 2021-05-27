@@ -25,6 +25,15 @@ class LoginForm(auth_forms.AuthenticationForm):
 
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
+
+        # Changing Username label on the go
+        username_label = '{} {} {}'.format(
+            _('username').capitalize(),
+            _('or'),
+            _('email').capitalize()
+        )
+        self.fields['username'].label = username_label
+
         self.helper = FormHelper(self)
         self.helper.form_id = 'loginForm'
         self.helper.field_class = 'form-text-white'

@@ -16,7 +16,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay import models
-from roleplay.enums import DomainTypes, SiteTypes
+from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -430,3 +430,50 @@ class TestRaceUser(TestCase):
         expected = f'{instance.user.username} <-> {instance.race.name}'
 
         self.assertEqual(expected, str(instance))
+
+
+class TestSession(TestCase):
+    model = apps.get_model(constants.SESSION_MODEL)
+    fake = Faker()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(constants.USER_MODEL)
+        cls.chat = baker.make(constants.CHAT_MODEL)
+        cls.world = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.WORLD)
+
+    def test_str_ok(self):
+        name = self.fake.word()
+        instance = self.model.objects.create(
+            name=name,
+            chat=self.chat,
+            game_master=self.user,
+            system=RoleplaySystems.PATHFINDER,
+            world=self.world,
+        )
+        created_at = instance.entry_created_at.strftime('%Y-%m-%d')
+        expected = f'{name} ({created_at})'
+
+        self.assertEqual(expected, str(instance))
+
+    def test_save_without_chat_ok(self):
+        instance = self.model.objects.create(
+            name=self.fake.word(),
+            game_master=self.user,
+            system=RoleplaySystems.PATHFINDER,
+            world=self.world,
+        )
+        instance.save()
+
+        self.assertIsNotNone(instance.chat)
+        self.assertIn(instance.name, instance.chat.name)
+
+    def test_non_world_ko(self):
+        place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
+        with self.assertRaisesRegex(ValidationError, 'World must be a world'):
+            self.model.objects.create(
+                name=self.fake.word(),
+                game_master=self.user,
+                system=RoleplaySystems.PATHFINDER,
+                world=place,
+            )
