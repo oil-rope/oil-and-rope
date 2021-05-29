@@ -1,6 +1,8 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
 class CommonConfig(AppConfig):
+    default_auto_field = 'django.db.models.AutoField'
     name = 'common'
-    verbose_name = 'Common Utils'
+    verbose_name = _('Common Utils')

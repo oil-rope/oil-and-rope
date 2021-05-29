@@ -24,6 +24,7 @@ RUN /usr/sbin/locale-gen
 
 EXPOSE 8000
 
-RUN echo "#!/bin/bash\npytest -sx" > /run_test && chmod 774 /run_test && ln /run_test /bin/run_test
+RUN echo "#!/bin/bash\npytest -sx" > /run_test_fail_fast && chmod 774 /run_test_fail_fast && ln /run_test_fail_fast /bin/run_test_fail_fast
+RUN echo "#!/bin/bash\npytest -s" > /run_test && chmod 774 /run_test && ln /run_test /bin/run_test
 
 WORKDIR /app/
