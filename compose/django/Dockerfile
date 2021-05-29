@@ -24,6 +24,6 @@ RUN /usr/sbin/locale-gen
 
 EXPOSE 8000
 
-COPY ./compose/django/command.sh /command.sh
+RUN echo "#!/bin/bash\npytest -sx" > /run_test && chmod 774 /run_test && ln /run_test /bin/run_test
 
-CMD [ "/command.sh" ]
+WORKDIR /app/

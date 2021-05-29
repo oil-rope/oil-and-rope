@@ -28,22 +28,57 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      # Database variables
+      # Database configuration
       DB_NAME: oilandrope
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: p4ssw0rd@
-      # Django variables
+      # Django configuration
       DJANGO_SETTINGS_MODULE: oilandrope.settings
       SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       ALLOWED_HOSTS: localhost,127.0.0.1
       DEBUG: "True"
-      # Gunicorn variables
+      # Gunicorn configuration
       GUNICORN_WSGI_MODULE: oilandrope.wsgi
+      # WebSocket configuration
+      WS_HOST: nginx:5000
+      CHANNEL_LAYER_HOST: redis
     volumes:
+      - "./compose/django/command.sh:/command.sh"
       - "./:/app/"
+    command: /command.sh
     working_dir: /app/
+
+  redis:
+    image: redis:latest
+
+  django_channels:
+    image: oil-and-rope:0.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      DB_NAME: oilandrope
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: p4ssw0rd@
+      # Django configuration
+      DJANGO_SETTINGS_MODULE: oilandrope.settings
+      SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: "True"
+      # WebSocket configuration
+      DAPHNE_ASGI_MODULE: oilandrope.asgi
+      CHANNEL_LAYER_HOST: redis
+    volumes:
+      - "./compose/channels/command.sh:/command.sh"
+      - "./:/app/"
+    command: /command.sh
+    expose:
+      - "8001"
 
   nginx:
     image: nginx:latest
@@ -52,6 +87,8 @@ services:
     ports:
       - "127.0.0.1:8000:80/tcp"
       - "127.0.0.1:8443:433/tcp"
+    expose:
+      - "5000"
     volumes:
       - "./static:/static"
       - "./media:/media"
