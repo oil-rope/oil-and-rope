@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from django.conf import settings
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -80,6 +81,7 @@ class TestEmbedFooter(TestCase):
         self.assertEqual(expected, result)
 
 
+@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestUser(TestCase):
     api_class = models.User
 
@@ -99,6 +101,7 @@ class TestUser(TestCase):
 
         self.assertEqual(user.id, self.id)
 
+    @pytest.mark.skip('Skipping for now since litecord allows this')
     def test_create_dm_ko(self):
         user = self.api_class(self.id)
 
@@ -106,21 +109,18 @@ class TestUser(TestCase):
         with self.assertRaises(DiscordApiException):
             user.create_dm()
 
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_create_dm_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
         dm = user.create_dm()
 
         self.assertTrue(isinstance(dm, models.Channel))
 
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
         msg = user.send_message(self.faker.word())
 
         self.assertTrue(isinstance(msg, models.Message))
 
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_with_embed_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
         msg = user.send_message(self.faker.word(), embed=self.embed)
@@ -128,7 +128,6 @@ class TestUser(TestCase):
         self.assertTrue(isinstance(msg, models.Message))
         self.assertEqual(self.embed, msg.embed)
 
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_send_message_ko(self):
         user = self.api_class(USER_WITH_DIFFERENT_SERVER)
 

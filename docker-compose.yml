@@ -1,83 +1,110 @@
-version: "3"
+version: "3.9"
 
 volumes:
-  postgres_db_data:
-  gunicorn_sockets:
-  daphne_sockets:
+  postgres_data:
 
 services:
-  postgres_db:
-    image: postgres:11.7
-    env_file:
-      - ./compose/postgres/postgres.env
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: oilandrope
+      POSTGRES_PASSWORD: p4ssw0rd@
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    user: postgres
     # Saving data on local
     volumes:
-      - "postgres_db_data:/var/lib/postgresql/data/"
+      - "postgres_data:/var/lib/postgresql/data/"
 
   django:
-    image: oil-and-rope:latest
+    image: oil-and-rope:0.1
     build:
       context: .
       dockerfile: ./compose/django/Dockerfile
-    command: /command.sh
     depends_on:
-      - postgres_db
-    dns_search: oilandrope-project.com
-    entrypoint: /entrypoint.sh
-    env_file:
-      - ./compose/django/django.env
-    expose:
-      - "80"
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      DB_NAME: oilandrope
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: p4ssw0rd@
+      # Django configuration
+      DJANGO_SETTINGS_MODULE: oilandrope.settings
+      SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: "True"
+      # Gunicorn configuration
+      GUNICORN_WSGI_MODULE: oilandrope.wsgi
+      # WebSocket configuration
+      WS_HOST: nginx:5000
+      CHANNEL_LAYER_HOST: redis
     volumes:
-      - "./:/app/"
-      - "./compose/django/entrypoint.sh:/entrypoint.sh"
       - "./compose/django/command.sh:/command.sh"
-      - "./compose/django/logs/:/var/log/gunicorn/"
-      - "gunicorn_sockets:/var/run/gunicorn/"
+      - "./:/app/"
+    command: /command.sh
     working_dir: /app/
 
   redis:
     image: redis:latest
-    ports:
-      - "127.0.0.1:6379:6379"
 
-  channels:
-    image: oil-and-rope:latest
-    command: /command.sh
+  django_channels:
+    image: oil-and-rope:0.1
     depends_on:
-      - django
-      - postgres_db
-    dns_search: live.oilandrope.com
-    entrypoint: /entrypoint.sh
-    env_file:
-      - ./compose/django/django.env
+      postgres:
+        condition: service_healthy
     environment:
+      # Database configuration
+      DB_NAME: oilandrope
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: p4ssw0rd@
+      # Django configuration
+      DJANGO_SETTINGS_MODULE: oilandrope.settings
+      SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: "True"
+      # WebSocket configuration
+      DAPHNE_ASGI_MODULE: oilandrope.asgi
       CHANNEL_LAYER_HOST: redis
-    expose:
-      - "80"
     volumes:
-      - "./:/app/"
-      - "./compose/django/entrypoint.sh:/entrypoint.sh"
       - "./compose/channels/command.sh:/command.sh"
-      - "./compose/channels/logs/:/var/log/daphne/"
-      - "daphne_sockets:/var/run/daphne/"
-    working_dir: /app/
+      - "./:/app/"
+    command: /command.sh
+    expose:
+      - "8001"
 
   nginx:
     image: nginx:latest
     depends_on:
       - django
-      - channels
+      - django_channels
     ports:
       - "127.0.0.1:8000:80/tcp"
-      - "127.0.0.1:443:433/tcp"
+      - "127.0.0.1:8443:433/tcp"
+    expose:
+      - "5000"
     volumes:
       - "./static:/static"
       - "./media:/media"
       - "./compose/nginx/conf.d/:/etc/nginx/conf.d/"
-      - "./compose/nginx/sites-available/:/etc/nginx/sites-available/"
-      - "./compose/nginx/sites-available/:/etc/nginx/sites-enabled/"
       - "./compose/nginx/nginx.conf:/etc/nginx/nginx.conf"
-      - "./compose/nginx/logs/:/var/log/nginx/"
-      - "gunicorn_sockets:/var/run/gunicorn/"
-      - "daphne_sockets:/var/run/daphne/"
+
+  litecord:
+    image: litecord:0.1
+    build:
+      context: .
+      dockerfile: ./compose/litecord/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - "./compose/litecord/config.py:/srv/litecord/config.py"
+      - "./compose/litecord/nginx.conf:/etc/nginx/nginx.conf"
