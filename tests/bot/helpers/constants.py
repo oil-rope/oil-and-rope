@@ -1,5 +1,7 @@
+import os
+
 # Credentials
-LITECORD_API_URL = 'http://litecord.oilandrope-project.com/api/v6/'
+LITECORD_API_URL = os.getenv('LITECORD_API_URL', 'http://litecord.oilandrope-project.com/api/v6/')
 LITECORD_TOKEN = 'ODQxMjQ3OTY5NzMzOTA2NDMz.YLI_iw.ri7HbEDVya9IKqNx4SQOOCflKUg'
 ANOTHER_BOT_TOKEN = 'NzI2MzkzNzQzNzQ5NTUwMDg2.Xvcpdw.zXqLxigMcMmy8JaFTxkgEO-ABBg'
 
