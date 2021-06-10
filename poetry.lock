@@ -167,19 +167,19 @@ pycparser = "*"
 
 [[package]]
 name = "channels"
-version = "3.0.3"
+version = "2.4.0"
 description = "Brings async, event-driven capabilities to Django. Django 2.2 and up only."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.5"
 
 [package.dependencies]
-asgiref = ">=3.2.10,<4"
-daphne = ">=3.0,<4"
+asgiref = ">=3.2,<4.0"
+daphne = ">=2.3,<3.0"
 Django = ">=2.2"
 
 [package.extras]
-tests = ["pytest", "pytest-django", "pytest-asyncio", "async-generator", "async-timeout", "coverage (>=4.5,<5.0)"]
+tests = ["pytest (>=4.4,<5.0)", "pytest-django (>=3.4,<4.0)", "pytest-asyncio (>=0.10,<1.0)", "async-generator (>=1.10,<2.0)", "async-timeout (>=3.0,<4.0)", "coverage (>=4.5,<5.0)"]
 
 [[package]]
 name = "channels-redis"
@@ -255,14 +255,14 @@ test = ["pytest (>=6.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pret
 
 [[package]]
 name = "daphne"
-version = "3.0.2"
+version = "2.5.0"
 description = "Django ASGI (HTTP/WebSocket) server"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = "*"
 
 [package.dependencies]
-asgiref = ">=3.2.10,<4"
+asgiref = ">=3.2,<4.0"
 autobahn = ">=0.18"
 twisted = {version = ">=18.7", extras = ["tls"]}
 
@@ -1268,7 +1268,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.5"
-content-hash = "8e6c908e642af9ba19805c7a39a394a3e27fc59a6b0deafbe524e66a99eaa8c9"
+content-hash = "b1aa61c07b8dd7f264ac805c938291b6a76c023537d9abe7479cc35db1b37251"
 
 [metadata.files]
 aiohttp = [
@@ -1398,8 +1398,8 @@ cffi = [
     {file = "cffi-1.14.5.tar.gz", hash = "sha256:fd78e5fee591709f32ef6edb9a015b4aa1a5022598e36227500c8f4e02328d9c"},
 ]
 channels = [
-    {file = "channels-3.0.3-py3-none-any.whl", hash = "sha256:3f15bdd2138bb4796e76ea588a0a344b12a7964ea9b2e456f992fddb988a4317"},
-    {file = "channels-3.0.3.tar.gz", hash = "sha256:056b72e51080a517a0f33a0a30003e03833b551d75394d6636c885d4edb8188f"},
+    {file = "channels-2.4.0-py2.py3-none-any.whl", hash = "sha256:80a5ad1962ae039a3dcc0a5cb5212413e66e2f11ad9e9db8004834436daf3400"},
+    {file = "channels-2.4.0.tar.gz", hash = "sha256:08e756406d7165cb32f6fc3090c0643f41ca9f7e0f7fada0b31194662f20f414"},
 ]
 channels-redis = [
     {file = "channels_redis-3.2.0-py2.py3-none-any.whl", hash = "sha256:18d63f6462a58011740dc8eeb57ea4b31ec220eb551cb71b27de9c6779a549de"},
@@ -1486,8 +1486,8 @@ cryptography = [
     {file = "cryptography-3.4.7.tar.gz", hash = "sha256:3d10de8116d25649631977cb37da6cbdd2d6fa0e0281d014a5b7d337255ca713"},
 ]
 daphne = [
-    {file = "daphne-3.0.2-py3-none-any.whl", hash = "sha256:a9af943c79717bc52fe64a3c236ae5d3adccc8b5be19c881b442d2c3db233393"},
-    {file = "daphne-3.0.2.tar.gz", hash = "sha256:76ffae916ba3aa66b46996c14fa713e46004788167a4873d647544e750e0e99f"},
+    {file = "daphne-2.5.0-py2.py3-none-any.whl", hash = "sha256:aa64840015709bbc9daa3c4464a4a4d437937d6cda10a9b51e913eb319272553"},
+    {file = "daphne-2.5.0.tar.gz", hash = "sha256:1ca46d7419103958bbc9576fb7ba3b25b053006e22058bc97084ee1a7d44f4ba"},
 ]
 decorator = [
     {file = "decorator-5.0.9-py3-none-any.whl", hash = "sha256:6e5c199c16f7a9f0e3a61a4a54b3d27e7dad0dbdde92b944426cb20914376323"},
