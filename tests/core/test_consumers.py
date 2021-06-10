@@ -16,7 +16,7 @@ fake = faker.Faker()
 
 @pytest.mark.asyncio
 async def test_websocket_sends_error():
-    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer, 'testws/')
+    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer.as_asgi(), 'testws/')
     data = {
         'dump': fake.word()
     }
@@ -34,7 +34,7 @@ async def test_websocket_sends_error():
 
 @pytest.mark.asyncio
 async def test_websocket_handler_non_existent_function():
-    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer, 'testws/')
+    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer.as_asgi(), 'testws/')
     data = {
         'type': fake.word()
     }

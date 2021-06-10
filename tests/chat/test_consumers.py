@@ -19,7 +19,7 @@ def url():
 @pytest.mark.django_db
 @pytest.mark.asyncio
 async def test_setup_channel_layer(url):
-    communicator = WebsocketCommunicator(ChatConsumer, url)
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
 
     chat = baker.make(models.CHAT_MODEL)
     data = {
@@ -39,7 +39,7 @@ async def test_send_message_without_setup(url, client):
     client.force_login(user)
     request = client.get(url).wsgi_request
 
-    communicator = WebsocketCommunicator(ChatConsumer, url)
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
     communicator.scope['session'] = request.session
 
     chat = baker.make(models.CHAT_MODEL)
@@ -65,7 +65,7 @@ async def test_send_message(url, client):
     request = client.get(url).wsgi_request
     session = request.session
 
-    communicator = WebsocketCommunicator(ChatConsumer, url)
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
     communicator.scope['session'] = session
 
     chat = baker.make(models.CHAT_MODEL)

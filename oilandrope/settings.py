@@ -135,7 +135,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
 # DjangoChannels ASGI Router
-ASGI_APPLICATION = 'oilandrope.routing.application'
+ASGI_APPLICATION = 'oilandrope.asgi.application'
 
 # Channel Layers
 CHANNEL_LAYERS = {

@@ -24,7 +24,7 @@ def url():
 
 @pytest.mark.asyncio
 async def test_websocket_connect(url):
-    communicator = WebsocketCommunicator(BotConsumer, url)
+    communicator = WebsocketCommunicator(BotConsumer.as_asgi(), url)
     connected, subprotocol = await communicator.connect()
     assert connected, 'WebSocket is not connected.'
 
@@ -35,7 +35,7 @@ async def test_websocket_connect(url):
 @pytest.mark.django_db
 @pytest.mark.asyncio
 async def test_discord_user_does_not_exist(url):
-    communicator = WebsocketCommunicator(BotConsumer, url)
+    communicator = WebsocketCommunicator(BotConsumer.as_asgi(), url)
     data = {
         'type': 'check_user',
         'discord_id': fake.random_int()
@@ -53,7 +53,7 @@ async def test_discord_user_does_not_exist(url):
 @pytest.mark.asyncio
 async def test_discord_user_exists(url):
     discord_user = baker.make(models.DiscordUser)
-    communicator = WebsocketCommunicator(BotConsumer, url)
+    communicator = WebsocketCommunicator(BotConsumer.as_asgi(), url)
 
     data = {
         'type': 'check_user',
