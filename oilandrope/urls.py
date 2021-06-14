@@ -27,6 +27,7 @@ import chat.routing
 urlpatterns = [
     path('', include((bot.routing.websocket_urlpatterns, 'bot_ws'))),
     path('', include((chat.routing.websocket_urlpatterns, 'chat_ws'))),
+    path('', include('django_prometheus.urls')),
 ]
 
 urlpatterns += i18n_patterns(
