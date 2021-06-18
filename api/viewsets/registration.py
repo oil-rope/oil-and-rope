@@ -3,8 +3,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 
 from common.constants import models
-from ..permissions import IsUserProfile, IsUser
-from ..serializers.registration import UserSerializer, ProfileSerializer
+
+from ..permissions import IsUser, IsUserProfile
+from ..serializers.registration import ProfileSerializer, UserSerializer
 
 Profile = apps.get_model(models.PROFILE_MODEL)
 
