@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from registration.serializers import UserSerializer
+from api.serializers.registration import UserSerializer
 
 from . import models
 

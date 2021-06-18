@@ -1,17 +1,11 @@
 from django.contrib.auth.views import LogoutView
-from django.urls import include, path
-from rest_framework import routers
+from django.urls import path
 
-from . import views, viewsets
-
-router = routers.DefaultRouter()
-router.register(r'user', viewsets.UserViewSet)
-router.register(r'profile', viewsets.ProfileViewSet)
+from . import views
 
 app_name = 'registration'
 
 urlpatterns = [
-    path('api/', include((router.urls, 'api'))),
     path('login/', views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', views.SignUpView.as_view(), name='register'),

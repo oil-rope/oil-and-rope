@@ -37,6 +37,8 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
+    # API
+    path('api/', include('api.urls')),
     # Common
     path('common/', include('common.urls')),
     # Auth system

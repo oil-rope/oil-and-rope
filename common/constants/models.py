@@ -5,6 +5,9 @@ USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
+# Registration
+PROFILE_MODEL = 'registration.Profile'
+
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'
 
