@@ -4,14 +4,14 @@ from rest_framework import viewsets
 from rest_framework.settings import api_settings
 
 from common.constants import models
-
+from .mixins import ListStaffRequiredMixin
 from ..permissions import IsUser, IsUserProfile
 from ..serializers.registration import ProfileSerializer, UserSerializer
 
 Profile = apps.get_model(models.PROFILE_MODEL)
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     """
     ViewSet for :class:`User`.
     """
