@@ -6,6 +6,6 @@ from .routers import registration
 app_name = 'api'
 
 urlpatterns = [
-    path('', views.ApiVersionView.as_view(), name='api:version'),
+    path('', views.ApiVersionView.as_view(), name='version'),
     path('registration/', include((registration.router.urls, 'registration'))),
 ]

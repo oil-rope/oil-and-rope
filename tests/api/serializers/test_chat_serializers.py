@@ -71,8 +71,9 @@ class TestChatSerializer(TestCase):
         obj = baker.make(_model=self.model, users=users)
         serialized_obj = self.serializer(obj)
         serialized_result = serialized_obj.data
+        expected_result = all([user.id in serialized_result['users'] for user in users])
 
-        self.assertListEqual([user.id for user in users], serialized_result['users'])
+        self.assertTrue(expected_result)
 
     def test_serializer_with_messages_ok(self):
         iterations = fake.pyint(min_value=1, max_value=6)
@@ -81,6 +82,6 @@ class TestChatSerializer(TestCase):
         baker.make(_model=models.CHAT_MESSAGE_MODEL, _quantity=iterations, message=cycle(expected_messages), chat=obj)
         serialized_obj = self.serializer(obj)
         serialized_result = serialized_obj.data
+        expected_result = all([m['message'] in expected_messages for m in serialized_result['chat_message_set']])
 
-        messages = [m['message'] for m in serialized_result['chat_message_set']]
-        self.assertListEqual(expected_messages, messages)
+        self.assertTrue(expected_result)
