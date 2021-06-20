@@ -3,7 +3,7 @@ from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 
-from api.serializers.registration import UserSerializer, ProfileSerializer
+from api.serializers.registration import ProfileSerializer, UserSerializer
 from common.constants import models
 
 fake = Faker()

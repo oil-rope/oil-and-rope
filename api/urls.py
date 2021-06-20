@@ -1,7 +1,7 @@
 from django.urls import include, path
 
-from .routers import registration
 from . import views
+from .routers import registration
 
 app_name = 'api'
 

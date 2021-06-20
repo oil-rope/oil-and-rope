@@ -1,9 +1,9 @@
 from django.apps import apps
 from rest_framework import serializers
 
-from .registration import UserSerializer
-
 from common.constants import models
+
+from .registration import UserSerializer
 
 ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
 Chat = apps.get_model(models.CHAT_MODEL)
