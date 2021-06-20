@@ -71,12 +71,16 @@ INSTALLED_APPS = [
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
+    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
+    'rest_framework.authtoken',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
     # Django metric with Prometheus (https://github.com/korfuri/django-prometheus#django-prometheus)
     'django_prometheus',
     # Source
     'core.apps.CoreConfig',
+    # API
+    'api.apps.ApiConfig',
     # Common
     'common.apps.CommonConfig',
     # Dynamic Menu
@@ -289,7 +293,7 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.DjangoModelPermissions',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',

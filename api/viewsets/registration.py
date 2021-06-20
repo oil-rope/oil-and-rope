@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 
 from common.constants import models
+from rest_framework.settings import api_settings
 
 from ..permissions import IsUser, IsUserProfile
 from ..serializers.registration import ProfileSerializer, UserSerializer
@@ -17,7 +18,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsUser]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUser]
 
 
 class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
@@ -27,4 +28,4 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsUserProfile]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserProfile]
