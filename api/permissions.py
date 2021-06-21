@@ -14,10 +14,15 @@ class IsUserProfile(permissions.BasePermission):
         return obj.user == request.user
 
 
-class IsUser(permissions.BasePermission):
+class IsUserOrAdmin(permissions.BasePermission):
     """
     Checks if user is the one retrieving object.
     """
 
     def has_object_permission(self, request, view, obj) -> bool:
-        return obj == request.user
+        user = request.user
+        if not user:
+            return False
+        if user.is_staff:
+            return True
+        return obj == user
