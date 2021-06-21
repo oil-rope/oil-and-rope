@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class IsUserProfile(permissions.BasePermission):
+class IsUserProfileOrAdmin(permissions.BasePermission):
     """
     Checks if :class:`auth.User` is the owner of the object.
     """
@@ -10,7 +10,11 @@ class IsUserProfile(permissions.BasePermission):
         """
         Checks if owner is the same as `request.user`.
         """
-
+        user = request.user
+        if not user:
+            return False
+        if user.is_staff:
+            return True
         return obj.user == request.user
 
 
