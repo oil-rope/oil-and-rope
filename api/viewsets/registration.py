@@ -4,7 +4,7 @@ from rest_framework.settings import api_settings
 
 from common.constants import models
 
-from ..permissions import IsUserOrAdmin, IsUserProfileOrAdmin
+from ..permissions.registration import IsUserOrAdmin, IsUserProfileOrAdmin
 from ..serializers.registration import ProfileSerializer, UserSerializer
 from .mixins import ListStaffRequiredMixin
 
@@ -17,9 +17,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     ViewSet for :class:`User`.
     """
 
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserOrAdmin]
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserOrAdmin]
 
 
 class ProfileViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
@@ -27,6 +27,6 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     ViewSet for :class:`Profile`.
     """
 
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserProfileOrAdmin]
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserProfileOrAdmin]
