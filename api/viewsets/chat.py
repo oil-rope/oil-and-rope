@@ -17,3 +17,13 @@ class ChatViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.is_staff:
+            qs = super().get_queryset()
+        else:
+            qs = super().get_queryset().filter(
+                users__in=[user],
+            )
+        return qs

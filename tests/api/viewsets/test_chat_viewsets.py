@@ -35,12 +35,12 @@ class TestChatViewSet(TestCase):
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_authenticated_not_admin_chat_list_ko(self):
+    def test_authenticated_chat_list_ok(self):
         url = reverse(f'{base_resolver}:chat-list')
         self.client.force_login(self.user)
         response = self.client.get(url)
 
-        self.assertTrue(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_admin_chat_list_ok(self):
         url = reverse(f'{base_resolver}:chat-list')

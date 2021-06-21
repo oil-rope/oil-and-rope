@@ -39,7 +39,7 @@ class TestUserViewSet(TestCase):
         self.client.force_login(user)
         response = self.client.get(url)
 
-        self.assertTrue(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_authenticated_admin_user_list_ok(self):
         url = reverse(f'{base_resolver}:user-list')
@@ -91,7 +91,7 @@ class TestProfileViewSet(TestRegistrationViewSet):
         self.client.force_login(user)
         response = self.client.get(url)
 
-        self.assertTrue(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_authenticated_admin_user_list_ok(self):
         url = reverse(f'{base_resolver}:profile-list')
