@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
 
-from api.serializers.chat import ChatMessageSerializer, ChatSerializer
+from api.serializers.chat import ChatMessageSerializer
 from common.tools.sync import async_get
 from core.consumers import HandlerJsonWebsocketConsumer
 

@@ -1,5 +1,3 @@
-from itertools import cycle
-
 from django.apps import apps
 from django.shortcuts import reverse
 from django.test import TestCase

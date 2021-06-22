@@ -1,11 +1,12 @@
 from django.apps import apps
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-from rest_framework.settings import api_settings
 from django.utils.translation import gettext_lazy as _
+from rest_framework import status, viewsets
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
 
 from common.constants import models
+
 from ..serializers.chat import ChatMessageSerializer, ChatSerializer
 
 Chat = apps.get_model(models.CHAT_MODEL)
