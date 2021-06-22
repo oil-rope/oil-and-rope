@@ -1,8 +1,7 @@
 from django.apps import apps
 from django.utils.translation import gettext_lazy as _
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from common.constants import models
@@ -43,6 +42,16 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
     queryset = ChatMessage.objects.all()
     serializer_class = ChatMessageSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.is_staff:
+            qs = super().get_queryset()
+        else:
+            qs = super().get_queryset().filter(
+                author_id=user.pk,
+            )
+        return qs
+
     def perform_create(self, serializer):
         self._check_user_in_chat(serializer.validated_data)
         super().perform_create(serializer)
@@ -72,13 +81,3 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
 
         kwargs['data'] = data
         return super().get_serializer(*args, **kwargs)
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated and user.is_staff:
-            qs = super().get_queryset()
-        else:
-            qs = super().get_queryset().filter(
-                author_id=user.pk,
-            )
-        return qs

@@ -1,9 +1,9 @@
 from django.apps import apps
 from django.shortcuts import reverse
-from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from common.constants import models
 
@@ -15,7 +15,7 @@ Profile = apps.get_model(models.PROFILE_MODEL)
 base_resolver = 'api:registration'
 
 
-class TestRegistrationViewSet(TestCase):
+class TestRegistrationViewSet(APITestCase):
 
     def test_non_authenticated_list_urls_ok(self):
         url = reverse(f'{base_resolver}:api-root')
@@ -24,7 +24,7 @@ class TestRegistrationViewSet(TestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-class TestUserViewSet(TestCase):
+class TestUserViewSet(APITestCase):
     model = User
 
     def test_non_authenticated_list_ko(self):

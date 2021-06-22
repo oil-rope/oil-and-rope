@@ -4,8 +4,8 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from common.constants import models
 
@@ -31,12 +31,12 @@ class TestDiscordServerViewSet(TestCase):
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'Anonymous user can access.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'Anonymous user can access.')
 
     def test_post_request_ko(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(self.url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make post request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make post request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')
 
@@ -45,7 +45,7 @@ class TestDiscordServerViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         url = reverse('bot:discordserver-detail', kwargs={'pk': discord_server.pk})
         response = self.client.put(url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make delete request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make delete request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')
 
@@ -54,7 +54,7 @@ class TestDiscordServerViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         url = reverse('bot:discordserver-detail', kwargs={'pk': discord_server.pk})
         response = self.client.delete(url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make delete request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make delete request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')
 
@@ -77,12 +77,12 @@ class TestDiscordTextChannelViewSet(TestCase):
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'Anonymous user can access.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'Anonymous user can access.')
 
     def test_post_request_ko(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(self.url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make post request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make post request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')
 
@@ -91,7 +91,7 @@ class TestDiscordTextChannelViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         url = reverse('bot:discordtextchannel-detail', kwargs={'pk': discord_server.pk})
         response = self.client.put(url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make delete request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make delete request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')
 
@@ -100,6 +100,6 @@ class TestDiscordTextChannelViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         url = reverse('bot:discordtextchannel-detail', kwargs={'pk': discord_server.pk})
         response = self.client.delete(url)
-        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, 'User can make delete request.')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, 'User can make delete request.')
         msg = 'You do not have permission to perform this action.'
         self.assertEqual(msg, response.json()['detail'], 'Message is incorrect.')

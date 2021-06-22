@@ -120,6 +120,7 @@ class TestChatViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
+# noinspection DuplicatedCode
 class TestChatMessageViewSet(APITestCase):
     model = ChatMessage
 
@@ -179,7 +180,7 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
-    def test_authenticated_not_admin_user_not_in_chat_message_create_ok(self):
+    def test_authenticated_not_admin_user_not_in_chat_message_create_ko(self):
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:message-list')
         data = {
@@ -202,7 +203,7 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
-    def test_authenticated_admin_user_not_in_chat_message_create_ok(self):
+    def test_authenticated_admin_user_not_in_chat_message_create_ko(self):
         self.client.force_login(self.admin_user)
         url = reverse(f'{base_resolver}:message-list')
         data = {
@@ -229,7 +230,7 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_not_admin_not_author_message_detail_ok(self):
+    def test_authenticated_not_admin_not_author_message_detail_ko(self):
         message = baker.make(self.model)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
@@ -263,3 +264,72 @@ class TestChatMessageViewSet(APITestCase):
         response = self.client.put(path=url, data=data)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_author_message_update_ko(self):
+        message = baker.make(self.model)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        data = {
+            'message': fake.word(),
+        }
+        response = self.client.put(path=url, data=data)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_author_message_update_ok(self):
+        message = baker.make(self.model, author=self.admin_user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        data = {
+            'message': fake.word(),
+            'chat': message.chat.pk,
+            'author': self.admin_user.pk,
+        }
+        response = self.client.put(path=url, data=data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_not_author_message_update_ok(self):
+        message = baker.make(self.model, author=self.user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        data = {
+            'message': fake.word(),
+            'chat': message.chat.pk,
+            'author': self.user.pk,
+        }
+        response = self.client.put(path=url, data=data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_author_message_delete_ok(self):
+        message = baker.make(self.model, author=self.user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_authenticated_not_admin_not_author_message_delete_ko(self):
+        message = baker.make(self.model)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_author_message_delete_ok(self):
+        message = baker.make(self.model, author=self.admin_user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_authenticated_admin_not_author_message_delete_ok(self):
+        message = baker.make(self.model)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
