@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.settings import api_settings
 
 from .models import DiscordServer, DiscordTextChannel, DiscordUser, DiscordVoiceChannel
 from .serializers import (DiscordServerSerializer, DiscordTextChannelSerializer, DiscordUserSerializer,
@@ -10,6 +11,7 @@ class DiscordServerViewSet(viewsets.ReadOnlyModelViewSet):
     ViewSet for :class:`DiscordServer`.
     """
 
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
     queryset = DiscordServer.objects.all()
     serializer_class = DiscordServerSerializer
 

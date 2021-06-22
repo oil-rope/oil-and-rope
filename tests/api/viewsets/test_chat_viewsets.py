@@ -1,9 +1,9 @@
 from django.apps import apps
 from django.shortcuts import reverse
-from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from common.constants import models
 
@@ -16,7 +16,7 @@ User = apps.get_model(models.USER_MODEL)
 base_resolver = 'api:chat'
 
 
-class TestChatAPIRootViewSet(TestCase):
+class TestChatAPIRootViewSet(APITestCase):
 
     def test_non_authenticated_list_urls_ok(self):
         url = reverse(f'{base_resolver}:api-root')
@@ -25,7 +25,7 @@ class TestChatAPIRootViewSet(TestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-class TestChatViewSet(TestCase):
+class TestChatViewSet(APITestCase):
     model = Chat
 
     @classmethod
@@ -120,7 +120,7 @@ class TestChatViewSet(TestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-class TestChatMessageViewSet(TestCase):
+class TestChatMessageViewSet(APITestCase):
     model = ChatMessage
 
     @classmethod
@@ -213,3 +213,53 @@ class TestChatMessageViewSet(TestCase):
         response = self.client.post(path=url, data=data)
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_non_authenticated_message_detail_ko(self):
+        message = baker.make(self.model)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_not_admin_author_message_detail_ok(self):
+        message = baker.make(self.model, author=self.user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_author_message_detail_ok(self):
+        message = baker.make(self.model)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_author_message_detail_ok(self):
+        message = baker.make(self.model, author=self.admin_user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_not_author_message_detail_ok(self):
+        message = baker.make(self.model, author=self.user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_author_message_update_ok(self):
+        message = baker.make(self.model, author=self.user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        data = {
+            'message': fake.word(),
+        }
+        response = self.client.put(path=url, data=data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)

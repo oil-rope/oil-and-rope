@@ -43,33 +43,6 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
     queryset = ChatMessage.objects.all()
     serializer_class = ChatMessageSerializer
 
-    def create_by_admin(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    def create_by_user(self, request, *args, **kwargs):
-        user = kwargs['user']
-        data = request.data.copy()
-        data['author'] = user.pk
-
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def create(self, request, *args, **kwargs):
-        """
-        Same behaviour as :class:`CreateModelMixin` but checking for admin and author in data.
-        """
-
-        user = request.user
-        kwargs['user'] = user
-
-        if user.is_authenticated and user.is_staff:
-            return self.create_by_admin(request, *args, **kwargs)
-        else:
-            return self.create_by_user(request, *args, **kwargs)
-
     def perform_create(self, serializer):
         self._check_user_in_chat(serializer.validated_data)
         super().perform_create(serializer)
@@ -82,6 +55,23 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
         if user not in chat.users.all():
             msg = _('User not in chat')
             raise ValidationError({'author': f'{msg}.'})
+
+    def get_serializer(self, *args, **kwargs):
+        if 'data' not in kwargs:
+            return super().get_serializer(*args, **kwargs)
+
+        user = self.request.user
+        data = kwargs['data'].copy()
+
+        if user.is_authenticated and not user.is_staff:
+            if self.request.method.lower() == 'post':  # For create author is not needed
+                data['author'] = user.pk
+            if self.request.method.lower() == 'put':  # For update just message is needed
+                data['author'] = user.pk
+                data['chat'] = self.get_object().chat.pk
+
+        kwargs['data'] = data
+        return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user

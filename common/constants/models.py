@@ -10,6 +10,8 @@ PROFILE_MODEL = 'registration.Profile'
 
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'
+DISCORD_SERVER_MODEL = 'bot.DiscordServer'
+DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
 
 # Content Types
 CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
