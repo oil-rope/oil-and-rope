@@ -1,3 +1,5 @@
+from itertools import cycle
+
 from django.apps import apps
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -10,6 +12,7 @@ from common.constants import models
 fake = Faker()
 
 Chat = apps.get_model(models.CHAT_MODEL)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
 User = apps.get_model(models.USER_MODEL)
 
 base_resolver = 'api:chat'
@@ -104,9 +107,111 @@ class TestChatViewSet(TestCase):
     def test_authenticated_user_in_chat_detail_ok(self):
         chat = baker.make(self.model, users=[self.user])
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
-
         url = reverse(f'{base_resolver}:chat-detail', kwargs={'pk': chat.pk})
         self.client.force_login(self.user)
         response = self.client.get(url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_chat_detail_ok(self):
+        chat = baker.make(self.model)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:chat-detail', kwargs={'pk': chat.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+
+class TestChatMessageViewSet(TestCase):
+    model = ChatMessage
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(User)
+        cls.admin_user = baker.make(User, is_staff=True)
+        cls.chat_with_user_in_it = baker.make(Chat, users=[cls.user])
+        cls.chat_without_user_in_it = baker.make(Chat)
+
+    def test_non_authenticated_message_list_ko(self):
+        url = reverse(f'{base_resolver}:message-list')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_not_admin_message_list_ok(self):
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10),
+            message=fake.word(), author_id=self.user.pk,
+        )
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), message=fake.word())
+        url = reverse(f'{base_resolver}:message-list')
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.model.objects.filter(
+            author_id=self.user.id
+        ).count()
+        data = len(response.json())
+
+        self.assertEqual(expected_data, data)
+
+    def test_authenticated_admin_message_list_ok(self):
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), message=fake.word())
+        url = reverse(f'{base_resolver}:message-list')
+        self.client.force_login(self.admin_user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.model.objects.count()
+        data = len(response.json())
+
+        self.assertEqual(expected_data, data)
+
+    def test_authenticated_not_admin_user_in_chat_message_create_ok(self):
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-list')
+        data = {
+            'chat': self.chat_with_user_in_it.pk,
+            'message': fake.word(),
+        }
+        response = self.client.post(path=url, data=data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_authenticated_not_admin_user_not_in_chat_message_create_ok(self):
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:message-list')
+        data = {
+            'chat': self.chat_without_user_in_it.pk,
+            'message': fake.word(),
+        }
+        response = self.client.post(path=url, data=data)
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_authenticated_admin_user_in_chat_message_create_ok(self):
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-list')
+        data = {
+            'chat': self.chat_with_user_in_it.pk,
+            'message': fake.word(),
+            'author': self.user.pk,
+        }
+        response = self.client.post(path=url, data=data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_authenticated_admin_user_not_in_chat_message_create_ok(self):
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:message-list')
+        data = {
+            'chat': self.chat_without_user_in_it.pk,
+            'message': fake.word(),
+            'author': self.user.pk,
+        }
+        response = self.client.post(path=url, data=data)
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)

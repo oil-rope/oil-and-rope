@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.constants.models import CHAT_MODEL, USER_MODEL
 from core.models import TracingMixin
 
 
@@ -19,8 +21,7 @@ class Chat(TracingMixin):
 
     id = models.AutoField(primary_key=True, verbose_name=_('ID'))
     name = models.CharField(verbose_name=_('Chat name'), max_length=50)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('Users'),
-                                   related_name='chat_set')
+    users = models.ManyToManyField(USER_MODEL, verbose_name=_('Users'), related_name='chat_set')
 
     class Meta:
         verbose_name = _('Chat')
@@ -45,11 +46,13 @@ class ChatMessage(TracingMixin):
     """
 
     id = models.AutoField(primary_key=True, verbose_name=_('ID'))
-    chat = models.ForeignKey('chat.Chat', verbose_name=_('Chat'),
-                             on_delete=models.CASCADE, related_name='chat_message_set')
-    message = models.CharField(verbose_name=_('Message'), max_length=150)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'),
-                               on_delete=models.CASCADE, related_name='chat_message_set')
+    chat = models.ForeignKey(
+        CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE, related_name='chat_message_set'
+    )
+    message = models.CharField(verbose_name=_('Message'), max_length=150, null=False, blank=False)
+    author = models.ForeignKey(
+        USER_MODEL, verbose_name=_('Author'), on_delete=models.CASCADE, related_name='chat_message_set'
+    )
 
     class Meta:
         verbose_name = _('Chat Message')

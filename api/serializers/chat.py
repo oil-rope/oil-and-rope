@@ -10,7 +10,6 @@ Chat = apps.get_model(models.CHAT_MODEL)
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
-    author = UserSerializer()
 
     class Meta:
         model = ChatMessage

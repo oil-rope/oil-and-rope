@@ -6,10 +6,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
 
+from api.serializers.chat import ChatMessageSerializer, ChatSerializer
 from common.tools.sync import async_get
 from core.consumers import HandlerJsonWebsocketConsumer
 
-from . import models, serializers
+from . import models
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             chat_id = content['chat']
             msg_text = content['message']
             message = await self.register_message(self.user.id, chat_id, msg_text)
-            data = serializers.ChatMessageSerializer(message).data
+            data = ChatMessageSerializer(message).data
 
             func = 'group_send_message'
             content = {
