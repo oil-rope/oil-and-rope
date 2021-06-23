@@ -18,7 +18,7 @@ base_resolver = 'api:chat'
 
 class TestChatAPIRootViewSet(APITestCase):
 
-    def test_non_authenticated_list_urls_ok(self):
+    def test_anonymous_list_urls_ok(self):
         url = reverse(f'{base_resolver}:api-root')
         response = self.client.get(url)
 
@@ -33,7 +33,7 @@ class TestChatViewSet(APITestCase):
         cls.user = baker.make(User)
         cls.admin_user = baker.make(User, is_staff=True)
 
-    def test_non_authenticated_list_ko(self):
+    def test_anonymous_list_ko(self):
         url = reverse(f'{base_resolver}:chat-list')
         response = self.client.get(url)
 
@@ -87,7 +87,7 @@ class TestChatViewSet(APITestCase):
 
         self.assertEqual(expected_data, len(data))
 
-    def test_non_authenticated_detail_ko(self):
+    def test_anonymous_detail_ko(self):
         chat = baker.make(self.model)
         url = reverse(f'{base_resolver}:chat-detail', kwargs={'pk': chat.pk})
         response = self.client.get(url)
@@ -131,7 +131,7 @@ class TestChatMessageViewSet(APITestCase):
         cls.chat_with_user_in_it = baker.make(Chat, users=[cls.user])
         cls.chat_without_user_in_it = baker.make(Chat)
 
-    def test_non_authenticated_message_list_ko(self):
+    def test_anonymous_message_list_ko(self):
         url = reverse(f'{base_resolver}:message-list')
         response = self.client.get(url)
 
@@ -215,7 +215,7 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
-    def test_non_authenticated_message_detail_ko(self):
+    def test_anonymous_message_detail_ko(self):
         message = baker.make(self.model)
         url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
         response = self.client.get(url)
@@ -254,25 +254,25 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_not_admin_author_message_update_ok(self):
+    def test_authenticated_not_admin_author_message_partial_update_ok(self):
         message = baker.make(self.model, author=self.user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
         data = {
             'message': fake.word(),
         }
-        response = self.client.put(path=url, data=data)
+        response = self.client.patch(path=url, data=data)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_not_admin_not_author_message_update_ko(self):
+    def test_authenticated_not_admin_not_author_message_partial_update_ko(self):
         message = baker.make(self.model)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
         data = {
             'message': fake.word(),
         }
-        response = self.client.put(path=url, data=data)
+        response = self.client.patch(path=url, data=data)
 
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 

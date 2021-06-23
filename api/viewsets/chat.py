@@ -2,6 +2,7 @@ from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAdminUser
 from rest_framework.settings import api_settings
 
 from common.constants import models
@@ -52,6 +53,11 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
             )
         return qs
 
+    def get_permissions(self):
+        if self.action == 'update':  # Only admin users has permission to change an entire entry
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+
     def perform_create(self, serializer):
         self._check_user_in_chat(serializer.validated_data)
         super().perform_create(serializer)
@@ -72,12 +78,16 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
         user = self.request.user
         data = kwargs['data'].copy()
 
-        if user.is_authenticated and not user.is_staff:
-            if self.request.method.lower() == 'post':  # For create author is not needed
-                data['author'] = user.pk
-            if self.request.method.lower() == 'put':  # For update just message is needed
-                data['author'] = user.pk
-                data['chat'] = self.get_object().chat.pk
+        if self.action == 'partial_update':
+            # Only message if allowed to be changed by patch
+            if 'message' in data:
+                data = {
+                    'message': data['message']
+                }
+
+        # If user is not admin we assume author is same as user
+        if self.action == 'create' and not user.is_staff:
+            data['author'] = user.pk
 
         kwargs['data'] = data
         return super().get_serializer(*args, **kwargs)
