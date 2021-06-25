@@ -21,6 +21,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_object(self):
+        if self.kwargs[self.lookup_url_kwarg or self.lookup_field] == '@me':
+            return self.request.user
+        return super().get_object()
+
 
 class ProfileViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     """
@@ -30,3 +35,8 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet, ListStaffRequiredMixin):
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserProfileOrAdmin]
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
+    def get_object(self):
+        if self.kwargs[self.lookup_url_kwarg or self.lookup_field] == '@me':
+            return self.request.user.profile
+        return super().get_object()

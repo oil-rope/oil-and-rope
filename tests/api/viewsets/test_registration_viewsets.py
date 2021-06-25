@@ -49,6 +49,14 @@ class TestUserViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_authenticated_get_current_user_ok(self):
+        url = reverse(f'{base_resolver}:user-detail', kwargs={'pk': '@me'})
+        user = baker.make(self.model)
+        self.client.force_login(user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
     def test_authenticated_not_same_user_detail_ko(self):
         user_to_check = baker.make(self.model)
         url = reverse(f'{base_resolver}:user-detail', kwargs={'pk': user_to_check.pk})
@@ -96,6 +104,14 @@ class TestProfileViewSet(TestRegistrationViewSet):
     def test_authenticated_admin_user_list_ok(self):
         url = reverse(f'{base_resolver}:profile-list')
         user = baker.make(User, is_staff=True)
+        self.client.force_login(user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_get_current_profile_ok(self):
+        url = reverse(f'{base_resolver}:profile-detail', kwargs={'pk': '@me'})
+        user = baker.make(User)
         self.client.force_login(user)
         response = self.client.get(url)
 
