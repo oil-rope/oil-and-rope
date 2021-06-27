@@ -29,7 +29,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
 
     def get_serializer(self, *args, **kwargs):
         if 'data' not in kwargs:
-            return super().get_serializer()
+            return super().get_serializer(*args, **kwargs)
 
         data = kwargs['data']
 
@@ -42,12 +42,10 @@ class PlaceViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
-        qs = super().get_queryset()
         user = self.request.user
+        qs = super().get_queryset()
 
         if not user.is_staff:
-            qs = qs.filter(
-                owner=user,
-            )
+            qs = Place.objects.community_places()
 
         return qs

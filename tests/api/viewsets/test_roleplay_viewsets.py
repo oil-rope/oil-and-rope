@@ -69,6 +69,7 @@ class TestDomainViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
+# noinspection DuplicatedCode
 class TestPlaceViewSet(APITestCase):
 
     @classmethod
@@ -84,17 +85,37 @@ class TestPlaceViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_authenticated_not_admin_owner_list_ok(self):
+    def test_authenticated_not_admin_community_places_list_ok(self):
         self.client.force_login(self.user)
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), owner=self.user)
+        # Community places
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        # Private places
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10),
+            user=self.admin_user, owner=self.admin_user
+        )
         response = self.client.get(self.list_url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-        expected_data = self.model.objects.filter(
-            owner=self.user
-        ).count()
+        expected_data = self.model.objects.community_places().count()
+        data = response.json()
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_admin_place_list_ok(self):
+        self.client.force_login(self.admin_user)
+        # Community places
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        # Private places
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user
+        )
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.model.objects.count()
         data = response.json()
 
         self.assertEqual(expected_data, len(data))
