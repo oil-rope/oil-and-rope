@@ -3,4 +3,4 @@ from .routers import OilAndRopeDefaultRouter
 
 router = OilAndRopeDefaultRouter()
 router.register(prefix=r'domain', viewset=DomainViewSet, basename='domain')
-router.register(prefix=f'place', viewset=PlaceViewSet, basename='place')
+router.register(prefix=r'place', viewset=PlaceViewSet, basename='place')

@@ -1,11 +1,11 @@
 from django.apps import apps
-from rest_framework import viewsets, permissions
+from rest_framework import permissions, viewsets
 from rest_framework.settings import api_settings
 
 from common.constants import models
 
-from ..serializers.roleplay import DomainSerializer, PlaceSerializer
 from ..permissions import common
+from ..serializers.roleplay import DomainSerializer, PlaceSerializer
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
