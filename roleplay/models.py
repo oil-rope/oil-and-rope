@@ -31,8 +31,9 @@ class Domain(TracingMixin):
 
     name = models.CharField(verbose_name=_('Name'), max_length=25, null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    domain_type = models.PositiveSmallIntegerField(verbose_name=_('Domain type'), choices=DomainTypes.choices,
-                                                   default=DomainTypes.DOMAIN, null=False, blank=False)
+    domain_type = models.PositiveSmallIntegerField(
+        verbose_name=_('Domain type'), choices=DomainTypes.choices, default=DomainTypes.DOMAIN, null=False, blank=False
+    )
     image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
 
     objects = managers.DomainManager()

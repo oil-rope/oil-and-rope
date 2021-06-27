@@ -1,7 +1,7 @@
 from django.urls import include, path
 
 from . import views
-from .routers import chat, dynamic_menu, registration
+from .routers import chat, dynamic_menu, registration, roleplay
 
 app_name = 'api'
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('registration/', include((registration.router.urls, 'registration'))),
     path('chat/', include((chat.router.urls, 'chat'))),
     path('dynamic_menu/', include((dynamic_menu.router.urls, 'dynamic_menu'))),
+    path('roleplay/', include((roleplay.router.urls, 'roleplay'))),
 ]
