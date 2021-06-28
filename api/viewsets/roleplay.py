@@ -6,6 +6,7 @@ from common.constants import models
 
 from ..permissions import common
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer
+from .mixins import UserListMixin
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
@@ -17,7 +18,8 @@ class DomainViewSet(viewsets.ModelViewSet):
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
 
 
-class PlaceViewSet(viewsets.ModelViewSet):
+class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
+    related_name = 'places'
     serializer_class = PlaceSerializer
     queryset = Place.objects.all()
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [common.IsOwnerOrStaff]
@@ -44,6 +46,9 @@ class PlaceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
+
+        if self.action != 'list':
+            return qs
 
         if not user.is_staff:
             qs = Place.objects.community_places()

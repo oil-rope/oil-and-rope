@@ -108,14 +108,33 @@ class TestPlaceViewSet(APITestCase):
         # Community places
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
         # Private places
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user
-        )
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user)
         response = self.client.get(self.list_url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         expected_data = self.model.objects.count()
+        data = response.json()
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_user_places_list_ok(self):
+        # Community places
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        # Private places
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user)
+        # Different user's private places
+        another_user = baker.make(User)
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=another_user, owner=another_user
+        )
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:place-user-list')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.user.places.count()
         data = response.json()
 
         self.assertEqual(expected_data, len(data))
