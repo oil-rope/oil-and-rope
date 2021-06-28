@@ -1,5 +1,6 @@
 from django.apps import apps
 from rest_framework import permissions, viewsets
+from rest_framework.permissions import IsAdminUser
 from rest_framework.settings import api_settings
 
 from common.constants import models
@@ -13,11 +14,15 @@ Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
 
 
-# TODO: Disable creating Domain for non staff users
 class DomainViewSet(viewsets.ModelViewSet):
     serializer_class = DomainSerializer
     queryset = Domain.objects.all()
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+
+    def get_permissions(self):
+        if self.action not in ('list', 'retrieve'):
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
 
 
 class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):

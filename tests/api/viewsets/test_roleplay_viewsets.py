@@ -68,6 +68,90 @@ class TestDomainViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_authenticated_not_admin_create_ko(self):
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_create_ok(self):
+        self.client.force_login(self.admin_user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_authenticated_not_admin_partial_update_ko(self):
+        self.client.force_login(self.user)
+        domain = baker.make(self.model)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_partial_update_ok(self):
+        self.client.force_login(self.admin_user)
+        domain = baker.make(self.model)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_update_ko(self):
+        self.client.force_login(self.user)
+        domain = baker.make(self.model)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_update_ok(self):
+        self.client.force_login(self.admin_user)
+        domain = baker.make(self.model)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_delete_ko(self):
+        self.client.force_login(self.user)
+        domain = baker.make(self.model)
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_delete_ok(self):
+        self.client.force_login(self.admin_user)
+        domain = baker.make(self.model)
+        url = reverse(f'{base_resolver}:domain-detail', kwargs={'pk': domain.pk})
+        response = self.client.delete(url)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
 
 # noinspection DuplicatedCode
 class TestPlaceViewSet(APITestCase):
