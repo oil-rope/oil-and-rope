@@ -99,7 +99,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         expected_data = self.model.objects.community_places().count()
-        data = response.json()
+        data = response.json()['results']
 
         self.assertEqual(expected_data, len(data))
 
@@ -114,7 +114,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         expected_data = self.model.objects.count()
-        data = response.json()
+        data = response.json()['results']
 
         self.assertEqual(expected_data, len(data))
 
@@ -135,6 +135,6 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         expected_data = self.user.places.count()
-        data = response.json()
+        data = response.json()['results']
 
         self.assertEqual(expected_data, len(data))

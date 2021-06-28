@@ -26,10 +26,10 @@ class TestChatAPIRootViewSet(APITestCase):
 
 
 class TestChatViewSet(APITestCase):
-    model = Chat
-
     @classmethod
     def setUpTestData(cls):
+        cls.model = Chat
+
         cls.user = baker.make(User)
         cls.admin_user = baker.make(User, is_staff=True)
 
@@ -61,7 +61,7 @@ class TestChatViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-        data = response.json()
+        data = response.json()['results']
         expected_data = self.model.objects.filter(
             users__in=[self.user],
         ).count()
@@ -82,7 +82,7 @@ class TestChatViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-        data = response.json()
+        data = response.json()['results']
         expected_data = self.model.objects.count()
 
         self.assertEqual(expected_data, len(data))
@@ -122,10 +122,10 @@ class TestChatViewSet(APITestCase):
 
 # noinspection DuplicatedCode
 class TestChatMessageViewSet(APITestCase):
-    model = ChatMessage
-
     @classmethod
     def setUpTestData(cls):
+        cls.model = ChatMessage
+
         cls.user = baker.make(User)
         cls.admin_user = baker.make(User, is_staff=True)
         cls.chat_with_user_in_it = baker.make(Chat, users=[cls.user])
@@ -152,9 +152,9 @@ class TestChatMessageViewSet(APITestCase):
         expected_data = self.model.objects.filter(
             author_id=self.user.id
         ).count()
-        data = len(response.json())
+        data = response.json()['results']
 
-        self.assertEqual(expected_data, data)
+        self.assertEqual(expected_data, len(data))
 
     def test_authenticated_admin_message_list_ok(self):
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), message=fake.word())
@@ -165,9 +165,9 @@ class TestChatMessageViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         expected_data = self.model.objects.count()
-        data = len(response.json())
+        data = response.json()['results']
 
-        self.assertEqual(expected_data, data)
+        self.assertEqual(expected_data, len(data))
 
     def test_authenticated_not_admin_user_in_chat_message_create_ok(self):
         self.client.force_login(self.user)
