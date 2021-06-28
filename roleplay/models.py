@@ -292,12 +292,17 @@ class Race(TracingMixin):
     intelligence = models.SmallIntegerField(verbose_name=_('Intelligence'), default=0)
     wisdom = models.SmallIntegerField(verbose_name=_('Wisdom'), default=0)
     charisma = models.SmallIntegerField(verbose_name=_('Charisma'), default=0)
-    affected_by_armor = models.BooleanField(verbose_name=_('Affected by armor'), default=True,
-                                            help_text=_('Declares if this race is affected by armor penalties'))
-    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, validators=[validate_file_size],
-                              null=True, blank=True)
-    users = models.ManyToManyField(verbose_name=_('Users'), to=constants.USER_MODEL, related_name='race_set',
-                                   db_index=True, through=constants.USER_RACE_RELATION)
+    affected_by_armor = models.BooleanField(
+        verbose_name=_('Affected by armor'), default=True,
+        help_text=_('Declares if this race is affected by armor penalties')
+    )
+    image = models.ImageField(
+        verbose_name=_('Image'), upload_to=default_upload_to, validators=[validate_file_size], null=True, blank=True
+    )
+    users = models.ManyToManyField(
+        verbose_name=_('Users'), to=constants.USER_MODEL, related_name='race_set', db_index=True,
+        through=constants.USER_RACE_RELATION,
+    )
 
     @property
     def owners(self):

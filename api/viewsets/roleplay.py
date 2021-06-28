@@ -5,11 +5,12 @@ from rest_framework.settings import api_settings
 from common.constants import models
 
 from ..permissions import common
-from ..serializers.roleplay import DomainSerializer, PlaceSerializer
+from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
 from .mixins import UserListMixin
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
+Race = apps.get_model(models.RACE_MODEL)
 
 
 # TODO: Disable creating Domain for non staff users
@@ -48,7 +49,8 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
 
         if self.action == 'create':
             data.appendlist('owner', user.pk)
-            data.appendlist('user', user.pk)
+            if not data.get('public', False):
+                data.appendlist('user', user.pk)
 
         kwargs['data'] = data
         return super().get_serializer(*args, **kwargs)
@@ -61,3 +63,9 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
             qs = Place.objects.community_places()
 
         return qs
+
+
+class RaceViewSet(viewsets.ModelViewSet):
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    queryset = Race.objects.all()
+    serializer_class = RaceSerializer

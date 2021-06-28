@@ -270,7 +270,7 @@ class TestPlaceViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
-    def test_authenticated_not_admin_create_place_ok(self):
+    def test_authenticated_not_admin_create_private_place_ok(self):
         self.client.force_login(self.user)
         data = {
             'name': fake.word(),
@@ -279,6 +279,27 @@ class TestPlaceViewSet(APITestCase):
         response = self.client.post(self.list_url, data)
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': response.json()['id']})
+        data = self.client.get(url).json()
+
+        self.assertEqual(data['user'], self.user.pk)
+
+    def test_authenticated_not_admin_create_public_place_ok(self):
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'public': True,
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': response.json()['id']})
+        data = self.client.get(url).json()
+
+        self.assertIsNone(data['user'])
 
     def test_authenticated_admin_create_place_ok(self):
         self.client.force_login(self.admin_user)
