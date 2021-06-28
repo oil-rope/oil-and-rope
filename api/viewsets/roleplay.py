@@ -12,6 +12,7 @@ Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 
 
+# TODO: Disable creating Domain for non staff users
 class DomainViewSet(viewsets.ModelViewSet):
     serializer_class = DomainSerializer
     queryset = Domain.objects.all()
@@ -33,7 +34,11 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
         if 'data' not in kwargs:
             return super().get_serializer(*args, **kwargs)
 
-        data = kwargs['data']
+        user = self.request.user
+        if user.is_staff:
+            return super().get_serializer(*args, **kwargs)
+
+        data = kwargs['data'].copy()
 
         if self.action == 'partial_update':
             if 'owner' in data:
@@ -41,6 +46,11 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
             if 'user' in data:
                 del data['user']
 
+        if self.action == 'create':
+            data.appendlist('owner', user.pk)
+            data.appendlist('user', user.pk)
+
+        kwargs['data'] = data
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
