@@ -47,10 +47,7 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
         user = self.request.user
         qs = super().get_queryset()
 
-        if self.action != 'list':
-            return qs
-
-        if not user.is_staff:
+        if self.action == 'list' and not user.is_staff:
             qs = Place.objects.community_places()
 
         return qs

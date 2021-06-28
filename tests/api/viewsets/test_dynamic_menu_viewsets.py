@@ -33,10 +33,10 @@ class TestDynamicMenuAPIRootViewSet(APITestCase):
 
 
 class TestDynamicMenuViewSet(APITestCase):
-    model = DynamicMenu
-
     @classmethod
     def setUpTestData(cls):
+        cls.model = DynamicMenu
+
         cls.user = baker.make(User)
         cls.admin_user = baker.make(User, is_staff=True)
         cls.instance = baker.make(cls.model)

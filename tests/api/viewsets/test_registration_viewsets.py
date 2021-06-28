@@ -25,7 +25,9 @@ class TestRegistrationViewSet(APITestCase):
 
 
 class TestUserViewSet(APITestCase):
-    model = User
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = User
 
     def test_non_authenticated_list_ko(self):
         url = reverse(f'{base_resolver}:user-list')
@@ -85,7 +87,9 @@ class TestUserViewSet(APITestCase):
 
 
 class TestProfileViewSet(TestRegistrationViewSet):
-    model = Profile
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = Profile
 
     def test_non_authenticated_list_ko(self):
         url = reverse(f'{base_resolver}:profile-list')

@@ -138,3 +138,91 @@ class TestPlaceViewSet(APITestCase):
         data = response.json()['results']
 
         self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_not_admin_owner_place_detail_ok(self):
+        self.client.force_login(self.user)
+        place = baker.make(self.model, owner=self.user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_owner_place_detail_ko(self):
+        self.client.force_login(self.user)
+        place = baker.make(self.model, owner=self.admin_user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_not_owner_place_detail_ko(self):
+        self.client.force_login(self.admin_user)
+        place = baker.make(self.model, owner=self.user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_owner_partial_update_place_ok(self):
+        place = baker.make(self.model, owner=self.user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_owner_partial_update_place_ok(self):
+        place = baker.make(self.model, owner=self.admin_user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_not_owner_partial_update_place_ok(self):
+        place = baker.make(self.model, owner=self.user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_owner_update_place_ko(self):
+        place = baker.make(self.model, owner=self.user)
+        self.client.force_login(self.user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'owner': self.user,
+            'user': self.user,
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_admin_not_owner_update_place_ko(self):
+        place = baker.make(self.model, owner=self.user)
+        self.client.force_login(self.admin_user)
+        url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'owner': self.user.pk,
+            'user': self.user.pk,
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)

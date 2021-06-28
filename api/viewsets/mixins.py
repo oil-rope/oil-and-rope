@@ -1,18 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
-from rest_framework import status
-from rest_framework.mixins import ListModelMixin
-from rest_framework.response import Response
-
-
-class ListStaffRequiredMixin(ListModelMixin):
-    def list(self, request, *args, **kwargs):
-        user = request.user
-        if user.is_staff or user.is_superuser:
-            return super().list(request, *args, **kwargs)
-        else:
-            msg = _('You don\'t have permission to perform this action')
-            return Response(data=f'{msg}.', status=status.HTTP_403_FORBIDDEN)
 
 
 # noinspection PyUnresolvedReferences
@@ -35,13 +22,14 @@ class UserListMixin:
 
     def get_reverse_relation(self):
         user = self.request.user
-        if not hasattr(user, self.related_name):
+        related_name = self.get_related_name()
+        if not hasattr(user, related_name):
             raise AttributeError(
                 _('User doesn\'t have %(related_name)s attribute.') % {
-                    'related_name': self.get_related_name()
+                    'related_name': related_name
                 }
             )
-        return getattr(user, self.related_name)
+        return getattr(user, related_name)
 
     def get_queryset(self):
         if self.action == 'user_list':
