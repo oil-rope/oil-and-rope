@@ -27,7 +27,7 @@ class TestDiscordServerViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code, 'User cannot access.')
-        self.assertEqual(entries, len(response.data), 'Not all entries are being listed.')
+        self.assertEqual(entries, len(response.data['results']), 'Not all entries are being listed.')
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
@@ -73,7 +73,7 @@ class TestDiscordTextChannelViewSet(TestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(200, response.status_code, 'User cannot access.')
-        self.assertEqual(entries, len(response.data), 'Not all entries are being listed.')
+        self.assertEqual(entries, len(response.data['results']), 'Not all entries are being listed.')
 
     def test_anonymous_user_ko(self):
         response = self.client.get(self.url)
