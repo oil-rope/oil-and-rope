@@ -9,6 +9,7 @@ from common.constants import models
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
+Race = apps.get_model(models.RACE_MODEL)
 User = apps.get_model(models.USER_MODEL)
 
 fake = Faker()
@@ -401,3 +402,178 @@ class TestPlaceViewSet(APITestCase):
         data = self.client.get(url).json()
 
         self.assertEqual(expected_data, data['owner'])
+
+
+# noinspection DuplicatedCode
+class TestRaceViewSet(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = Race
+        cls.list_url = reverse(f'{base_resolver}:race-list')
+
+        cls.user = baker.make(User)
+        cls.admin_user = baker.make(User, is_staff=True)
+
+    def test_anonymous_race_list_ko(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_not_admin_race_list_ok(self):
+        self.client.force_login(self.user)
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.user.race_set.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_admin_race_list_ok(self):
+        self.client.force_login(self.admin_user)
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.model.objects.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_not_admin_owner_race_detail_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_owner_race_detail_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_owner_race_detail_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        race.add_owners(self.admin_user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_not_owner_race_detail_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_owner_race_update_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_owner_race_update_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_owner_race_update_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        race.add_owners(self.admin_user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_not_owner_race_update_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_owner_race_partial_update_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_not_owner_race_partial_update_ok(self):
+        self.client.force_login(self.user)
+        race = baker.make(self.model)
+        race.add_owners(self.admin_user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_owner_race_partial_update_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        race.add_owners(self.admin_user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_admin_not_owner_race_partial_update_ok(self):
+        self.client.force_login(self.admin_user)
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-detail', kwargs={'pk': race.pk})
+        data = {
+            'description': fake.paragraph(),
+        }
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)

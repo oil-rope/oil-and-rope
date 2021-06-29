@@ -71,6 +71,13 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
 
 
 class RaceViewSet(viewsets.ModelViewSet):
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [common.IsInOwnersOrStaff]
     queryset = Race.objects.all()
     serializer_class = RaceSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        if not user.is_staff:
+            qs = user.race_set.all()
+        return qs

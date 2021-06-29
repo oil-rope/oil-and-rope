@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
@@ -304,10 +305,11 @@ class Race(TracingMixin):
         through=constants.USER_RACE_RELATION,
     )
 
-    @property
-    def owners(self):
+    def get_owners(self):
         qs = self.users.filter(m2m_race_set__is_owner=True)
         return qs
+
+    owners = cached_property(func=get_owners, name='owners')
 
     def add_owners(self, *users):
         # Getting RaceUser model

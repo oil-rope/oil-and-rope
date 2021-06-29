@@ -27,11 +27,18 @@ class PlaceSerializer(serializers.ModelSerializer):
         )
 
 
+# noinspection PyMethodMayBeStatic
 class RaceSerializer(serializers.ModelSerializer):
+
+    owners = serializers.SerializerMethodField(method_name='get_owners')
+
+    def get_owners(self, obj):
+        owners_pk = obj.owners.values_list('pk', flat=True)
+        return list(owners_pk)
 
     class Meta:
         model = Race
         fields = (
             'id', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma',
-            'affected_by_armor', 'image', 'users',
+            'affected_by_armor', 'image', 'users', 'owners',
         )
