@@ -28,11 +28,15 @@ def is_gettext_node(node):
     return True
 
 
-def check_model(model):
+def check_model(model):  # noqa
     """
     Checks a model to accomplish the following hints:
 
     - MC001: Model has `verbose_name`.
+    - MC002: `verbose_name` uses gettext.
+    - MC003: `verbose_name` is lowercase.
+    - MC004: `help_text` uses gettext.
+    - MC005: ForeignKey uses `db_index`.
     """
 
     model_source = inspect.getsource(model)
@@ -81,7 +85,7 @@ def check_model(model):
                         'Words in verbose name must be all lower case',
                         hint='Change verbose name to "{}".'.format(value.lower()),
                         obj=field,
-                        id='H003',
+                        id='MC003',
                     )
 
         help_text = get_argument(node, 'help_text')
@@ -91,7 +95,7 @@ def check_model(model):
                     'Help text should use gettext',
                     hint='Use gettext on the help text.',
                     obj=field,
-                    id='H004',
+                    id='MC004',
                 )
 
         if field.many_to_one:
@@ -101,7 +105,7 @@ def check_model(model):
                     'Must set db_index explicitly on a ForeignKey field',
                     hint='Set db_index on the field.',
                     obj=field,
-                    id='H008',
+                    id='MC005',
                 )
 
 
