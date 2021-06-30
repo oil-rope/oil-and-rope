@@ -6,6 +6,7 @@ from common.constants import models
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
+Session = apps.get_model(models.SESSION_MODEL)
 
 
 class DomainSerializer(serializers.ModelSerializer):
@@ -41,4 +42,13 @@ class RaceSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma',
             'affected_by_armor', 'image', 'users', 'owners',
+        )
+
+
+class SessionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Session
+        fields = (
+            'id', 'name', 'players', 'chat', 'next_game', 'system', 'game_master', 'world',
         )

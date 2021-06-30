@@ -10,6 +10,7 @@ from common.constants import models
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
+Session = apps.get_model(models.SESSION_MODEL)
 User = apps.get_model(models.USER_MODEL)
 
 fake = Faker()
@@ -639,3 +640,18 @@ class TestRaceViewSet(APITestCase):
         race = self.model.objects.get(pk=response.json()['id'])
 
         self.assertIn(self.admin_user, race.owners)
+
+
+class TestSessionViewSet(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = Session
+        cls.list_url = reverse(f'{base_resolver}:session-list')
+
+        cls.user = baker.make(User)
+        cls.admin_user = baker.make(User, is_staff=True)
+
+    def test_anonymous_session_list_ko(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)

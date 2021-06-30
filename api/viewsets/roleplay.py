@@ -6,12 +6,13 @@ from rest_framework.settings import api_settings
 from common.constants import models
 
 from ..permissions import common
-from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
+from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
+Session = apps.get_model(models.SESSION_MODEL)
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -94,5 +95,24 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
 
         if not user.is_staff:
             qs = user.race_set.all()
+
+        return qs
+
+
+class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
+    related_name = 'gm_session'
+    queryset = Session.objects.all()
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    serializer_class = SessionSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if self.action == 'user_list':
+            return qs
+
+        user = self.request.user
+        if not user.is_staff:
+            qs = user.session_set.all()
 
         return qs
