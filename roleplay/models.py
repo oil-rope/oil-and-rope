@@ -1,5 +1,4 @@
 from django.apps import apps
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.urls import reverse
@@ -30,12 +29,12 @@ class Domain(TracingMixin):
         Little description about what involves this domain.
     """
 
-    name = models.CharField(verbose_name=_('Name'), max_length=25, null=False, blank=False)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    name = models.CharField(verbose_name=_('name'), max_length=25, null=False, blank=False)
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
     domain_type = models.PositiveSmallIntegerField(
-        verbose_name=_('Domain type'), choices=DomainTypes.choices, default=DomainTypes.DOMAIN, null=False, blank=False
+        verbose_name=_('domain type'), choices=DomainTypes.choices, default=DomainTypes.DOMAIN, null=False, blank=False
     )
-    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True)
+    image = models.ImageField(verbose_name=_('image'), upload_to=default_upload_to, null=True, blank=True)
 
     objects = managers.DomainManager()
 
@@ -48,8 +47,8 @@ class Domain(TracingMixin):
         return self.domain_type == DomainTypes.SUBDOMAIN
 
     class Meta:
-        verbose_name = _('Domain')
-        verbose_name_plural = _('Domains')
+        verbose_name = _('domain')
+        verbose_name_plural = _('domains')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
 
     def __str__(self):
@@ -81,18 +80,26 @@ class Place(MPTTModel, TracingMixin):
 
     ICON_RESOLVERS = ICON_RESOLVERS
 
-    name = models.CharField(verbose_name=_('Name'), max_length=100, null=False, blank=False)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    site_type = models.PositiveSmallIntegerField(verbose_name=_('Site type'), choices=SiteTypes.choices,
-                                                 default=SiteTypes.TOWN, null=False, blank=False)
-    image = models.ImageField(verbose_name=_('Image'), upload_to=default_upload_to, null=True, blank=True,
-                              validators=[validate_file_size])
-    parent_site = TreeForeignKey('self', verbose_name=_('Parent site'), on_delete=models.CASCADE, null=True, blank=True,
-                                 related_name='children_sites', db_index=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='places', verbose_name=_('User'),
-                             blank=True, null=True, db_index=True)
-    owner = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name='places_owned',
-                              verbose_name=_('Owner'), blank=True, null=True, db_index=True)
+    name = models.CharField(verbose_name=_('name'), max_length=100, null=False, blank=False)
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    site_type = models.PositiveSmallIntegerField(
+        verbose_name=_('site type'), choices=SiteTypes.choices, default=SiteTypes.TOWN, null=False, blank=False
+    )
+    image = models.ImageField(
+        verbose_name=_('image'), upload_to=default_upload_to, null=True, blank=True, validators=[validate_file_size]
+    )
+    parent_site = TreeForeignKey(
+        to='self', verbose_name=_('parent site'), on_delete=models.CASCADE, null=True, blank=True,
+        related_name='children_sites', db_index=True
+    )
+    user = models.ForeignKey(
+        to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='places', verbose_name=_('user'), blank=True,
+        null=True, db_index=True
+    )
+    owner = models.ForeignKey(
+        to=constants.USER_MODEL, on_delete=models.SET_NULL, related_name='places_owned', verbose_name=_('owner'),
+        blank=True, null=True, db_index=True
+    )
 
     objects = managers.PlaceManager()
 
@@ -236,19 +243,19 @@ class Place(MPTTModel, TracingMixin):
         parent_attr = 'parent_site'
 
     class Meta:
-        verbose_name = _('Place')
-        verbose_name_plural = _('Places')
+        verbose_name = _('place')
+        verbose_name_plural = _('places')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
 
     def clean(self):
         if self.user and not self.owner:
             raise ValidationError({
-                'user': _('A private world must have owner') + '.'
+                'user': _('a private world must have owner') + '.'
             })
 
     def save(self, *args, **kwargs):
         if self.user and not self.owner:
-            raise IntegrityError(_('A private world must have owner') + '.')
+            raise IntegrityError(_('a private world must have owner') + '.')
         return super().save(*args, **kwargs)
 
     def __str__(self):
@@ -285,23 +292,23 @@ class Race(TracingMixin):
         Users that have this race.
     """
 
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    strength = models.SmallIntegerField(verbose_name=_('Strength'), default=0)
-    dexterity = models.SmallIntegerField(verbose_name=_('Dexterity'), default=0)
-    constitution = models.SmallIntegerField(verbose_name=_('Constitution'), default=0)
-    intelligence = models.SmallIntegerField(verbose_name=_('Intelligence'), default=0)
-    wisdom = models.SmallIntegerField(verbose_name=_('Wisdom'), default=0)
-    charisma = models.SmallIntegerField(verbose_name=_('Charisma'), default=0)
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0)
+    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0)
+    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0)
+    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0)
+    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0)
+    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0)
     affected_by_armor = models.BooleanField(
-        verbose_name=_('Affected by armor'), default=True,
-        help_text=_('Declares if this race is affected by armor penalties')
+        verbose_name=_('affected by armor'), default=True,
+        help_text=_('declares if this race is affected by armor penalties')
     )
     image = models.ImageField(
-        verbose_name=_('Image'), upload_to=default_upload_to, validators=[validate_file_size], null=True, blank=True
+        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=True, blank=True
     )
     users = models.ManyToManyField(
-        verbose_name=_('Users'), to=constants.USER_MODEL, related_name='race_set', db_index=True,
+        verbose_name=_('users'), to=constants.USER_MODEL, related_name='race_set', db_index=True,
         through=constants.USER_RACE_RELATION,
     )
 
@@ -321,8 +328,8 @@ class Race(TracingMixin):
         return model.objects.filter(pk__in=new_entries)
 
     class Meta:
-        verbose_name = _('Race')
-        verbose_name_plural = _('Races')
+        verbose_name = _('race')
+        verbose_name_plural = _('races')
         ordering = ['-entry_created_at', 'name']
 
     def __str__(self):
@@ -343,11 +350,15 @@ class RaceUser(TracingMixin):
         Declares if the related user is owner.
     """
 
-    user = models.ForeignKey(verbose_name=_('User'), to=constants.USER_MODEL, related_name='m2m_race_set',
-                             on_delete=models.CASCADE, db_index=True)
-    race = models.ForeignKey(verbose_name=_('Race'), to=constants.RACE_MODEL, related_name='m2m_race_set',
-                             on_delete=models.CASCADE, db_index=True)
-    is_owner = models.BooleanField(verbose_name=_('Ownership'), default=False)
+    user = models.ForeignKey(
+        verbose_name=_('user'), to=constants.USER_MODEL, related_name='m2m_race_set', on_delete=models.CASCADE,
+        db_index=True
+    )
+    race = models.ForeignKey(
+        verbose_name=_('race'), to=constants.RACE_MODEL, related_name='m2m_race_set', on_delete=models.CASCADE,
+        db_index=True
+    )
+    is_owner = models.BooleanField(verbose_name=_('ownership'), default=False)
 
     def __str__(self):
         return f'{self.user.username} <-> {self.race.name}'
@@ -375,32 +386,32 @@ class Session(TracingMixin):
         The world where this session is played.
     """
 
-    name = models.CharField(verbose_name=_('Name'), max_length=100)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
+    name = models.CharField(verbose_name=_('name'), max_length=100)
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
     players = models.ManyToManyField(
-        get_user_model(), verbose_name=_('Players'), related_name='session_set', related_query_name='session'
+        to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session'
     )
     chat = models.ForeignKey(
-        to=constants.CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE,
+        to=constants.CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True, blank=True
     )
     next_game = models.DateTimeField(
-        verbose_name=_('Next session'), auto_now=False, auto_now_add=False, null=True, blank=True
+        verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True
     )
-    system = models.PositiveSmallIntegerField(verbose_name=_('System'), choices=RoleplaySystems.choices)
+    system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     game_master = models.ForeignKey(
-        to=constants.USER_MODEL, verbose_name=_('GameMaster'), on_delete=models.CASCADE,
+        to=constants.USER_MODEL, verbose_name=_('game master'), on_delete=models.CASCADE,
         related_name='gm_session_set', related_query_name='gm_session', db_index=True
     )
     world = models.ForeignKey(
-        to=constants.PLACE_MODEL, verbose_name=_('World'), on_delete=models.CASCADE,
+        to=constants.PLACE_MODEL, verbose_name=_('world'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True,
         limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
 
     class Meta:
-        verbose_name = _('Session')
-        verbose_name_plural = _('Sessions')
+        verbose_name = _('session')
+        verbose_name_plural = _('sessions')
         ordering = ['-entry_created_at', 'name']
 
     def get_absolute_url(self):
@@ -410,12 +421,12 @@ class Session(TracingMixin):
         # Don't allow non Worlds to be world
         try:
             if self.world.site_type != SiteTypes.WORLD:
-                msg = _('World must be a world')
+                msg = _('world must be a world')
                 raise ValidationError({'world': f'{msg}.'})
         except ValidationError as e:
             raise e
         except Session.world.RelatedObjectDoesNotExist:
-            msg = _('World is required')
+            msg = _('world is required')
             raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):
