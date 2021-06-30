@@ -445,6 +445,40 @@ class TestRaceViewSet(APITestCase):
 
         self.assertEqual(expected_data, len(data))
 
+    def test_authenticated_not_admin_owned_races_list_ok(self):
+        self.client.force_login(self.user)
+        # Not owned races
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        # Owned race
+        race = baker.make(self.model)
+        race.add_owners(self.user)
+        url = reverse(f'{base_resolver}:race-user-list')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.user.owned_races.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_admin_owned_races_list_ok(self):
+        self.client.force_login(self.admin_user)
+        # Not owned races
+        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        # Owned race
+        race = baker.make(self.model)
+        race.add_owners(self.admin_user)
+        url = reverse(f'{base_resolver}:race-user-list')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.admin_user.owned_races.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
     def test_authenticated_not_admin_owner_race_detail_ok(self):
         self.client.force_login(self.user)
         race = baker.make(self.model)
@@ -577,3 +611,31 @@ class TestRaceViewSet(APITestCase):
         response = self.client.patch(url, data)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_race_create_ok(self):
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        race = self.model.objects.get(pk=response.json()['id'])
+
+        self.assertIn(self.user, race.owners)
+
+    def test_authenticated_admin_race_create_ok(self):
+        self.client.force_login(self.admin_user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        race = self.model.objects.get(pk=response.json()['id'])
+
+        self.assertIn(self.admin_user, race.owners)

@@ -17,7 +17,14 @@ from core.models import TracingMixin
 
 class User(AbstractUser):
     email = models.EmailField(verbose_name=_('email address'), null=False, blank=False, unique=True)
-    is_premium = models.BooleanField(verbose_name=_('Premium user'), default=False)
+    is_premium = models.BooleanField(verbose_name=_('premium user'), default=False)
+
+    @property
+    def owned_races(self):
+        races = self.race_set.filter(
+            m2m_race_set__is_owner=True
+        )
+        return races
 
     def get_user_from_discord_api(self):
         try:

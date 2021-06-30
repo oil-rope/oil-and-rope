@@ -70,14 +70,29 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
         return qs
 
 
-class RaceViewSet(viewsets.ModelViewSet):
+class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
+    related_name = 'owned_races'
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [common.IsInOwnersOrStaff]
     queryset = Race.objects.all()
     serializer_class = RaceSerializer
 
+    def perform_create(self, serializer):
+        """
+        We add the user that performed create to owners.
+        """
+
+        obj = serializer.save()
+        user = self.request.user
+        obj.add_owners(user)
+
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
+
+        if self.action == 'user_list':
+            return qs
+
         if not user.is_staff:
             qs = user.race_set.all()
+
         return qs

@@ -12,4 +12,8 @@ EXTRA_PLACE_PATTERNS = [
     path('place/@me', PlaceViewSet.as_view({'get': 'user_list'}), name='place-user-list'),
 ]
 
-urls = router.urls + EXTRA_PLACE_PATTERNS
+EXTRA_RACE_PATTERNS = [
+    path('race/@me', RaceViewSet.as_view({'get': 'user_list'}), name='race-user-list'),
+]
+
+urls = router.urls + EXTRA_PLACE_PATTERNS + EXTRA_RACE_PATTERNS
