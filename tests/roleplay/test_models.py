@@ -372,7 +372,7 @@ class TestPlace(TestCase):
                 name=self.faker.city(),
                 user=user
             )
-        self.assertEqual(str(ex.exception), 'A private world must have owner.')
+        self.assertEqual(str(ex.exception), 'a private world must have owner.')
 
     def test_user_but_no_owner_clean_ko(self):
         user = baker.make(get_user_model())
@@ -388,7 +388,7 @@ class TestPlace(TestCase):
         ex = ex.exception
         self.assertIn('user', ex.error_dict)
         message = ex.error_dict['user'][0].message
-        self.assertEqual(message, 'A private world must have owner.')
+        self.assertEqual(message, 'a private world must have owner.')
 
 
 class TestRace(TestCase):
@@ -470,7 +470,7 @@ class TestSession(TestCase):
 
     def test_non_world_ko(self):
         place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
-        with self.assertRaisesRegex(ValidationError, 'World must be a world'):
+        with self.assertRaisesRegex(ValidationError, 'world must be a world'):
             self.model.objects.create(
                 name=self.fake.word(),
                 game_master=self.user,
