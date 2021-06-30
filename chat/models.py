@@ -17,13 +17,13 @@ class Chat(TracingMixin):
         Users in this chat.
     """
 
-    id = models.AutoField(primary_key=True, verbose_name=_('ID'))
-    name = models.CharField(verbose_name=_('Chat name'), max_length=50)
-    users = models.ManyToManyField(USER_MODEL, verbose_name=_('Users'), related_name='chat_set')
+    id = models.AutoField(primary_key=True, verbose_name=_('id'))
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    users = models.ManyToManyField(to=USER_MODEL, verbose_name=_('users'), related_name='chat_set')
 
     class Meta:
-        verbose_name = _('Chat')
-        verbose_name_plural = _('Chats')
+        verbose_name = _('chat')
+        verbose_name_plural = _('chats')
 
     def __str__(self):
         return f'{self.name} ({self.pk})'
@@ -43,18 +43,19 @@ class ChatMessage(TracingMixin):
         Person who sent the message.
     """
 
-    id = models.AutoField(primary_key=True, verbose_name=_('ID'))
+    id = models.AutoField(primary_key=True, verbose_name=_('id'))
     chat = models.ForeignKey(
-        CHAT_MODEL, verbose_name=_('Chat'), on_delete=models.CASCADE, related_name='chat_message_set'
+        to=CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE, related_name='chat_message_set', db_index=True
     )
-    message = models.CharField(verbose_name=_('Message'), max_length=150, null=False, blank=False)
+    message = models.CharField(verbose_name=_('message'), max_length=150, null=False, blank=False)
     author = models.ForeignKey(
-        USER_MODEL, verbose_name=_('Author'), on_delete=models.CASCADE, related_name='chat_message_set'
+        to=USER_MODEL, verbose_name=_('author'), on_delete=models.CASCADE, related_name='chat_message_set',
+        db_index=True
     )
 
     class Meta:
-        verbose_name = _('Chat Message')
-        verbose_name_plural = _('Chat Messages')
+        verbose_name = _('chat message')
+        verbose_name_plural = _('chat messages')
 
     def __str__(self):
         return f'{self.message} ({self.entry_created_at})'
