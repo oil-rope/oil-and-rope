@@ -28,7 +28,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         )
 
 
-# noinspection PyMethodMayBeStatic
 class RaceSerializer(serializers.ModelSerializer):
 
     owners = serializers.SerializerMethodField(method_name='get_owners')
@@ -46,9 +45,14 @@ class RaceSerializer(serializers.ModelSerializer):
 
 
 class SessionSerializer(serializers.ModelSerializer):
+    game_masters = serializers.SerializerMethodField(method_name='get_game_masters')
+
+    def get_game_masters(self, obj):
+        gms_pk = obj.game_masters.values_list('pk', flat=True)
+        return list(gms_pk)
 
     class Meta:
         model = Session
         fields = (
-            'id', 'name', 'players', 'chat', 'next_game', 'system', 'game_master', 'world',
+            'id', 'name', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters',
         )

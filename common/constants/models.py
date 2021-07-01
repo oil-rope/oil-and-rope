@@ -25,6 +25,7 @@ PLACE_MODEL = 'roleplay.Place'
 RACE_MODEL = 'roleplay.Race'
 USER_RACE_RELATION = 'roleplay.RaceUser'
 SESSION_MODEL = 'roleplay.Session'
+ROLEPLAY_PLAYER_IN_SESSION = 'roleplay.PlayerInSession'
 
 # Chat
 CHAT_MODEL = 'chat.Chat'

@@ -6,9 +6,11 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.constants import models
+from roleplay.enums import SiteTypes, RoleplaySystems
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
+PlayerInSession = apps.get_model(models.ROLEPLAY_PLAYER_IN_SESSION)
 Race = apps.get_model(models.RACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
 User = apps.get_model(models.USER_MODEL)
@@ -642,6 +644,7 @@ class TestRaceViewSet(APITestCase):
         self.assertIn(self.admin_user, race.owners)
 
 
+# noinspection DuplicatedCode
 class TestSessionViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -650,8 +653,157 @@ class TestSessionViewSet(APITestCase):
 
         cls.user = baker.make(User)
         cls.admin_user = baker.make(User, is_staff=True)
+        cls.world = baker.make(Place, site_type=SiteTypes.WORLD)
 
     def test_anonymous_session_list_ko(self):
         response = self.client.get(self.list_url)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_not_admin_session_list_ok(self):
+        # User sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
+        )
+        # Other's sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
+            world=self.world
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.user.session_set.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_admin_session_list_ok(self):
+        # User sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
+        )
+        # Other's sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
+            world=self.world
+        )
+        self.client.force_login(self.admin_user)
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.model.objects.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_not_admin_user_in_players_retrieve_session_ok(self):
+        session = baker.make(self.model, players=[self.user], world=self.world)
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_user_not_in_players_retrieve_session_ok(self):
+        session = baker.make(self.model, world=self.world)
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_not_admin_gm_sessions_list_ok(self):
+        # User sessions
+        sessions = baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
+        )
+        for session in sessions:
+            PlayerInSession.objects.create(
+                player=self.user,
+                session=session,
+                is_game_master=True
+            )
+        # Other's sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
+            world=self.world
+        )
+        url = reverse(f'{base_resolver}:session-user-list')
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.user.gm_sessions.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_admin_gm_sessions_list_ok(self):
+        # User sessions
+        sessions = baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
+        )
+        for session in sessions:
+            PlayerInSession.objects.create(
+                player=self.admin_user,
+                session=session,
+                is_game_master=True
+            )
+        # Other's sessions
+        baker.make(
+            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user],
+            world=self.world
+        )
+        url = reverse(f'{base_resolver}:session-user-list')
+        self.client.force_login(self.admin_user)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        expected_data = self.admin_user.gm_sessions.count()
+        data = response.json()['results']
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_not_admin_create_session_ok(self):
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        data = response.json()
+        players = data['players']
+        game_masters = data['game_masters']
+
+        self.assertIn(self.user.pk, players)
+        self.assertIn(self.user.pk, game_masters)
+
+    def test_authenticated_admin_create_session_ok(self):
+        self.client.force_login(self.admin_user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk
+        }
+        response = self.client.post(self.list_url, data)
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        data = response.json()
+        players = data['players']
+        game_masters = data['game_masters']
+
+        self.assertIn(self.admin_user.pk, players)
+        self.assertIn(self.admin_user.pk, game_masters)

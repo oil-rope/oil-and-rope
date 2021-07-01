@@ -100,7 +100,7 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
 
 
 class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
-    related_name = 'gm_session'
+    related_name = 'gm_sessions'
     queryset = Session.objects.all()
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
     serializer_class = SessionSerializer
@@ -116,3 +116,9 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
             qs = user.session_set.all()
 
         return qs
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        user = self.request.user
+        obj.add_game_masters(user)
+        return obj

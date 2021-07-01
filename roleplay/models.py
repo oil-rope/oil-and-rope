@@ -389,7 +389,8 @@ class Session(TracingMixin):
     name = models.CharField(verbose_name=_('name'), max_length=100)
     description = models.TextField(verbose_name=_('description'), null=True, blank=True)
     players = models.ManyToManyField(
-        to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session'
+        to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session',
+        through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
     )
     chat = models.ForeignKey(
         to=constants.CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE,
@@ -399,10 +400,6 @@ class Session(TracingMixin):
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True
     )
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
-    game_master = models.ForeignKey(
-        to=constants.USER_MODEL, verbose_name=_('game master'), on_delete=models.CASCADE,
-        related_name='gm_session_set', related_query_name='gm_session', db_index=True
-    )
     world = models.ForeignKey(
         to=constants.PLACE_MODEL, verbose_name=_('world'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True,
@@ -413,6 +410,19 @@ class Session(TracingMixin):
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
         ordering = ['-entry_created_at', 'name']
+
+    def add_game_masters(self, *users):
+        PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
+        entries_to_create = [PlayerInSession(player=user, session=self, is_game_master=True) for user in users]
+        objs = PlayerInSession.objects.bulk_create(entries_to_create)
+        return objs
+
+    @property
+    def game_masters(self):
+        gms = self.players.filter(
+            player_in_session_set__is_game_master=True
+        )
+        return gms
 
     def get_absolute_url(self):
         return reverse('roleplay:session:detail', kwargs={'pk': self.pk})
@@ -430,7 +440,6 @@ class Session(TracingMixin):
             raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):
-        Chat = apps.get_model(constants.CHAT_MODEL)
         self.full_clean()
 
         try:
@@ -438,16 +447,35 @@ class Session(TracingMixin):
         except Session.chat.RelatedObjectDoesNotExist:
             formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
             chat_name = f'{self.name}_{formatted_date}'
+            # noinspection PyPep8Naming
+            Chat = apps.get_model(constants.CHAT_MODEL)
             self.chat = Chat.objects.create(
                 name=chat_name[:Chat.name.field.max_length]
             )
         finally:
             super().save(*args, **kwargs)
-            # We add GM
-            self.chat.users.add(self.game_master)
             # We add all players
             self.chat.users.add(*self.players.all())
 
     def __str__(self):
         created_at = self.entry_created_at.strftime('%Y-%m-%d')
         return f'{self.name} ({created_at})'
+
+
+class PlayerInSession(TracingMixin):
+    id = models.AutoField(verbose_name=_('id'), primary_key=True, db_index=True)
+    session = models.ForeignKey(
+        to=constants.SESSION_MODEL, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
+        db_index=True, verbose_name=_('session'),
+    )
+    player = models.ForeignKey(
+        to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
+        db_index=True, verbose_name=_('player')
+    )
+    is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
+
+    def __str__(self):
+        str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s') % {
+            'player': self.player, 'session': self.session, 'is_game_master': self.is_game_master
+        }
+        return str_model

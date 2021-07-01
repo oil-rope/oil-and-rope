@@ -27,6 +27,13 @@ class User(AbstractUser):
         )
         return races
 
+    @property
+    def gm_sessions(self):
+        sessions = self.session_set.filter(
+            player_in_session_set__is_game_master=True
+        )
+        return sessions
+
     def get_user_from_discord_api(self):
         try:
             discord_user = self.discord_user
