@@ -16,6 +16,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
+from datetime import datetime
 
 Domain = apps.get_model(constants.DOMAIN_MODEL)
 Place = apps.get_model(constants.PLACE_MODEL)
@@ -473,14 +474,29 @@ class TestSession(TestCase):
         self.assertIsNotNone(instance.chat)
         self.assertIn(instance.name, instance.chat.name)
 
-    def test_non_world_ko(self):
+    def test_clean_non_world_ko(self):
         place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
+        session = self.model(
+            name=fake.word(),
+            description=fake.paragraph(),
+            next_game=datetime.now(),
+            system=RoleplaySystems.PATHFINDER,
+            world=place,
+        )
+
         with self.assertRaisesRegex(ValidationError, 'world must be a world'):
-            self.model.objects.create(
-                name=fake.word(),
-                system=RoleplaySystems.PATHFINDER,
-                world=place,
-            )
+            session.clean()
+
+    def test_clean_no_world_given_ko(self):
+        session = self.model(
+            name=fake.word(),
+            description=fake.paragraph(),
+            next_game=datetime.now(),
+            system=RoleplaySystems.PATHFINDER,
+        )
+
+        with self.assertRaisesRegex(ValidationError, 'session hasn\'t any world'):
+            session.clean()
 
     def test_add_game_masters_ok(self):
         iterations = fake.pyint(min_value=1, max_value=10)

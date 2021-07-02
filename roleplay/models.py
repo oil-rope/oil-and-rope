@@ -429,7 +429,11 @@ class Session(TracingMixin):
 
     def clean(self):
         # Don't allow non Worlds to be world
-        world = self.world
+        try:
+            world = self.world
+        except Session.world.RelatedObjectDoesNotExist:
+            msg = _('session hasn\'t any world')
+            raise ValidationError({'world': f'{msg}.'})
         if world:
             if world.site_type != SiteTypes.WORLD:
                 msg = _('world must be a world')
