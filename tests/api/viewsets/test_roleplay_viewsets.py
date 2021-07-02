@@ -803,3 +803,60 @@ class TestSessionViewSet(APITestCase):
 
         self.assertIn(self.admin_user.pk, players)
         self.assertIn(self.admin_user.pk, game_masters)
+
+    def test_authenticated_not_admin_game_master_update_session_ok(self):
+        session = baker.make(self.model, world=self.world)
+        session.add_game_masters(self.user)
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk,
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_player_not_game_master_update_session_ok(self):
+        session = baker.make(self.model, world=self.world)
+        self.client.force_login(self.user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk,
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_admin_not_player_not_game_master_update_session_ok(self):
+        session = baker.make(self.model, world=self.world)
+        self.client.force_login(self.admin_user)
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk,
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_not_admin_player_not_game_master_update_session_ko(self):
+        self.client.force_login(self.user)
+        session = baker.make(self.model, world=self.world, players=[self.user])
+        data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'system': RoleplaySystems.PATHFINDER,
+            'world': self.world.pk,
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.put(url, data)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)

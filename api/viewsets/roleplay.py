@@ -6,6 +6,7 @@ from rest_framework.settings import api_settings
 from common.constants import models
 
 from ..permissions import common
+from ..permissions.roleplay import IsInGameMastersOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
 
@@ -116,6 +117,30 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
             qs = user.session_set.all()
 
         return qs
+
+    def get_serializer(self, *args, **kwargs):
+        user = self.request.user
+        if user.is_staff:
+            return super().get_serializer(*args, **kwargs)
+
+        if self.action in ('list', 'user_list', 'retrieve', 'create'):
+            return super().get_serializer(*args, **kwargs)
+
+        data = kwargs['data'].copy()
+
+        if 'players' in data:
+            del data['players']
+        if 'chat' in data:
+            del data['chat']
+
+        kwargs['data'] = data
+
+        return super().get_serializer(*args, **kwargs)
+
+    def get_permissions(self):
+        if self.action in ('partial_update', 'update'):
+            self.permission_classes = [IsInGameMastersOrStaff]
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         obj = serializer.save()
