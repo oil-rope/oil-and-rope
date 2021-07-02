@@ -197,7 +197,6 @@ class SessionJoinView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
     model = models.Session
     pattern_name = 'roleplay:session:detail'
 
-    # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         user = request.user
@@ -214,7 +213,6 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
     model = models.Session
     template_name = 'roleplay/session/session_detail.html'
 
-    # noinspection PyAttributeOutsideInit
     def dispatch(self, request, *args, **kwargs):
         user = request.user
 
@@ -223,9 +221,8 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
 
         self.object = self.get_object()
         players = self.object.players.all()
-        game_master = self.object.game_master
 
-        if user not in players and user != game_master:
+        if user not in players:
             msg = _('You are not part of this session')
             messages.error(request, f'{msg}.')
             return HttpResponseForbidden(content=f'{msg}.')

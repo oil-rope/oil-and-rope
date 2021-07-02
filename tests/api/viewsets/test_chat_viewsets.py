@@ -120,7 +120,6 @@ class TestChatViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-# noinspection DuplicatedCode
 class TestChatMessageViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls):

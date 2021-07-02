@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.constants import models
-from roleplay.enums import SiteTypes, RoleplaySystems
+from roleplay.enums import RoleplaySystems, SiteTypes
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
@@ -28,7 +28,6 @@ class TestRoleplayAPIRoot(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
-# noinspection DuplicatedCode
 class TestDomainViewSet(APITestCase):
 
     @classmethod
@@ -157,7 +156,6 @@ class TestDomainViewSet(APITestCase):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
 
-# noinspection DuplicatedCode
 class TestPlaceViewSet(APITestCase):
 
     @classmethod
@@ -407,7 +405,6 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(expected_data, data['owner'])
 
 
-# noinspection DuplicatedCode
 class TestRaceViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -644,7 +641,6 @@ class TestRaceViewSet(APITestCase):
         self.assertIn(self.admin_user, race.owners)
 
 
-# noinspection DuplicatedCode
 class TestSessionViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls):

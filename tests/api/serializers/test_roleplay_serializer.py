@@ -16,7 +16,6 @@ User = apps.get_model(models.USER_MODEL)
 fake = Faker()
 
 
-# noinspection DuplicatedCode
 class TestDomainSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -47,7 +46,6 @@ class TestDomainSerializer(TestCase):
         self.assertEqual(expected_name, serialized_result['name'])
 
 
-# noinspection DuplicatedCode
 class TestPlaceSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -78,7 +76,6 @@ class TestPlaceSerializer(TestCase):
         self.assertEqual(expected_name, serialized_result['name'])
 
 
-# noinspection DuplicatedCode
 class TestRaceSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -128,7 +125,6 @@ class TestRaceSerializer(TestCase):
         self.assertListEqual([user.pk], owners)
 
 
-# noinspection DuplicatedCode
 class TestSessionSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):

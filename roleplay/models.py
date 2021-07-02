@@ -447,7 +447,7 @@ class Session(TracingMixin):
         except Session.chat.RelatedObjectDoesNotExist:
             formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
             chat_name = f'{self.name}_{formatted_date}'
-            # noinspection PyPep8Naming
+
             Chat = apps.get_model(constants.CHAT_MODEL)
             self.chat = Chat.objects.create(
                 name=chat_name[:Chat.name.field.max_length]

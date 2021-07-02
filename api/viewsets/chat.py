@@ -62,7 +62,6 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
         self._check_user_in_chat(serializer.validated_data)
         super().perform_create(serializer)
 
-    # noinspection PyMethodMayBeStatic
     def _check_user_in_chat(self, data):
         user = data['author']
         chat = data['chat']

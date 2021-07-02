@@ -2,7 +2,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
 
-# noinspection PyUnresolvedReferences
 class UserListMixin:
     """
     Returns a queryset by a given reverse relation.

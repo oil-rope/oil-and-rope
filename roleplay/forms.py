@@ -162,7 +162,6 @@ class SessionForm(forms.ModelForm):
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
-    # noinspection PyAttributeOutsideInit
     def clean(self):
         cleaned_data = super().clean()
 

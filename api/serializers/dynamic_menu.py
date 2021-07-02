@@ -6,7 +6,6 @@ from common.constants import models
 DynamicMenu = apps.get_model(models.DYNAMIC_MENU)
 
 
-# noinspection PyMethodMayBeStatic
 class DynamicMenuSerializer(serializers.ModelSerializer):
     models = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()

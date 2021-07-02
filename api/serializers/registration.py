@@ -28,7 +28,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     profile = ProfileSerializer()
 
-    # noinspection PyMethodMayBeStatic
     def get_auth_token(self, obj):
         return obj.auth_token
 

@@ -7,7 +7,6 @@ from faker import Faker
 from common.tools import mail as common_mail
 
 
-# noinspection DuplicatedCode
 class ThreadMail(TestCase):
     mail_class = common_mail.ThreadMail
 
@@ -35,7 +34,6 @@ class ThreadMail(TestCase):
             self.assertEqual(self.to, mail.outbox[0].to, 'Receiver is incorrect.')
 
 
-# noinspection DuplicatedCode
 class HtmlThreadMail(TestCase):
     mail_class = common_mail.HtmlThreadMail
 

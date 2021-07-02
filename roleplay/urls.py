@@ -1,10 +1,6 @@
 from django.urls import include, path
-from rest_framework import routers
 
-from . import views, viewsets
-
-router = routers.DefaultRouter()
-router.register('place', viewsets.PlaceViewSet)
+from . import views
 
 app_name = 'roleplay'
 
@@ -23,7 +19,6 @@ SESSION_PATTERNS = [
 ]
 
 urlpatterns = [
-    path('api/', include(router.urls)),
     path('place/', include(PLACE_PATTERNS)),
     path('session/', include((SESSION_PATTERNS, 'session'))),
 ]
