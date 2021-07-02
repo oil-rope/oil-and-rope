@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -5,19 +6,27 @@ from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
 
-from common.constants import models
+from common.constants import models as constants
 from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
+from roleplay.enums import SiteTypes
+
+
+Place = apps.get_model(constants.PLACE_MODEL)
+Race = apps.get_model(constants.RACE_MODEL)
+Session = apps.get_model(constants.SESSION_MODEL)
+User = apps.get_model(constants.USER_MODEL)
+
+fake = Faker()
 
 
 class TestUser(TestCase):
-    fake = Faker()
-    model = get_user_model()
-
     @classmethod
     def setUpTestData(cls):
+        cls.model = get_user_model()
+
         cls.instance = baker.make(_model=cls.model)
         cls.discord_user = baker.make(
-            _model=models.DISCORD_USER_MODEL,
+            _model=constants.DISCORD_USER_MODEL,
             id=USER_WITH_SAME_SERVER,
             user=cls.instance,
         )
@@ -33,11 +42,31 @@ class TestUser(TestCase):
         discord_user = self.instance.get_user_from_discord_api()
         self.assertIsNotNone(discord_user)
 
+    def test_owned_races_ok(self):
+        iterations = fake.pyint(min_value=1, max_value=10)
+        races = baker.make(Race, iterations)
+        [r.add_owners(self.instance) for r in races]
+
+        result = self.instance.owned_races.count()
+        expected_result = iterations
+
+        self.assertEqual(expected_result, result)
+
+    def test_gm_sessions_ok(self):
+        iterations = fake.pyint(min_value=1, max_value=10)
+        world = baker.make(Place, site_type=SiteTypes.WORLD)
+        sessions = baker.make(_model=Session, _quantity=iterations, world=world)
+        [s.add_game_masters(self.instance) for s in sessions]
+
+        result = self.instance.gm_sessions.count()
+        expected_result = iterations
+
+        self.assertEqual(expected_result, result)
+
 
 class TestProfileModel(TestCase):
 
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
         self.profile = self.user.profile
         self.profile.birthday = timezone.datetime(1998, 7, 14).date()
