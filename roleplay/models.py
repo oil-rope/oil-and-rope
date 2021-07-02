@@ -429,15 +429,11 @@ class Session(TracingMixin):
 
     def clean(self):
         # Don't allow non Worlds to be world
-        try:
-            if self.world.site_type != SiteTypes.WORLD:
+        world = self.world
+        if world:
+            if world.site_type != SiteTypes.WORLD:
                 msg = _('world must be a world')
                 raise ValidationError({'world': f'{msg}.'})
-        except ValidationError as e:
-            raise e
-        except Session.world.RelatedObjectDoesNotExist:
-            msg = _('world is required')
-            raise ValidationError({'world': f'{msg}.'})
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -475,7 +471,7 @@ class PlayerInSession(TracingMixin):
     is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
 
     def __str__(self):
-        str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s') % {
+        str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s)') % {
             'player': self.player, 'session': self.session, 'is_game_master': self.is_game_master
         }
         return str_model

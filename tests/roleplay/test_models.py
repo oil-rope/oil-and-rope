@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
+from django.shortcuts import reverse
 from django.test import TestCase
 from faker import Faker
 from freezegun import freeze_time
@@ -18,6 +19,7 @@ from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 
 Domain = apps.get_model(constants.DOMAIN_MODEL)
 Place = apps.get_model(constants.PLACE_MODEL)
+PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
 Race = apps.get_model(constants.RACE_MODEL)
 RaceUser = apps.get_model(constants.USER_RACE_RELATION)
 Session = apps.get_model(constants.SESSION_MODEL)
@@ -479,3 +481,61 @@ class TestSession(TestCase):
                 system=RoleplaySystems.PATHFINDER,
                 world=place,
             )
+
+    def test_add_game_masters_ok(self):
+        iterations = fake.pyint(min_value=1, max_value=10)
+        users = baker.make(_model=User, _quantity=iterations)
+        instace = baker.make(self.model, world=self.world)
+        queries = (
+            'Bulk Create',
+        )
+
+        with self.assertNumQueries(len(queries)):
+            instace.add_game_masters(*users)
+
+        expected = iterations
+        result = PlayerInSession.objects.filter(
+            player__in=users,
+            is_game_master=True
+        ).count()
+
+        self.assertEqual(expected, result)
+
+    def test_property_game_masters_ok(self):
+        iterations = fake.pyint(min_value=1, max_value=10)
+        users = baker.make(_model=User, _quantity=iterations)
+        instace = baker.make(self.model, world=self.world)
+        instace.add_game_masters(*users)
+
+        expected = iterations
+        result = instace.game_masters.count()
+
+        self.assertEqual(expected, result)
+
+    def test_get_absolute_url(self):
+        instance = baker.make(self.model, world=self.world)
+        expected_url = reverse('roleplay:session:detail', kwargs={'pk': instance.pk})
+        url = instance.get_absolute_url()
+
+        self.assertEqual(expected_url, url)
+
+
+class TestPlayerInSession(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = PlayerInSession
+        cls.world = baker.make(Place, site_type=SiteTypes.WORLD)
+        cls.session = baker.make(Session, world=cls.world)
+
+    def setUp(self):
+        self.instance = baker.make(self.model, session=self.session)
+
+    def test_str_ok(self):
+        expected_str = '%(player)s in %(session)s (Game Master: %(is_game_master)s)' % {
+            'player': self.instance.player,
+            'session': self.instance.session,
+            'is_game_master': self.instance.is_game_master,
+        }
+        result_str = str(self.instance)
+
+        self.assertEqual(expected_str, result_str)
