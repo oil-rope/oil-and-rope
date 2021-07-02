@@ -2,6 +2,7 @@ import os
 import pathlib
 import tempfile
 import unittest
+from datetime import datetime
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
@@ -16,7 +17,6 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-from datetime import datetime
 
 Domain = apps.get_model(constants.DOMAIN_MODEL)
 Place = apps.get_model(constants.PLACE_MODEL)
