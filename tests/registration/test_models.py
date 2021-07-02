@@ -7,9 +7,8 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
-from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 from roleplay.enums import SiteTypes
-
+from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 Place = apps.get_model(constants.PLACE_MODEL)
 Race = apps.get_model(constants.RACE_MODEL)
