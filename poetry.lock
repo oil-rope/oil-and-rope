@@ -39,7 +39,7 @@ python-versions = "*"
 
 [[package]]
 name = "asgiref"
-version = "3.4.0"
+version = "3.4.1"
 description = "ASGI specs, helper code, and adapters"
 category = "main"
 optional = false
@@ -175,7 +175,7 @@ tests = ["pytest", "pytest-django", "pytest-asyncio", "async-generator", "async-
 
 [[package]]
 name = "channels-redis"
-version = "3.2.0"
+version = "3.3.0"
 description = "Redis-backed ASGI channel layer implementation"
 category = "dev"
 optional = false
@@ -189,7 +189,7 @@ msgpack = ">=1.0,<2.0"
 
 [package.extras]
 cryptography = ["cryptography (>=1.3.0)"]
-tests = ["cryptography (>=1.3.0)", "pytest", "pytest-asyncio", "async-generator", "async-timeout"]
+tests = ["cryptography (>=1.3.0)", "pytest", "pytest-asyncio (==0.14.0)", "async-generator", "async-timeout"]
 
 [[package]]
 name = "chardet"
@@ -384,17 +384,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "django-prometheus"
-version = "2.1.0"
-description = "Django middlewares to monitor your application with Prometheus.io."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-prometheus-client = ">=0.7"
-
-[[package]]
 name = "django-simple-history"
 version = "3.0.0"
 description = "Store model history and view/revert changes from admin site."
@@ -440,7 +429,7 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "faker"
-version = "8.9.0"
+version = "8.9.1"
 description = "Faker is a Python package that generates fake data for you."
 category = "main"
 optional = false
@@ -692,11 +681,11 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "packaging"
-version = "20.9"
+version = "21.0"
 description = "Core utilities for Python packages"
 category = "dev"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.6"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
@@ -758,17 +747,6 @@ description = "A pure-Python implementation of the HTTP/2 priority tree"
 category = "main"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "prometheus-client"
-version = "0.11.0"
-description = "Python client for the Prometheus monitoring system."
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.extras]
-twisted = ["twisted"]
 
 [[package]]
 name = "prompt-toolkit"
@@ -1280,7 +1258,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.5"
-content-hash = "aeb5466dc282c8f8363fb33715f4b2e0a4447bcb65731b9b4477decabb2ff297"
+content-hash = "a2a43e490ad118d9066f5b2d2dc1de8b8f151c778a59a4630b373ee2c6c4e46a"
 
 [metadata.files]
 aiohttp = [
@@ -1331,8 +1309,8 @@ appnope = [
     {file = "appnope-0.1.2.tar.gz", hash = "sha256:dd83cd4b5b460958838f6eb3000c660b1f9caf2a5b1de4264e941512f603258a"},
 ]
 asgiref = [
-    {file = "asgiref-3.4.0-py3-none-any.whl", hash = "sha256:d36fa91dd90e3aa3c81a6bd426ccc8fb20bd3d22b0cf14a12800289e9c3e2563"},
-    {file = "asgiref-3.4.0.tar.gz", hash = "sha256:05914d0fa65a21711e732adc6572edad6c8da5f1435c3f0c060689ced5e85195"},
+    {file = "asgiref-3.4.1-py3-none-any.whl", hash = "sha256:ffc141aa908e6f175673e7b1b3b7af4fdb0ecb738fc5c8b88f69f055c2415214"},
+    {file = "asgiref-3.4.1.tar.gz", hash = "sha256:4ef1ab46b484e3c706329cedeff284a5d40824200638503f5768edb6de7d58e9"},
 ]
 async-timeout = [
     {file = "async-timeout-3.0.1.tar.gz", hash = "sha256:0c3c816a028d47f659d6ff5c745cb2acf1f966da1fe5c19c77a70282b25f4c5f"},
@@ -1410,8 +1388,8 @@ channels = [
     {file = "channels-3.0.3.tar.gz", hash = "sha256:056b72e51080a517a0f33a0a30003e03833b551d75394d6636c885d4edb8188f"},
 ]
 channels-redis = [
-    {file = "channels_redis-3.2.0-py2.py3-none-any.whl", hash = "sha256:18d63f6462a58011740dc8eeb57ea4b31ec220eb551cb71b27de9c6779a549de"},
-    {file = "channels_redis-3.2.0.tar.gz", hash = "sha256:2fb31a63b05373f6402da2e6a91a22b9e66eb8b56626c6bfc93e156c734c5ae6"},
+    {file = "channels_redis-3.3.0-py3-none-any.whl", hash = "sha256:1abd5820ff1ed4ac627f8a219ad389e4c87e52e47a230929a7a474e95dd2c6c2"},
+    {file = "channels_redis-3.3.0.tar.gz", hash = "sha256:0a18ce279c15ba79b7985bb12b2d6dd0ac8a14e4ad6952681f4422a4cc4a5ea9"},
 ]
 chardet = [
     {file = "chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5"},
@@ -1540,10 +1518,6 @@ django-mptt-admin = [
 django-pdb = [
     {file = "django-pdb-0.6.2.tar.gz", hash = "sha256:eb8f4ed1a7f2b9c67944414688fd39a6f38f410dd7461d417512d72359f0472d"},
 ]
-django-prometheus = [
-    {file = "django-prometheus-2.1.0.tar.gz", hash = "sha256:dd3f8da1399140fbef5c00d1526a23d1ade286b144281c325f8e409a781643f2"},
-    {file = "django_prometheus-2.1.0-py2.py3-none-any.whl", hash = "sha256:c338d6efde1ca336e90c540b5e87afe9287d7bcc82d651a778f302b0be17a933"},
-]
 django-simple-history = [
     {file = "django-simple-history-3.0.0.tar.gz", hash = "sha256:66fe76c560054be393c52b1799661e104fbe372918d37d151e5d41c676158118"},
     {file = "django_simple_history-3.0.0-py2.py3-none-any.whl", hash = "sha256:a312adfe8fbec4c450b08e641b11249a8a589a7e7d1ba2404764b8b5bed53552"},
@@ -1561,8 +1535,8 @@ execnet = [
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
 ]
 faker = [
-    {file = "Faker-8.9.0-py3-none-any.whl", hash = "sha256:28ae027ce17b0d938dc0adcb827b81eea814050acd6d08f9ccacbd43cdf3c600"},
-    {file = "Faker-8.9.0.tar.gz", hash = "sha256:08c08ce6e4d3ae5859e11f6d2e4e7652f513565bb805ebd7b97d6becce9d8b90"},
+    {file = "Faker-8.9.1-py3-none-any.whl", hash = "sha256:9d4b0f6537ad093db351f0d11cd72aef65c9e5fb0616347329919d9889c19f95"},
+    {file = "Faker-8.9.1.tar.gz", hash = "sha256:156c321953ef13a59261b08f08d514e6877c477490068470d2bea38d1c8a0f98"},
 ]
 flake8 = [
     {file = "flake8-3.9.2-py2.py3-none-any.whl", hash = "sha256:bf8fd333346d844f616e8d47905ef3a3384edae6b4e9beb0c5101e25e3110907"},
@@ -1748,8 +1722,8 @@ multidict = [
     {file = "multidict-5.1.0.tar.gz", hash = "sha256:25b4e5f22d3a37ddf3effc0710ba692cfc792c2b9edfb9c05aefe823256e84d5"},
 ]
 packaging = [
-    {file = "packaging-20.9-py2.py3-none-any.whl", hash = "sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a"},
-    {file = "packaging-20.9.tar.gz", hash = "sha256:5b327ac1320dc863dca72f4514ecc086f31186744b84a230374cc1fd776feae5"},
+    {file = "packaging-21.0-py3-none-any.whl", hash = "sha256:c86254f9220d55e31cc94d69bade760f0847da8000def4dfe1c6b872fd14ff14"},
+    {file = "packaging-21.0.tar.gz", hash = "sha256:7dc96269f53a4ccec5c0670940a4281106dd0bb343f47b7471f779df49c2fbe7"},
 ]
 parso = [
     {file = "parso-0.8.2-py2.py3-none-any.whl", hash = "sha256:a8c4922db71e4fdb90e0d0bc6e50f9b273d3397925e5e60a717e719201778d22"},
@@ -1806,10 +1780,6 @@ pluggy = [
 priority = [
     {file = "priority-1.3.0-py2.py3-none-any.whl", hash = "sha256:be4fcb94b5e37cdeb40af5533afe6dd603bd665fe9c8b3052610fc1001d5d1eb"},
     {file = "priority-1.3.0.tar.gz", hash = "sha256:6bc1961a6d7fcacbfc337769f1a382c8e746566aaa365e78047abe9f66b2ffbe"},
-]
-prometheus-client = [
-    {file = "prometheus_client-0.11.0-py2.py3-none-any.whl", hash = "sha256:b014bc76815eb1399da8ce5fc84b7717a3e63652b0c0f8804092c9363acab1b2"},
-    {file = "prometheus_client-0.11.0.tar.gz", hash = "sha256:3a8baade6cb80bcfe43297e33e7623f3118d660d41387593758e2fb1ea173a86"},
 ]
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.19-py3-none-any.whl", hash = "sha256:7089d8d2938043508aa9420ec18ce0922885304cddae87fb96eebca942299f88"},
