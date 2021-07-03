@@ -6,8 +6,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.constants import models
-from roleplay.enums import RoleplaySystems, SiteTypes
+from roleplay.baker_recipes import session as session_recipe
+from roleplay.enums import RoleplaySystems
 
+Chat = apps.get_model(models.CHAT_MODEL)
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 PlayerInSession = apps.get_model(models.ROLEPLAY_PLAYER_IN_SESSION)
@@ -35,8 +37,8 @@ class TestDomainViewSet(APITestCase):
         cls.list_url = reverse(f'{base_resolver}:domain-list')
         cls.model = Domain
 
-        cls.user = baker.make(User)
-        cls.admin_user = baker.make(User, is_staff=True)
+        cls.user = baker.make_recipe('registration.user')
+        cls.admin_user = baker.make_recipe('registration.staff_user')
 
     def test_anonymous_domain_list_ko(self):
         response = self.client.get(self.list_url)
@@ -163,8 +165,8 @@ class TestPlaceViewSet(APITestCase):
         cls.model = Place
         cls.list_url = reverse(f'{base_resolver}:place-list')
 
-        cls.user = baker.make(User)
-        cls.admin_user = baker.make(User, is_staff=True)
+        cls.user = baker.make_recipe('registration.user')
+        cls.admin_user = baker.make_recipe('registration.staff_user')
 
     def test_anonymous_place_list_ko(self):
         response = self.client.get(self.list_url)
@@ -411,8 +413,8 @@ class TestRaceViewSet(APITestCase):
         cls.model = Race
         cls.list_url = reverse(f'{base_resolver}:race-list')
 
-        cls.user = baker.make(User)
-        cls.admin_user = baker.make(User, is_staff=True)
+        cls.user = baker.make_recipe('registration.user')
+        cls.admin_user = baker.make_recipe('registration.staff_user')
 
     def test_anonymous_race_list_ko(self):
         response = self.client.get(self.list_url)
@@ -647,9 +649,10 @@ class TestSessionViewSet(APITestCase):
         cls.model = Session
         cls.list_url = reverse(f'{base_resolver}:session-list')
 
-        cls.user = baker.make(User)
-        cls.admin_user = baker.make(User, is_staff=True)
-        cls.world = baker.make(Place, site_type=SiteTypes.WORLD)
+        cls.user = baker.make_recipe('registration.user')
+        cls.admin_user = baker.make_recipe('registration.staff_user')
+        cls.session_recipe = session_recipe
+        cls.world = baker.make_recipe('roleplay.world')
 
     def test_anonymous_session_list_ko(self):
         response = self.client.get(self.list_url)
@@ -658,14 +661,9 @@ class TestSessionViewSet(APITestCase):
 
     def test_authenticated_not_admin_session_list_ok(self):
         # User sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
         # Other's sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
-            world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         self.client.force_login(self.user)
         response = self.client.get(self.list_url)
 
@@ -678,14 +676,9 @@ class TestSessionViewSet(APITestCase):
 
     def test_authenticated_admin_session_list_ok(self):
         # User sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
         # Other's sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
-            world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         self.client.force_login(self.admin_user)
         response = self.client.get(self.list_url)
 
@@ -697,7 +690,7 @@ class TestSessionViewSet(APITestCase):
         self.assertEqual(expected_data, len(data))
 
     def test_authenticated_not_admin_user_in_players_retrieve_session_ok(self):
-        session = baker.make(self.model, players=[self.user], world=self.world)
+        session = self.session_recipe.make(players=[self.user])
         url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
         self.client.force_login(self.user)
         response = self.client.get(url)
@@ -705,7 +698,7 @@ class TestSessionViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_user_not_in_players_retrieve_session_ok(self):
-        session = baker.make(self.model, world=self.world)
+        session = self.session_recipe.make()
         url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
         self.client.force_login(self.user)
         response = self.client.get(url)
@@ -714,20 +707,11 @@ class TestSessionViewSet(APITestCase):
 
     def test_authenticated_not_admin_gm_sessions_list_ok(self):
         # User sessions
-        sessions = baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
-        )
+        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
         for session in sessions:
-            PlayerInSession.objects.create(
-                player=self.user,
-                session=session,
-                is_game_master=True
-            )
+            session.add_game_masters(self.user)
         # Other's sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.admin_user],
-            world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         url = reverse(f'{base_resolver}:session-user-list')
         self.client.force_login(self.user)
         response = self.client.get(url)
@@ -741,20 +725,11 @@ class TestSessionViewSet(APITestCase):
 
     def test_authenticated_admin_gm_sessions_list_ok(self):
         # User sessions
-        sessions = baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user], world=self.world
-        )
+        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
         for session in sessions:
-            PlayerInSession.objects.create(
-                player=self.admin_user,
-                session=session,
-                is_game_master=True
-            )
+            session.add_game_masters(self.user)
         # Other's sessions
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), players=[self.user],
-            world=self.world
-        )
+        self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         url = reverse(f'{base_resolver}:session-user-list')
         self.client.force_login(self.admin_user)
         response = self.client.get(url)
@@ -805,7 +780,7 @@ class TestSessionViewSet(APITestCase):
         self.assertIn(self.admin_user.pk, game_masters)
 
     def test_authenticated_not_admin_game_master_update_session_ok(self):
-        session = baker.make(self.model, world=self.world)
+        session = self.session_recipe.make()
         session.add_game_masters(self.user)
         self.client.force_login(self.user)
         data = {
@@ -820,7 +795,7 @@ class TestSessionViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_player_not_game_master_update_session_ok(self):
-        session = baker.make(self.model, world=self.world)
+        session = self.session_recipe.make()
         self.client.force_login(self.user)
         data = {
             'name': fake.word(),
@@ -834,7 +809,7 @@ class TestSessionViewSet(APITestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_authenticated_admin_not_player_not_game_master_update_session_ok(self):
-        session = baker.make(self.model, world=self.world)
+        session = self.session_recipe.make()
         self.client.force_login(self.admin_user)
         data = {
             'name': fake.word(),
@@ -849,14 +824,55 @@ class TestSessionViewSet(APITestCase):
 
     def test_authenticated_not_admin_player_not_game_master_update_session_ko(self):
         self.client.force_login(self.user)
-        session = baker.make(self.model, world=self.world, players=[self.user])
+        session = baker.make_recipe('roleplay.session', players=[self.user])
         data = {
             'name': fake.word(),
             'description': fake.paragraph(),
             'system': RoleplaySystems.PATHFINDER,
-            'world': self.world.pk,
+            'world': session.world.pk,
         }
         url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
         response = self.client.put(url, data)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_game_master_cannot_change_players_ko(self):
+        self.client.force_login(self.user)
+        players = baker.make_recipe('registration.user', _quantity=fake.pyint(min_value=2, max_value=10))
+        session = baker.make_recipe('roleplay.session', players=players)
+        session.add_game_masters(self.user)
+        players_id = session.players.values_list('pk', flat=True)
+        data = {
+            'players': [players_id[0]]  # We set just one player
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        data = response.json()['players']
+
+        for player in data:
+            self.assertIn(player, players_id)
+
+    def test_admin_can_change_players_ok(self):
+        self.client.force_login(self.admin_user)
+
+    def test_game_master_cannot_change_chat_ko(self):
+        self.client.force_login(self.user)
+        session = self.session_recipe.make()
+        session.add_game_masters(self.user)
+        chat = session.chat
+        new_chat = baker.make(Chat)
+        data = {
+            'chat': new_chat.pk
+        }
+        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        response = self.client.patch(url, data)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        data = response.json()['chat']
+        expected_data = chat.pk
+
+        self.assertEqual(expected_data, data)

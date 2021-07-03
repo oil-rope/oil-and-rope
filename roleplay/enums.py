@@ -9,6 +9,7 @@ class DomainTypes(models.IntegerChoices):
 
 class RoleplaySystems(models.IntegerChoices):
     PATHFINDER = 0, _('pathfinder')
+    DUNGEONS_AND_DRAGONS = 1, _('dungeons & dragons')
 
 
 class SiteTypes(models.IntegerChoices):

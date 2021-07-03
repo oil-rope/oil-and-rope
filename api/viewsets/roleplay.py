@@ -6,7 +6,7 @@ from rest_framework.settings import api_settings
 from common.constants import models
 
 from ..permissions import common
-from ..permissions.roleplay import IsInGameMastersOrStaff
+from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
 
@@ -103,7 +103,7 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
 class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
     related_name = 'gm_sessions'
     queryset = Session.objects.all()
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsInPlayersOrStaff]
     serializer_class = SessionSerializer
 
     def get_queryset(self):

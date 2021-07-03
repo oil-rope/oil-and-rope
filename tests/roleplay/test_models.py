@@ -458,8 +458,8 @@ class TestSession(TestCase):
             system=RoleplaySystems.PATHFINDER,
             world=self.world,
         )
-        created_at = instance.entry_created_at.strftime('%Y-%m-%d')
-        expected = f'{name} ({created_at})'
+        system = instance.system.label.title()
+        expected = f'{name} [{system}]'
 
         self.assertEqual(expected, str(instance))
 

@@ -374,7 +374,7 @@ class Session(TracingMixin):
         Name of the session.
     players: List[:class:`User`]
         Players in session.
-    chat: :class:`Chat`
+    chat: Optional[:class:`Chat`]
         Chat used for this session.
     next_game: :class:`datetime.datetime`
         Next session's date.
@@ -458,8 +458,8 @@ class Session(TracingMixin):
             self.chat.users.add(*self.players.all())
 
     def __str__(self):
-        created_at = self.entry_created_at.strftime('%Y-%m-%d')
-        return f'{self.name} ({created_at})'
+        system = RoleplaySystems(self.system)
+        return f'{self.name} [{system.label.title()}]'
 
 
 class PlayerInSession(TracingMixin):
