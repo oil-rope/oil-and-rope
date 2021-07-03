@@ -25,12 +25,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      DB_HOST: postgres
     env_file:
       - ./.env
     volumes:
       - "./compose/django/command.sh:/command.sh"
+      - "./compose/django/logs:/var/log/oilandrope/"
       - "./:/app/"
     command: /command.sh
     working_dir: /app/
