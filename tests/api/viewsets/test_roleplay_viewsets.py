@@ -881,6 +881,15 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(expected_data, data)
 
+    def test_invite_without_players_to_session_ko(self):
+        self.client.force_login(self.user)
+        session = self.session_recipe.make(players=[self.user])
+        url = reverse(f'{base_resolver}:session-invite', kwargs={'pk': session.pk})
+        data = {}
+        response = self.client.post(url, data)
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
     def test_invite_players_to_session_ok(self):
         self.client.force_login(self.user)
         session = self.session_recipe.make(players=[self.user])
