@@ -18,7 +18,8 @@ EXTRA_RACE_PATTERNS = [
 ]
 
 EXTRA_SESSION_PATTERNS = [
-    path('session/@me', SessionViewSet.as_view({'get': 'user_list'}), name='session-user-list')
+    path('session/@me', SessionViewSet.as_view({'get': 'user_list'}), name='session-user-list'),
+    path('session/invite', SessionViewSet.as_view({'post': 'invite_players_to_session'}), name='session-invite'),
 ]
 
 urls = router.urls + EXTRA_PLACE_PATTERNS + EXTRA_RACE_PATTERNS + EXTRA_SESSION_PATTERNS

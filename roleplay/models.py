@@ -475,6 +475,13 @@ class PlayerInSession(TracingMixin):
     )
     is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
 
+    class Meta:
+        verbose_name = _('player in session')
+        verbose_name_plural = _('players in sessions')
+        unique_together = [
+            ['session', 'player']
+        ]
+
     def __str__(self):
         str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s)') % {
             'player': self.player, 'session': self.session, 'is_game_master': self.is_game_master

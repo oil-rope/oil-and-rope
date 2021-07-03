@@ -9,11 +9,13 @@ from ..permissions import common
 from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
+from rest_framework.exceptions import ValidationError
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
+User = apps.get_model(models.USER_MODEL)
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -24,7 +26,7 @@ class DomainViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action not in ('list', 'retrieve'):
             self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
+        return super(DomainViewSet, self).get_permissions()
 
 
 class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
@@ -36,15 +38,15 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'update':
             self.permission_classes = [permissions.IsAdminUser]
-        return super().get_permissions()
+        return super(PlaceViewSet, self).get_permissions()
 
     def get_serializer(self, *args, **kwargs):
         if 'data' not in kwargs:
-            return super().get_serializer(*args, **kwargs)
+            return super(PlaceViewSet, self).get_serializer(*args, **kwargs)
 
         user = self.request.user
         if user.is_staff:
-            return super().get_serializer(*args, **kwargs)
+            return super(PlaceViewSet, self).get_serializer(*args, **kwargs)
 
         data = kwargs['data'].copy()
 
@@ -60,11 +62,11 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
                 data.appendlist('user', user.pk)
 
         kwargs['data'] = data
-        return super().get_serializer(*args, **kwargs)
+        return super(PlaceViewSet, self).get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
-        qs = super().get_queryset()
+        qs = super(PlaceViewSet, self).get_queryset()
 
         if self.action == 'list' and not user.is_staff:
             qs = Place.objects.community_places()
@@ -89,7 +91,7 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = super().get_queryset()
+        qs = super(RaceViewSet, self).get_queryset()
 
         if self.action == 'user_list':
             return qs
@@ -105,26 +107,31 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
     queryset = Session.objects.all()
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsInPlayersOrStaff]
     serializer_class = SessionSerializer
+    current_user = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.current_user = request.user
+        return super(SessionViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super(SessionViewSet, self).get_queryset()
 
         if self.action == 'user_list':
             return qs
 
-        user = self.request.user
+        user = self.current_user
         if not user.is_staff:
             qs = user.session_set.all()
 
         return qs
 
     def get_serializer(self, *args, **kwargs):
-        user = self.request.user
+        user = self.current_user
         if user.is_staff:
-            return super().get_serializer(*args, **kwargs)
+            return super(SessionViewSet, self).get_serializer(*args, **kwargs)
 
         if self.action in ('list', 'user_list', 'retrieve', 'create'):
-            return super().get_serializer(*args, **kwargs)
+            return super(SessionViewSet, self).get_serializer(*args, **kwargs)
 
         data = kwargs['data'].copy()
 
@@ -133,15 +140,25 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
 
         kwargs['data'] = data
 
-        return super().get_serializer(*args, **kwargs)
+        return super(SessionViewSet, self).get_serializer(*args, **kwargs)
 
     def get_permissions(self):
         if self.action in ('partial_update', 'update'):
             self.permission_classes = [IsInGameMastersOrStaff]
-        return super().get_permissions()
+        return super(SessionViewSet, self).get_permissions()
 
     def perform_create(self, serializer):
         obj = serializer.save()
-        user = self.request.user
+        user = self.current_user
         obj.add_game_masters(user)
         return obj
+
+    def invite_players_to_session(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        if 'players' not in data:
+            raise ValidationError()
+        players = User.objects.filter(
+            pk__in=data['players'],
+        )
+        instance.players.add(players)

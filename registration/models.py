@@ -14,6 +14,7 @@ from bot.discord_api import models as api_models
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
+from django.utils.functional import keep_lazy
 
 
 class User(AbstractUser):
@@ -28,6 +29,7 @@ class User(AbstractUser):
         return races
 
     @property
+    @keep_lazy(models.QuerySet)
     def gm_sessions(self):
         sessions = self.session_set.filter(
             player_in_session_set__is_game_master=True
