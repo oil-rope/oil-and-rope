@@ -52,7 +52,8 @@ class Domain(TracingMixin):
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
 
     def __str__(self):
-        return self.name
+        domain_type = DomainTypes(self.domain_type)
+        return f'{self.name} [{domain_type.label.title()}]'
 
 
 class Place(MPTTModel, TracingMixin):

@@ -128,8 +128,6 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
 
         data = kwargs['data'].copy()
 
-        if 'players' in data:
-            del data['players']
         if 'chat' in data:
             del data['chat']
 

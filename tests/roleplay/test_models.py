@@ -38,7 +38,8 @@ class TestDomain(TestCase):
 
     def test_str_ok(self):
         domain = baker.make(self.model)
-        self.assertEqual(str(domain), domain.name)
+        domain_type = DomainTypes(domain.domain_type)
+        self.assertEqual(str(domain), f'{domain.name} [{domain_type.label.title()}]')
 
     def test_ok(self):
         entries = fake.pyint(min_value=1, max_value=100)
@@ -458,8 +459,8 @@ class TestSession(TestCase):
             system=RoleplaySystems.PATHFINDER,
             world=self.world,
         )
-        system = instance.system.label.title()
-        expected = f'{name} [{system}]'
+        system = RoleplaySystems(instance.system)
+        expected = f'{name} [{system.label.title()}]'
 
         self.assertEqual(expected, str(instance))
 
