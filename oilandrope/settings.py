@@ -75,8 +75,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
-    # Django metric with Prometheus (https://github.com/korfuri/django-prometheus#django-prometheus)
-    'django_prometheus',
     # Source
     'core.apps.CoreConfig',
     # API
@@ -98,7 +96,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -107,8 +104,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'dynamic_menu.middleware.DynamicMenuMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # SITE_ID = 1 is for declaring page ID

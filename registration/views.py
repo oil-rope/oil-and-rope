@@ -33,8 +33,8 @@ class LoginView(auth_views.LoginView):
             user = get_user_model().objects.get(username=cleaned_data['username'])
             if not user.is_active:
                 warn_message = '{}. {}'.format(
-                    _('Seems like this user is inactive'),
-                    _('Have you confirmed your email?')
+                    _('seems like this user is inactive').capitalize(),
+                    _('have you confirmed your email?').capitalize(),
                 )
                 messages.warning(self.request, warn_message)
         except get_user_model().DoesNotExist:

@@ -1,8 +1,13 @@
-#!/bin/bash
+#!/bin/bash -e
 
 CYAN='\e[36m'
 GREEN='\e[32m'
 END='\e[0m'
+
+# Environment variables
+echo -e "${CYAN}Adding environment variables...${END}"
+declare -A ENVVARS=( [DB_NAME]=${POSTGRES_DB} [DB_USER]=${POSTGRES_USER} [DB_PASSWORD]=${POSTGRES_PASSWORD} )
+for K in "${!ENVVARS[@]}"; do export $K="${ENVVARS[$K]}" && echo -e "${CYAN}Added $K${END}"; done
 
 # Run migrations
 echo -e "${CYAN}Updating database...${END}"
