@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.core import mail
 from django.shortcuts import reverse
 from model_bakery import baker
 from rest_framework import status
@@ -716,7 +717,7 @@ class TestSessionViewSet(APITestCase):
 
     def test_not_admin_gm_sessions_list_ok(self):
         # User sessions
-        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
+        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         for session in sessions:
             session.add_game_masters(self.user)
         # Other's sessions
@@ -734,7 +735,7 @@ class TestSessionViewSet(APITestCase):
 
     def test_admin_gm_sessions_list_ok(self):
         # User sessions
-        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10), players=[self.user])
+        sessions = self.session_recipe.make(_quantity=fake.pyint(min_value=1, max_value=10))
         for session in sessions:
             session.add_game_masters(self.user)
         # Other's sessions
@@ -879,3 +880,15 @@ class TestSessionViewSet(APITestCase):
         expected_data = new_chat.pk
 
         self.assertEqual(expected_data, data)
+
+    def test_invite_players_to_session_ok(self):
+        self.client.force_login(self.user)
+        session = self.session_recipe.make(players=[self.user])
+        url = reverse(f'{base_resolver}:session-invite', kwargs={'pk': session.pk})
+        data = {
+            'players': [self.user.pk, self.admin_user.pk]
+        }
+        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            response = self.client.post(url, data)
+            self.assertEqual(status.HTTP_200_OK, response.status_code)
+            self.assertEqual(2, len(mail.outbox))

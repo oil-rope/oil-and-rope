@@ -8,13 +8,13 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.functional import keep_lazy
 from django.utils.translation import gettext_lazy as _
 
 from bot.discord_api import models as api_models
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
-from django.utils.functional import keep_lazy
 
 
 class User(AbstractUser):

@@ -1,15 +1,18 @@
 from django.apps import apps
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from common.constants import models
+from common.tools.mail import HtmlThreadMail
 
 from ..permissions import common
 from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
-from rest_framework.exceptions import ValidationError
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
@@ -158,7 +161,23 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
         data = request.data
         if 'players' not in data:
             raise ValidationError()
-        players = User.objects.filter(
-            pk__in=data['players'],
-        )
-        instance.players.add(players)
+        players_pk = data.getlist('players')
+        emails = User.objects.filter(
+            pk__in=players_pk,
+        ).values_list('email', flat=True)
+
+        subject = _('you\'ve invited to a session!')
+        context = {
+            'protocol': 'https' if self.request.is_secure() else 'http',
+            'domain': self.request.META.get('HTTP_HOST', 'localhost'),
+            'object': instance,
+        }
+
+        # TODO: For some reason Mailing is not working with threads
+        for email in emails:
+            HtmlThreadMail(
+                template_name='email_templates/invitation_email.html', context=context,
+                subject=subject, to=[email],
+            ).run()
+
+        return Response(_('users invited!'))
