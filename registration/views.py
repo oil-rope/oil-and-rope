@@ -13,10 +13,10 @@ from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView, TemplateView
+from rest_framework.authtoken.models import Token
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
-from rest_framework.authtoken.models import Token
 
 LOGGER = logging.getLogger(__name__)
 
