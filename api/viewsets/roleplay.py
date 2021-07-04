@@ -112,8 +112,12 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
     serializer_class = SessionSerializer
     current_user = None
 
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+        self.current_user = request.user
+        return request
+
     def get_queryset(self):
-        self.current_user = self.request.user
         qs = super(SessionViewSet, self).get_queryset()
 
         if self.action == 'user_list':
