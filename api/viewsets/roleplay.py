@@ -156,12 +156,9 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
     def invite_players_to_session(self, request, *args, **kwargs):
         instance = self.get_object()
         data = request.data
-        if 'players' not in data:
+        if 'emails' not in data:
             raise ValidationError()
-        players_pk = data.getlist('players')
-        emails = User.objects.filter(
-            pk__in=players_pk,
-        ).values_list('email', flat=True)
+        emails = data.getlist('emails')
 
         subject = _('you\'ve invited to a session!')
         context = {

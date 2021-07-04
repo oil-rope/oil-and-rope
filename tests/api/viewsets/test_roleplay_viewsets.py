@@ -895,7 +895,7 @@ class TestSessionViewSet(APITestCase):
         session = self.session_recipe.make(players=[self.user])
         url = reverse(f'{base_resolver}:session-invite', kwargs={'pk': session.pk})
         data = {
-            'players': [self.user.pk, self.admin_user.pk]
+            'emails': [self.user.email, self.admin_user.email]
         }
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             response = self.client.post(url, data)
