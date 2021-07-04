@@ -426,3 +426,24 @@ class TestPasswordResetConfirmView(TestCase):
         )
 
         self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
+
+
+class TestRequestTokenView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.url = reverse('registration:token')
+
+    def test_anonymous_access_ko(self):
+        login_url = reverse('registration:login')
+        response = self.client.get(self.url)
+        expected_url = f'{login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_authenticated_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        token = self.user.auth_token
+
+        self.assertContains(response, f'{token.key}')

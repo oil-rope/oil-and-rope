@@ -6,15 +6,17 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, FormView, RedirectView
+from django.views.generic import CreateView, FormView, RedirectView, TemplateView
 
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
+from rest_framework.authtoken.models import Token
 
 LOGGER = logging.getLogger(__name__)
 
@@ -234,6 +236,17 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     template_name = 'registration/password_change.html'
 
     def form_valid(self, form):
-        msg = '{}'.format(_('Password changed successfully!'))
-        messages.success(self.request, msg)
+        msg = '{}'.format(_('password changed successfully!'))
+        messages.success(self.request, msg.capitalize())
         return super().form_valid(form)
+
+
+class RequestTokenView(LoginRequiredMixin, TemplateView):
+    template_name = 'api/request_token.html'
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        token, created = Token.objects.get_or_create(user=self.request.user)
+        context_data['object'] = token
+        context_data['created'] = created
+        return context_data
