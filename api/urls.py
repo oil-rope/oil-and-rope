@@ -9,6 +9,7 @@ app_name = 'api'
 urlpatterns = [
     path('', views.ApiVersionView.as_view(), name='version'),
     path('token/', ObtainAuthToken.as_view(), name='token'),
+    path('resolver/', views.URLResolverViewSet.as_view({'post': 'resolve_url'}), name='resolver'),
     path('registration/', include((registration.urls, 'registration'))),
     path('chat/', include((chat.urls, 'chat'))),
     path('dynamic_menu/', include((dynamic_menu.urls, 'dynamic_menu'))),
