@@ -230,6 +230,11 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale/')
 ]
 
+# Session expire date
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-age
+
+SESSION_COOKIE_AGE = 172800
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
