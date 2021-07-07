@@ -73,6 +73,8 @@ INSTALLED_APPS = [
     'rest_framework',
     # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
     'rest_framework.authtoken',
+    # Django CORS (https://github.com/adamchainz/django-cors-headers)
+    'corsheaders',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
     # Source
@@ -99,6 +101,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -312,6 +315,40 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
+
+# CORS System
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_methods
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# https://github.com/adamchainz/django-cors-headers#cors_urls_regex
+
+CORS_URLS_REGEX = r'^/\w+/api/.*$'
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_headers
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Discord
 

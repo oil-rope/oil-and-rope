@@ -35,7 +35,9 @@ class URLResolverViewSet(ViewSet):
         if 'resolver' not in data:
             raise ValidationError()
 
-        resolver = data.pop('resolver')[0]
+        resolver = data.pop('resolver')
+        if isinstance(resolver, list):
+            resolver = resolver[0]
         extra_params = {}
         for key,  value in data.items():
             extra_params[key] = value
