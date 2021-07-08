@@ -48,8 +48,9 @@ ADMINS = [
 MANAGERS = ADMINS
 
 # Application definition
-
 INSTALLED_APPS = [
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
     # Must be settled before 'django.contrib.admin' to work correctly on admin
     'modeltranslation',
@@ -59,8 +60,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
@@ -96,6 +95,7 @@ INSTALLED_APPS = [
     # Roleplay
     'roleplay.apps.RoleplayConfig'
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
