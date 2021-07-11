@@ -5,7 +5,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:13.3-alpine
     env_file:
       - ./.env
     healthcheck:
@@ -15,7 +15,11 @@ services:
       retries: 5
     # Saving data on local
     volumes:
-      - "postgres_database_data:/var/lib/postgresql/data/"
+      - type: volume
+        source: postgres_database_data
+        target: /var/lib/postgresql/data/
+        volume:
+          nocopy: true
 
   django:
     image: oil-and-rope:0.1
@@ -35,7 +39,7 @@ services:
     working_dir: /app/
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.21-alpine
     depends_on:
       - django
     ports:
