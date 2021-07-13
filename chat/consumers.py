@@ -2,22 +2,25 @@ import logging
 
 from channels.auth import login
 from channels.db import database_sync_to_async
-from django.contrib.auth import get_user_model
+from django.apps import apps
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.models import Session
+from rest_framework.authtoken.models import Token
 
 from api.serializers.chat import ChatMessageSerializer
-from common.tools.sync import async_get
+from common.constants import models as constants
 from core.consumers import HandlerJsonWebsocketConsumer
 
 from . import models
 
 LOGGER = logging.getLogger(__name__)
 
+User = apps.get_model(constants.USER_MODEL)
+
 
 class ChatConsumer(HandlerJsonWebsocketConsumer):
     user = AnonymousUser()
     chat_group_name = None
+    BACKEND_SESSION_KEY = '_auth_user_backend'
 
     async def connect(self):
         await super().connect()
@@ -37,23 +40,33 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         return message
 
     async def setup_channel_layer(self, content):
-        try:
-            # Since Hosts can be different due to 'live.oilandrope-project.com' we get
-            # user from Session instead from Middleware
-            session = await async_get(Session, pk=content['session_key'])
-            session_data = session.get_decoded()
-            user = await async_get(get_user_model(), pk=session_data['_auth_user_id'])
-            self.user = user
-            backend = session_data['_auth_user_backend']
-            await login(scope=self.scope, user=user, backend=backend)
-            scope_session = self.scope['session']
-            await database_sync_to_async(scope_session.save)()
-        except (Session.DoesNotExist, get_user_model().DoesNotExist, KeyError):
-            self.user = AnonymousUser()
-        finally:
+        required_params = ('token', 'chat')
+        if not all(key in content for key in required_params):
+            params = ', '.join(required_params)
+            msg = '%s are required.' % params
+            await self.send_json({
+                'type': 'info',
+                'status': 'error',
+                'content': msg,
+            }, True)
+        else:
+            try:
+                # Everything is based on RestFramework's Token
+                token = await database_sync_to_async(Token.objects.get)(pk=content['token'])
+                self.user = await database_sync_to_async(User.objects.get)(pk=token.user_id)
+                await login(scope=self.scope, user=self.user, backend=self.BACKEND_SESSION_KEY)
+                await database_sync_to_async(self.scope['session'].save)()
+            except (Token.DoesNotExist, User.DoesNotExist, KeyError):
+                self.user = AnonymousUser()
+
             chat_id = content['chat']
             self.chat_group_name = f'chat_{chat_id}'
             await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
+            await self.send_json({
+                'type': 'info',
+                'status': 'ok',
+                'content': 'Chat connected!'
+            })
 
     async def send_message(self, content):
 

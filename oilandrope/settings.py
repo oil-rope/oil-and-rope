@@ -28,10 +28,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
 
 if 'ALLOWED_HOSTS' in os.environ:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oilandrope-project.com').split(',')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.oilandrope-project.com').split(',')
 else:
     ALLOWED_HOSTS = [
-        'oilandrope-project.com',
+        '.oilandrope-project.com',
     ]
 
 # Defines Admins
@@ -203,7 +203,7 @@ AUTH_USER_MODEL = 'registration.User'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'registration.backends.EmailBacked',
+    'registration.backends.EmailBackend',
 ]
 
 # Internationalization
