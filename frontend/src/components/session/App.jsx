@@ -26,7 +26,7 @@ const App = () => {
 
   return (
     <SessionContext.Provider value={{ session }}>
-      <Container>
+      <Container fluid>
         <WebSocketContext.Provider value={{ chatWebSocket }}>
           <Row>
             <Col xs={12} lg={8}></Col>

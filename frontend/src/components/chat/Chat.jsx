@@ -54,7 +54,7 @@ const Chat = () => {
   }, [session]);
 
   return (
-    <Container fluid={true} className="bg-white pb-4">
+    <Container fluid className="bg-white pb-4">
       <Row>
         <Col>
           <Suspense fallback={<Loader />}>

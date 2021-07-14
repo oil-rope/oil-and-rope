@@ -10,7 +10,8 @@ const MessagesContainer = () => {
   const { session } = useContext(SessionContext);
   const { chatWebSocket } = useContext(WebSocketContext);
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
+  const [componentLoaded, setComponentLoaded] = useState(false);
 
   /**
    * Adds the message to messages.
@@ -45,17 +46,21 @@ const MessagesContainer = () => {
     element.scrollTop = element.scrollHeight;
   };
 
+  // Okay this is tricky
+  // First we check if both session and chatWebSocket exist
   useEffect(() => {
-    if (Boolean(chatWebSocket)) {
-      chatWebSocket.onmessage = handleWebSocketOnMessage;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (Boolean(session)) {
+    if (Boolean(session) && Boolean(chatWebSocket)) {
       loadMessages();
     }
-  }, [session]);
+  }, [session, chatWebSocket]);
+
+  // Once they exist we set the onmessage and set component as loaded
+  useEffect(() => {
+    if (messages !== null) {
+      chatWebSocket.onmessage = handleWebSocketOnMessage;
+      setComponentLoaded(true);
+    }
+  }, [messages]);
 
   return (
     <div
@@ -66,11 +71,15 @@ const MessagesContainer = () => {
         scrollBehavior: "smooth",
       }}
     >
-      <Suspense fallback={<Loader />}>
-        {messages.map((message, index) => (
-          <Message message={message} key={index} />
-        ))}
-      </Suspense>
+      {componentLoaded ? (
+        <Suspense fallback={<Loader />}>
+          {messages.map((message, index) => (
+            <Message message={message} key={index} />
+          ))}
+        </Suspense>
+      ) : (
+        <Loader text={gettext("Loading messages")} />
+      )}
     </div>
   );
 };
