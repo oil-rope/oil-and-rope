@@ -1,21 +1,16 @@
-import React, {
-  useState,
-  useContext,
-  useEffect,
-  useRef,
-  Suspense,
-} from "react";
+import React, { useState, useContext, useEffect, Suspense } from "react";
 import Loader from "../loader/Loader";
-import ChatContext from "../../contexts/ChatContext";
+
+import SessionContext from "../../contexts/SessionContext";
+import WebSocketContext from "../../contexts/WebSocketContext";
 
 const Message = React.lazy(() => import("./Message"));
 
 const MessagesContainer = () => {
-  const { webSocket, setWebSocketOnMessage, chat, user } =
-    useContext(ChatContext);
-  const [userLoaded, setUserLoaded] = useState(false);
+  const { session } = useContext(SessionContext);
+  const { chatWebSocket } = useContext(WebSocketContext);
+
   const [messages, setMessages] = useState([]);
-  const messageContainerRef = useRef(null);
 
   /**
    * Adds the message to messages.
@@ -23,13 +18,15 @@ const MessagesContainer = () => {
    * @param {Object} messageEvent Message received.
    */
   const handleWebSocketOnMessage = (messageEvent) => {
-    let payload = JSON.parse(messageEvent.data);
-    let message = payload.message;
-    setMessages([...messages, message]);
-
-    if (payload.hasOwnProperty("error")) {
-      new Notification(payload.error);
+    const payload = JSON.parse(messageEvent.data);
+    if (payload.status == "error") {
+      new Notification(payload.content);
       scrollToBottom();
+    }
+
+    if (payload.type === "send_message") {
+      const message = payload.content;
+      setMessages([...messages, message]);
     }
   };
 
@@ -37,9 +34,7 @@ const MessagesContainer = () => {
    * Creates all messages in chat.
    */
   const loadMessages = () => {
-    if (Boolean(chat)) {
-      setMessages(chat.chat_message_set);
-    }
+    setMessages(session.chat.chat_message_set);
   };
 
   /**
@@ -51,24 +46,16 @@ const MessagesContainer = () => {
   };
 
   useEffect(() => {
-    if (Boolean(webSocket)) {
-      setWebSocketOnMessage(handleWebSocketOnMessage);
+    if (Boolean(chatWebSocket)) {
+      chatWebSocket.onmessage = handleWebSocketOnMessage;
     }
-  });
+  }, []);
 
   useEffect(() => {
-    loadMessages();
-  }, [chat]);
-
-  useEffect(() => {
-    if (Boolean(user)) {
-      setUserLoaded(true);
+    if (Boolean(session)) {
+      loadMessages();
     }
-  }, [user]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  }, [session]);
 
   return (
     <div
@@ -78,17 +65,12 @@ const MessagesContainer = () => {
         overflowY: "scroll",
         scrollBehavior: "smooth",
       }}
-      ref={messageContainerRef}
     >
-      {userLoaded ? (
-        <Suspense fallback={<Loader />}>
-          {messages.map((message, index) => (
-            <Message message={message} key={index} />
-          ))}
-        </Suspense>
-      ) : (
-        <Loader />
-      )}
+      <Suspense fallback={<Loader />}>
+        {messages.map((message, index) => (
+          <Message message={message} key={index} />
+        ))}
+      </Suspense>
     </div>
   );
 };

@@ -1,14 +1,15 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { Form, Col, Button } from "react-bootstrap";
 
-import AuthContext from "../../contexts/AuthContext.jsx";
 import WebSocketContext from "../../contexts/WebSocketContext.jsx";
+import SessionContext from "../../contexts/SessionContext.jsx";
 
 const ChatInput = () => {
   const [message, setMessage] = useState(null);
   const func = "send_message";
 
-  const { connection } = useContext(WebSocketContext);
+  const { chatWebSocket } = useContext(WebSocketContext);
+  const { session } = useContext(SessionContext);
 
   /**
    * Declares what to do on submit.
@@ -18,11 +19,11 @@ const ChatInput = () => {
   const handleFormOnSubmit = (e) => {
     e.preventDefault();
     if (Boolean(message)) {
-      webSocket.send(
+      chatWebSocket.send(
         JSON.stringify({
           type: func,
           message: message,
-          chat: chat.id,
+          chat: session.chat.id,
         })
       );
       e.currentTarget.reset();

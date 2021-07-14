@@ -2,6 +2,7 @@ from django.apps import apps
 from rest_framework import serializers
 
 from common.constants import models
+from api.serializers.chat import ChatSerializer
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
@@ -45,6 +46,7 @@ class RaceSerializer(serializers.ModelSerializer):
 
 
 class SessionSerializer(serializers.ModelSerializer):
+    chat = ChatSerializer(many=False)
     game_masters = serializers.SerializerMethodField(method_name='get_game_masters')
 
     def get_game_masters(self, obj):

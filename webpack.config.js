@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 
-const PUBLIC_PATH = process.env.PUBLIC_PATH;
+const PUBLIC_PATH = "/static/frontend/dist/";
 const NODE_ENV = process.env.NODE_ENV;
 
 module.exports = {
@@ -35,6 +35,5 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin(["API_URL"]),
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
-    new webpack.EnvironmentPlugin(["PUBLIC_PATH"]),
   ],
 };

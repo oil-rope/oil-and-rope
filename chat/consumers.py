@@ -11,9 +11,11 @@ from common.constants import models as constants
 from core.consumers import HandlerJsonWebsocketConsumer
 
 from . import models
+from rest_framework import status
 
 LOGGER = logging.getLogger(__name__)
 
+ChatMessage = apps.get_model(constants.CHAT_MESSAGE_MODEL)
 User = apps.get_model(constants.USER_MODEL)
 
 
@@ -37,7 +39,13 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             chat_id=chat_id,
             message=message,
         )
-        return message
+        serialized_message = ChatMessageSerializer(message).data
+        return serialized_message
+
+    @database_sync_to_async
+    def delete_message(self, chat_id):
+        message = ChatMessage.objects.get(pk=chat_id)
+        message.delete()
 
     async def setup_channel_layer(self, content):
         required_params = ('token', 'chat')
@@ -79,12 +87,12 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             chat_id = content['chat']
             msg_text = content['message']
             message = await self.register_message(self.user.id, chat_id, msg_text)
-            data = ChatMessageSerializer(message).data
 
             func = 'group_send_message'
             content = {
                 'type': f'{func}',
-                'message': data
+                'status': 'ok',
+                'content': message,
             }
 
             try:
@@ -92,11 +100,15 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             except TypeError:
                 # We send error message with serialized message and remove
                 await self.send_json(
-                    {'error': 'We couldn\'t send your message', 'message': data},
+                    {'error': 'We couldn\'t send your message', 'message': message},
                     close=True
                 )
-                message.delete()
+                await self.delete_message(message['id'])
 
     async def group_send_message(self, content):
-        message = content['message']
-        await self.send_json({'message': message})
+        message = content['content']
+        await self.send_json({
+            'type': 'send_message',
+            'status': 'ok',
+            'content': message
+        })

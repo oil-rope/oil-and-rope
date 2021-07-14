@@ -37,3 +37,15 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'last_login', 'username', 'first_name', 'last_name', 'is_active', 'date_joined', 'email',
             'is_premium', 'auth_token', 'profile',
         )
+
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    """
+    Simplified API serializer for :class:`User`.
+    """
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'first_name', 'last_name', 'email',
+        )
