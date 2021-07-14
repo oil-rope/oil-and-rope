@@ -20,7 +20,7 @@ User = apps.get_model(constants.USER_MODEL)
 class ChatConsumer(HandlerJsonWebsocketConsumer):
     user = AnonymousUser()
     chat_group_name = None
-    BACKEND_SESSION_KEY = '_auth_user_backend'
+    SESSION_BACKEND = 'django.contrib.auth.backends.ModelBackend'
 
     async def connect(self):
         await super().connect()
@@ -54,7 +54,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 # Everything is based on RestFramework's Token
                 token = await database_sync_to_async(Token.objects.get)(pk=content['token'])
                 self.user = await database_sync_to_async(User.objects.get)(pk=token.user_id)
-                await login(scope=self.scope, user=self.user, backend=self.BACKEND_SESSION_KEY)
+                await login(scope=self.scope, user=self.user, backend=self.SESSION_BACKEND)
                 await database_sync_to_async(self.scope['session'].save)()
             except (Token.DoesNotExist, User.DoesNotExist, KeyError):
                 self.user = AnonymousUser()

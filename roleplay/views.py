@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -11,6 +12,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
+from api.serializers.registration import UserSerializer
 
 from . import enums, forms, models
 
@@ -228,3 +230,8 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
             return HttpResponseForbidden(content=f'{msg}.')
 
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['serialized_user'] = json.dumps(UserSerializer(self.request.user).data)
+        return context

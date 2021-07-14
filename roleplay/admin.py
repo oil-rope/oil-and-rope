@@ -27,7 +27,8 @@ class PlaceAdmin(DraggableMPTTAdmin):
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
-    lis_display = ('__str__', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
+    fields = (('name', 'system'), 'next_game')
+    list_display = ('__str__', 'system', 'next_game', 'entry_created_at')
     list_display_links = ('__str__', )
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')

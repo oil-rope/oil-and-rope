@@ -1,12 +1,12 @@
 import React from "react";
 import Spinner from "react-bootstrap/Spinner";
 
-const Loader = () => {
+const Loader = (text = gettext("Loading")) => {
 	return (
-		<div data-testid="testLoader" className="d-flex justify-content-around">
-			<div>{`${gettext("Loading")}...`}</div>
+		<div className="d-flex justify-content-around">
+			<div>{`${text}...`}</div>
 			<Spinner animation="border" role="status">
-				<span className="sr-only">{`${gettext("Loading")}...`}</span>
+				<span className="sr-only">{`${text}...`}</span>
 			</Spinner>
 		</div>
 	);

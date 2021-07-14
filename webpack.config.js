@@ -1,50 +1,40 @@
 const path = require("path");
+const webpack = require("webpack");
 
-const PUBLIC_PATH = process.env.STATIC_URL || "/static/frontend/dist/";
+const PUBLIC_PATH = process.env.PUBLIC_PATH;
+const NODE_ENV = process.env.NODE_ENV;
 
 module.exports = {
-	entry: {
-		Calendar: "./frontend/src/renderCalendar.jsx",
-		UserCheckButton: "./frontend/src/renderUserCheckButton.jsx",
-		Chat: "./frontend/src/renderChat.jsx"
-	},
-	output: {
-		publicPath: PUBLIC_PATH,
-		filename: "[name].bundle.js",
-		path: path.resolve(__dirname, "./frontend/static/frontend/dist/"),
-		chunkFilename: "[name].bundle.js",
-	},
-	devServer: {
-		contentBase: "dist",
-	},
-	module: {
-		rules: [
-			{
-				test: [/\.js$/, /\.jsx$/],
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: "babel-loader",
-					},
-				],
-			},
-			{
-				test: /\.s[ac]ss$/i,
-				use: [
-					// Creates `style` nodes from JS strings
-					"style-loader",
-					// // Translates CSS into CommonJS
-					"css-loader",
-					// // Compiles Sass to CSS
-					"sass-loader",
-				],
-			},
-		],
-	},
-	resolve: {
-		extensions: [".js", ".jsx", ".scss", ".sass"],
-	},
-	externals: {
-		jquery: "jQuery",
-	},
+  mode: NODE_ENV,
+  entry: {
+    session: "./frontend/src/renders/renderSession.jsx",
+  },
+  output: {
+    filename: "[name].bundle.js",
+    chunkFilename: "[name].bundle.js",
+    path: path.resolve(__dirname, "./frontend/static/frontend/dist/"),
+    publicPath: PUBLIC_PATH,
+  },
+  module: {
+    rules: [
+      {
+        test: [/\.m?js$/, /\.m?jsx$/],
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"],
+          },
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".js", ".jsx"],
+  },
+  plugins: [
+    new webpack.EnvironmentPlugin(["API_URL"]),
+    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.EnvironmentPlugin(["PUBLIC_PATH"]),
+  ],
 };

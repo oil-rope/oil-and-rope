@@ -238,6 +238,11 @@ LOCALE_PATHS = [
 
 SESSION_COOKIE_AGE = 172800
 
+# Session accesible from JavaScript
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-httponly
+
+SESSION_COOKIE_HTTPONLY = False
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
