@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from rest_framework.authtoken.models import Token
 
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
@@ -231,7 +232,11 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def _check_user_has_token(self):
+        Token.objects.get_or_create(user=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self._check_user_has_token()
         context['serialized_user'] = json.dumps(UserSerializer(self.request.user).data)
         return context

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 
 import WebSocketContext from "../../contexts/WebSocketContext.jsx";
 import SessionContext from "../../contexts/SessionContext.jsx";
+
+import Loader from "../loader/Loader.jsx";
 
 import * as Constants from "../../utils/constants.js";
 import { getSession } from "./utils.js";

@@ -11,7 +11,6 @@ from common.constants import models as constants
 from core.consumers import HandlerJsonWebsocketConsumer
 
 from . import models
-from rest_framework import status
 
 LOGGER = logging.getLogger(__name__)
 
