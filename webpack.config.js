@@ -2,10 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 
 const PUBLIC_PATH = "/static/frontend/dist/";
-const NODE_ENV = process.env.NODE_ENV;
 
 module.exports = {
-  mode: NODE_ENV,
   entry: {
     session: "./frontend/src/renders/renderSession.jsx",
   },
@@ -32,8 +30,5 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
   },
-  plugins: [
-    new webpack.EnvironmentPlugin(["API_URL"]),
-    new webpack.EnvironmentPlugin(["NODE_ENV"]),
-  ],
+  plugins: [new webpack.EnvironmentPlugin(["API_URL"])],
 };
