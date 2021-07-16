@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect, Suspense } from "react";
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  Suspense,
+} from "react";
 import Loader from "../loader/Loader";
 
 import SessionContext from "../../contexts/SessionContext";
@@ -13,6 +19,8 @@ const MessagesContainer = () => {
   const [messages, setMessages] = useState(null);
   const [componentLoaded, setComponentLoaded] = useState(false);
 
+  const messageContainerRef = useRef(null);
+
   /**
    * Adds the message to messages.
    *
@@ -22,13 +30,14 @@ const MessagesContainer = () => {
     const payload = JSON.parse(messageEvent.data);
     if (payload.status == "error") {
       new Notification(payload.content);
-      scrollToBottom();
     }
 
     if (payload.type === "send_message") {
       const message = payload.content;
       setMessages([...messages, message]);
     }
+
+    scrollToBottom();
   };
 
   /**
@@ -70,6 +79,7 @@ const MessagesContainer = () => {
         overflowY: "scroll",
         scrollBehavior: "smooth",
       }}
+      ref={messageContainerRef}
     >
       {componentLoaded ? (
         <Suspense fallback={<Loader />}>

@@ -1,8 +1,8 @@
 from django.apps import apps
 from rest_framework import serializers
 
-from common.constants import models
 from api.serializers.chat import ChatSerializer
+from common.constants import models
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)

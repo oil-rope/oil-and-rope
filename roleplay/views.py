@@ -11,9 +11,9 @@ from django.views.generic import CreateView, DeleteView, DetailView, RedirectVie
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.authtoken.models import Token
 
+from api.serializers.registration import UserSerializer
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
-from api.serializers.registration import UserSerializer
 
 from . import enums, forms, models
 
