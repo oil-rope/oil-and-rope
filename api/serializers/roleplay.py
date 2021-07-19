@@ -1,8 +1,9 @@
 from django.apps import apps
 from rest_framework import serializers
 
-from .chat import ChatSerializer
 from common.constants import models
+
+from .chat import ChatSerializer
 from .common import MappedSerializerMixin
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
