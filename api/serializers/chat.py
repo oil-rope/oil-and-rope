@@ -3,14 +3,17 @@ from rest_framework import serializers
 
 from common.constants import models
 
+from .common import MappedSerializerMixin
 from .registration import SimpleUserSerializer
 
 ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
 Chat = apps.get_model(models.CHAT_MODEL)
 
 
-class ChatMessageSerializer(serializers.ModelSerializer):
-    author = SimpleUserSerializer(many=False)
+class ChatMessageSerializer(MappedSerializerMixin, serializers.ModelSerializer):
+    serializers_map = {
+        'author': SimpleUserSerializer(many=False, read_only=True)
+    }
 
     class Meta:
         model = ChatMessage
