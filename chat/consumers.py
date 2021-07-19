@@ -37,8 +37,13 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             chat_id=chat_id,
             message=message,
         )
-        serialized_message = ChatMessageSerializer(message).data
-        return serialized_message
+        return message
+
+    @database_sync_to_async
+    def get_serialized_message(self, message):
+        serialized_message = ChatMessageSerializer(message, map_fields=['author'])
+        data = serialized_message.data
+        return data
 
     @database_sync_to_async
     def get_user_by_token(self, token):
@@ -48,8 +53,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         return user
 
     @database_sync_to_async
-    def delete_message(self, chat_id):
-        message = ChatMessage.objects.get(pk=chat_id)
+    def delete_message(self, message):
         message.delete()
 
     async def setup_channel_layer(self, content):
@@ -97,12 +101,13 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             chat_id = content['chat']
             msg_text = content['message']
             message = await self.register_message(self.user.id, chat_id, msg_text)
+            serialized_message = await self.get_serialized_message(message)
 
             func = 'group_send_message'
             content = {
                 'type': func,
                 'status': 'ok',
-                'content': message,
+                'content': serialized_message,
             }
 
             try:
@@ -114,7 +119,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                     'status': 'error',
                     'content': 'We couldn\'t send your message.',
                 }, close=True)
-                await self.delete_message(message['id'])
+                await self.delete_message(message)
 
     async def group_send_message(self, content):
         message = content['content']

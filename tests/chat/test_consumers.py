@@ -1,9 +1,8 @@
-import asyncio
-
+import pytest
+from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.apps import apps
 from django.shortcuts import reverse
-from django.test import TestCase, override_settings
 from model_bakery import baker
 from rest_framework.authtoken.models import Token
 
@@ -14,92 +13,89 @@ from common.utils import create_faker
 User = apps.get_model(models.USER_MODEL)
 
 fake = create_faker()
+url = reverse('chat:index')
 
 
-class TestChatConsumer(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.url = reverse('chat:index')
-        cls.user = baker.make_recipe('registration.user')
-        cls.chat = baker.make_recipe('chat.chat')
-        cls.token = Token.objects.create(user=cls.user).key
+@pytest.fixture(scope='function')
+def user(db):
+    return baker.make_recipe('registration.user')
 
-    async def test_connect_ok(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), self.url)
-        connected, protocol = await communicator.connect()
 
-        self.assertTrue(connected, 'WebSocket doesn\'t connect')
+@pytest.fixture(scope='function')
+def token(user, db):
+    return Token.objects.create(user=user)
 
-        await communicator.disconnect()
 
-    async def test_setup_channel_layer_ok(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), self.url)
-        connected, protocol = await communicator.connect()
+@pytest.fixture(scope='function')
+def chat(db):
+    return baker.make_recipe('chat.chat')
 
-        self.assertTrue(connected, 'WebSocket doesn\'t connect')
 
-        data = {
-            'type': 'setup_channel_layer',
-            'chat': self.chat.pk,
-            'token': self.token,
-        }
-        await communicator.send_json_to(data)
-        response = await communicator.receive_json_from()
+@pytest.mark.asyncio
+async def test_connect_ok():
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
 
-        await communicator.disconnect()
+    await communicator.disconnect()
 
-        self.assertEqual('info', response['type'])
-        self.assertEqual('ok', response['status'])
-        self.assertEqual('Chat connected!', response['content'])
 
-    @override_settings(CHANNEL_LAYERS={
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                'hosts': [('google.com', 6379)],
-            },
-        },
-    })
-    async def test_setup_channel_layer_ko(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), self.url)
-        connected, protocol = await communicator.connect()
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_setup_channel_layer_ok(token, chat, async_client):
+    await database_sync_to_async(async_client.force_login)(token.user)
+    response = await async_client.get(url)
+    request = response.asgi_request
 
-        self.assertTrue(connected, 'WebSocket doesn\'t connect')
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    communicator.scope['session'] = request.session
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
 
-        data = {
-            'type': 'setup_channel_layer',
-            'chat': self.chat.pk,
-            'token': self.token,
-        }
-        await communicator.send_json_to(data)
-        with self.assertRaises(asyncio.exceptions.TimeoutError):
-            await communicator.receive_json_from()
+    data = {
+        'type': 'setup_channel_layer',
+        'chat': chat.pk,
+        'token': token.key,
+    }
+    await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
+    await communicator.disconnect()
 
-        await communicator.disconnect()
+    assert 'info' == response['type']
+    assert 'ok' == response['status']
+    assert 'Chat connected!' == response['content']
 
-    async def test_send_message_ok(self):
-        communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), self.url)
-        connected, protocol = await communicator.connect()
 
-        self.assertTrue(connected, 'WebSocket doesn\'t connect')
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_send_message_ok(token, chat, async_client, settings):
+    await database_sync_to_async(async_client.force_login)(token.user)
+    response = await async_client.get(url)
+    request = response.asgi_request
 
-        data = {
-            'type': 'setup_channel_layer',
-            'chat': self.chat.pk,
-            'token': self.token,
-        }
-        await communicator.send_json_to(data)
-        await communicator.receive_from()
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    communicator.scope['session'] = request.session
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
 
-        msg = fake.word()
-        data = {
-            'type': 'send_message',
-            'chat': self.chat.pk,
-            'message': msg,
-        }
-        await communicator.send_json_to(data)
-        response = await communicator.receive_json_from()
+    data = {
+        'type': 'setup_channel_layer',
+        'chat': chat.pk,
+        'token': token.key,
+    }
+    await communicator.send_json_to(data)
+    await communicator.receive_json_from()
 
-        self.assertEqual(response['type'], 'send_message')
-        self.assertEqual(response['status'], 'ok')
-        self.assertEqual(response['content'], msg)
+    data = {
+        'type': 'send_message',
+        'chat': chat.pk,
+        'message': fake.word(),
+    }
+    await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
+    communicator.disconnect()
+
+    assert response['type'] == 'send_message'
+    assert response['status'] == 'ok'
+    assert response['content']['message'] == data['message']
+    assert response['content']['author']['username'] == token.user.username
