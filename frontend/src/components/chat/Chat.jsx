@@ -28,7 +28,7 @@ const Chat = () => {
         JSON.stringify({
           type: "setup_channel_layer",
           token: user.auth_token,
-          chat: session.chat.id,
+          chat: session.chat,
         })
       );
     }

@@ -4,7 +4,6 @@ from channels.auth import login
 from channels.db import database_sync_to_async
 from django.apps import apps
 from django.contrib.auth.models import AnonymousUser
-from rest_framework.authtoken.models import Token
 
 from api.serializers.chat import ChatMessageSerializer
 from common.constants import models as constants
@@ -42,6 +41,13 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         return serialized_message
 
     @database_sync_to_async
+    def get_user_by_token(self, token):
+        user = User.objects.get(
+            auth_token__key=token
+        )
+        return user
+
+    @database_sync_to_async
     def delete_message(self, chat_id):
         message = ChatMessage.objects.get(pk=chat_id)
         message.delete()
@@ -55,33 +61,38 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 'type': 'info',
                 'status': 'error',
                 'content': msg,
-            }, True)
+            }, close=True)
         else:
             try:
                 # Everything is based on RestFramework's Token
-                token = await database_sync_to_async(Token.objects.get)(pk=content['token'])
-                self.user = await database_sync_to_async(User.objects.get)(pk=token.user_id)
+                token = content['token']
+                self.user = await self.get_user_by_token(token)
                 await login(scope=self.scope, user=self.user, backend=self.SESSION_BACKEND)
                 await database_sync_to_async(self.scope['session'].save)()
-            except (Token.DoesNotExist, User.DoesNotExist, KeyError):
-                self.user = AnonymousUser()
 
-            chat_id = content['chat']
-            self.chat_group_name = f'chat_{chat_id}'
-            await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
-            await self.send_json({
-                'type': 'info',
-                'status': 'ok',
-                'content': 'Chat connected!'
-            })
+                chat_id = content['chat']
+                self.chat_group_name = f'chat_{chat_id}'
+                await self.channel_layer.group_add(self.chat_group_name, self.channel_name)
+                await self.send_json({
+                    'type': 'info',
+                    'status': 'ok',
+                    'content': 'Chat connected!'
+                })
+            except User.DoesNotExist:
+                await self.send_json({
+                    'type': 'info',
+                    'status': 'error',
+                    'content': 'Can\'t login user.'
+                }, close=True)
 
     async def send_message(self, content):
 
         if not self.user.is_authenticated:
-            await self.send_json(
-                {'error': 'User is not authenticated.'},
-                close=True
-            )
+            await self.send_json({
+                'type': 'info',
+                'status': 'error',
+                'content': 'User is not authenticated.'
+            }, close=True)
         else:
             chat_id = content['chat']
             msg_text = content['message']
@@ -89,7 +100,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
 
             func = 'group_send_message'
             content = {
-                'type': f'{func}',
+                'type': func,
                 'status': 'ok',
                 'content': message,
             }
@@ -98,16 +109,18 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 await self.channel_layer.group_send(self.chat_group_name, content)
             except TypeError:
                 # We send error message with serialized message and remove
-                await self.send_json(
-                    {'error': 'We couldn\'t send your message', 'message': message},
-                    close=True
-                )
+                await self.send_json({
+                    'type': 'info',
+                    'status': 'error',
+                    'content': 'We couldn\'t send your message.',
+                }, close=True)
                 await self.delete_message(message['id'])
 
     async def group_send_message(self, content):
         message = content['content']
+        func = 'send_message'
         await self.send_json({
-            'type': 'send_message',
+            'type': func,
             'status': 'ok',
             'content': message
         })
