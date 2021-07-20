@@ -11,6 +11,6 @@ Chat = apps.get_model(models.CHAT_MODEL)
 
 chat = Recipe(
     Chat,
-    name=fake.sentence,
+    name=fake.sentence()[:49],
     users=related(user),
 )
