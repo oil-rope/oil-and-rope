@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -8,7 +9,9 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from rest_framework.authtoken.models import Token
 
+from api.serializers.registration import UserSerializer
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
 
@@ -197,7 +200,6 @@ class SessionJoinView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
     model = models.Session
     pattern_name = 'roleplay:session:detail'
 
-    # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         user = request.user
@@ -214,7 +216,6 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
     model = models.Session
     template_name = 'roleplay/session/session_detail.html'
 
-    # noinspection PyAttributeOutsideInit
     def dispatch(self, request, *args, **kwargs):
         user = request.user
 
@@ -223,11 +224,19 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
 
         self.object = self.get_object()
         players = self.object.players.all()
-        game_master = self.object.game_master
 
-        if user not in players and user != game_master:
+        if user not in players:
             msg = _('You are not part of this session')
             messages.error(request, f'{msg}.')
             return HttpResponseForbidden(content=f'{msg}.')
 
         return super().dispatch(request, *args, **kwargs)
+
+    def _check_user_has_token(self):
+        Token.objects.get_or_create(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self._check_user_has_token()
+        context['serialized_user'] = json.dumps(UserSerializer(self.request.user).data)
+        return context

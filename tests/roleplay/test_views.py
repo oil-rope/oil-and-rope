@@ -13,17 +13,20 @@ from PIL import Image
 
 from roleplay import enums, models, views
 
+fake = Faker()
+
 
 class TestWorldListView(TestCase):
-    model = models.Place
-    enum = enums.SiteTypes
-    view = views.WorldListView
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = models.Place
+        cls.enum = enums.SiteTypes
+        cls.view = views.WorldListView
+        cls.url = reverse('roleplay:world_list')
 
     def setUp(self):
-        self.faker = Faker()
         self.pagination = self.view.paginate_by
         self.user = baker.make(get_user_model())
-        self.url = reverse('roleplay:world_list')
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -105,7 +108,7 @@ class TestWorldListView(TestCase):
         for _ in range(0, self.pagination):
             another_user_entries.append(
                 self.model.objects.create(
-                    name=self.faker.name(), user=another_user,
+                    name=fake.name(), user=another_user,
                     site_type=self.enum.WORLD, owner=another_user
                 )
             )
@@ -200,7 +203,7 @@ class TestWorldListView(TestCase):
             )
         for _ in range(0, self.pagination):
             community_worlds.append(
-                self.model.objects.create(name=self.faker.name(), site_type=self.enum.WORLD)
+                self.model.objects.create(name=fake.name(), site_type=self.enum.WORLD)
             )
         self.client.force_login(self.user)
         response = self.client.get(self.url + '?{}=1&page=1'.format(self.view.user_worlds_page_kwarg))
@@ -244,13 +247,14 @@ class TestWorldListView(TestCase):
 
 
 class TestWorldCreateView(TestCase):
-    enum = enums.SiteTypes
-    model = models.Place
-    view = views.WorldCreateView
+    @classmethod
+    def setUpTestData(cls):
+        cls.enum = enums.SiteTypes
+        cls.model = models.Place
+        cls.view = views.WorldCreateView
+        cls.url = reverse('roleplay:world_create')
 
     def setUp(self):
-        self.faker = Faker()
-        self.url = reverse('roleplay:world_create')
         self.user = baker.make(get_user_model())
 
         self.tmp_image = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.png', delete=False)
@@ -259,8 +263,8 @@ class TestWorldCreateView(TestCase):
         with open(image_file, 'rb') as image_content:
             self.image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/png')
         self.data_ok = {
-            'name': self.faker.country(),
-            'description': self.faker.paragraph(),
+            'name': fake.country(),
+            'description': fake.paragraph(),
             'image': self.image
         }
 
@@ -331,13 +335,14 @@ class TestWorldCreateView(TestCase):
 
 
 class TestWorldDetailView(TestCase):
-    model = models.Place
-    view = views.WorldDetailView
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = models.Place
+        cls.view = views.WorldDetailView
 
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
-        self.world = baker.make(models.Place, name=self.faker.country(), owner=self.user, user=self.user)
+        self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
         self.url = reverse('roleplay:world_detail', kwargs={'pk': self.world.pk})
 
     def test_access_ok(self):
@@ -356,7 +361,7 @@ class TestWorldDetailView(TestCase):
     def test_access_community_world_ok(self):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
-        world = baker.make(self.model, name=self.faker.country(), owner=self.user)
+        world = baker.make(self.model, name=fake.country(), owner=self.user)
         url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
@@ -364,7 +369,7 @@ class TestWorldDetailView(TestCase):
 
     def test_access_default_world_ok(self):
         self.client.force_login(self.user)
-        world = baker.make(self.model, name=self.faker.country())
+        world = baker.make(self.model, name=fake.country())
         url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
@@ -379,17 +384,18 @@ class TestWorldDetailView(TestCase):
 
 
 class TestWorldDeleteView(TestCase):
-    model = models.Place
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = models.Place
 
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
         self.world = self.model.objects.create(
-            name=self.faker.city(),
+            name=fake.city(),
             owner=self.user
         )
         self.private_world = self.model.objects.create(
-            name=self.faker.city(),
+            name=fake.city(),
             owner=self.user,
             user=self.user
         )
@@ -424,7 +430,6 @@ class TestWorldDeleteView(TestCase):
 
         self.assertEqual(403, response.status_code)
 
-    # noinspection PyTypeChecker
     def test_delete_ok(self):
         self.client.force_login(self.user)
         self.client.delete(self.url)
@@ -451,14 +456,13 @@ class TestWorldUpdateView(TestCase):
         with open(self.image_file, 'rb') as image:
             self.image = SimpleUploadedFile(name=self.image_file, content=image.read(), content_type='image/png')
 
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
-        self.world = self.model.objects.create(name=self.faker.city(), user=self.user, owner=self.user)
-        self.community_world = self.model.objects.create(name=self.faker.city(), owner=self.user)
+        self.world = self.model.objects.create(name=fake.city(), user=self.user, owner=self.user)
+        self.community_world = self.model.objects.create(name=fake.city(), owner=self.user)
         self.url = reverse('roleplay:world_edit', kwargs={'pk': self.world.pk})
         self.data_ok = {
-            'name': self.faker.city(),
-            'description': self.faker.paragraph(),
+            'name': fake.city(),
+            'description': fake.paragraph(),
             'image': self.image
         }
 
@@ -573,8 +577,8 @@ class TestSessionCreateView(TestCase):
     def setUp(self):
         self.url = reverse(self.resolver)
         self.data_ok = {
-            'name': self.fake.word(),
-            'description': self.fake.paragraph(),
+            'name': fake.word(),
+            'description': fake.paragraph(),
             'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
             'next_game_time': timezone.now().time(),
             'system': enums.RoleplaySystems.PATHFINDER,
@@ -613,7 +617,7 @@ class TestSessionJoinView(TestCase):
         cls.user = baker.make(get_user_model())
         cls.game_master = baker.make(get_user_model())
         cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
-        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+        cls.session = baker.make(cls.model, world=cls.world)
 
     def setUp(self):
         self.login_url = reverse('registration:login')
@@ -651,8 +655,9 @@ class TestSessionDetailView(TestCase):
         cls.game_master = baker.make(get_user_model())
         cls.player = baker.make(get_user_model())
         cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
-        cls.session = baker.make(cls.model, world=cls.world, game_master=cls.game_master)
+        cls.session = baker.make(cls.model, world=cls.world)
         cls.session.players.add(cls.player)
+        cls.session.add_game_masters(cls.game_master)
 
     def setUp(self):
         self.login_url = reverse('registration:login')

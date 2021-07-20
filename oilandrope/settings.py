@@ -28,10 +28,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
 
 if 'ALLOWED_HOSTS' in os.environ:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oilandrope-project.com').split(',')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.oilandrope-project.com').split(',')
 else:
     ALLOWED_HOSTS = [
-        'oilandrope-project.com',
+        '.oilandrope-project.com',
     ]
 
 # Defines Admins
@@ -48,8 +48,9 @@ ADMINS = [
 MANAGERS = ADMINS
 
 # Application definition
-
 INSTALLED_APPS = [
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
     # Must be settled before 'django.contrib.admin' to work correctly on admin
     'modeltranslation',
@@ -59,8 +60,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
@@ -71,12 +70,16 @@ INSTALLED_APPS = [
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
+    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
+    'rest_framework.authtoken',
+    # Django CORS (https://github.com/adamchainz/django-cors-headers)
+    'corsheaders',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
-    # Django metric with Prometheus (https://github.com/korfuri/django-prometheus#django-prometheus)
-    'django_prometheus',
     # Source
     'core.apps.CoreConfig',
+    # API
+    'api.apps.ApiConfig',
     # Common
     'common.apps.CommonConfig',
     # Dynamic Menu
@@ -93,18 +96,17 @@ INSTALLED_APPS = [
     'roleplay.apps.RoleplayConfig'
 ]
 
+
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'dynamic_menu.middleware.DynamicMenuMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # SITE_ID = 1 is for declaring page ID
@@ -201,7 +203,7 @@ AUTH_USER_MODEL = 'registration.User'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'registration.backends.EmailBacked',
+    'registration.backends.EmailBackend',
 ]
 
 # Internationalization
@@ -230,6 +232,16 @@ USE_TZ = True
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale/')
 ]
+
+# Session expire date
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-age
+
+SESSION_COOKIE_AGE = 172800
+
+# Session accesible from JavaScript
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-httponly
+
+SESSION_COOKIE_HTTPONLY = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -289,12 +301,13 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
 }
 
 # Email System
@@ -307,6 +320,40 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
+
+# CORS System
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_methods
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# https://github.com/adamchainz/django-cors-headers#cors_urls_regex
+
+CORS_URLS_REGEX = r'^/\w+/api/.*$'
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_headers
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Discord
 

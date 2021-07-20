@@ -27,7 +27,6 @@ import chat.routing
 urlpatterns = [
     path('', include((bot.routing.websocket_urlpatterns, 'bot_ws'))),
     path('', include((chat.routing.websocket_urlpatterns, 'chat_ws'))),
-    path('', include('django_prometheus.urls')),
 ]
 
 urlpatterns += i18n_patterns(
@@ -37,6 +36,8 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
+    # API
+    path('api/', include('api.urls')),
     # Common
     path('common/', include('common.urls')),
     # Auth system

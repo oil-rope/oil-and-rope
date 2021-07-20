@@ -1,97 +1,99 @@
 import React, {
-	useState,
-	useContext,
-	useEffect,
-	useRef,
-	Suspense,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  Suspense,
 } from "react";
 import Loader from "../loader/Loader";
-import ChatContext from "../../contexts/ChatContext";
 
-const Message = React.lazy(() => import("./Message"));
+import SessionContext from "../../contexts/SessionContext";
+import WebSocketContext from "../../contexts/WebSocketContext";
+
+const Message = React.lazy(() =>
+  import(/* webpackChunkName: "message" */ "./Message")
+);
 
 const MessagesContainer = () => {
-	const { webSocket, setWebSocketOnMessage, chat, user } = useContext(
-		ChatContext
-	);
-	const [userLoaded, setUserLoaded] = useState(false);
-	const [messages, setMessages] = useState([]);
-	const messageContainerRef = useRef(null);
+  const { session } = useContext(SessionContext);
+  const { chatWebSocket } = useContext(WebSocketContext);
 
-	/**
-	 * Adds the message to messages.
-	 *
-	 * @param {Object} messageEvent Message received.
-	 */
-	const handleWebSocketOnMessage = (messageEvent) => {
-		let payload = JSON.parse(messageEvent.data);
-		let message = payload.message;
-		setMessages([...messages, message]);
+  const [messages, setMessages] = useState(null);
+  const [componentLoaded, setComponentLoaded] = useState(false);
 
-		if (payload.hasOwnProperty("error")) {
-			new Notification(payload.error);
-			scrollToBottom();
-		}
-	};
+  const messageContainerRef = useRef(null);
 
-	/**
-	 * Creates all messages in chat.
-	 */
-	const loadMessages = () => {
-		if (Boolean(chat)) {
-			setMessages(chat.chat_message_set);
-		}
-	};
+  /**
+   * Adds the message to messages.
+   *
+   * @param {Object} messageEvent Message received.
+   */
+  const handleWebSocketOnMessage = (messageEvent) => {
+    const payload = JSON.parse(messageEvent.data);
+    if (payload.status == "error") {
+      new Notification(payload.content);
+    }
 
-	/**
-	 * Scrolls to bottom.
-	 */
-	const scrollToBottom = () => {
-		let element = messageContainerRef.current;
-		element.scrollTop = element.scrollHeight;
-	};
+    if (payload.type === "send_message") {
+      const message = payload.content;
+      setMessages([...messages, message]);
+    }
 
-	useEffect(() => {
-		if (Boolean(webSocket)) {
-			setWebSocketOnMessage(handleWebSocketOnMessage);
-		}
-	});
+    scrollToBottom();
+  };
 
-	useEffect(() => {
-		loadMessages();
-	}, [chat]);
+  /**
+   * Creates all messages in chat.
+   */
+  const loadMessages = () => {
+    setMessages(session.chat.chat_message_set);
+  };
 
-	useEffect(() => {
-		if (Boolean(user)) {
-			setUserLoaded(true);
-		}
-	}, [user]);
+  /**
+   * Scrolls to bottom.
+   */
+  const scrollToBottom = () => {
+    let element = messageContainerRef.current;
+    element.scrollTop = element.scrollHeight;
+  };
 
-	useEffect(() => {
-		scrollToBottom();
-	}, [messages]);
+  // Okay this is tricky
+  // First we check if both session and chatWebSocket exist
+  useEffect(() => {
+    if (Boolean(session) && Boolean(chatWebSocket)) {
+      loadMessages();
+    }
+  }, [session, chatWebSocket]);
 
-	return (
-		<div
-			style={{
-				height: "400px",
-				width: "100%",
-				overflowY: "scroll",
-				scrollBehavior: "smooth",
-			}}
-			ref={messageContainerRef}
-		>
-			{userLoaded ? (
-				<Suspense fallback={<Loader />}>
-					{messages.map((message, index) => (
-						<Message message={message} key={index} />
-					))}
-				</Suspense>
-			) : (
-				<Loader />
-			)}
-		</div>
-	);
+  // Once they exist we set the onmessage and set component as loaded
+  useEffect(() => {
+    if (messages !== null) {
+      chatWebSocket.onmessage = handleWebSocketOnMessage;
+      setComponentLoaded(true);
+    }
+  }, [messages]);
+
+  return (
+    <div
+      style={{
+        height: "400px",
+        width: "100%",
+        overflowY: "scroll",
+        scrollBehavior: "smooth",
+      }}
+      ref={messageContainerRef}
+    >
+      {componentLoaded ? (
+        <Suspense fallback={<Loader />}>
+          {messages.map((message, index) => (
+            <Message message={message} key={index} />
+          ))}
+        </Suspense>
+      ) : (
+        <Loader text={gettext("Loading messages")} />
+      )}
+    </div>
+  );
 };
 
 export default MessagesContainer;

@@ -27,21 +27,21 @@ class DiscordUser(TracingMixin):
         Declares when user joined Discord.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
+    id = models.CharField(verbose_name=_('identifier'), max_length=254, primary_key=True)
     user = models.OneToOneField(
-        to=constants.USER_MODEL, verbose_name=_('User'), on_delete=models.CASCADE,
+        to=constants.USER_MODEL, verbose_name=_('user'), on_delete=models.CASCADE,
         related_name='discord_user', blank=True, null=True
     )
-    nick = models.CharField(verbose_name=_('Nick'), max_length=50)
-    code = models.PositiveSmallIntegerField(verbose_name=_('Code'))
-    avatar_url = models.URLField(verbose_name=_('Avatar URL'), max_length=254, null=True, blank=True)
-    locale = models.CharField(verbose_name=_('Locale'), max_length=10, null=True, blank=True)
-    premium = models.BooleanField(verbose_name=_('Premium'), default=False)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
+    nick = models.CharField(verbose_name=_('nick'), max_length=50)
+    code = models.PositiveSmallIntegerField(verbose_name=_('code'))
+    avatar_url = models.URLField(verbose_name=_('avatar'), max_length=254, null=True, blank=True)
+    locale = models.CharField(verbose_name=_('locale'), max_length=10, null=True, blank=True)
+    premium = models.BooleanField(verbose_name=_('premium'), default=False)
+    created_at = models.DateTimeField(verbose_name=_('created at'))
 
     class Meta:
-        verbose_name = _('Discord User')
-        verbose_name_plural = _('Discord Users')
+        verbose_name = _('discord user')
+        verbose_name_plural = _('discord users')
         ordering = ['nick', '-created_at', '-entry_updated_at']
 
     def __str__(self):
@@ -74,21 +74,24 @@ class DiscordServer(TracingMixin):
         List with all Discord Users in this server.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    region = models.CharField(verbose_name=_('Region'), max_length=20)
-    icon_url = models.URLField(verbose_name=_('Icon URL'), max_length=254, null=True, blank=True)
-    owner = models.ForeignKey('bot.DiscordUser', verbose_name=_('Owner'), on_delete=models.CASCADE,
-                              related_name='owner_servers', db_index=True)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    member_count = models.PositiveSmallIntegerField(verbose_name=_('Member count'), default=0)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_servers')
+    id = models.CharField(verbose_name=_('identifier'), max_length=254, primary_key=True)
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    region = models.CharField(verbose_name=_('region'), max_length=20)
+    icon_url = models.URLField(verbose_name=_('icon'), max_length=254, null=True, blank=True)
+    owner = models.ForeignKey(
+        to=constants.DISCORD_USER_MODEL, verbose_name=_('owner'), on_delete=models.CASCADE,
+        related_name='owner_servers', db_index=True
+    )
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    member_count = models.PositiveSmallIntegerField(verbose_name=_('member count'), default=0)
+    created_at = models.DateTimeField(verbose_name=_('created at'))
+    discord_users = models.ManyToManyField(
+        to=constants.DISCORD_USER_MODEL, verbose_name=_('discord users'), related_name='discord_servers'
+    )
 
     class Meta:
-        verbose_name = _('Discord Server')
-        verbose_name_plural = _('Discord Servers')
+        verbose_name = _('discord server')
+        verbose_name_plural = _('discord servers')
         ordering = ['name', '-created_at', '-entry_updated_at']
 
     def __str__(self):
@@ -111,10 +114,10 @@ class DiscordChannelMixin(models.Model):
         Declares when the server was created.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    position = models.PositiveSmallIntegerField(verbose_name=_('Position'), default=0)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
+    id = models.CharField(verbose_name=_('identifier'), max_length=254, primary_key=True)
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    position = models.PositiveSmallIntegerField(verbose_name=_('position'), default=0)
+    created_at = models.DateTimeField(verbose_name=_('created at'))
 
     class Meta:
         abstract = True
@@ -146,17 +149,20 @@ class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
         List with all Discord Users in this text channel.
     """
 
-    nsfw = models.BooleanField(verbose_name=_('NSFW'), default=False, blank=True)
-    topic = models.CharField(verbose_name=_('Topic'), max_length=100, null=True, blank=True)
-    news = models.BooleanField(verbose_name=_('News'), default=False, blank=True)
-    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
-                               on_delete=models.CASCADE, related_name='discord_text_channels')
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_text_channels')
+    nsfw = models.BooleanField(verbose_name=_('nsfw'), default=False, blank=True)
+    topic = models.CharField(verbose_name=_('topic'), max_length=100, null=True, blank=True)
+    news = models.BooleanField(verbose_name=_('news'), default=False, blank=True)
+    server = models.ForeignKey(
+        to=constants.DISCORD_SERVER_MODEL, verbose_name=_('discord server'), on_delete=models.CASCADE,
+        related_name='discord_text_channels', db_index=True
+    )
+    discord_users = models.ManyToManyField(
+        to=constants.DISCORD_USER_MODEL, verbose_name=_('discord users'), related_name='discord_text_channels'
+    )
 
     class Meta:
-        verbose_name = _('Discord Text Channel')
-        verbose_name_plural = _('Discord Text Channels')
+        verbose_name = _('discord text channel')
+        verbose_name_plural = _('discord text channels')
         ordering = ['name', '-created_at', '-entry_updated_at']
 
     def __str__(self):
@@ -185,15 +191,19 @@ class DiscordVoiceChannel(TracingMixin, DiscordChannelMixin):
         List with all Discord Users in this voice channel.
     """
 
-    bitrate = models.PositiveSmallIntegerField(verbose_name=_('Bitrate'))
-    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
-                               on_delete=models.CASCADE, related_name='discord_voice_channels')
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_voice_channels')
+    bitrate = models.PositiveSmallIntegerField(verbose_name=_('bitrate'))
+    server = models.ForeignKey(
+        to=constants.DISCORD_SERVER_MODEL, verbose_name=_('discord server'), on_delete=models.CASCADE,
+        related_name='discord_voice_channels', db_index=True
+    )
+    discord_users = models.ManyToManyField(
+        to=constants.DISCORD_USER_MODEL, verbose_name=_('discord users'), related_name='discord_voice_channels',
+        db_index=True
+    )
 
     class Meta:
-        verbose_name = _('Discord Voice Channel')
-        verbose_name_plural = _('Discord Voice Channels')
+        verbose_name = _('discord voice channel')
+        verbose_name_plural = _('discord voice channels')
         ordering = ['name', '-created_at', '-entry_updated_at']
 
     def __str__(self):

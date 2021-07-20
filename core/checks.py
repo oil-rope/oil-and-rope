@@ -17,11 +17,26 @@ def get_argument(node, arg):
     return None
 
 
-def check_model(model):
+def is_gettext_node(node):
+    if not isinstance(node, ast.Call):
+        return False
+
+    # We assume gettext is aliased '_'.
+    if not node.func.id == '_':  # type: ignore
+        return False
+
+    return True
+
+
+def check_model(model):  # noqa
     """
     Checks a model to accomplish the following hints:
 
     - MC001: Model has `verbose_name`.
+    - MC002: `verbose_name` uses gettext.
+    - MC003: `verbose_name` is lowercase.
+    - MC004: `help_text` uses gettext.
+    - MC005: ForeignKey uses `db_index`.
     """
 
     model_source = inspect.getsource(model)
@@ -55,6 +70,43 @@ def check_model(model):
                 obj=field,
                 id='MC001',
             )
+        else:
+            if not is_gettext_node(verbose_name.value):
+                yield Warning(
+                    'Verbose name should use gettext',
+                    hint='Use gettext on the verbose name.',
+                    obj=field,
+                    id='MC002',
+                )
+            else:
+                value = verbose_name.value.args[0].s  # type: ignore
+                if not all(w.islower() or w.isdigit() for w in value.split(' ')):
+                    yield Warning(
+                        'Words in verbose name must be all lower case',
+                        hint='Change verbose name to "{}".'.format(value.lower()),
+                        obj=field,
+                        id='MC003',
+                    )
+
+        help_text = get_argument(node, 'help_text')
+        if help_text is not None:
+            if not is_gettext_node(help_text.value):
+                yield Warning(
+                    'Help text should use gettext',
+                    hint='Use gettext on the help text.',
+                    obj=field,
+                    id='MC004',
+                )
+
+        if field.many_to_one:
+            db_index = get_argument(node, 'db_index')
+            if db_index is None:
+                yield Warning(
+                    'Must set db_index explicitly on a ForeignKey field',
+                    hint='Set db_index on the field.',
+                    obj=field,
+                    id='MC005',
+                )
 
 
 @register(Tags.models)

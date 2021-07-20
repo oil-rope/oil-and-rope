@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
 
-class EmailBacked(ModelBackend):
+class EmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         user = super().authenticate(request, username, password, **kwargs)
 

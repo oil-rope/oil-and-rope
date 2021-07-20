@@ -1,13 +1,6 @@
-"""
-ASGI entrypoint. Configures Django and then runs the application
-defined in the ASGI_APPLICATION setting.
-"""
-
-import os
-
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
-from django.core.asgi import get_asgi_application
+from channels.auth import AuthMiddlewareStack, SessionMiddleware
+from channels.routing import AsgiHandler, ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
 
 from bot.routing import websocket_urlpatterns as bot_ws_urls
 from chat.routing import websocket_urlpatterns as chat_ws_urls
@@ -21,12 +14,15 @@ def get_all_websocket_urlpatterns():
     return bot_ws_urls + chat_ws_urls
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oilandrope.settings")
 application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            get_all_websocket_urlpatterns()
+    'http': AsgiHandler(),
+    'websocket': AllowedHostsOriginValidator(
+        SessionMiddleware(
+            AuthMiddlewareStack(
+                URLRouter(
+                    get_all_websocket_urlpatterns()
+                )
+            )
         )
     )
 })
