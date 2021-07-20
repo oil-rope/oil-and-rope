@@ -5,11 +5,6 @@ module.exports = {
 		node: true,
 	},
 	parser: "babel-eslint",
-	parserOptions: {
-		ecmaFeatures: {
-			jsx: true,
-		},
-	},
 	plugins: ["react"],
 	extends: [
 		"eslint:recommended",
@@ -17,6 +12,7 @@ module.exports = {
 		"plugin:prettier/recommended",
 		"plugin:jest/recommended",
 	],
+	rules: {},
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true,
@@ -24,7 +20,6 @@ module.exports = {
 		ecmaVersion: 12,
 		sourceType: "module",
 	},
-	rules: {},
 	settings: {
 		react: {
 			createClass: "createReactClass",
