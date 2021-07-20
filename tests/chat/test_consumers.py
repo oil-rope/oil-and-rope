@@ -45,11 +45,8 @@ async def test_connect_ok():
 @pytest.mark.django_db(transaction=True)
 async def test_setup_channel_layer_ok(token, chat, async_client):
     await database_sync_to_async(async_client.force_login)(token.user)
-    response = await async_client.get(url)
-    request = response.asgi_request
-
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
-    communicator.scope['session'] = request.session
+    communicator.scope['session'] = async_client.session
     connected, protocol = await communicator.connect()
     assert connected, 'WebSocket doesn\'t connect'
 
@@ -72,11 +69,8 @@ async def test_setup_channel_layer_ok(token, chat, async_client):
 @pytest.mark.django_db(transaction=True)
 async def test_setup_channel_layer_with_incorrect_data_ko(token, chat, async_client):
     await database_sync_to_async(async_client.force_login)(token.user)
-    response = await async_client.get(url)
-    request = response.asgi_request
-
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
-    communicator.scope['session'] = request.session
+    communicator.scope['session'] = async_client.session
     connected, protocol = await communicator.connect()
     assert connected, 'WebSocket doesn\'t connect'
 
@@ -98,14 +92,9 @@ async def test_setup_channel_layer_with_incorrect_data_ko(token, chat, async_cli
 @pytest.mark.django_db(transaction=True)
 async def test_setup_channel_layer_with_non_existent_token_ko(token, chat, async_client):
     await database_sync_to_async(async_client.force_login)(token.user)
-    response = await async_client.get(url)
-    request = response.asgi_request
-
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
-    communicator.scope['session'] = request.session
+    communicator.scope['session'] = async_client.session
     connected, protocol = await communicator.connect()
-    assert connected, 'WebSocket doesn\'t connect'
-
     data = {
         'type': 'setup_channel_layer',
         'chat': chat.pk,
@@ -123,16 +112,11 @@ async def test_setup_channel_layer_with_non_existent_token_ko(token, chat, async
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_send_message_ok(token, chat, async_client, settings):
+async def test_send_message_ok(token, chat, async_client):
     await database_sync_to_async(async_client.force_login)(token.user)
-    response = await async_client.get(url)
-    request = response.asgi_request
-
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
-    communicator.scope['session'] = request.session
+    communicator.scope['session'] = async_client.session
     connected, protocol = await communicator.connect()
-    assert connected, 'WebSocket doesn\'t connect'
-
     data = {
         'type': 'setup_channel_layer',
         'chat': chat.pk,
@@ -160,16 +144,11 @@ async def test_send_message_ok(token, chat, async_client, settings):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_send_message_user_not_authenticated_ko(token, chat, async_client, settings):
+async def test_send_message_user_not_authenticated_ko(token, chat, async_client):
     await database_sync_to_async(async_client.force_login)(token.user)
-    response = await async_client.get(url)
-    request = response.asgi_request
-
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
-    communicator.scope['session'] = request.session
+    communicator.scope['session'] = async_client.session
     connected, protocol = await communicator.connect()
-    assert connected, 'WebSocket doesn\'t connect'
-
     data = {
         'type': 'send_message',
         'chat': chat.pk,
