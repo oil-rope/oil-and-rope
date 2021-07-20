@@ -15,7 +15,7 @@ const Message = React.lazy(() =>
 );
 
 const MessagesContainer = () => {
-  const { session } = useContext(SessionContext);
+  const { chat } = useContext(SessionContext);
   const { chatWebSocket } = useContext(WebSocketContext);
 
   const [messages, setMessages] = useState(null);
@@ -46,7 +46,7 @@ const MessagesContainer = () => {
    * Creates all messages in chat.
    */
   const loadMessages = () => {
-    setMessages(session.chat.chat_message_set);
+    setMessages(chat.chat_message_set);
   };
 
   /**
@@ -60,10 +60,10 @@ const MessagesContainer = () => {
   // Okay this is tricky
   // First we check if both session and chatWebSocket exist
   useEffect(() => {
-    if (Boolean(session) && Boolean(chatWebSocket)) {
+    if (Boolean(chat) && Boolean(chatWebSocket)) {
       loadMessages();
     }
-  }, [session, chatWebSocket]);
+  }, [chatWebSocket, chat]);
 
   // Once they exist we set the onmessage and set component as loaded
   useEffect(() => {

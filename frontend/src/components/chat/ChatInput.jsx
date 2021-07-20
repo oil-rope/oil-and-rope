@@ -9,7 +9,7 @@ const ChatInput = () => {
   const func = "send_message";
 
   const { chatWebSocket } = useContext(WebSocketContext);
-  const { session } = useContext(SessionContext);
+  const { chat } = useContext(SessionContext);
 
   /**
    * Declares what to do on submit.
@@ -23,7 +23,7 @@ const ChatInput = () => {
         JSON.stringify({
           type: func,
           message: message,
-          chat: session.chat.id,
+          chat: chat.id,
         })
       );
       e.currentTarget.reset();

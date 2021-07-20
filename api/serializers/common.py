@@ -24,7 +24,11 @@ class MappedSerializerMixin:
         mapped_fields = fields.copy()
         if self.map_fields:
             for field in self.map_fields:
-                mapped_fields[field] = self.serializers_map[field]
+                override_field = self.serializers_map[field]
+                if getattr(override_field, 'source', None) == field:
+                    # Avoiding AssertionError
+                    setattr(override_field, 'source', None)
+                mapped_fields[field] = override_field
         return mapped_fields
 
     def get_fields(self):

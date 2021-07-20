@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
 	entry: {
@@ -24,4 +25,11 @@ module.exports = {
 	externals: {
 		gettext: "gettext",
 	},
+	plugins: [
+		new webpack.EnvironmentPlugin({
+			WEBSOCKET_URL: "127.0.0.1:8000",
+			API_URL: "127.0.0.1:8000",
+			NODE_ENV: "development",
+		}),
+	],
 };

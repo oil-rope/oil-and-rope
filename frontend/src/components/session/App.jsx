@@ -15,6 +15,7 @@ const Chat = React.lazy(() =>
 
 const App = () => {
   const [session, setSession] = useState(null);
+  const [chat, setChat] = useState(null);
   const [chatWebSocket, setChatWebSocket] = useState(null);
 
   const setUpChatWebSocket = () => {
@@ -27,7 +28,7 @@ const App = () => {
   }, []);
 
   return (
-    <SessionContext.Provider value={{ session }}>
+    <SessionContext.Provider value={{ session, chat, setChat }}>
       <Container fluid>
         <WebSocketContext.Provider value={{ chatWebSocket }}>
           <Row>

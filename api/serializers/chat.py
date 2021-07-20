@@ -22,7 +22,11 @@ class ChatMessageSerializer(MappedSerializerMixin, serializers.ModelSerializer):
         )
 
 
-class ChatSerializer(serializers.ModelSerializer):
+class ChatSerializer(MappedSerializerMixin, serializers.ModelSerializer):
+    serializers_map = {
+        'chat_message_set': ChatMessageSerializer(many=True, read_only=True, map_fields=['author'])
+    }
+
     chat_message_set = ChatMessageSerializer(many=True)
 
     class Meta:

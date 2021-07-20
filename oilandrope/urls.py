@@ -52,6 +52,7 @@ urlpatterns += i18n_patterns(
     path('frontend/', include('frontend.urls')),
     # Roleplay
     path('roleplay/', include('roleplay.urls')),
+    prefix_default_language=False,
 )
 
 if settings.DEBUG:  # pragma: no cover

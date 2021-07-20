@@ -1,3 +1,5 @@
+import Axios from "axios";
+
 import * as Constants from "./constants.js";
 
 /**
@@ -6,18 +8,9 @@ import * as Constants from "./constants.js";
  * @returns {Promise} API active (true or false).
  */
 export const checkAPIHealth = () => {
-	const headers = new Headers();
-	headers.append("Content-Type", "application/json");
-	headers.append("Accept", "application/json");
-	const initRequest = {
-		method: "GET",
-		headers: headers,
-		mode: "cors",
-	};
-	const request = new Request(`${Constants.API_URL}/`, initRequest);
-	return fetch(request)
+	return Axios.get(`${Constants.API_URL}/`)
 		.then(
-			(res) => res.status === 200 && parseFloat(res.json().drf_version) >= 3.12
+			(res) => res.status === 200 && parseFloat(res.data.drf_version) >= 3.12
 		)
 		.then((status) => status)
 		.catch(console.error);
@@ -30,19 +23,21 @@ export const checkAPIHealth = () => {
  * @param {Object} extra_params Any extra arg to send POST.
  * @returns The URL resolved.
  */
-export const resolveURL = ({ resolver, ...extra_params }) => {
-	const headers = new Headers();
-	headers.append("Content-Type", "application/json");
-	headers.append("Accept", "application/json");
-	const initRequest = {
+export const resolveURL = (resolver, extra_params) => {
+	return Axios({
 		method: "POST",
-		headers: headers,
-		mode: "cors",
-		body: JSON.stringify({ resolver, ...extra_params }),
-	};
-	const request = new Request(`${Constants.RESOLVER_URL}/`, { initRequest });
-	return fetch(request)
-		.then((res) => res.json())
-		.then((data) => `${process.env.API_URL}${data.url}`)
+		url: `${Constants.RESOLVER_URL}/`,
+		data: {
+			resolver,
+			...extra_params,
+		},
+		headers: {
+			"Content-Type": "application/json",
+			Accept: "application/json",
+			"X-CSRFToken": Constants.CSRFToken,
+		},
+	})
+		.then((res) => res.data)
+		.then((data) => `http://${process.env.API_URL}${data.url}`)
 		.catch(console.error);
 };

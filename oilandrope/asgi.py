@@ -1,4 +1,4 @@
-from channels.auth import AuthMiddlewareStack, SessionMiddleware
+from channels.auth import AuthMiddlewareStack
 from channels.routing import AsgiHandler, ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
@@ -17,11 +17,9 @@ def get_all_websocket_urlpatterns():
 application = ProtocolTypeRouter({
     'http': AsgiHandler(),
     'websocket': AllowedHostsOriginValidator(
-        SessionMiddleware(
-            AuthMiddlewareStack(
-                URLRouter(
-                    get_all_websocket_urlpatterns()
-                )
+        AuthMiddlewareStack(
+            URLRouter(
+                get_all_websocket_urlpatterns()
             )
         )
     )

@@ -23,6 +23,13 @@ class ChatViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
 
+    def get_serializer(self, *args, **kwargs):
+        map_fields = self.request.GET.getlist('use_map')
+        kwargs.update({
+            "map_fields": map_fields
+        })
+        return super().get_serializer(*args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated and user.is_staff:
