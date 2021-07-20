@@ -35,6 +35,7 @@ def chat(db):
 async def test_connect_ok():
     communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
     connected, protocol = await communicator.connect()
+
     assert connected, 'WebSocket doesn\'t connect'
 
     await communicator.disconnect()
@@ -59,11 +60,65 @@ async def test_setup_channel_layer_ok(token, chat, async_client):
     }
     await communicator.send_json_to(data)
     response = await communicator.receive_json_from()
-    await communicator.disconnect()
 
     assert 'info' == response['type']
     assert 'ok' == response['status']
     assert 'Chat connected!' == response['content']
+
+    await communicator.disconnect()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_setup_channel_layer_with_incorrect_data_ko(token, chat, async_client):
+    await database_sync_to_async(async_client.force_login)(token.user)
+    response = await async_client.get(url)
+    request = response.asgi_request
+
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    communicator.scope['session'] = request.session
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
+
+    data = {
+        'type': 'setup_channel_layer',
+        'chat': chat.pk,
+    }
+    await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
+
+    assert 'info' == response['type']
+    assert 'error' == response['status']
+    assert 'token, chat are required.' == response['content']
+
+    await communicator.disconnect()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_setup_channel_layer_with_non_existent_token_ko(token, chat, async_client):
+    await database_sync_to_async(async_client.force_login)(token.user)
+    response = await async_client.get(url)
+    request = response.asgi_request
+
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    communicator.scope['session'] = request.session
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
+
+    data = {
+        'type': 'setup_channel_layer',
+        'chat': chat.pk,
+        'token': fake.password(),
+    }
+    await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
+
+    assert 'info' == response['type']
+    assert 'error' == response['status']
+    assert 'There isn\'t any user with this token.' == response['content']
+
+    await communicator.disconnect()
 
 
 @pytest.mark.asyncio
@@ -93,9 +148,38 @@ async def test_send_message_ok(token, chat, async_client, settings):
     }
     await communicator.send_json_to(data)
     response = await communicator.receive_json_from()
-    communicator.disconnect()
 
     assert response['type'] == 'send_message'
     assert response['status'] == 'ok'
     assert response['content']['message'] == data['message']
     assert response['content']['author']['username'] == token.user.username
+    assert response['content']['author']['id'] == token.user.id
+
+    await communicator.disconnect()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_send_message_user_not_authenticated_ko(token, chat, async_client, settings):
+    await database_sync_to_async(async_client.force_login)(token.user)
+    response = await async_client.get(url)
+    request = response.asgi_request
+
+    communicator = WebsocketCommunicator(ChatConsumer.as_asgi(), url)
+    communicator.scope['session'] = request.session
+    connected, protocol = await communicator.connect()
+    assert connected, 'WebSocket doesn\'t connect'
+
+    data = {
+        'type': 'send_message',
+        'chat': chat.pk,
+        'message': fake.word(),
+    }
+    await communicator.send_json_to(data)
+    response = await communicator.receive_json_from()
+
+    assert response['type'] == 'info'
+    assert response['status'] == 'error'
+    assert response['content'] == 'User is not authenticated.'
+
+    await communicator.disconnect()

@@ -52,10 +52,6 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         )
         return user
 
-    @database_sync_to_async
-    def delete_message(self, message):
-        message.delete()
-
     async def setup_channel_layer(self, content):
         required_params = ('token', 'chat')
         if not all(key in content for key in required_params):
@@ -86,11 +82,10 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 await self.send_json({
                     'type': 'info',
                     'status': 'error',
-                    'content': 'Can\'t login user.'
+                    'content': 'There isn\'t any user with this token.'
                 }, close=True)
 
     async def send_message(self, content):
-
         if not self.user.is_authenticated:
             await self.send_json({
                 'type': 'info',
@@ -110,16 +105,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
                 'content': serialized_message,
             }
 
-            try:
-                await self.channel_layer.group_send(self.chat_group_name, content)
-            except TypeError:
-                # We send error message with serialized message and remove
-                await self.send_json({
-                    'type': 'info',
-                    'status': 'error',
-                    'content': 'We couldn\'t send your message.',
-                }, close=True)
-                await self.delete_message(message)
+            await self.channel_layer.group_send(self.chat_group_name, content)
 
     async def group_send_message(self, content):
         message = content['content']
