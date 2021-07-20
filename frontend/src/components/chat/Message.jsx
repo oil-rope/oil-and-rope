@@ -22,7 +22,7 @@ const Message = ({ message }) => {
         </p>
         <p className="text-right mb-0">
           <small className="text-muted">
-            {gettext("Sent at")} {date.formatDate(message.entry_created_at)}
+            {gettext("Sent at")} {formatDate(message.entry_created_at)}
           </small>
         </p>
       </Fragment>
