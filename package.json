@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "lint": "eslint --color frontend/src/**/*.js frontend/src/**/*.jsx",
-    "lint:fix": "eslint --color frontend/src/**/*.js frontend/src/**/*.jsx --fix",
+    "lint": "eslint --color ./frontend/src/**/*.js frontend/src/**/*.jsx",
+    "lint:fix": "eslint --color ./frontend/src/**/*.js frontend/src/**/*.jsx --fix",
     "dev": "webpack --mode development --watch --devtool source-map",
     "build": "webpack --mode production --progress",
     "test": "jest",
