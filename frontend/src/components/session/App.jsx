@@ -9,7 +9,9 @@ import Loader from "../loader/Loader.jsx";
 import * as Constants from "../../utils/constants.js";
 import { getSession } from "./utils.js";
 
-const Chat = React.lazy(() => import("../chat/Chat.jsx"));
+const Chat = React.lazy(() =>
+  import(/* webpackChunkName: "chat" */ "../chat/Chat.jsx")
+);
 
 const App = () => {
   const [session, setSession] = useState(null);

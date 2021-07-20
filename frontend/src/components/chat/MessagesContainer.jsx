@@ -10,7 +10,9 @@ import Loader from "../loader/Loader";
 import SessionContext from "../../contexts/SessionContext";
 import WebSocketContext from "../../contexts/WebSocketContext";
 
-const Message = React.lazy(() => import("./Message"));
+const Message = React.lazy(() =>
+  import(/* webpackChunkName: "message" */ "./Message")
+);
 
 const MessagesContainer = () => {
   const { session } = useContext(SessionContext);

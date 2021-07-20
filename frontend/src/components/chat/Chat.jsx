@@ -6,8 +6,12 @@ import SessionContext from "../../contexts/SessionContext.jsx";
 import WebSocketContext from "../../contexts/WebSocketContext.jsx";
 import Loader from "../loader/Loader.jsx";
 
-const MessagesContainer = React.lazy(() => import("./MessagesContainer"));
-const ChatInput = React.lazy(() => import("./ChatInput"));
+const MessagesContainer = React.lazy(() =>
+  import(/* webpackChunkName: "messagescontainer" */ "./MessagesContainer")
+);
+const ChatInput = React.lazy(() =>
+  import(/* webpackChunkName: "chatinput" */ "./ChatInput")
+);
 
 const Chat = () => {
   const { user } = useContext(AuthContext);
@@ -15,11 +19,15 @@ const Chat = () => {
   const { chatWebSocket } = useContext(WebSocketContext);
 
   const handleOnOpen = (ev) => {
-    return;
+    if (process.env.NODE_ENV === "development" || false) {
+      console.debug(ev);
+    }
   };
 
   const handleOnClose = (ev) => {
-    return;
+    if (process.env.NODE_ENV === "development" || false) {
+      console.debug(ev);
+    }
   };
 
   const setUpChannelLayer = () => {
@@ -35,7 +43,7 @@ const Chat = () => {
   };
 
   const setUpWebSocket = () => {
-    if (Boolean(chatWebSocket)) {
+    if (chatWebSocket) {
       chatWebSocket.onopen = handleOnOpen;
       chatWebSocket.onclose = handleOnClose;
     }

@@ -18,7 +18,7 @@ const ChatInput = () => {
    */
   const handleFormOnSubmit = (e) => {
     e.preventDefault();
-    if (Boolean(message)) {
+    if (message) {
       chatWebSocket.send(
         JSON.stringify({
           type: func,

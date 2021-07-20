@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 
 /**
  * Transform date into desired format.
@@ -6,5 +6,5 @@ import moment from "moment";
  * @param {Date} date The date to parse.
  */
 export const formatDate = (date, format = "DD/MM/YYYY HH:mm:ss") => {
-  return moment(date).format(format);
+	return dayjs(date).format(format);
 };

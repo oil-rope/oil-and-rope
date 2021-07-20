@@ -1,7 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "../components/session/App.jsx";
+
 import AuthContext from "../contexts/AuthContext.jsx";
+
+import App from "../components/session/App.jsx";
 
 const currentScript = document.currentScript;
 let user = currentScript.getAttribute("data-user");

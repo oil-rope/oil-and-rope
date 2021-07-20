@@ -7,8 +7,9 @@
     "test": "tests"
   },
   "scripts": {
-    "check": "eslint --color .",
-    "dev": "webpack --mode development -w --devtool source-map",
+    "lint": "eslint --color frontend/src/**",
+    "lint:fix": "eslint --color frontend/src/** --fix",
+    "dev": "webpack --mode development --watch --devtool source-map",
     "build": "webpack --mode production --progress",
     "test": "jest",
     "twatch": "jest --watch"
@@ -34,17 +35,24 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.1.9",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
+    "eslint": "^7.31.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
     "jest": "^27.0.6",
+    "prettier": "^2.3.2",
     "webpack": "^5.42.0",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
     "@react-three/fiber": "^7.0.2",
     "axios": "^0.21.1",
+    "dayjs": "^1.10.6",
     "drei": "^2.2.21",
-    "moment": "^2.29.1",
+    "eslint-config-prettier": "^8.3.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",

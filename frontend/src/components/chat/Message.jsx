@@ -1,21 +1,14 @@
-import moment from "moment";
 import React, { useContext, Fragment } from "react";
 import { Row, Col } from "react-bootstrap";
+
 import AuthContext from "../../contexts/AuthContext";
+
+import { formatDate } from "../../utils/date.js";
 
 const Message = ({ message }) => {
   const { user } = useContext(AuthContext);
   const colWidthXS = 10;
   const colWidthMD = 8;
-
-  /**
-   * Transform date into desired format.
-   *
-   * @param {Date} date The date to parse.
-   */
-  const formatDate = (date, format = "DD/MM/YYYY HH:mm:ss") => {
-    return moment(date).format(format);
-  };
 
   const renderMessage = () => {
     return (
@@ -29,7 +22,7 @@ const Message = ({ message }) => {
         </p>
         <p className="text-right mb-0">
           <small className="text-muted">
-            {gettext("Sent at")} {formatDate(message.entry_created_at)}
+            {gettext("Sent at")} {date.formatDate(message.entry_created_at)}
           </small>
         </p>
       </Fragment>
