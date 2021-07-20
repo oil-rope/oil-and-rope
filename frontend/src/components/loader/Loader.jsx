@@ -1,5 +1,6 @@
 import React from "react";
 import Spinner from "react-bootstrap/Spinner";
+import PropTypes from "prop-types";
 
 const Loader = ({ text = "Loading" }) => {
   return (
@@ -10,6 +11,10 @@ const Loader = ({ text = "Loading" }) => {
       </Spinner>
     </div>
   );
+};
+
+Loader.propTypes = {
+  text: PropTypes.string,
 };
 
 export default Loader;
