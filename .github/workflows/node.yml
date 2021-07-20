@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Check syntax
-        run: npm run check
+        run: npm run lint
 
       - name: Test
         run: npm test
