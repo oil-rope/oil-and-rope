@@ -13,7 +13,7 @@ from common.utils import create_faker
 User = apps.get_model(models.USER_MODEL)
 
 fake = create_faker()
-url = reverse('chat:index')
+url = reverse('core:home')
 
 
 @pytest.fixture(scope='function')

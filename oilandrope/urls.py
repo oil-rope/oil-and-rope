@@ -39,8 +39,6 @@ urlpatterns += i18n_patterns(
     path('accounts/', include('registration.urls')),
     # Bot
     path('bot/', include('bot.urls')),
-    # Chat
-    path('chat/', include('chat.urls')),
     # Dynamic Menu
     path('dynamic_menu/', include('dynamic_menu.urls')),
     # React FrontEnd

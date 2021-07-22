@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
 from django.apps import apps
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -138,7 +139,7 @@ class TestWorldsCommand:
     @pytest.mark.django_db(transaction=True)
     @pytest.mark.asyncio
     async def test_list_private_ok(self, ctx, registered_author, user):
-        baker.make(Place, 2, user=user, owner=user)
+        await database_sync_to_async(baker.make)(Place, 2, user=user, owner=user)
         ctx.author = registered_author
         command = self.command(ctx, 'list', 'private')
         await command.run()

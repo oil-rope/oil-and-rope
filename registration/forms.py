@@ -90,7 +90,6 @@ class SignUpForm(auth_forms.UserCreationForm):
         super().__init__(*args, **kwargs)
         self.request = request
         self.setup()
-        self.consumer_url = self._resolve_consumer_url()
         self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
@@ -126,7 +125,6 @@ class SignUpForm(auth_forms.UserCreationForm):
                 Column(
                     Div(
                         # Refers to ReactComponent `UserCheckButton`
-                        data_consumer_url=self.consumer_url,
                         data_invitation_url=settings.BOT_INVITATION,
                         data_send_invitation_url=self.send_invitation_url,
                         data_related_field='id_discord_id',
@@ -144,12 +142,6 @@ class SignUpForm(auth_forms.UserCreationForm):
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
-
-    def _resolve_consumer_url(self):
-        consumer_url = 'wss://' if self.request.is_secure() else 'ws://'
-        consumer_url += settings.WS_HOST if settings.WS_HOST else self.request.get_host()
-        consumer_url += reverse('bot_ws:register')
-        return consumer_url
 
     def clean_email(self):
         """

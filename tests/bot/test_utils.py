@@ -1,5 +1,6 @@
 
 import pytest
+from channels.db import database_sync_to_async
 from django.contrib.sites.models import Site
 from django.shortcuts import reverse
 from model_bakery import baker
@@ -48,7 +49,7 @@ async def test_get_or_create_discord_text_channel_ok():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_get_url_from_without_kwargs_ok():
-    site = Site.objects.first()
+    site = await database_sync_to_async(Site.objects.first)()
     url = reverse('core:home')
     expected = f'http://{site.domain}{url}'
     result = await get_url_from('core:home')
@@ -60,10 +61,10 @@ async def test_get_url_from_without_kwargs_ok():
 @pytest.mark.asyncio
 async def test_get_url_from_with_kwargs_ok():
     # We setup a world for testing
-    world = baker.make('roleplay.Place')
+    world = await database_sync_to_async(baker.make)('roleplay.Place')
     url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
 
-    site = Site.objects.first()
+    site = await database_sync_to_async(Site.objects.first)()
     expected = f'http://{site.domain}{url}'
     result = await get_url_from('roleplay:world_detail', kwargs={'pk': world.pk})
 
