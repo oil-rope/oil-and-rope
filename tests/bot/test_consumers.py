@@ -52,7 +52,7 @@ async def test_discord_user_does_not_exist(url):
 @pytest.mark.django_db
 @pytest.mark.asyncio
 async def test_discord_user_exists(url):
-    discord_user = baker.make(models.DiscordUser)
+    discord_user = await sync_to_async(baker.make)(models.DiscordUser)
     communicator = WebsocketCommunicator(BotConsumer.as_asgi(), url)
 
     data = {

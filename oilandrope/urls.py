@@ -25,13 +25,11 @@ import bot.routing
 import chat.routing
 
 urlpatterns = [
-    path('', include((bot.routing.websocket_urlpatterns, 'bot_ws'))),
-    path('', include((chat.routing.websocket_urlpatterns, 'chat_ws'))),
+    # JavaScript translations
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
 urlpatterns += i18n_patterns(
-    # JavaScript translations
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     # Main site
     path('', include('core.urls')),
     # Admin site

@@ -1,26 +1,21 @@
+import django
 from channels.auth import AuthMiddlewareStack
-from channels.routing import AsgiHandler, ProtocolTypeRouter, URLRouter
+from channels.http import AsgiHandler
+from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
+from django.urls import re_path
 
-from bot.routing import websocket_urlpatterns as bot_ws_urls
-from chat.routing import websocket_urlpatterns as chat_ws_urls
+django.setup()
 
-
-def get_all_websocket_urlpatterns():
-    """
-    Simple function to get everything inside a list.
-    """
-
-    return bot_ws_urls + chat_ws_urls
-
+from chat.consumers import ChatConsumer  # noqa: E402
 
 application = ProtocolTypeRouter({
-    'http': AsgiHandler(),
-    'websocket': AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                get_all_websocket_urlpatterns()
+        'http': AsgiHandler(),
+        'websocket': AllowedHostsOriginValidator(
+            AuthMiddlewareStack(
+                URLRouter([
+                    re_path(r'^ws/chat/$', ChatConsumer.as_asgi(), name='connect',),
+                ])
             )
         )
-    )
-})
+    })
