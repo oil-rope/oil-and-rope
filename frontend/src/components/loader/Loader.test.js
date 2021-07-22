@@ -5,7 +5,7 @@
 import React from "react";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
-import Loader from "./Loader.jsx";
+import Loader from "./Loader";
 
 // Mocking Django's gettext
 global.gettext = (txt) => txt;

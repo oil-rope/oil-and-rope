@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import AuthContext from "../contexts/AuthContext.jsx";
+import AuthContext from "../contexts/AuthContext";
 
-import App from "../components/session/App.jsx";
+import App from "../components/session/App";
 
-const currentScript = document.currentScript;
+const { currentScript } = document;
 const plainUser = currentScript.getAttribute("data-user");
 
 const RenderSession = () => {

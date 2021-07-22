@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Form, Col, Button } from "react-bootstrap";
 
-import WebSocketContext from "../../contexts/WebSocketContext.jsx";
-import SessionContext from "../../contexts/SessionContext.jsx";
+import WebSocketContext from "../../contexts/WebSocketContext";
+import SessionContext from "../../contexts/SessionContext";
 
 const ChatInput = () => {
   const [message, setMessage] = useState(null);
@@ -22,7 +22,7 @@ const ChatInput = () => {
       chatWebSocket.send(
         JSON.stringify({
           type: func,
-          message: message,
+          message,
           chat: chat.id,
         })
       );

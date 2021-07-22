@@ -6,11 +6,13 @@
 export const getUserSessionFromCookies = (callbackfn) => {
 	const cookies = document.cookie.split(";");
 	cookies.forEach((cookie) => {
-		let splitted_cookie = cookie.split("=");
-		let key = splitted_cookie[0].trim();
-		let value = splitted_cookie[1].trim();
+		const splittedCookie = cookie.split("=");
+		const key = splittedCookie[0].trim();
+		const value = splittedCookie[1].trim();
 		if (key === "sessionid") {
 			callbackfn(value);
 		}
 	});
 };
+
+export default getUserSessionFromCookies;

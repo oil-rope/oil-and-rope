@@ -1,10 +1,19 @@
 import Cookies from "js-cookie";
 
-export const IS_SECURE = Boolean(location.protocol === "https:");
-export const API_URL = `${location.protocol}//${process.env.API_URL}/api`;
-export const RESOLVER_URL = `${API_URL}/resolver`;
-export const USER_DETAIL = "api:registration:user-detail";
-export const SESSION_URL = `${API_URL}/roleplay/session`;
-export const WS_URL = process.env.WEBSOCKET_URL;
-export const WS_CHAT = `${IS_SECURE ? "wss:" : "ws:"}//${WS_URL}/ws/chat/`;
+// Base
+export const { API_DOMAIN } = process.env;
+export const { WEBSOCKET_DOMAIN } = process.env;
+export const BASE_DOMAIN_URL = `${document.location.protocol}//${API_DOMAIN}`;
+export const BASE_WS_URL = `${
+	document.location.protocol === "https:" ? "wss:" : "ws:"
+}//${WEBSOCKET_DOMAIN}`;
+
+// Base API
+export const API_URL = `${BASE_DOMAIN_URL}/api`;
+export const RESOLVER_URL = `${API_URL}/resolver/`;
+
+// Resolvers
+export const SESSION_DETAIL = "api:roleplay:session-detail";
+
+export const WS_CHAT = `${BASE_WS_URL}/ws/chat/`;
 export const CSRFToken = Cookies.get("csrftoken");

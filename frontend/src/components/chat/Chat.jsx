@@ -3,13 +3,13 @@ import Axios from "axios";
 
 import { Container, Row, Col } from "react-bootstrap";
 
-import AuthContext from "../../contexts/AuthContext.jsx";
-import SessionContext from "../../contexts/SessionContext.jsx";
-import WebSocketContext from "../../contexts/WebSocketContext.jsx";
+import AuthContext from "../../contexts/AuthContext";
+import SessionContext from "../../contexts/SessionContext";
+import WebSocketContext from "../../contexts/WebSocketContext";
 
-import Loader from "../loader/Loader.jsx";
+import Loader from "../loader/Loader";
 
-import { resolveURL } from "../../utils/api.js";
+import { resolveURL } from "../../utils/api";
 
 const MessagesContainer = React.lazy(() =>
   import(/* webpackChunkName: "messagescontainer" */ "./MessagesContainer")
@@ -31,20 +31,12 @@ const Chat = () => {
     });
   };
 
-  const handleOnOpen = (ev) => {
-    if (process.env.NODE_ENV === "development" || false) {
-      console.debug(ev);
-    }
-  };
+  const handleOnOpen = () => undefined;
 
-  const handleOnClose = (ev) => {
-    if (process.env.NODE_ENV === "development" || false) {
-      console.debug(ev);
-    }
-  };
+  const handleOnClose = () => undefined;
 
   const setUpChannelLayer = () => {
-    if (chatWebSocket.readyState == chatWebSocket.OPEN) {
+    if (chatWebSocket.readyState === chatWebSocket.OPEN) {
       chatWebSocket.send(
         JSON.stringify({
           type: "setup_channel_layer",
@@ -87,7 +79,7 @@ const Chat = () => {
           </Suspense>
         </Col>
       </Row>
-      <Row className="mt-5">
+      <Row className="pt-3">
         <Col>
           <Suspense fallback={<Loader />}>
             <ChatInput />

@@ -232,6 +232,17 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        self.add_user_to_chat()
+        return super().get(request, *args, **kwargs)
+
+    def get_chat(self):
+        return self.object.chat
+
+    def add_user_to_chat(self):
+        chat = self.get_chat()
+        chat.users.add(self.request.user)
+
     def _check_user_has_token(self):
         Token.objects.get_or_create(user=self.request.user)
 

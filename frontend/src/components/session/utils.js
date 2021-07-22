@@ -1,16 +1,17 @@
 import Axios from "axios";
 
-import * as Constants from "../../utils/constants.js";
+import * as Constants from "../../utils/constants";
+import { resolveURL } from "../../utils/api";
 
 /**
  * By current URL gets sessionID
  *
  * @returns Session ID
  */
-const getSessionIDByPath = () => {
-	const splitted_path = location.href.split("/");
-	const split_length = splitted_path.length;
-	const sessionID = splitted_path[split_length - 2];
+export const getSessionIDByPath = () => {
+	const splittedPath = document.location.href.split("/");
+	const splittedLength = splittedPath.length;
+	const sessionID = splittedPath[splittedLength - 2];
 	return sessionID;
 };
 
@@ -19,8 +20,10 @@ const getSessionIDByPath = () => {
  *
  * @returns {Promise} Response.
  */
-export const getSession = () => {
-	return Axios.get(`${Constants.SESSION_URL}/${getSessionIDByPath()}`)
-		.then((res) => res)
-		.catch(console.error);
-};
+export const getSession = () =>
+	resolveURL(Constants.SESSION_DETAIL, { pk: getSessionIDByPath() }).then(
+		(url) =>
+			Axios.get(url)
+				.then((res) => res)
+				.catch(console.error)
+	);

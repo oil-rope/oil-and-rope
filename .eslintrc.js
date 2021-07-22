@@ -3,16 +3,10 @@ module.exports = {
 		browser: true,
 		es2021: true,
 		node: true,
+		"jest/globals": true,
 	},
+	extends: ["plugin:react/recommended", "airbnb", "prettier"],
 	parser: "babel-eslint",
-	plugins: ["react"],
-	extends: [
-		"eslint:recommended",
-		"plugin:react/recommended",
-		"plugin:prettier/recommended",
-		"plugin:jest/recommended",
-	],
-	rules: {},
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true,
@@ -20,26 +14,15 @@ module.exports = {
 		ecmaVersion: 12,
 		sourceType: "module",
 	},
-	settings: {
-		react: {
-			createClass: "createReactClass",
-			pragma: "React",
-			fragment: "Fragment",
-			version: "detect",
-			flowVersion: "0.53",
-		},
-		propWrapperFunctions: [
-			"forbidExtraProps",
-			{ property: "freeze", object: "Object" },
-			{ property: "myFavoriteWrapper" },
-		],
-		componentWrapperFunctions: [
-			"observer",
-			{ property: "styled" },
-			{ property: "observer", object: "Mobx" },
-			{ property: "observer", object: "<pragma>" },
-		],
-		linkComponents: ["Hyperlink", { name: "Link", linkAttribute: "to" }],
+	plugins: ["react", "react-hooks", "prettier", "jest"],
+	rules: {
+		"react/jsx-filename-extension": [1, { extensions: [".js", ".jsx"] }],
+		"no-console": ["error", { allow: ["error"] }],
+		"jest/no-disabled-tests": "warn",
+		"jest/no-focused-tests": "error",
+		"jest/no-identical-title": "error",
+		"jest/prefer-to-have-length": "warn",
+		"jest/valid-expect": "error",
 	},
 	globals: {
 		gettext: "readonly",

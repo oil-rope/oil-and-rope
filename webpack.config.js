@@ -2,6 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 
 module.exports = {
+	mode: process.env.NODE_ENV,
 	entry: {
 		session: "./frontend/src/renders/renderSession.jsx",
 	},
@@ -26,10 +27,10 @@ module.exports = {
 		gettext: "gettext",
 	},
 	plugins: [
-		new webpack.EnvironmentPlugin({
-			WEBSOCKET_URL: "127.0.0.1:8000",
-			API_URL: "127.0.0.1:8000",
-			NODE_ENV: "development",
-		}),
+		new webpack.EnvironmentPlugin([
+			"NODE_ENV",
+			"API_DOMAIN",
+			"WEBSOCKET_DOMAIN",
+		]),
 	],
 };

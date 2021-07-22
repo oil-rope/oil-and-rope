@@ -1,35 +1,34 @@
 import Axios from "axios";
 
-import * as Constants from "./constants.js";
+import * as Constants from "./constants";
 
 /**
  * Checks if API is reachable.
  *
  * @returns {Promise} API active (true or false).
  */
-export const checkAPIHealth = () => {
-	return Axios.get(`${Constants.API_URL}/`)
+export const checkAPIHealth = () =>
+	Axios.get(`${Constants.API_URL}`)
 		.then(
 			(res) => res.status === 200 && parseFloat(res.data.drf_version) >= 3.12
 		)
 		.then((status) => status)
 		.catch(console.error);
-};
 
 /**
  * Returns a URL resolved.
  *
  * @param {String} resolver The resolver for the URL.
- * @param {Object} extra_params Any extra arg to send POST.
+ * @param {Object} extraParams Any extra arg to send POST.
  * @returns The URL resolved.
  */
-export const resolveURL = (resolver, extra_params) => {
-	return Axios({
+export const resolveURL = (resolver, extraParams) =>
+	Axios({
 		method: "POST",
-		url: `${Constants.RESOLVER_URL}/`,
+		url: `${Constants.RESOLVER_URL}`,
 		data: {
 			resolver,
-			...extra_params,
+			...extraParams,
 		},
 		headers: {
 			"Content-Type": "application/json",
@@ -38,6 +37,5 @@ export const resolveURL = (resolver, extra_params) => {
 		},
 	})
 		.then((res) => res.data)
-		.then((data) => `http://${process.env.API_URL}${data.url}`)
+		.then((data) => `${Constants.BASE_DOMAIN_URL}${data.url}`)
 		.catch(console.error);
-};

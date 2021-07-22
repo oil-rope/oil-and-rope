@@ -5,6 +5,7 @@ import dayjs from "dayjs";
  *
  * @param {Date} date The date to parse.
  */
-export const formatDate = (date, format = "DD/MM/YYYY HH:mm:ss") => {
-	return dayjs(date).format(format);
-};
+export const formatDate = (date, format = "DD/MM/YYYY HH:mm:ss") =>
+	dayjs(date).format(format);
+
+export default formatDate;

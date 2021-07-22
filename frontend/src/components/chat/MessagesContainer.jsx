@@ -5,10 +5,12 @@ import React, {
   useRef,
   Suspense,
 } from "react";
-import Loader from "../loader/Loader";
+import { scrollToBottom } from "../../utils/ux";
 
 import SessionContext from "../../contexts/SessionContext";
 import WebSocketContext from "../../contexts/WebSocketContext";
+
+import Loader from "../loader/Loader";
 
 const Message = React.lazy(() =>
   import(/* webpackChunkName: "message" */ "./Message")
@@ -30,8 +32,8 @@ const MessagesContainer = () => {
    */
   const handleWebSocketOnMessage = (messageEvent) => {
     const payload = JSON.parse(messageEvent.data);
-    if (payload.status == "error") {
-      new Notification(payload.content);
+    if (payload.status === "error") {
+      Notification(payload.content);
     }
 
     if (payload.type === "send_message") {
@@ -39,7 +41,7 @@ const MessagesContainer = () => {
       setMessages([...messages, message]);
     }
 
-    scrollToBottom();
+    scrollToBottom(messageContainerRef);
   };
 
   /**
@@ -47,14 +49,6 @@ const MessagesContainer = () => {
    */
   const loadMessages = () => {
     setMessages(chat.chat_message_set);
-  };
-
-  /**
-   * Scrolls to bottom.
-   */
-  const scrollToBottom = () => {
-    let element = messageContainerRef.current;
-    element.scrollTop = element.scrollHeight;
   };
 
   // Okay this is tricky
@@ -76,17 +70,19 @@ const MessagesContainer = () => {
   return (
     <div
       style={{
-        height: "400px",
+        minHeight: "400px",
+        height: "100%",
         width: "100%",
         overflowY: "scroll",
         scrollBehavior: "smooth",
       }}
       ref={messageContainerRef}
+      className="p-2"
     >
       {componentLoaded ? (
         <Suspense fallback={<Loader />}>
           {messages.map((message, index) => (
-            <Message message={message} key={index} />
+            <Message message={message} key={`msgIdx${index + 10}`} />
           ))}
         </Suspense>
       ) : (
