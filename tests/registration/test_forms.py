@@ -6,6 +6,9 @@ from model_bakery import baker
 
 from registration import forms
 
+from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
+                                     USER_WITH_SAME_SERVER)
+
 
 class TestLoginForm(TestCase):
     """
@@ -49,7 +52,7 @@ class TestSignUpForm(TestCase):
             'username': self.faker.user_name(),
             'email': email,
             'password1': password,
-            'password2': password
+            'password2': password,
         }
         self.request = RequestFactory().get('/')
 
@@ -57,11 +60,21 @@ class TestSignUpForm(TestCase):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         self.assertTrue(form.is_valid(), 'Form is invalid.')
 
-        # Adding Discord ID
-        data_discord = self.data_ok.copy()
-        form = forms.SignUpForm(self.request, data=data_discord)
-        form_valid = form.is_valid()
-        self.assertTrue(form_valid, repr(form.errors))
+    def test_discord_id_does_not_exist_ko(self):
+        data = self.data_ok.copy()
+        data['discord_id'] = USER_WITH_DIFFERENT_SERVER
+
+        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=ANOTHER_BOT_TOKEN):
+            form = forms.SignUpForm(self.request, data=data)
+            self.assertFalse(form.is_valid())
+
+    def test_discord_id_exists_ok(self):
+        data = self.data_ok.copy()
+        data['discord_id'] = USER_WITH_SAME_SERVER
+
+        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
+            form = forms.SignUpForm(self.request, data=data)
+            self.assertTrue(form.is_valid())
 
     def test_form_wrong_confirm_password_ko(self):
         data_ko = self.data_ok.copy()

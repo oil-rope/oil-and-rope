@@ -1,5 +1,4 @@
 import logging
-from concurrent.futures.thread import ThreadPoolExecutor
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
@@ -8,10 +7,13 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
+from bot.exceptions import DiscordApiException
+from bot.models import User
 from common.utils.auth import generate_token
 
 LOGGER = logging.getLogger(__name__)
@@ -79,16 +81,15 @@ class SignUpForm(auth_forms.UserCreationForm):
     """
 
     discord_id = forms.CharField(
-        label=_('Discord Identifier'),
+        label=_('discord identifier').title(),
         max_length=254,
         required=False,
-        help_text=_('If you have a Discord Account you want to link with just give us your ID!')
+        help_text=_('if you have a discord account you want to link with just give us your ID!').capitalize()
     )
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.request = request
-        self.setup()
         self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
         self.helper.id = 'registerForm'
@@ -122,51 +123,36 @@ class SignUpForm(auth_forms.UserCreationForm):
                     css_class='col-12 col-md-8 col-lg-6 col-xl-5'
                 ),
                 Column(
-                    Div(
-                        # Refers to ReactComponent `UserCheckButton`
-                        data_invitation_url=settings.BOT_INVITATION,
-                        data_send_invitation_url=self.send_invitation_url,
-                        data_related_field='id_discord_id',
-                        css_id='discord_check_user'
+                    HTML(
+                        '<a target="_blank" class="btn btn-info w-100" href="{url}">{text}</a>'.format(
+                            url=settings.BOT_INVITATION,
+                            text=_('invite our bot to your server!').capitalize(),
+                        )
                     ),
-                    css_class='col-12 col-md-4 col-xl-5 align-self-center',
+                    css_class='col-12 col-md-8 col-lg-6 col-xl-5',
                 ),
                 css_class='justify-content-lg-between'
             ),
             Row(
                 Column(
-                    Submit('submit', _('Register'), css_class='btn-lg w-100'),
+                    Submit('submit', _('register').capitalize(), css_class='btn-lg w-100'),
                     css_class='col-12 col-xl-6'
                 ),
                 css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
             )
         )
 
-    def clean_email(self):
-        """
-        Checks if email already exists!
-        """
+    def clean_discord_id(self):
+        data = self.cleaned_data.get('discord_id')
+        if data:
+            try:
+                data = User(data)
+            except DiscordApiException:
+                msg = _('seems like your user couldn\'t be found, do you have any server in common with our bot?')
+                msg = msg.capitalize()
+                raise ValidationError(msg)
 
-        data = self.cleaned_data.get('email')
-        if get_user_model().objects.filter(email=data).exists():
-            msg = _('This email is already in use') + '.'
-            self.add_error('email', msg)
         return data
-
-    def setup(self, required_fields=None):
-        """
-        Modifies some attributtes before rendering the form.
-
-        Parameters
-        ----------
-        required_fields: Iterable.
-            Fields to modify and set as required.
-        """
-
-        if not required_fields:
-            required_fields = ('email',)
-        for field in required_fields:
-            self.fields[field].required = True
 
     def _send_email_confirmation(self, user):
         """
@@ -181,7 +167,9 @@ class SignUpForm(auth_forms.UserCreationForm):
         })
 
         try:
-            user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+            title = 'Oil & Rope!'
+            subject = _('welcome to %(title)s') % {'title': title}
+            user.email_user(subject, '', html_message=msg_html)
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
@@ -200,9 +188,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         instance.is_active = False
         if commit:
             instance.save()
-            # User shouldn't wait for the email to be sent
-            with ThreadPoolExecutor(max_workers=2) as executor:
-                executor.submit(self._send_email_confirmation, instance)
+            self._send_email_confirmation(instance)
         return instance
 
     class Meta:
@@ -210,7 +196,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         fields = ('username', 'email')
         field_classes = {'username': auth_forms.UsernameField}
         help_texts = {
-            'email': _('We will send you an email to confirm your account') + '.'
+            'email': _('we will send you an email to confirm your account').capitalize() + '.'
         }
 
 
