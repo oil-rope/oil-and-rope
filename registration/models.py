@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.functional import keep_lazy
 from django.utils.translation import gettext_lazy as _
 
-from bot.discord_api import models as api_models
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
@@ -35,14 +34,6 @@ class User(AbstractUser):
             player_in_session_set__is_game_master=True
         )
         return sessions
-
-    def get_user_from_discord_api(self):
-        try:
-            discord_user = self.discord_user
-            api_discord_user = api_models.User(id=discord_user.id)
-            return api_discord_user
-        except User.discord_user.RelatedObjectDoesNotExist:
-            return None
 
     class Meta:
         db_table = 'auth_user'

@@ -2,7 +2,7 @@ from django.shortcuts import reverse
 from django.test import TestCase, override_settings
 from faker.proxy import Faker
 
-from bot.discord_api.models import Channel, Message
+from bot.models import Channel, Message
 
 from .helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 

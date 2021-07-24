@@ -51,7 +51,6 @@ class TestSignUpForm(TestCase):
             'password1': password,
             'password2': password
         }
-        self.discord_user = baker.make('bot.DiscordUser')
         self.request = RequestFactory().get('/')
 
     def test_form_ok(self):
@@ -60,7 +59,6 @@ class TestSignUpForm(TestCase):
 
         # Adding Discord ID
         data_discord = self.data_ok.copy()
-        data_discord['discord_id'] = self.discord_user.pk
         form = forms.SignUpForm(self.request, data=data_discord)
         form_valid = form.is_valid()
         self.assertTrue(form_valid, repr(form.errors))
@@ -70,10 +68,6 @@ class TestSignUpForm(TestCase):
         data_ko['password2'] = self.faker.word()
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
-
-    def test_form_wrong_discord_id(self):
-        data_ko = self.data_ok.copy()
-        data_ko['discord_id'] = self.faker.random_int()
 
     def test_form_taken_email_ko(self):
         # First we create a user
@@ -108,14 +102,6 @@ class TestSignUpForm(TestCase):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         user = form.save()
         self.assertFalse(user.is_active, 'User is active before activating email.')
-
-    def test_save_with_discord_user_ok(self):
-        data_ok = self.data_ok.copy()
-        data_ok['discord_id'] = self.discord_user.id
-        form = forms.SignUpForm(self.request, data=data_ok)
-        user = form.save()
-        self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
-        self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
 
     def test_email_sent_ok(self):
         # Changing Django Settings to get email sent
