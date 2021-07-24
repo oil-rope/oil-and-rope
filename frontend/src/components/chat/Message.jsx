@@ -45,6 +45,7 @@ const Message = ({ message }) => {
       </Row>
     );
   }
+
   return (
     <Row
       className="justify-content-start m-0 mb-2"

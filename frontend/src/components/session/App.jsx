@@ -4,14 +4,13 @@ import { Container, Row, Col } from "react-bootstrap";
 import WebSocketContext from "../../contexts/WebSocketContext";
 import SessionContext from "../../contexts/SessionContext";
 
+import ErrorBoundary from "../ErrorBoundary";
 import Loader from "../loader/Loader";
 
 import * as Constants from "../../utils/constants";
 import { getSession } from "./utils";
 
-const Chat = React.lazy(() =>
-  import(/* webpackChunkName: "chat" */ "../chat/Chat")
-);
+const Chat = React.lazy(() => import("../chat/Chat"));
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -34,9 +33,11 @@ const App = () => {
           <Row>
             <Col xs={12} lg={8} />
             <Col xs={12} lg={4}>
-              <Suspense fallback={<Loader text={gettext("Loading chat")} />}>
-                <Chat />
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<Loader text={gettext("Loading chat")} />}>
+                  <Chat />
+                </Suspense>
+              </ErrorBoundary>
             </Col>
           </Row>
         </WebSocketContext.Provider>

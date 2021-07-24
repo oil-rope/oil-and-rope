@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
 	mode: process.env.NODE_ENV,
@@ -27,10 +28,10 @@ module.exports = {
 		gettext: "gettext",
 	},
 	plugins: [
-		new webpack.EnvironmentPlugin([
-			"NODE_ENV",
-			"API_DOMAIN",
-			"WEBSOCKET_DOMAIN",
-		]),
+		new webpack.EnvironmentPlugin(["NODE_ENV"]),
+		new Dotenv({
+			path: "./.env",
+			safe: true,
+		}),
 	],
 };
