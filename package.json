@@ -11,8 +11,7 @@
     "lint:fix": "eslint --ext .jsx --ext .js --color --fix ./frontend/src/",
     "dev": "webpack build --node-env development --watch --devtool eval-source-map",
     "build": "webpack build --progress --node-env production",
-    "test": "jest",
-    "twatch": "jest --watch"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
