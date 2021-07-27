@@ -12,11 +12,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from distutils.util import strtobool as to_bool
+from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -49,8 +50,6 @@ MANAGERS = ADMINS
 
 # Application definition
 INSTALLED_APPS = [
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
     # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
     # Must be settled before 'django.contrib.admin' to work correctly on admin
     'modeltranslation',
@@ -62,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -120,8 +121,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'email/templates/'),
-            os.path.join(BASE_DIR, 'common/templates/errors/')
+            BASE_DIR / 'email/templates/',
+            BASE_DIR / 'common/templates/errors/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -149,7 +150,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             'hosts': [
-                (os.getenv('CHANNEL_LAYER_HOST', ALLOWED_HOSTS[0]), 6379)
+                (os.environ['CHANNEL_LAYER_HOST'], 6379)
             ],
         },
     },
@@ -171,6 +172,11 @@ DATABASES = {
         },
     },
 }
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -212,8 +218,8 @@ LANGUAGE_CODE = 'en'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#languages
 
 LANGUAGES = [
-    ('en', _('english')),
-    ('es', _('spanish')),
+    ('en-us', _('english')),
+    ('es-ES', _('spanish')),
 ]
 
 TIME_ZONE = 'UTC'
@@ -227,7 +233,7 @@ USE_TZ = True
 # Translation files
 
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale/')
+    BASE_DIR / 'locale/',
 ]
 
 # Session expire date
@@ -243,7 +249,7 @@ SESSION_COOKIE_HTTPONLY = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static/'))
+STATIC_ROOT = os.getenv('STATIC_ROOT', BASE_DIR / 'static/')
 STATIC_URL = os.getenv('STATIC_URL', '/static/')
 
 # Login System
@@ -256,7 +262,7 @@ LOGOUT_REDIRECT_URL = 'registration:login'
 # Media files
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
 
-MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(BASE_DIR, 'media/'))
+MEDIA_ROOT = os.getenv('MEDIA_ROOT', BASE_DIR / 'media/')
 MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 
 # The maximum size (in bytes)

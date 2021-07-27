@@ -8,11 +8,13 @@ https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
 import os
+from pathlib import Path
 
-from django.core.wsgi import get_wsgi_application
 import dotenv
+from django.core.wsgi import get_wsgi_application
 
-ENV_FILE = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)))) / '.env'
+BASE_DIR = Path(__file__).resolve().parent
+ENV_FILE = BASE_DIR / '.env'
 if not ENV_FILE.is_file() or not ENV_FILE.exists():
     raise FileNotFoundError('File \'.env\' doesn\'t exist, please create one by copying \'.env.example\'')
 

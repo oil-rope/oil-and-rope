@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
@@ -159,7 +160,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         Sends a confirmation email to the user.
         """
 
-        msg_html = render_to_string('email_templates/confirm_email.html', {
+        html_msg = render_to_string('email_templates/confirm_email.html', {
             # We declare localhost as default for tests purposes
             'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
             'token': generate_token(user),
@@ -169,7 +170,10 @@ class SignUpForm(auth_forms.UserCreationForm):
         try:
             title = 'Oil & Rope!'
             subject = _('welcome to %(title)s') % {'title': title}
-            user.email_user(subject, '', html_message=msg_html)
+            send_mail(
+                subject=str(subject).capitalize(), message='', from_email=None,
+                recipient_list=[user.email], html_message=html_msg,
+            )
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 

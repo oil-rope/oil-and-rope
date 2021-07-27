@@ -8,7 +8,8 @@ import dotenv
 
 
 def main():
-    ENV_FILE = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)))) / '.env'
+    BASE_DIR = Path(__file__).resolve().parent
+    ENV_FILE = BASE_DIR / '.env'
     if not ENV_FILE.is_file() or not ENV_FILE.exists():
         raise FileNotFoundError('File \'.env\' doesn\'t exist, please create one by copying \'.env.example\'')
     dotenv.load_dotenv(ENV_FILE, override=True, verbose=True, encoding='utf-8')
