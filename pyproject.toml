@@ -25,10 +25,10 @@ gunicorn = "^20.1"
 Pillow = "^8.2"
 psycopg2 = "^2.8"
 python-dateutil = "^2.8"
-python-dotenv = "^0.17"
 requests = "^2.24"
 Twisted = {extras = ["tls", "http2"], version = "^21.2"}
 xlrd = "^2.0"
+python-dotenv = "^0.19"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5"

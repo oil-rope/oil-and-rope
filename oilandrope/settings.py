@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
@@ -155,22 +155,19 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Host for WebSocket
-WS_HOST = os.getenv('WS_HOST', None)
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'oilandrope'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
         'PORT': os.getenv('DB_PORT', '5432'),
         'TEST': {
-            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
+            'NAME': 'test_{}'.format(os.environ['DB_NAME'])
         },
     },
 }
@@ -215,8 +212,8 @@ LANGUAGE_CODE = 'en'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#languages
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('es', _('Spanish')),
+    ('en', _('english')),
+    ('es', _('spanish')),
 ]
 
 TIME_ZONE = 'UTC'
@@ -315,9 +312,9 @@ REST_FRAMEWORK = {
 
 DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[Oil & Rope] '
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST = os.environ['EMAIL_HOST'],
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER'],
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD'],
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
 
@@ -365,7 +362,7 @@ BOT_INVITATION = os.getenv(
     'BOT_INVITATION',
     'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
 )
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.environ['BOT_TOKEN']
 BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
 BOT_DESCRIPTION = os.getenv('BOT_DESCRIPTION', 'Oil & Rope Bot: Managing sessions was never this easy!')
 

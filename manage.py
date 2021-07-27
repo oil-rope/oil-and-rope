@@ -2,9 +2,17 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
+
+import dotenv
 
 
 def main():
+    ENV_FILE = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)))) / '.env'
+    if not ENV_FILE.is_file() or not ENV_FILE.exists():
+        raise FileNotFoundError('File \'.env\' doesn\'t exist, please create one by copying \'.env.example\'')
+    dotenv.load_dotenv(ENV_FILE, override=True, verbose=True, encoding='utf-8')
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
     try:
         from django.core.management import execute_from_command_line
