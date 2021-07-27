@@ -1,9 +1,29 @@
 import pathlib
 
-from django.utils.translation import gettext_lazy as _
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
-from bot.exceptions import OilAndRopeException
+
+def check_env_file(env_file: pathlib.Path):
+    """
+    Checks that all values in .env.example are in .env file.
+    """
+
+    example_env_file = env_file.resolve().parent / '.env.example'
+
+    if not example_env_file.is_file() or not example_env_file.exists():
+        raise Warning(f'File \'{example_env_file}\' couldn\'t be found')
+
+    env_keys = dotenv_values(env_file)
+    example_keys = dotenv_values(example_env_file)
+    missing_keys = []
+
+    for key in example_keys:
+        if key not in env_keys:
+            missing_keys.append(key)
+
+    if missing_keys:
+        missing_values = ', '.join(missing_keys)
+        raise Warning(f'Some values are missing from \'{env_file}\': {missing_values}')
 
 
 def load_env_file(env_file: pathlib.Path):
@@ -11,9 +31,11 @@ def load_env_file(env_file: pathlib.Path):
     Looks for the given .env file and sets up Environment Variables.
     """
 
-    if not isinstance(env_file, pathlib.Path):
-        env_file = pathlib.Path(str(env_file))
+    if isinstance(env_file, str):
+        env_file = pathlib.Path(env_file)
 
-    if not env_file.exists():
-        raise OilAndRopeException(_('Env file does not exist') + '.')
-    load_dotenv(env_file.as_posix(), verbose=True, override=True)
+    if not env_file.is_file() or not env_file.exists():
+        raise ImportError(f'File \'{env_file}\' couldn\'t be found')
+
+    check_env_file(env_file)
+    return load_dotenv(env_file, override=True, verbose=True, encoding='utf-8')

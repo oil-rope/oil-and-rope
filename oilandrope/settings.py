@@ -275,6 +275,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 3145728
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
 
+# Using Pytest as test runner
+# https://pytest-django.readthedocs.io/en/latest/faq.html#how-can-i-use-manage-py-test-with-pytest-django
+
+TEST_RUNNER = 'oilandrope.runner.PytestTestRunner'
+
 # CKEditor
 # https://django-ckeditor.readthedocs.io/en/latest/#optional-customizing-ckeditor-editor
 

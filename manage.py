@@ -4,15 +4,13 @@ import os
 import sys
 from pathlib import Path
 
-import dotenv
+from common.utils.env import load_env_file
 
 
 def main():
     BASE_DIR = Path(__file__).resolve().parent
     ENV_FILE = BASE_DIR / '.env'
-    if not ENV_FILE.is_file() or not ENV_FILE.exists():
-        raise FileNotFoundError('File \'.env\' doesn\'t exist, please create one by copying \'.env.example\'')
-    dotenv.load_dotenv(ENV_FILE, override=True, verbose=True, encoding='utf-8')
+    load_env_file(ENV_FILE)
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
     try:
