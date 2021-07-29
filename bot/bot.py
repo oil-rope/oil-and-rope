@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 
 import discord
@@ -7,14 +6,8 @@ from discord.ext import commands
 from discord.ext.commands import errors
 from django.conf import settings
 from django.utils.translation import gettext as _
-from faker import Faker
-
-from common.utils.env import load_env_file
-
-from .exceptions import HelpfulError
 
 LOGGER = logging.getLogger(__name__)
-fake = Faker()  # To generate tokens and stuff
 
 
 class OilAndRopeBot(commands.Bot):
@@ -23,32 +16,14 @@ class OilAndRopeBot(commands.Bot):
     """
 
     def __init__(self, env_file=None, **options):
-        self.command_prefix = None
-        self.description = None
-        self.token = None
-        if env_file:
-            load_env_file(env_file)
-        self.load_variables()
+        self.command_prefix = settings.BOT_COMMAND_PREFIX
+        self.description = settings.BOT_DESCRIPTION
+        self.token = settings.BOT_TOKEN
         super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
 
         # Manually registering events
         # TODO: Search if there's a better way to do this
         self.event(self.on_guild_join)
-
-    def load_variables(self):
-        """
-        Loads required variables for the bot.
-        """
-
-        try:
-            self.command_prefix = os.environ['BOT_COMMAND_PREFIX']
-            self.description = os.getenv('BOT_DESCRIPTION', '')
-            self.token = os.environ['BOT_TOKEN']
-        except KeyError as ex:
-            missing_variables = ', '.join(ex.args)
-            error_message = 'Environment variables %s not found.' % missing_variables
-            solution = 'Use .env file or set up %s environment variables.' % missing_variables
-            raise HelpfulError(error_message, solution, preface='Error loading bot variables.')
 
     def load_commands(self):
         """
