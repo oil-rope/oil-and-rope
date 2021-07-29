@@ -1,6 +1,6 @@
 {
   "name": "oil-and-rope",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "[![Python](https://img.shields.io/badge/Python-3.6+-green.svg?style=flat-square)](https://www.python.org/downloads/)\r [![Docker](https://img.shields.io/badge/Docker-latest-blue.svg?style=flat-square)](https://docs.docker.com/)\r [![Build Status for Develop](https://travis-ci.com/oil-rope/oil-and-rope.svg?branch=develop)](https://travis-ci.com/oil-rope/oil-and-rope)\r [![codecov](https://codecov.io/gh/oil-rope/oil-and-rope/branch/develop/graph/badge.svg)](https://codecov.io/gh/oil-rope/oil-and-rope)",
   "main": "index.js",
   "directories": {
@@ -13,10 +13,7 @@
     "build": "webpack build --progress --node-env production",
     "test": "jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/oil-rope/oil-and-rope.git"
-  },
+  "repository": "git+https://github.com/oil-rope/oil-and-rope.git",
   "keywords": [],
   "author": "Oil & Rope Team",
   "license": "MIT",
@@ -31,7 +28,6 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
     "dotenv-webpack": "^7.0.3",
@@ -50,10 +46,11 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "@babel/eslint-parser": "^7.14.7",
+    "@react-three/drei": "^7.2.2",
     "@react-three/fiber": "^7.0.2",
     "axios": "^0.21.1",
     "dayjs": "^1.10.6",
-    "drei": "^2.2.21",
     "js-cookie": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -67,5 +64,6 @@
       "@babel/preset-env",
       "@babel/preset-react"
     ]
-  }
+  },
+  "private": false
 }
