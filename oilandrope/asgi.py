@@ -18,12 +18,12 @@ ENV_FILE = BASE_DIR / '.env'
 load_env_file(ENV_FILE)
 
 application = ProtocolTypeRouter({
-        'http': AsgiHandler(),
-        'websocket': AllowedHostsOriginValidator(
-            AuthMiddlewareStack(
-                URLRouter([
-                    re_path(r'^ws/chat/$', ChatConsumer.as_asgi(), name='connect',),
-                ])
-            )
+    'http': AsgiHandler(),
+    'websocket': AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter([
+                re_path(r'^ws/chat/$', ChatConsumer.as_asgi(), name='connect',),
+            ])
         )
-    })
+    )
+})

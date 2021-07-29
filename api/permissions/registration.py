@@ -10,6 +10,7 @@ class IsUserProfileOrAdmin(permissions.BasePermission):
         """
         Checks if owner is the same as `request.user`.
         """
+
         user = request.user
         if not user:
             return False
