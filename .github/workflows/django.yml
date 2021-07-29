@@ -77,7 +77,8 @@ jobs:
 
       - name: Pytest
         run: |
-          python manage.py test -- --cov ./ --cov-report xml
+          coverage run manage.py test
+          coverage xml
 
       - name: Django Check
         run: |
@@ -137,7 +138,7 @@ jobs:
 
       - name: Pytest
         run: |
-          python manage.py test -- --cov ./ --cov-report xml
+          python manage.py test
 
       - name: Django Check
         run: |

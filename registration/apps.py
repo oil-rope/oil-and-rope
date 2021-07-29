@@ -3,6 +3,5 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RegistrationConfig(AppConfig):
-    default_auto_field = 'django.db.models.AutoField'
     name = 'registration'
-    verbose_name = _('Registration System')
+    verbose_name = _('registration ystem')
