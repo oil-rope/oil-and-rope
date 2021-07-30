@@ -15,7 +15,7 @@ class OilAndRopeBot(commands.Bot):
     Custom class to control the behaviour of the bot by environment variables.
     """
 
-    def __init__(self, env_file=None, **options):
+    def __init__(self, **options):
         self.command_prefix = settings.BOT_COMMAND_PREFIX
         self.description = settings.BOT_DESCRIPTION
         self.token = settings.BOT_TOKEN

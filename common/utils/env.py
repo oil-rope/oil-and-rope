@@ -8,16 +8,17 @@ def check_env_file(env_file: pathlib.Path):
     Checks that all values in .env.example are in .env file.
     """
 
-    example_env_file = env_file.resolve().parent / '.env.example'
+    project_dir = pathlib.Path(__file__).resolve().parent.parent.parent
+    example_env_file = project_dir / '.env.example'
 
-    if not example_env_file.is_file() or not example_env_file.exists():
+    if not example_env_file.is_file() or not example_env_file.exists():  # pragma: no cover
         raise Warning(f'File \'{example_env_file}\' couldn\'t be found')
 
     env_keys = dotenv_values(env_file)
-    example_keys = dotenv_values(example_env_file)
+    expected_keys = dotenv_values(example_env_file)
     missing_keys = []
 
-    for key in example_keys:
+    for key in expected_keys:
         if key not in env_keys:
             missing_keys.append(key)
 
