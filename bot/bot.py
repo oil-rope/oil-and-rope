@@ -82,10 +82,12 @@ class OilAndRopeBot(commands.Bot):
         await super().on_message(message)
 
     async def on_command_error(self, context, exception):
+        breakpoint()
         if isinstance(exception, errors.MissingRequiredArgument):
             msg = _('incorrect format').capitalize()
             await context.send(f'{msg}.')
             await context.send_help(context.command)
+        await super().on_command_error(context, exception)
 
     def run(self, *args, **kwargs):
         self.load_commands()

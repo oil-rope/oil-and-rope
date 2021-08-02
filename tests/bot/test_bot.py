@@ -1,6 +1,7 @@
 import discord
 import discord.ext.test as dpytest
 import pytest
+from discord.ext.commands.errors import MissingRequiredArgument
 from discord.ext.test.backend import make_message, make_user
 from django.conf import settings
 
@@ -54,10 +55,9 @@ async def test_on_guild_join_ok(bot, mocker):
     user = make_user(fake.user_name(), 123)
     guild._add_member(user)
     guild._member_count += 1
-    text_channel = guild.text_channels[0]
 
     mocker.patch('discord.channel.TextChannel.send')
-    await bot.first_join_message(text_channel)
+    await bot.on_guild_join(guild)
 
     discord.channel.TextChannel.send.assert_called_once_with(
         'Hello! You are about to experience a brand-new way to manage sessions and play!'
@@ -75,3 +75,12 @@ async def test_on_message_ok(bot, mocker):
     await bot.on_message(message)
 
     discord.ext.commands.Bot.on_message.assert_called_once_with(message)
+
+
+@pytest.mark.asyncio
+async def test_on_command_error_ok(bot, mocker):
+    mocker.patch('discord.ext.commands.Context')
+    context = mocker.MagicMock()
+    await bot.on_command_error(context, MissingRequiredArgument)
+
+    context.send.assert_called_once_with('Incorrect format.')
