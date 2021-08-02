@@ -2,7 +2,7 @@ import json
 
 from django.utils import timezone
 
-from .enums import EmbedTypes
+from bot.enums import EmbedTypes
 
 
 class Embed:

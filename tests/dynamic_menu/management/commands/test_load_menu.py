@@ -19,26 +19,26 @@ class TestLoadMenuCommand(TestCase):
         self.data = [
             {
                 'name': 'First Menu',
-                'name_en': 'First Menu',
-                'name_es': 'Primer Menú',
+                'name_en_us': 'First Menu',
+                'name_es_ES': 'Primer Menú',
                 'menu_type': MenuTypes.MAIN_MENU,
                 'children': [{
                         'name': 'First Submenu',
-                        'name_en': 'First Submenu',
-                        'name_es': 'Primer Submenú',
+                        'name_en_us': 'First Submenu',
+                        'name_es_ES': 'Primer Submenú',
                         'menu_type': MenuTypes.MAIN_MENU,
                         'children': [{
                             'name': 'First Context Menu',
-                            'name_en': 'First Context Menu',
-                            'name_es': 'Primer Menú Contextual',
+                            'name_en_us': 'First Context Menu',
+                            'name_es_ES': 'Primer Menú Contextual',
                             'menu_type': MenuTypes.CONTEXT_MENU
                         }]
                 }]
             },
             {
                 'name': 'Second Menu',
-                'name_en': 'Second Menu',
-                'name_es': 'Segundo Menú',
+                'name_en_us': 'Second Menu',
+                'name_es_ES': 'Segundo Menú',
                 'menu_type': MenuTypes.MAIN_MENU,
             }
         ]

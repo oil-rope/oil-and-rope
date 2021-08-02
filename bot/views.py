@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from bot.discord_api.models import User
+from bot.models import User
 
 LOGGER = logging.getLogger(__name__)
 

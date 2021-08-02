@@ -10,26 +10,22 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-<header class="container">
-  <h2 class="display-3 text-center">
-    {% trans "Start your adventure" %}!
-  </h2>
-  <hr>
-  <p class="lead text-center">
-    {% trans "Take the first step" %}. {% trans "Create your account" %}.
-    <br>
-    {% trans "Your world awaits" %}!
-  </p>
-</header>
-<main class="container pb-3">
-  <div class="row">
-    <div class="col-12">
-      {% crispy form %}
+  <header class="container">
+    <h1 class="display-4 text-center">
+      {% trans "start your adventure!"|capfirst %}
+    </h1>
+    <hr>
+    <p class="lead text-center">
+      {% trans "take the first step"|capfirst %}. {% trans "create your account"|capfirst %}.
+      <br>
+      {% trans "your world awaits!"|capfirst %}
+    </p>
+  </header>
+  <main class="container pb-3">
+    <div class="row">
+      <div class="col-12">
+        {% crispy form %}
+      </div>
     </div>
-  </div>
-</main>
+  </main>
 {% endblock body_content %}
-
-{% block javascript %}
-<script src="{% static 'frontend/dist/UserCheckButton.bundle.js' %}"></script>
-{% endblock javascript %}

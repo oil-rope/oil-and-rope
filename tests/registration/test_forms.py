@@ -6,6 +6,9 @@ from model_bakery import baker
 
 from registration import forms
 
+from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
+                                     USER_WITH_SAME_SERVER)
+
 
 class TestLoginForm(TestCase):
     """
@@ -49,31 +52,35 @@ class TestSignUpForm(TestCase):
             'username': self.faker.user_name(),
             'email': email,
             'password1': password,
-            'password2': password
+            'password2': password,
         }
-        self.discord_user = baker.make('bot.DiscordUser')
         self.request = RequestFactory().get('/')
 
     def test_form_ok(self):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         self.assertTrue(form.is_valid(), 'Form is invalid.')
 
-        # Adding Discord ID
-        data_discord = self.data_ok.copy()
-        data_discord['discord_id'] = self.discord_user.pk
-        form = forms.SignUpForm(self.request, data=data_discord)
-        form_valid = form.is_valid()
-        self.assertTrue(form_valid, repr(form.errors))
+    def test_discord_id_does_not_exist_ko(self):
+        data = self.data_ok.copy()
+        data['discord_id'] = USER_WITH_DIFFERENT_SERVER
+
+        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=ANOTHER_BOT_TOKEN):
+            form = forms.SignUpForm(self.request, data=data)
+            self.assertFalse(form.is_valid())
+
+    def test_discord_id_exists_ok(self):
+        data = self.data_ok.copy()
+        data['discord_id'] = USER_WITH_SAME_SERVER
+
+        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
+            form = forms.SignUpForm(self.request, data=data)
+            self.assertTrue(form.is_valid())
 
     def test_form_wrong_confirm_password_ko(self):
         data_ko = self.data_ok.copy()
         data_ko['password2'] = self.faker.word()
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
-
-    def test_form_wrong_discord_id(self):
-        data_ko = self.data_ok.copy()
-        data_ko['discord_id'] = self.faker.random_int()
 
     def test_form_taken_email_ko(self):
         # First we create a user
@@ -108,14 +115,6 @@ class TestSignUpForm(TestCase):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         user = form.save()
         self.assertFalse(user.is_active, 'User is active before activating email.')
-
-    def test_save_with_discord_user_ok(self):
-        data_ok = self.data_ok.copy()
-        data_ok['discord_id'] = self.discord_user.id
-        form = forms.SignUpForm(self.request, data=data_ok)
-        user = form.save()
-        self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
-        self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
 
     def test_email_sent_ok(self):
         # Changing Django Settings to get email sent

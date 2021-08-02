@@ -6,7 +6,7 @@ module.exports = {
 		"jest/globals": true,
 	},
 	extends: ["plugin:react/recommended", "airbnb", "prettier"],
-	parser: "babel-eslint",
+	parser: "@babel/eslint-parser",
 	parserOptions: {
 		ecmaFeatures: {
 			jsx: true,

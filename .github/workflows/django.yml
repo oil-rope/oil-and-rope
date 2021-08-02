@@ -11,28 +11,20 @@ on:
       - develop
 
 jobs:
-  python-build-with-postgres:
-    name: Python Build with PostgreSQL
+  python:
+    name: Python with PostgreSQL & Redis
     runs-on: ubuntu-latest
     env:
-      DB_HOST: localhost
-      DB_NAME: oilandrope
-      DB_PASSWORD: p4ssw0rd@
-      DB_PORT: 5432
-      DB_USER: oilandrope
       DJANGO_SETTINGS_MODULE: oilandrope.settings
-      DJANGO_ALLOW_ASYNC_UNSAFE: true
-      SECRET_KEY: de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      CHANNEL_LAYER_HOST: localhost
 
     # Set up Postgres and Redis
     services:
       postgres:
-        image: postgres:11.7
+        image: postgres:13.3
         env:
           POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: oilandrope
+          POSTGRES_USER: postgres
           POSTGRES_DB: oilandrope
         options: >-
           --health-cmd pg_isready
@@ -50,19 +42,20 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.8]
+        python-version: [3.9]
 
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: x64
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f requirements.txt -o /tmp/requirements.txt --without-hashes
+          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
           pip install -r /tmp/requirements.txt
 
       - name: Lint with flake8
@@ -77,8 +70,9 @@ jobs:
 
       - name: Pytest
         run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun codecov pytest-cov pytest-env
-          pytest --cov ./ --cov-report xml
+          cp .env.example .env
+          coverage run manage.py test
+          coverage xml
 
       - name: Django Check
         run: |
@@ -86,62 +80,9 @@ jobs:
           python manage.py check
 
       - name: Updating Codecov (coverage)
-        if: ${{ success() && matrix.python-version==3.8 }}
+        if: ${{ success() && matrix.python-version==3.9 }}
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           file: ./coverage.xml
-
-  python-build-without-postgres:
-    name: Python Build without PostgreSQL
-    runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
-      DJANGO_ALLOW_ASYNC_UNSAFE: true
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-
-    # Redis
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.8]
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip poetry
-          poetry export --dev -f requirements.txt -o /tmp/requirements.txt --without-hashes
-          pip install -r /tmp/requirements.txt
-
-      - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8 --config=setup.cfg
-
-      - name: Check iSort
-        run: |
-          pip install -U isort
-          isort . --check --diff
-
-      - name: Pytest
-        run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov pytest-env
-          pytest --cov ./ --cov-report xml
-
-      - name: Django Check
-        run: |
-          python manage.py migrate
-          python manage.py check

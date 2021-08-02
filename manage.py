@@ -2,9 +2,16 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
+
+from common.utils.env import load_env_file
 
 
 def main():
+    BASE_DIR = Path(__file__).resolve().parent
+    ENV_FILE = BASE_DIR / '.env'
+    load_env_file(ENV_FILE)
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
     try:
         from django.core.management import execute_from_command_line

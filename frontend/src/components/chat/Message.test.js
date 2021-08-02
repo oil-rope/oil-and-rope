@@ -8,7 +8,7 @@ import { render } from "@testing-library/react";
 import Message from "./Message";
 import AuthContext from "../../contexts/AuthContext";
 
-describe("test message renders", () => {
+describe("tests for messages", () => {
 	let user;
 	let anotherUser;
 	let message;
