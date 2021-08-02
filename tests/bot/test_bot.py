@@ -1,7 +1,7 @@
 import discord
 import discord.ext.test as dpytest
 import pytest
-from discord.ext.commands.errors import MissingRequiredArgument
+from discord.ext.commands.errors import CommandError, MissingRequiredArgument
 from discord.ext.test.backend import make_message, make_user
 from django.conf import settings
 
@@ -78,9 +78,22 @@ async def test_on_message_ok(bot, mocker):
 
 
 @pytest.mark.asyncio
-async def test_on_command_error_ok(bot, mocker):
+async def test_on_command_error_with_command_syntax_ok(bot, mocker):
     mocker.patch('discord.ext.commands.Context')
-    context = mocker.MagicMock()
-    await bot.on_command_error(context, MissingRequiredArgument)
+    context = mocker.AsyncMock()
+    param = mocker.MagicMock()
+    error = MissingRequiredArgument(param)
+    await bot.on_command_error(context, error)
 
     context.send.assert_called_once_with('Incorrect format.')
+
+
+@pytest.mark.asyncio
+async def test_on_command_error_with_command_error_ok(bot, mocker):
+    mocker.patch('discord.ext.commands.Context')
+    context = mocker.AsyncMock()
+    error_msg = fake.sentence()
+    error = CommandError(error_msg)
+    await bot.on_command_error(context, error)
+
+    context.send.assert_called_once_with(error_msg)
