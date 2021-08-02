@@ -83,7 +83,8 @@ class OilAndRopeBot(commands.Bot):
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, errors.MissingRequiredArgument):
-            await context.send(_('Incorrect format') + '.')
+            msg = _('incorrect format').capitalize()
+            await context.send(f'{msg}.')
             await context.send_help(context.command)
 
     def run(self, *args, **kwargs):
