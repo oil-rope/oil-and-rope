@@ -7,6 +7,8 @@ from discord.ext.commands import errors
 from django.conf import settings
 from django.utils.translation import gettext as _
 
+from .cogs import Miscellaneous
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -21,10 +23,6 @@ class OilAndRopeBot(commands.Bot):
         self.token = settings.BOT_TOKEN
         super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
 
-        # Manually registering events
-        # TODO: Search if there's a better way to do this
-        self.event(self.on_guild_join)
-
     def load_commands(self):
         """
         Reads all the commands from `bot.commands` and adds them to the bot command list.
@@ -33,11 +31,11 @@ class OilAndRopeBot(commands.Bot):
         print('\nLoading commands ', end='')
 
         # List of categories
-        cogs = []
+        cogs = [Miscellaneous, ]
         new_commands = []
 
         for cog in cogs:
-            cog = cog()
+            cog = cog(self)
             self.add_cog(cog)
             new_commands.extend(cog.get_commands())
             [print('.', end='') for _ in new_commands]
@@ -51,8 +49,8 @@ class OilAndRopeBot(commands.Bot):
             id=self.user.id,
             time=datetime.now().strftime('%d/%m/%Y %H:%M')
         )
-        LOGGER.info(init_message)
         print(init_message)
+        LOGGER.info(init_message)
 
         name = 'awesome sessions!'
         name += f'Type \'{settings.BOT_COMMAND_PREFIX}help\' for help.'
@@ -79,12 +77,13 @@ class OilAndRopeBot(commands.Bot):
             message_content = message.content
             log_message = f'{author} ({author_id}): {message_content}'
             print(log_message)
+            LOGGER.info(log_message)
         await super().on_message(message)
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, errors.MissingRequiredArgument):
-            msg = _('incorrect format').capitalize()
-            await context.send(f'{msg}.')
+            msg = _('incorrect format')
+            await context.send(f'{msg.capitalize()}.')
             await context.send_help(context.command)
         else:
             await context.send(str(exception))
