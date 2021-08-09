@@ -23,10 +23,6 @@ class OilAndRopeBot(commands.Bot):
         self.token = settings.BOT_TOKEN
         super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
 
-        # Manually registering events
-        # TODO: Search if there's a better way to do this
-        self.event(self.on_guild_join)
-
     def load_commands(self):
         """
         Reads all the commands from `bot.commands` and adds them to the bot command list.

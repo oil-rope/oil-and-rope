@@ -1,21 +1,12 @@
 import discord
-import discord.ext.test as dpytest
 import pytest
 from discord.ext.commands.errors import CommandError, MissingRequiredArgument
 from discord.ext.test.backend import make_message, make_user
 from django.conf import settings
 
-from bot.bot import OilAndRopeBot
 from common.utils.faker import create_faker
 
 fake = create_faker()
-
-
-@pytest.fixture
-def bot(event_loop):
-    bot = OilAndRopeBot(loop=event_loop)
-    dpytest.configure(client=bot, num_guilds=3, num_channels=3, num_members=3)
-    return bot
 
 
 @pytest.mark.asyncio
@@ -97,3 +88,12 @@ async def test_on_command_error_with_command_error_ok(bot, mocker):
     await bot.on_command_error(context, error)
 
     context.send.assert_called_once_with(error_msg)
+
+
+def test_load_commands_ok(bot):
+    bot.load_commands()
+    misc = bot.get_cog('Miscellaneous')
+
+    assert misc is not None, 'Miscellaneous is not loaded'
+
+    assert True

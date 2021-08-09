@@ -1,5 +1,5 @@
-from django.utils.translation import gettext_lazy as _
 from discord.ext import commands
+from django.utils.translation import gettext_lazy as _
 
 
 class Miscellaneous(commands.Cog, name='Miscellaneous'):
