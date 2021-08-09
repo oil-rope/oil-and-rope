@@ -21,7 +21,12 @@ class OilAndRopeBot(commands.Bot):
         self.command_prefix = settings.BOT_COMMAND_PREFIX
         self.description = settings.BOT_DESCRIPTION
         self.token = settings.BOT_TOKEN
+        if 'intents' not in options:
+            intents = discord.Intents.default()
+            intents.members = True
+            options['intents'] = intents
         super().__init__(command_prefix=self.command_prefix, description=self.description, **options)
+        self.load_commands()
 
     def load_commands(self):
         """
@@ -52,9 +57,8 @@ class OilAndRopeBot(commands.Bot):
         print(init_message)
         LOGGER.info(init_message)
 
-        name = 'awesome sessions!'
-        name += f'Type \'{settings.BOT_COMMAND_PREFIX}help\' for help.'
-        activity = discord.Game(name=name)
+        presence = f'awesome sessions! Type \'{settings.BOT_COMMAND_PREFIX}help\' for help.'
+        activity = discord.Game(name=presence)
         status = discord.Status.online
         await self.change_presence(activity=activity, status=status)
 
@@ -80,16 +84,5 @@ class OilAndRopeBot(commands.Bot):
             LOGGER.info(log_message)
         await super().on_message(message)
 
-    async def on_command_error(self, context, exception):
-        if isinstance(exception, errors.MissingRequiredArgument):
-            msg = _('incorrect format')
-            await context.send(f'{msg.capitalize()}.')
-            await context.send_help(context.command)
-        else:
-            await context.send(str(exception))
-            await context.send_help()
-        await super().on_command_error(context, exception)
-
     def run(self, *args, **kwargs):
-        self.load_commands()
         super().run(self.token, *args, **kwargs)
