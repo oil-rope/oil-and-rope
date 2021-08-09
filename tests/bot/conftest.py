@@ -1,4 +1,3 @@
-import discord
 import discord.ext.test as dpytest
 import pytest
 

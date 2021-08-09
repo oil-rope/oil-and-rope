@@ -3,7 +3,6 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import errors
 from django.conf import settings
 from django.utils.translation import gettext as _
 

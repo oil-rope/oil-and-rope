@@ -1,7 +1,6 @@
 import discord
 import discord.ext.test as dpytest
 import pytest
-from discord.ext.commands.errors import CommandNotFound
 from django.conf import settings
 
 from common.utils.faker import create_faker
