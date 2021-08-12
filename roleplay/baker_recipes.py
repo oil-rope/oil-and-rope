@@ -2,6 +2,7 @@ import functools
 import random
 
 from django.apps import apps
+from django.utils import timezone as tz
 from model_bakery.recipe import Recipe, foreign_key, related
 
 from common.constants import models
@@ -11,7 +12,9 @@ from registration.baker_recipes import user
 from .enums import DomainTypes, RoleplaySystems, SiteTypes
 
 fake = create_faker()
-random_date_after_today = functools.partial(fake.date_this_year, before_today=False, after_today=True)
+random_date_after_today = functools.partial(
+    fake.date_time_between, tzinfo=tz.get_current_timezone(), start_date='now', end_date='+1y'
+)
 random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
 

@@ -9,6 +9,7 @@ from common.constants import models
 from common.utils import create_faker
 from roleplay import baker_recipes as recipes
 from roleplay.enums import RoleplaySystems
+from tests.api.viewsets.utils import bake_places
 
 Chat = apps.get_model(models.CHAT_MODEL)
 Domain = apps.get_model(models.DOMAIN_MODEL)
@@ -178,12 +179,9 @@ class TestPlaceViewSet(APITestCase):
     def test_authenticated_not_admin_community_places_list_ok(self):
         self.client.force_login(self.user)
         # Community places
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        bake_places()
         # Private places
-        baker.make(
-            _model=self.model, _quantity=fake.pyint(min_value=1, max_value=10),
-            user=self.admin_user, owner=self.admin_user
-        )
+        bake_places(user=self.admin_user, owner=self.admin_user)
         response = self.client.get(self.list_url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -353,7 +351,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_authenticated_admin_not_owner_delete_place_ko(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.admin_user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.delete(url)

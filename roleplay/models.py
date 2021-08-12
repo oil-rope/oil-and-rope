@@ -56,6 +56,7 @@ class Domain(TracingMixin):
         return f'{self.name} [{domain_type.label.title()}]'
 
 
+# TODO: MPTTModel is unmaintaned, we need to change it
 class Place(MPTTModel, TracingMixin):
     """
     Declares where did the creature grown, how it was, what does it belong to?
