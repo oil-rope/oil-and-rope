@@ -194,9 +194,9 @@ class TestPlaceViewSet(APITestCase):
     def test_authenticated_admin_place_list_ok(self):
         self.client.force_login(self.admin_user)
         # Community places
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        bake_places()
         # Private places
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user)
+        bake_places(user=self.user, owner=self.user)
         response = self.client.get(self.list_url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -208,9 +208,9 @@ class TestPlaceViewSet(APITestCase):
 
     def test_authenticated_user_places_list_ok(self):
         # Community places
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
+        bake_places()
         # Private places
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), user=self.user, owner=self.user)
+        bake_places(user=self.user, owner=self.user)
         # Different user's private places
         another_user = baker.make(User)
         baker.make(
@@ -229,7 +229,7 @@ class TestPlaceViewSet(APITestCase):
 
     def test_authenticated_not_admin_owner_place_detail_ok(self):
         self.client.force_login(self.user)
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.get(url)
 
@@ -237,7 +237,7 @@ class TestPlaceViewSet(APITestCase):
 
     def test_authenticated_not_admin_not_owner_place_detail_ko(self):
         self.client.force_login(self.user)
-        place = baker.make(self.model, owner=self.admin_user)
+        place = bake_places(_quantity=1, owner=self.admin_user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.get(url)
 
@@ -245,14 +245,14 @@ class TestPlaceViewSet(APITestCase):
 
     def test_authenticated_admin_not_owner_place_detail_ko(self):
         self.client.force_login(self.admin_user)
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.get(url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_owner_partial_update_place_ok(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -264,7 +264,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_owner_ignore_user_and_owner_partial_update_place_ok(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -283,7 +283,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(expected_data, data['owner'])
 
     def test_authenticated_not_admin_not_owner_partial_update_place_ko(self):
-        place = baker.make(self.model, owner=self.admin_user)
+        place = bake_places(_quantity=1, owner=self.admin_user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -295,7 +295,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_authenticated_admin_not_owner_partial_update_place_ok(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.admin_user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -307,7 +307,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_owner_update_place_ko(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -321,7 +321,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
     def test_authenticated_admin_not_owner_update_place_ok(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.admin_user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         data = {
@@ -335,7 +335,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_authenticated_not_admin_owner_delete_place_ok(self):
-        place = baker.make(self.model, owner=self.user)
+        place = bake_places(_quantity=1, owner=self.user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.delete(url)
@@ -343,7 +343,7 @@ class TestPlaceViewSet(APITestCase):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
     def test_authenticated_not_admin_not_owner_delete_place_ko(self):
-        place = baker.make(self.model, owner=self.admin_user)
+        place = bake_places(_quantity=1, owner=self.admin_user)
         self.client.force_login(self.user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.delete(url)
