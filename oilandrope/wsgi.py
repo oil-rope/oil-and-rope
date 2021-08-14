@@ -15,7 +15,7 @@ from django.core.wsgi import get_wsgi_application
 
 from common.utils.env import load_env_file
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = BASE_DIR / '.env'
 load_env_file(ENV_FILE)
 
