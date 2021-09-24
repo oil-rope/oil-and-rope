@@ -10,6 +10,7 @@ from faker import Faker
 from bot import embeds, models
 from bot.exceptions import DiscordApiException, HelpfulError
 from bot.utils import discord_api_get
+
 from ..utils import check_litecord_connection
 from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
                                 USER_WITH_SAME_SERVER)

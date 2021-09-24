@@ -1,3 +1,5 @@
+import unittest
+
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import RequestFactory, TestCase
@@ -6,6 +8,7 @@ from model_bakery import baker
 
 from registration import forms
 
+from ..utils import check_litecord_connection
 from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
                                      USER_WITH_SAME_SERVER)
 
@@ -68,6 +71,7 @@ class TestSignUpForm(TestCase):
             form = forms.SignUpForm(self.request, data=data)
             self.assertFalse(form.is_valid())
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     def test_discord_id_exists_ok(self):
         data = self.data_ok.copy()
         data['discord_id'] = USER_WITH_SAME_SERVER

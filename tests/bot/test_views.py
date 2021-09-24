@@ -1,9 +1,12 @@
+import unittest
+
 from django.shortcuts import reverse
 from django.test import TestCase, override_settings
 from faker.proxy import Faker
 
 from bot.models import Channel, Message
 
+from ..utils import check_litecord_connection
 from .helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 
@@ -22,6 +25,7 @@ class TestSendMessageToDiscordUserView(TestCase):
         }
         self.url = reverse('bot:utils:send_message')
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     def test_post_ok(self):
         response = self.client.post(self.url, data=self.data)
 
@@ -38,12 +42,14 @@ class TestSendMessageToDiscordUserView(TestCase):
 
         self.assertEqual(403, response.status_code)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     @override_settings(ALLOWED_HOSTS=['develop.oilandrope-project.com', 'testserver'])
     def test_post_from_outer_ok(self):
         response = self.client.post(self.url, data=self.data, HTTP_ORIGIN='http://develop.oilandrope-project.com')
 
         self.assertEqual(201, response.status_code)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     def test_post_msg_created_ok(self):
         response = self.client.post(self.url, data=self.data)
         channel = Channel(response.json()['channel_id'])
@@ -65,6 +71,7 @@ class TestSendInvitationView(TestCase):
         }
         self.url = reverse('bot:utils:send_invitation')
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     def test_post_ok(self):
         response = self.client.post(self.url, data=self.data)
 
