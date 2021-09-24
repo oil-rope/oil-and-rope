@@ -1,4 +1,5 @@
 import json
+import unittest
 
 import pytest
 from django.conf import settings
@@ -9,8 +10,9 @@ from faker import Faker
 from bot import embeds, models
 from bot.exceptions import DiscordApiException, HelpfulError
 from bot.utils import discord_api_get
-from tests.bot.helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
-                                         USER_WITH_SAME_SERVER)
+from ..utils import check_litecord_connection
+from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
+                                USER_WITH_SAME_SERVER)
 
 
 class TestApiMixin(TestCase):
@@ -80,6 +82,7 @@ class TestEmbedFooter(TestCase):
         self.assertEqual(expected, result)
 
 
+@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestUser(TestCase):
     api_class = models.User
@@ -141,6 +144,7 @@ class TestUser(TestCase):
         self.assertEqual(expected, result)
 
 
+@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestChannel(TestCase):
     api_class = models.Channel
@@ -183,6 +187,7 @@ class TestChannel(TestCase):
         self.assertEqual(expected, result)
 
 
+@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestMessage(TestCase):
     api_class = models.Message

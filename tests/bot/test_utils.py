@@ -1,3 +1,5 @@
+import unittest
+
 from django.conf import settings
 from django.test import TestCase, override_settings
 from faker.proxy import Faker
@@ -6,8 +8,10 @@ from bot.exceptions import DiscordApiException
 from bot.utils import discord_api_get, discord_api_patch, discord_api_post
 from tests.bot.helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
                                          USER_WITH_SAME_SERVER)
+from tests.utils import check_litecord_connection
 
 
+@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable')
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestDiscordApiRequest(TestCase):
 
