@@ -8,9 +8,9 @@ from model_bakery import baker
 
 from registration import forms
 
-from ..utils import check_litecord_connection
 from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
                                      USER_WITH_SAME_SERVER)
+from ..utils import check_litecord_connection
 
 
 class TestLoginForm(TestCase):
