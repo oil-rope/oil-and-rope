@@ -1,0 +1,71 @@
+version: '3.9'
+
+volumes:
+  db_data:
+
+networks:
+  external_network:
+    driver: bridge
+    attachable: true
+    name: oilandrope_external
+  internal_network:
+    driver: bridge
+    attachable: false
+    name: oilandrope_internal
+
+services:
+  database:
+    image: postgres:14.0-alpine
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    networks:
+      internal_network:
+        aliases:
+          - database
+          - postgres
+    volumes:
+      - type: volume
+        source: db_data
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: p4ssw0rd
+      POSTGRES_DB: oilandrope
+
+  oilandrope:
+    build:
+      context: .
+      dockerfile: ./compose/oilandrope/Dockerfile
+    image: lecuay/oilandrope:dev
+    working_dir: /app/
+    env_file:
+      - ./.env
+    networks:
+      internal_network:
+        aliases:
+          - oilandrope
+          - django
+      external_network:
+        aliases:
+          - oilandrope
+          - django
+
+  proxy:
+    image: nginx:1.21.3-alpine
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+    networks:
+      external_network:
+        aliases:
+          - web
+          - nginx
+          - proxy
+    volumes:
+      - type: bind
+        source: ./static/
+        target: /usr/share/static/
+      - type: bind
+        source: ./media/
+        target: /usr/share/media/
