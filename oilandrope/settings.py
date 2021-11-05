@@ -77,6 +77,12 @@ INSTALLED_APPS = [
     'corsheaders',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
+    # DjangoAllAuth (https://django-allauth.readthedocs.io/)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # DjangoAllAuth for Google (https://django-allauth.readthedocs.io/en/latest/providers.html#google)
+    'allauth.socialaccount.providers.google',
     # Source
     'core.apps.CoreConfig',
     # API
@@ -207,6 +213,9 @@ AUTH_USER_MODEL = 'registration.User'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'registration.backends.EmailBackend',
+    # `allauth` authentication by specific allowed methods
+    # https://django-allauth.readthedocs.io/en/latest/overview.html
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # Internationalization
@@ -362,6 +371,19 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+    },
+}
 
 # Discord
 

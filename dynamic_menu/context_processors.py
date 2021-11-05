@@ -6,7 +6,7 @@ from .enums import MenuTypes
 
 def filter_menus(menus, user):
     """
-    Filters menus queryset from user based on permissions, staff, superuser...
+    Filters menus queryset from user based on permissions, staff...
     """
 
     # Comparing permissions
@@ -14,11 +14,8 @@ def filter_menus(menus, user):
     exclude_menus = []
     for menu in menus:
         menu_permissions = menu.permissions
-        # Removing if staff or superuser are not accomplished
+        # Removing if staff are not accomplished
         if menu.staff_required and not user.is_staff:
-            exclude_menus.append(menu.pk)
-            continue
-        if menu.superuser_required and not user.is_superuser:
             exclude_menus.append(menu.pk)
             continue
         # If menu has no permissions there's no need to further check
@@ -52,12 +49,10 @@ def menus(request) -> dict:
         menus_dict = {
             'menus': models.DynamicMenu.objects.filter(
                 staff_required=False,
-                superuser_required=False,
                 permissions_required__isnull=True,
             ),
             'context_menus': models.DynamicMenu.objects.filter(
                 staff_required=False,
-                superuser_required=False,
                 permissions_required__isnull=True,
             )
         }

@@ -37,6 +37,8 @@ urlpatterns += i18n_patterns(
     path('common/', include('common.urls')),
     # Auth system
     path('accounts/', include('registration.urls')),
+    # oAuth
+    path('oauth/', include('allauth.urls')),
     # Bot
     path('bot/', include('bot.urls')),
     # Dynamic Menu
