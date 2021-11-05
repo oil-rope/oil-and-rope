@@ -2,7 +2,7 @@ import logging
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML, Submit
+from crispy_forms.layout import HTML, Column, Layout, Row, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
