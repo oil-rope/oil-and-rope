@@ -24,8 +24,6 @@ class DynamicMenuAdmin(TranslationAdmin):
         'extra_urls_args',
         'order',
         'staff_required',
-        'superuser_required',
-        'icon',
         'menu_type',
         'lft',
         'rght',
@@ -37,7 +35,6 @@ class DynamicMenuAdmin(TranslationAdmin):
         'entry_updated_at',
         'parent',
         'staff_required',
-        'superuser_required',
     )
-    raw_id_fields = ('permissions_required', 'related_models')
+    raw_id_fields = ('permissions_required', )
     search_fields = ('name',)
