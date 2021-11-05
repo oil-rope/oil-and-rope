@@ -111,13 +111,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         to=PERMISSION_CLASS, blank=True, related_name='menus', verbose_name=_('permissions required')
     )
     staff_required = models.BooleanField(verbose_name=_('staff required'), default=False)
-    superuser_required = models.BooleanField(verbose_name=_('superuser required'), default=False)
-    icon = models.FileField(
-        verbose_name=_('icon'), upload_to=dynamic_menu_path, max_length=254, blank=True, null=True
-    )
-    related_models = models.ManyToManyField(
-        to=MODEL_MANAGER_CLASS, verbose_name=_('related models'), related_name='menus', blank=True
-    )
 
     menu_type = models.PositiveSmallIntegerField(
         verbose_name=_('menu type'), default=MenuTypes.MAIN_MENU, choices=MenuTypes.choices
@@ -171,24 +164,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         return self._permissions_cache
 
     @property
-    def models(self) -> set:
-        """
-        Returns a set of models related to this menu.
-        """
-
-        if hasattr(self, '_models_cache'):
-            return self._models_cache
-
-        models = self.related_models.values_list(
-            'app_label',
-            'model'
-        )
-        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
-        setattr(self, '_models_cache', models)
-
-        return self._models_cache
-
-    @property
     def display_menu_name(self):
         menu_str = ''
 
@@ -222,32 +197,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
                 parsed_objs.append(obj)
 
         self.permissions_required.add(*parsed_objs)
-
-    def add_models(self, *objs):
-        """
-        Takes a list of model either in :class:`str` (`app_label.model`), :class:`models.Model` subclass
-        or :class:`contenttypes.ContentType` instance format.
-        """
-
-        ContentType = apps.get_model(constants.CONTENT_TYPE_MODEL)
-        parsed_objs = []
-
-        for obj in objs:
-            if isinstance(obj, str):
-                # Models are parsed from 'app_label.model'
-                app_label, model = obj.lower().split('.', 1)
-                parsed_objs.append(
-                    ContentType.objects.get(app_label=app_label, model=model)
-                )
-            elif isinstance(obj, ContentType):
-                parsed_objs.append(obj)
-            elif hasattr(obj, '_meta') and issubclass(obj._meta.model, models.Model):
-                app_label, model = obj._meta.label.lower().split('.', 1)
-                parsed_objs.append(
-                    ContentType.objects.get(app_label=app_label, model=model)
-                )
-
-        self.related_models.add(*parsed_objs)
 
     class Meta:
         verbose_name = _('Dynamic Menu')
