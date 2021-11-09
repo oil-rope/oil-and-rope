@@ -227,8 +227,8 @@ LANGUAGE_CODE = 'en'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#languages
 
 LANGUAGES = [
-    ('en-us', _('english')),
-    ('es-ES', _('spanish')),
+    ('en', _('english')),
+    ('es', _('spanish')),
 ]
 
 TIME_ZONE = 'UTC'

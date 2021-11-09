@@ -2,7 +2,6 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-{% load socialaccount %}
 
 {% block title %}{% trans "Login" %}{% endblock title %}
 
@@ -53,11 +52,6 @@
         <form method="post" action="{% url 'registration:login' %}" id="loginForm">
           {% crispy form %}
         </form>
-        <div class="row justify-content-around mt-3">
-          <a href="{% provider_login_url "google" %}" class="btn btn-lg bg-white col-10">
-            {% trans "login with Google"|capfirst %}
-          </a>
-        </div>
         <div class="row justify-content-around mt-3 mt-md-5 mb-5">
           <a href="{% url 'registration:password_reset' %}">
             {% trans "forgot password?"|capfirst %}
