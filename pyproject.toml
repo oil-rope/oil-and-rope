@@ -12,6 +12,7 @@ Django = "3.2.8"
 channels = "^3.0"
 channels-redis = "^3.3"
 "discord.py" = {extras = ["voice"], version = "^1.7"}
+django-allauth = "^0.45.0"
 django-crispy-forms = "^1.11"
 django-ckeditor = "^6.1"
 django-cors-headers = "^3.7"

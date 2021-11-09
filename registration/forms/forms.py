@@ -2,7 +2,7 @@ import logging
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Column, Div, Layout, Row, Submit
+from crispy_forms.layout import HTML, Column, Layout, Row, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
@@ -16,6 +16,8 @@ from django.utils.translation import gettext_lazy as _
 from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.utils.auth import generate_token
+
+from .layouts import LoginFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,43 +39,9 @@ class LoginForm(auth_forms.AuthenticationForm):
         self.fields['username'].label = username_label
 
         self.helper = FormHelper(self)
-        self.helper.form_id = 'loginForm'
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
-        self.helper.layout = Layout(
-            Row(
-                Column('username', css_class='col-12'),
-                Column('password', css_class='col-12'),
-            ),
-            Row(
-                Column(
-                    Submit('login', _('Login'), css_class='btn btn-lg text-white w-100'),
-                    css_class='col-6'
-                ),
-                Column(
-                    Div(
-                        Row(
-                            HTML(
-                                '<a class="mr-lg-5" href="{url}">{text}</a>'.format(
-                                    url=reverse('registration:password_reset'),
-                                    text=_('Forgot password?')
-                                )
-                            ),
-                            HTML(
-                                '<a class="" href="{url}">{text}</a>'.format(
-                                    url=reverse('registration:resend_email'),
-                                    text=_('Resend email')
-                                )
-                            ),
-                            css_class='row justify-content-sm-between justify-content-lg-center \
-                                        align-items-center h-100'
-                        ),
-                        css_class='container-fluid h-100'
-                    ),
-                    css_class='col-6'
-                ),
-            ),
-        )
+        self.helper.layout = LoginFormLayout
 
 
 class SignUpForm(auth_forms.UserCreationForm):

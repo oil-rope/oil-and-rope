@@ -37,6 +37,8 @@ urlpatterns += i18n_patterns(
     path('common/', include('common.urls')),
     # Auth system
     path('accounts/', include('registration.urls')),
+    # oAuth
+    path('oauth/', include('allauth.urls')),
     # Bot
     path('bot/', include('bot.urls')),
     # Dynamic Menu
@@ -45,7 +47,7 @@ urlpatterns += i18n_patterns(
     path('frontend/', include('frontend.urls')),
     # Roleplay
     path('roleplay/', include('roleplay.urls')),
-    prefix_default_language=False,
+    prefix_default_language=True,
 )
 
 if settings.DEBUG:  # pragma: no cover
