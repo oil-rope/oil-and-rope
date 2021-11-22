@@ -68,12 +68,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         List of permissions needed to access this menu.
     staff_required: Optional[:class:`bool`]
         Declares if staff is required to access this section of the menu.
-    superuser_required: Optional[:class:`bool`]
-        Declares if superuser is required to access this section of the menu.
-    icon: Optional[:class:`file`]
-        Icon asociated to this section of the menu.
-    related_models: Optional[List[:class:`models.Model`]]
-        A model related to this section of the menu.
     menu_type: Optional[:class:`int`]
         Role for this menu.
         `MAIN_MENU` stands for a regular menu section.
@@ -111,7 +105,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         to=PERMISSION_CLASS, blank=True, related_name='menus', verbose_name=_('permissions required')
     )
     staff_required = models.BooleanField(verbose_name=_('staff required'), default=False)
-
     menu_type = models.PositiveSmallIntegerField(
         verbose_name=_('menu type'), default=MenuTypes.MAIN_MENU, choices=MenuTypes.choices
     )

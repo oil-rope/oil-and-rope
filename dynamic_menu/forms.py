@@ -147,8 +147,6 @@ class DynamicMenuForm(TranslationModelForm):
             self.instance.save()
             perms = self.cleaned_data['permissions_required']
             self.instance.add_permissions(*perms)
-            models = self.cleaned_data['related_models']
-            self.instance.add_models(*models)
 
         return self.instance
 
@@ -156,5 +154,5 @@ class DynamicMenuForm(TranslationModelForm):
         model = models.DynamicMenu
         fields = (
             'prepended_text', 'name', 'appended_text', 'description', 'url_resolver', 'extra_urls_args',
-            'parent', 'menu_type', 'order', 'permissions_required', 'related_models', 'staff_required',
+            'parent', 'menu_type', 'order', 'permissions_required', 'staff_required',
         )

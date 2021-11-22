@@ -7,11 +7,7 @@ DynamicMenu = apps.get_model(models.DYNAMIC_MENU)
 
 
 class DynamicMenuSerializer(serializers.ModelSerializer):
-    models = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
-
-    def get_models(self, obj):
-        return list(obj.models)
 
     def get_permissions(self, obj):
         return list(obj.permissions)
@@ -20,6 +16,5 @@ class DynamicMenuSerializer(serializers.ModelSerializer):
         model = DynamicMenu
         fields = (
             'id', 'name', 'description', 'prepended_text', 'appended_text', 'url_resolver', 'extra_urls_args', 'order',
-            'permissions', 'staff_required', 'superuser_required', 'icon', 'menu_type', 'models', 'entry_created_at',
-            'entry_updated_at', 'parent',
+            'permissions', 'staff_required', 'menu_type', 'entry_created_at', 'entry_updated_at', 'parent',
         )

@@ -188,7 +188,6 @@ class TestFilterMenus(TestCase):
         self.menu_with_auth_perms = DynamicMenu.objects.create(name=self.faker.word())
         self.menu_with_auth_perms.add_permissions(*self.auth_permssions)
         self.menu_with_staff = DynamicMenu.objects.create(name=self.faker.word(), staff_required=True)
-        self.menu_with_superuser = DynamicMenu.objects.create(name=self.faker.word(), superuser_required=True)
 
         self.menus = DynamicMenu.objects.all()
 
@@ -208,9 +207,3 @@ class TestFilterMenus(TestCase):
 
         self.assertIn(self.menu_without_perms, menus)
         self.assertNotIn(self.menu_with_staff, menus)
-
-    def test_non_superuser_user_ok(self):
-        menus = context_processors.filter_menus(self.menus, self.user)
-
-        self.assertIn(self.menu_without_perms, menus)
-        self.assertNotIn(self.menu_with_superuser, menus)

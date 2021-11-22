@@ -119,57 +119,6 @@ class TestDynamicMenuModel(TestCase):
 
         self.assertTrue(all_perms)
 
-    def test_add_models_with_contenttypes_instances_ok(self):
-        content_types = ContentType.objects.filter(
-            app_label='auth',
-            model__in=['user', 'group']
-        )
-        self.instance.add_models(*content_types)
-        menu_models = self.instance.related_models.values_list('pk', flat=True)
-        content_types = content_types.values_list('pk', flat=True)
-        all_models = all([model in menu_models for model in content_types])
-
-        self.assertTrue(all_models)
-
-    def test_add_models_with_strings_ok(self):
-        models = [constants.USER_MODEL, constants.GROUP_MODEL]
-        content_types = ContentType.objects.filter(
-            app_label='auth',
-            model__in=['user', 'group']
-        ).values_list('pk', flat=True)
-        self.instance.add_models(*models)
-        menu_models = self.instance.related_models.values_list('pk', flat=True)
-        all_models = all([model in menu_models for model in content_types])
-
-        self.assertTrue(all_models)
-
-    def test_add_models_with_model_instances_ok(self):
-        User = apps.get_model(constants.USER_MODEL)
-        Group = apps.get_model(constants.GROUP_MODEL)
-        content_types = ContentType.objects.filter(
-            app_label='auth',
-            model__in=['user', 'group']
-        ).values_list('pk', flat=True)
-        self.instance.add_models(User, Group)
-        menu_models = self.instance.related_models.values_list('pk', flat=True)
-        all_models = all([model in menu_models for model in content_types])
-
-        self.assertTrue(all_models)
-
-    def test_add_models_mixed_ok(self):
-        user = apps.get_model(constants.USER_MODEL)
-        group = 'auth.Group'
-        content_type = ContentType.objects.get(app_label='contenttypes', model='contenttype')
-        content_types = ContentType.objects.filter(
-            app_label__in=['auth', 'contenttypes'],
-            model__in=['user', 'group', 'contenttype']
-        ).values_list('pk', flat=True)
-        self.instance.add_models(user, group, content_type)
-        menu_models = self.instance.related_models.values_list('pk', flat=True)
-        all_models = all([model in menu_models for model in content_types])
-
-        self.assertTrue(all_models)
-
     def test_permissions_ok(self):
         perms = [
             'registration.add_user', 'registration.change_user',
@@ -204,21 +153,3 @@ class TestDynamicMenuModel(TestCase):
         all_perms = all([perm in perms for perm in self.instance.permissions])
 
         self.assertTrue(all_perms)
-
-    def test_models_ok(self):
-        models = ['registration.User', 'auth.Group']
-        self.instance.add_models(*models)
-        all_models = all([model in models for model in self.instance.models])
-
-        self.assertTrue(all_models)
-
-    def test_models_cached_ok(self):
-        models = ['registration.User', 'auth.Group']
-        self.instance.add_models(*models)
-
-        with self.assertNumQueries(1):
-            self.instance.models
-            all_models = all([model in models for model in self.instance.models])
-
-            self.assertTrue(all_models)
-            self.assertTrue(hasattr(self.instance, '_models_cache'))
