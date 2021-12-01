@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
-      DJANGO_ALLOW_ASYNC_UNSAFE: true
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     # Redis
@@ -24,19 +23,20 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.9]
+        python-version: [3.8, 3.9, 3.10]
 
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: x64
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry export --dev -f requirements.txt -o /tmp/requirements.txt
+          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
           pip install -r /tmp/requirements.txt
 
       - name: Lint with flake8
@@ -51,8 +51,9 @@ jobs:
 
       - name: Pytest
         run: |
-          pip install -U pytest pytest-django pytest-asyncio pytest-mock model_bakery freezegun pytest-cov pytest-env
-          pytest --cov ./ --cov-report xml
+          cp .env.example .env
+          coverage run manage.py test
+          coverage xml
 
       - name: Django Check
         run: |
