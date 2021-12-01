@@ -16,8 +16,8 @@ from core.models import TracingMixin
 from . import managers
 from .enums import MenuTypes
 
-PERMISSION_CLASS = 'auth.Permission'
-MODEL_MANAGER_CLASS = 'contenttypes.ContentType'
+PERMISSION_CLASS = constants.PERMISSION_MODEL
+MODEL_MANAGER_CLASS = constants.CONTENT_TYPE_MODEL
 
 
 def dynamic_menu_path(instance: models.Model, filename: str) -> str:
@@ -70,12 +70,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         List of permissions needed to access this menu.
     staff_required: Optional[:class:`bool`]
         Declares if staff is required to access this section of the menu.
-    superuser_required: Optional[:class:`bool`]
-        Declares if superuser is required to access this section of the menu.
-    icon: Optional[:class:`file`]
-        Icon asociated to this section of the menu.
-    related_models: Optional[List[:class:`models.Model`]]
-        A model related to this section of the menu.
     menu_type: Optional[:class:`int`]
         Role for this menu.
         `MAIN_MENU` stands for a regular menu section.
@@ -92,32 +86,30 @@ class DynamicMenu(MPTTModel, TracingMixin):
         Last time model was updated.
     """
 
-    name = models.CharField(verbose_name=_('Name'), max_length=100)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    prepended_text = models.CharField(verbose_name=_('Prepended Text'), max_length=50,
-                                      null=True, blank=True)
-    appended_text = models.CharField(verbose_name=_('Appended Text'), max_length=50,
-                                     null=True, blank=True)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='menus',
-                            null=True, blank=True, verbose_name=_('Parent Menu'))
-    url_resolver = models.CharField(verbose_name=_('URL Resolver'), max_length=50,
-                                    null=True, blank=True)
-    extra_urls_args = models.CharField(verbose_name=_('Extra URL Parameters'), max_length=254,
-                                       null=True, blank=True)
-    order = models.PositiveSmallIntegerField(verbose_name=_('Order'), default=0)
-    permissions_required = models.ManyToManyField(PERMISSION_CLASS, blank=True,
-                                                  related_name='menus',
-                                                  verbose_name=_('Permissions required'))
-    staff_required = models.BooleanField(verbose_name=_('Staff Required'), default=False)
-    superuser_required = models.BooleanField(verbose_name=_('SuperUser Required'),
-                                             default=False)
-    icon = models.FileField(verbose_name=_('Icon'), upload_to=dynamic_menu_path,
-                            max_length=254, blank=True, null=True)
-    related_models = models.ManyToManyField(MODEL_MANAGER_CLASS, verbose_name=_('Related Models'),
-                                            related_name='menus', blank=True)
-
-    menu_type = models.PositiveSmallIntegerField(verbose_name=_('Menu Type'), default=MenuTypes.MAIN_MENU,
-                                                 choices=MenuTypes.choices)
+    name = models.CharField(verbose_name=_('name'), max_length=100)
+    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    prepended_text = models.CharField(
+        verbose_name=_('prepended text'), max_length=50, null=True, blank=True
+    )
+    appended_text = models.CharField(
+        verbose_name=_('appended text'), max_length=50, null=True, blank=True
+    )
+    parent = TreeForeignKey(
+        to='self', on_delete=models.CASCADE, related_name='menus', null=True, blank=True, verbose_name=_('parent menu'),
+        db_index=True,
+    )
+    url_resolver = models.CharField(verbose_name=_('resolver'), max_length=50, null=True, blank=True)
+    extra_urls_args = models.CharField(
+        verbose_name=_('extra parameters'), max_length=254, null=True, blank=True
+    )
+    order = models.PositiveSmallIntegerField(verbose_name=_('order'), default=0)
+    permissions_required = models.ManyToManyField(
+        to=PERMISSION_CLASS, blank=True, related_name='menus', verbose_name=_('permissions required')
+    )
+    staff_required = models.BooleanField(verbose_name=_('staff required'), default=False)
+    menu_type = models.PositiveSmallIntegerField(
+        verbose_name=_('menu type'), default=MenuTypes.MAIN_MENU, choices=MenuTypes.choices
+    )
 
     objects = managers.DynamicMenuManager()
 
@@ -177,15 +169,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         return permissions
     permissions = cached_property(get_permissions, name='permissions')
 
-    def get_models(self) -> set:
-        """
-        Returns a set of models related to this menu.
-        """
-
-        models = self._get_models()
-        return models
-    models = cached_property(get_models, name='models')
-
     @property
     def display_menu_name(self):
         menu_str = ''
@@ -220,32 +203,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
                 parsed_objs.append(obj)
 
         self.permissions_required.add(*parsed_objs)
-
-    def add_models(self, *objs):
-        """
-        Takes a list of model either in :class:`str` (`app_label.model`), :class:`models.Model` subclass
-        or :class:`contenttypes.ContentType` instance format.
-        """
-
-        ContentType = apps.get_model(constants.CONTENT_TYPE_MODEL)
-        parsed_objs = []
-
-        for obj in objs:
-            if isinstance(obj, str):
-                # Models are parsed from 'app_label.model'
-                app_label, model = obj.lower().split('.', 1)
-                parsed_objs.append(
-                    ContentType.objects.get(app_label=app_label, model=model)
-                )
-            elif isinstance(obj, ContentType):
-                parsed_objs.append(obj)
-            elif hasattr(obj, '_meta') and issubclass(obj._meta.model, models.Model):
-                app_label, model = obj._meta.label.lower().split('.', 1)
-                parsed_objs.append(
-                    ContentType.objects.get(app_label=app_label, model=model)
-                )
-
-        self.related_models.add(*parsed_objs)
 
     class Meta:
         verbose_name = _('Dynamic Menu')

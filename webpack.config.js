@@ -1,49 +1,37 @@
 const path = require("path");
-
-const PUBLIC_PATH = process.env.STATIC_URL || "/static/frontend/dist/";
+const webpack = require("webpack");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
+	mode: process.env.NODE_ENV,
 	entry: {
-		Calendar: "./frontend/src/renderCalendar.jsx",
-		UserCheckButton: "./frontend/src/renderUserCheckButton.jsx",
+		session: "./frontend/src/renders/renderSession.jsx",
 	},
 	output: {
-		publicPath: PUBLIC_PATH,
 		filename: "[name].bundle.js",
 		path: path.resolve(__dirname, "./frontend/static/frontend/dist/"),
-		chunkFilename: "[name].bundle.js",
-	},
-	devServer: {
-		contentBase: "dist",
+		clean: true,
 	},
 	module: {
 		rules: [
 			{
-				test: [/\.js$/, /\.jsx$/],
+				test: [/\.m?js$/, /\.m?jsx$/],
 				exclude: /node_modules/,
-				use: [
-					{
-						loader: "babel-loader",
-					},
-				],
-			},
-			{
-				test: /\.s[ac]ss$/i,
-				use: [
-					// Creates `style` nodes from JS strings
-					"style-loader",
-					// // Translates CSS into CommonJS
-					"css-loader",
-					// // Compiles Sass to CSS
-					"sass-loader",
-				],
+				use: "babel-loader",
 			},
 		],
 	},
 	resolve: {
-		extensions: [".js", ".jsx", ".scss", ".sass"],
+		extensions: [".js", ".jsx"],
 	},
 	externals: {
-		jquery: "jQuery",
+		gettext: "gettext",
 	},
+	plugins: [
+		new webpack.EnvironmentPlugin(["NODE_ENV"]),
+		new Dotenv({
+			path: "./.env",
+			safe: true,
+		}),
+	],
 };

@@ -1,5 +1,7 @@
+import pathlib
 import threading
 
+from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -31,9 +33,14 @@ class HtmlThreadMail(threading.Thread):
         self.subject = subject
         self.from_email = from_email
         self.to = to
-        if not context:
-            context = {}
-        self.context = context
+        css_file = pathlib.Path(f'{settings.BASE_DIR}/core/static/core/css/oilandrope-theme.min.css')
+        self.context = {
+            'style': css_file.read_text(encoding='utf-8'),
+            'protocol': 'https',
+            'domain': settings.ALLOWED_HOSTS[0],
+        }
+        if context:
+            self.context.update(context)
         self.body = self.render_body()
         self.plain_message = strip_tags(self.body)
 

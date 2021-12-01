@@ -19,10 +19,12 @@ class TestLoginView(TestCase):
     Checks LoginView works correctly.
     """
 
+    faker = Faker()
+    resolver = 'registration:login'
+
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
-        self.url = reverse('registration:login')
+        self.url = reverse(self.resolver)
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -42,6 +44,34 @@ class TestLoginView(TestCase):
         self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
         self.client.post(self.url, data=data)
         self.assertTrue(get_user(self.client).is_authenticated, 'User is not logged.')
+
+    def test_user_login_with_email_ok(self):
+        # Change password so we can control input
+        password = self.faker.password()
+        self.user.set_password(password)
+        self.user.save()
+
+        data = {
+            'username': self.user.email,
+            'password': password
+        }
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
+        self.client.post(self.url, data=data)
+        self.assertTrue(get_user(self.client).is_authenticated, 'User is not logged.')
+
+    def test_user_login_with_email_ko(self):
+        # Change password so we can control input
+        password = self.faker.password()
+        self.user.set_password(password)
+        self.user.save()
+
+        data = {
+            'username': self.faker.email(),
+            'password': password
+        }
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
+        self.client.post(self.url, data=data)
+        self.assertFalse(get_user(self.client).is_authenticated, 'User is logged.')
 
     @mock.patch('registration.views.messages')
     def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
@@ -105,7 +135,6 @@ class TestSignUpView(TestCase):
             'password2': password
         }
         self.url = reverse('registration:register')
-        self.discord_user = baker.make('bot.DiscordUser')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -127,7 +156,6 @@ class TestSignUpView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_can_register_with_discord_user(self, mock_call: mock.MagicMock):
         data_ok = self.data_ok.copy()
-        data_ok['discord_id'] = self.discord_user.id
         response = self.client.post(self.url, data=data_ok)
 
         succes_message = '{} {}.'.format(
@@ -144,15 +172,6 @@ class TestSignUpView(TestCase):
         user_exists = get_user_model().objects.filter(username=self.data_ok['username']).exists()
         self.assertTrue(user_exists, 'User is not created.')
 
-    def test_user_is_vinculed_to_discord_user(self):
-        data_ok = self.data_ok.copy()
-        data_ok['discord_id'] = self.discord_user.id
-        self.client.post(self.url, data=data_ok)
-
-        user = get_user_model().objects.get(username=data_ok['username'])
-        self.assertIsNotNone(user.discord_user, 'Discord User is not vinculed.')
-        self.assertEqual(user.discord_user, self.discord_user, 'Discord User vinculed incorrectly.')
-
     def test_email_sent_ok(self):
         with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.client.post(self.url, data=self.data_ok, follow=True)
@@ -163,20 +182,6 @@ class TestSignUpView(TestCase):
         data_ko['password2'] = self.faker.word()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'password2', 'The two password fields didn’t match.')
-
-    def test_wrong_discord_id_ko(self):
-        data_ko = self.data_ok.copy()
-        data_ko['discord_id'] = self.faker.random_int()
-        response = self.client.post(self.url, data=data_ko)
-        self.assertFormError(response, 'form', 'discord_id', 'User not found. Have you requested invitation?')
-
-    def test_email_already_in_use(self):
-        # First we create a user
-        user = baker.make(get_user_model(), email=self.faker.email())
-        data_ko = self.data_ok.copy()
-        data_ko['email'] = user.email
-        response = self.client.post(self.url, data=data_ko)
-        self.assertFormError(response, 'form', 'email', 'This email is already in use.')
 
     def test_required_fields_not_given(self):
         data_without_email = self.data_ok.copy()
@@ -282,17 +287,6 @@ class TestResendConfirmationEmailView(TestCase):
         data_ko['email'] = self.faker.email()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
-
-    @mock.patch('registration.views.messages')
-    def test_multiple_users_with_same_email_ko(self, mock_call):
-        # First we create a user with same email since this is possible at database-level
-        baker.make(get_user_model(), email=self.data_ok['email'])
-        response = self.client.post(self.url, data=self.data_ok)
-        warning_message = _('Multiple users with same email, please contact our developers')
-        mock_call.warning.assert_called_with(
-            response.wsgi_request,
-            warning_message
-        )
 
 
 class TestResetPasswordView(TestCase):
@@ -407,3 +401,24 @@ class TestPasswordResetConfirmView(TestCase):
         )
 
         self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
+
+
+class TestRequestTokenView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.url = reverse('registration:token')
+
+    def test_anonymous_access_ko(self):
+        login_url = reverse('registration:login')
+        response = self.client.get(self.url)
+        expected_url = f'{login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_authenticated_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        token = self.user.auth_token
+
+        self.assertContains(response, f'{token.key}')

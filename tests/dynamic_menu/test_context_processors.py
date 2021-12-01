@@ -20,7 +20,7 @@ class TestMenuContextProcessor(TestCase):
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.perms = Permission.objects.filter(
-            content_type__app_label='auth',
+            content_type__app_label='registration',
             codename__in=['view_user', 'delete_user']
         )
         self.user.user_permissions.add(*self.perms)
@@ -76,7 +76,7 @@ class TestMenuContextProcessor(TestCase):
         # Random user
         user = baker.make(constants.USER_MODEL)
         user.user_permissions.add(
-            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+            Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
         # Random menu
         DynamicMenu.objects.create(
@@ -109,7 +109,7 @@ class TestMenuContextProcessor(TestCase):
             menu.add_permissions(*self.perms)
         user = baker.make(constants.USER_MODEL)
         user.user_permissions.add(
-            Permission.objects.get(content_type__app_label='auth', codename='view_user')
+            Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
         request = RequestFactory().get('/')
         request.user = user
@@ -143,4 +143,61 @@ class TestMenuContextProcessor(TestCase):
         request.COOKIES['_auth_user_menu_referrer'] = menu.id
         menus = context_processors.menus(request)
 
-        self.assertEqual(count, len(menus['context_menus']))
+        self.assertEqual(count, menus['context_menus'].count())
+
+    def test_non_existent_menu_parent_ko(self):
+        menu = DynamicMenu.objects.create(
+            name=self.faker.word(),
+            menu_type=MenuTypes.MAIN_MENU
+        )
+        DynamicMenu.objects.create(
+            name=self.faker.word(),
+            menu_type=MenuTypes.CONTEXT_MENU,
+            parent=menu
+        )
+        request = RequestFactory().get('/')
+        request.user = self.user
+        request.COOKIES['_auth_user_menu_referrer'] = self.faker.pyint(100, 1000)
+        menus = context_processors.menus(request)
+
+        self.assertEqual(0, menus['context_menus'].count())
+        self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])
+
+
+class TestFilterMenus(TestCase):
+
+    def setUp(self):
+        self.faker = Faker()
+        self.auth_permssions = ['add_user', 'add_group', 'delete_user', 'delete_group']
+        self.auth_permssions = Permission.objects.filter(
+            content_type__app_label='registration', codename__in=self.auth_permssions
+        )
+        self.user = baker.make(constants.USER_MODEL)
+        self.staff_user = baker.make(constants.USER_MODEL, is_staff=True)
+        self.superuser = baker.make(constants.USER_MODEL, is_superuser=True)
+        self.user_with_perms = baker.make(constants.USER_MODEL)
+        self.user_with_perms.user_permissions.add(*self.auth_permssions)
+
+        self.menu_without_perms = DynamicMenu.objects.create(name=self.faker.word())
+        self.menu_with_auth_perms = DynamicMenu.objects.create(name=self.faker.word())
+        self.menu_with_auth_perms.add_permissions(*self.auth_permssions)
+        self.menu_with_staff = DynamicMenu.objects.create(name=self.faker.word(), staff_required=True)
+
+        self.menus = DynamicMenu.objects.all()
+
+    def test_menu_without_perms_ok(self):
+        menus = context_processors.filter_menus(self.menus, self.user)
+
+        self.assertIn(self.menu_without_perms, menus)
+
+    def test_user_without_perms_ok(self):
+        menus = context_processors.filter_menus(self.menus, self.user)
+
+        self.assertIn(self.menu_without_perms, menus)
+        self.assertNotIn(self.menu_with_auth_perms, menus)
+
+    def test_non_staff_user_ok(self):
+        menus = context_processors.filter_menus(self.menus, self.user)
+
+        self.assertIn(self.menu_without_perms, menus)
+        self.assertNotIn(self.menu_with_staff, menus)

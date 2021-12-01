@@ -24,18 +24,11 @@ class PlaceAdmin(DraggableMPTTAdmin):
     search_fields = ['name__icontains']
 
 
-@admin.register(models.Music)
-class MusicAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'entry_created_at',
-        'entry_updated_at',
-        'title',
-        'description',
-        'file',
-        'content_type',
-        'object_id',
-    )
-    list_filter = ('entry_created_at', 'entry_updated_at', 'content_type')
+@admin.register(models.Session)
+class SessionAdmin(admin.ModelAdmin):
+    date_hierarchy = 'entry_created_at'
+    fields = (('name', 'system'), 'next_game')
+    list_display = ('__str__', 'system', 'next_game', 'entry_created_at')
+    list_display_links = ('__str__', )
+    list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
-    search_fields = ['tile__icontains']

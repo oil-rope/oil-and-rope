@@ -1,6 +1,7 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
 class RoleplayConfig(AppConfig):
     name = 'roleplay'
-    verbose_name = 'Roleplay'
+    verbose_name = _('roleplay')

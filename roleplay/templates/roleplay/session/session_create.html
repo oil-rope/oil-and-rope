@@ -1,0 +1,22 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Create" %} {% trans "Game" %}{% endblock title %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <h2 class="display-4 text-center">{% trans "Create" %} {% trans "Game" %}</h2>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col">
+        {% crispy form %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script src="{% static 'roleplay/js/session/addPlayers.js' %}"></script>
+{% endblock javascript %}

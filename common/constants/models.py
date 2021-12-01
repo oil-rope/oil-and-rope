@@ -5,6 +5,14 @@ USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
+# Registration
+PROFILE_MODEL = 'registration.Profile'
+
+# Bot
+DISCORD_USER_MODEL = 'bot.DiscordUser'
+DISCORD_SERVER_MODEL = 'bot.DiscordServer'
+DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
+
 # Content Types
 CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
 
@@ -16,5 +24,9 @@ DOMAIN_MODEL = 'roleplay.Domain'
 PLACE_MODEL = 'roleplay.Place'
 RACE_MODEL = 'roleplay.Race'
 USER_RACE_RELATION = 'roleplay.RaceUser'
-MUSIC_MODEL = 'roleplay.Music'
-USER_MUSIC_RELATION = 'roleplay.MusicUser'
+SESSION_MODEL = 'roleplay.Session'
+ROLEPLAY_PLAYER_IN_SESSION = 'roleplay.PlayerInSession'
+
+# Chat
+CHAT_MODEL = 'chat.Chat'
+CHAT_MESSAGE_MODEL = 'chat.ChatMessage'

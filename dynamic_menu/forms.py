@@ -85,7 +85,6 @@ class DynamicMenuForm(TranslationModelForm):
                     Column('permissions_required', css_class='col-md-6 col-lg-3'),
                     Column('related_models', css_class='col-md-6 col-lg-3'),
                     Column('staff_required', css_class='col-md-6 col-lg-3 align-self-lg-center'),
-                    Column('superuser_required', css_class='col-md-6 col-lg-3 align-self-lg-center'),
                     css_class='justify-content-around'
                 ),
                 css_class='mb-3'
@@ -97,7 +96,6 @@ class DynamicMenuForm(TranslationModelForm):
                 css_class='justify-content-around'
             ),
             Row(
-                Column('icon', css_class='col-12'),
                 Column('description', css_class='col-12'),
                 css_class='justify-content-around'
             ),
@@ -149,8 +147,6 @@ class DynamicMenuForm(TranslationModelForm):
             self.instance.save()
             perms = self.cleaned_data['permissions_required']
             self.instance.add_permissions(*perms)
-            models = self.cleaned_data['related_models']
-            self.instance.add_models(*models)
 
         return self.instance
 
@@ -158,6 +154,5 @@ class DynamicMenuForm(TranslationModelForm):
         model = models.DynamicMenu
         fields = (
             'prepended_text', 'name', 'appended_text', 'description', 'url_resolver', 'extra_urls_args',
-            'parent', 'menu_type', 'order', 'permissions_required', 'related_models', 'staff_required',
-            'superuser_required', 'icon',
+            'parent', 'menu_type', 'order', 'permissions_required', 'staff_required',
         )

@@ -16,6 +16,6 @@ class TestUpload(TestCase):
 
     @freeze_time('2020-01-01')
     def test_default_upload_to_with_identifier(self):
-        expected = 'auth/user/2020/01/01/{}/{}'.format(self.instance.pk, self.filename)
+        expected = 'registration/user/2020/01/01/{}/{}'.format(self.instance.pk, self.filename)
         result = default_upload_to(self.instance, self.filename)
         self.assertEqual(expected, result)

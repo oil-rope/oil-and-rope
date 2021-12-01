@@ -1,13 +1,29 @@
-"""
-ASGI entrypoint. Configures Django and then runs the application
-defined in the ASGI_APPLICATION setting.
-"""
-
-import os
+from pathlib import Path
 
 import django
-from channels.routing import get_default_application
+from channels.auth import AuthMiddlewareStack
+from channels.http import AsgiHandler
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
+from django.urls import re_path
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oilandrope.settings")
+from common.utils.env import load_env_file
+
 django.setup()
-application = get_default_application()
+
+from chat.consumers import ChatConsumer  # noqa: E402
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_FILE = BASE_DIR / '.env'
+load_env_file(ENV_FILE)
+
+application = ProtocolTypeRouter({
+    'http': AsgiHandler(),
+    'websocket': AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter([
+                re_path(r'^ws/chat/$', ChatConsumer.as_asgi(), name='connect',),
+            ])
+        )
+    )
+})

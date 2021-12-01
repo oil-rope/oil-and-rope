@@ -89,7 +89,7 @@
   <!-- D3 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
 
-  {% url 'roleplay:place-detail' object.pk as placeApiUrl %}
+  {% url 'api:roleplay:place-detail' object.pk as placeApiUrl %}
   <script place-api-url="{{ placeApiUrl }}" source-view-element="#treeView"
           src="{% static 'roleplay/js/places/listWorlds.js' %}"></script>
 {% endblock javascript %}

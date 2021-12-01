@@ -10,6 +10,8 @@
 
     <!-- Styles imported -->
     <link rel="stylesheet" href="{{ protocol }}://{{ domain }}{% static 'core/css/oilandrope-theme.min.css' %}">
+    {% block style %}
+    {% endblock style %}
 
     <title>{% block title %}{% endblock title %}</title>
   </head>

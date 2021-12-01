@@ -6,6 +6,7 @@
 {% block title %}{% trans "Login" %}{% endblock title %}
 
 {% block css %}
+  <!--suppress CssReplaceWithShorthandSafely -->
   <style>
     #cover {
       background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url('{% static 'img/cover-min.png' %}');
@@ -28,7 +29,7 @@
 {% endblock css %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Login' no_separation=True %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='login' no_separation=True %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -36,24 +37,37 @@
 
     <div id="cover" class="row min-vh-100 cover justify-content-lg-center">
       <!-- Presentation -->
-      <div class="col-12 text-center pt-3">
+      <div class="col-12 text-center py-3">
         <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="Oil & Rope Logo">
         <h2 class="display-3 text-white font-ds-bold">
           Oil &amp; Rope
         </h2>
+        <small class="lead text-white">
+          <em>&laquo;{{ slogan|default:"i'm rollin' it"|capfirst }}&raquo;</em>
+        </small>
       </div>
 
       <!-- Form -->
       <div class="col-12 col-xl-6">
-        {% crispy form %}
+        <form method="post" action="{% url 'registration:login' %}" id="loginForm">
+          {% crispy form %}
+        </form>
+        <div class="row justify-content-around mt-3 mt-md-5 mb-5">
+          <a href="{% url 'registration:password_reset' %}">
+            {% trans "forgot password?"|capfirst %}
+          </a>
+          <a href="{% url 'registration:resend_email' %}">
+            {% trans "resend email"|capfirst %}
+          </a>
+        </div>
       </div>
 
       <!-- Join -->
-      <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0">
+      <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0 py-lg-3 pt-xl-0 pb-xl-5">
         <p class="lead text-white mr-sm-3 mb-md-0">
-          {% trans "Don't have an account?" %}
+          {% trans "don't have an account?"|capfirst %}
         </p>
-        <a class="lead" href="{% url 'registration:register' %}">{% trans "Join now" %}!</a>
+        <a class="lead" href="{% url 'registration:register' %}">{% trans "join now!"|capfirst %}</a>
       </div>
 
       <!-- Arrow -->

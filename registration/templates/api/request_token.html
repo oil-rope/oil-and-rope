@@ -1,0 +1,42 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "request token"|title %}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Token' no_separation=True %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row justify-content-lg-center">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title text-center">
+              {% trans "your token"|title %}
+            </h5>
+            <h6 class="card-subtitle text-muted text-center">
+              {% trans "you can always look it up by comming back here"|capfirst %}
+            </h6>
+          </div>
+          <div class="card-body">
+            <h3 class="text-center">
+              <code>{{ object.key }}</code>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col-12">
+        <p>
+          {% blocktrans with api='<a target="_blank" href="https://github.com/oil-rope/oil-and-rope/wiki/Server-API">API REST</a>' %}
+            For more information check our {{ api }}.
+          {% endblocktrans %}
+        </p>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}

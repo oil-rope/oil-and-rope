@@ -1,150 +1,71 @@
-import logging
+import json
 
-from django.apps import apps
+import requests
 from django.conf import settings
-from django.shortcuts import reverse
-from django.utils.timezone import is_naive, make_aware
 
-from common.tools.sync import async_get, async_get_or_create
+from bot.enums import HttpMethods
+from bot.exceptions import DiscordApiException
 
-LOGGER = logging.getLogger(__name__)
+NO_ERROR_STATUS = (200, 201, 202, 100, 101)
 
 
-async def get_or_create_discord_user(member):
+def discord_api_request(url, method=HttpMethods.GET, data=None):
     """
-    Searches in database for the given user or creates one if not found.
-
-    Parameters
-    ----------
-    member: :class:`abc.User`
-        Discord API abstract user.
-
-    Returns
-    -------
-    user: :class:`models.DiscordUser`
-        The user fetched.
+    Makes a request to the URL with the current Bot got from settings.
     """
 
-    if not hasattr(member, 'premium_since'):  # pragma: no cover
-        premium_since = None
-    else:
-        premium_since = member.premium_since
-
-    created_at = member.created_at
-    if is_naive(created_at):
-        created_at = make_aware(created_at)
-
-    # Importing DiscordUser inside a function to avoid 'Apps not ready'
-    DiscordUser = apps.get_model('bot.DiscordUser')
-
-    defaults = {
-        'nick': member.display_name,
-        'code': member.discriminator,
-        'avatar_url': member.avatar_url or None,
-        'locale': settings.LANGUAGE_CODE or None,
-        'premium': True if premium_since else False,
-        'created_at': created_at
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bot {settings.BOT_TOKEN}'
     }
-    user, created = await async_get_or_create(DiscordUser, id=member.id, defaults=defaults)
+    if data:
+        data = json.dumps(data)
 
-    if created:
-        logging.info('User %s created', user)
+    if method == HttpMethods.GET:
+        response = requests.get(url, headers=headers, data=data)
+        return response
+    if method == HttpMethods.POST:
+        response = requests.post(url, headers=headers, data=data)
+        return response
+    if method == HttpMethods.PATCH:
+        response = requests.patch(url, headers=headers, data=data)
+        return response
 
-    return user
 
-
-async def get_or_create_discord_server(guild):
+def discord_api_post(url, data=None):
     """
-    Searches in database for the given server or creates one if not found.
-
-    Parameters
-    ----------
-    guild: :class:`discord.Guild`
-        Discord API Guild.
-
-    Returns
-    -------
-    server: :class:`models.DiscordServer`
-        The server fetched.
+    Makes a POST request to the give URL.
     """
 
-    created_at = guild.created_at
-    if is_naive(created_at):
-        created_at = make_aware(created_at)
+    response = discord_api_request(url=url, method=HttpMethods.POST, data=data)
 
-    # Importing DiscordServer inside a function to avoid 'Apps not ready'
-    DiscordServer = apps.get_model('bot.DiscordServer')
+    if response.status_code not in NO_ERROR_STATUS:
+        raise DiscordApiException(response)
 
-    defaults = {
-        'name': guild.name,
-        'region': guild.region.value,
-        'icon_url': guild.icon_url or None,
-        'owner_id': guild.owner_id,
-        'description': guild.description or None,
-        'member_count': guild.member_count,
-        'created_at': created_at
-    }
-    server, created = await async_get_or_create(DiscordServer, id=guild.id, defaults=defaults)
-
-    if created:
-        logging.info('Server %s created', server)
-
-    return server
+    return response
 
 
-async def get_or_create_discord_text_channel(channel, guild):
+def discord_api_get(url):
     """
-    Searches in database for the given text channel or creates one if not found.
-
-    Parameters
-    ----------
-    channel: :class:`discord.channel.TextChannel`
-        Discord API TextChannel.
-    guild: :class:`discord.Guild`
-        Discord API Guild.
-
-    Returns
-    -------
-    text_channel: :class:`models.DiscordTextChannel`
-        The text channel fetched.
+    Makes a GET request to the given URL.
     """
 
-    created_at = channel.created_at
-    if is_naive(created_at):
-        created_at = make_aware(created_at)
+    response = discord_api_request(url=url, method=HttpMethods.GET)
 
-    # Importing DiscordTextChannel inside a function to avoid 'Apps not ready'
-    DiscordTextChannel = apps.get_model('bot.DiscordTextChannel')
+    if response.status_code not in NO_ERROR_STATUS:
+        raise DiscordApiException(response)
 
-    defaults = {
-        'name': channel.name,
-        'position': channel.position,
-        'nsfw': channel.is_nsfw(),
-        'topic': channel.topic or None,
-        'news': channel.is_news(),
-        'created_at': created_at,
-        'server_id': guild.id
-    }
-    text_channel, created = await async_get_or_create(DiscordTextChannel, id=channel.id, defaults=defaults)
-
-    if created:
-        logging.info('Text Channel %s created', text_channel)
-
-    return text_channel
+    return response
 
 
-async def get_url_from(resolver, site_id=settings.SITE_ID, secure=settings.DEBUG, kwargs=None):
+def discord_api_patch(url, data=None):
     """
-    Constructs absolute URL from given params.
+    Makes a PATCH request to the given URL.
     """
 
-    Site = apps.get_model('sites.Site')
-    site = await async_get(Site, pk=site_id)
-    http_protocol = 'http://' if secure else 'http://'
-    if kwargs:
-        reverse_url = reverse(resolver, kwargs=kwargs)
-    else:
-        reverse_url = reverse(resolver)
-    url = f'{http_protocol}{site.domain}{reverse_url}'
+    response = discord_api_request(url=url, method=HttpMethods.PATCH, data=data)
 
-    return url
+    if response.status_code not in NO_ERROR_STATUS:
+        raise DiscordApiException(response)
+
+    return response

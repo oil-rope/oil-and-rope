@@ -12,28 +12,27 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from distutils.util import strtobool as to_bool
+from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
 
 if 'ALLOWED_HOSTS' in os.environ:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'oilandrope-project.com').split(',')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.oilandrope-project.com').split(',')
 else:
     ALLOWED_HOSTS = [
-        'oil-and-rope.herokuapp.com',
-        'oilandrope-project.com'
+        '.oilandrope-project.com',
     ]
 
 # Defines Admins
@@ -50,7 +49,6 @@ ADMINS = [
 MANAGERS = ADMINS
 
 # Application definition
-
 INSTALLED_APPS = [
     # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
     # Must be settled before 'django.contrib.admin' to work correctly on admin
@@ -61,10 +59,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -73,10 +71,22 @@ INSTALLED_APPS = [
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)
     'rest_framework',
+    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
+    'rest_framework.authtoken',
+    # Django CORS (https://github.com/adamchainz/django-cors-headers)
+    'corsheaders',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
+    # DjangoAllAuth (https://django-allauth.readthedocs.io/)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # DjangoAllAuth for Google (https://django-allauth.readthedocs.io/en/latest/providers.html#google)
+    'allauth.socialaccount.providers.google',
     # Source
     'core.apps.CoreConfig',
+    # API
+    'api.apps.ApiConfig',
     # Common
     'common.apps.CommonConfig',
     # Dynamic Menu
@@ -93,16 +103,17 @@ INSTALLED_APPS = [
     'roleplay.apps.RoleplayConfig'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'dynamic_menu.middleware.DynamicMenuMiddleware',
 ]
 
 # SITE_ID = 1 is for declaring page ID
@@ -116,8 +127,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'email/templates/'),
-            os.path.join(BASE_DIR, 'common/templates/errors/')
+            BASE_DIR / 'email/templates/',
+            BASE_DIR / 'common/templates/errors/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -137,10 +148,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
 
 # DjangoChannels ASGI Router
-ASGI_APPLICATION = 'oilandrope.routing.application'
+ASGI_APPLICATION = 'oilandrope.asgi.application'
 
-WS_HOST = os.getenv('WS_HOST', None)
-
+# Channel Layers
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                (os.environ['CHANNEL_LAYER_HOST'], 6379)
+            ],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -148,17 +168,21 @@ WS_HOST = os.getenv('WS_HOST', None)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'oilandrope'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
         'PORT': os.getenv('DB_PORT', '5432'),
         'TEST': {
-            'NAME': os.getenv('DB_TEST_NAME', 'test_{}'.format(os.getenv('DB_NAME', 'oilandrope')))
+            'NAME': 'test_{}'.format(os.environ['DB_NAME'])
         },
     },
 }
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -178,6 +202,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Model to use for User
+# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-user-model
+
+AUTH_USER_MODEL = 'registration.User'
+
+# Authentication systems
+# https://docs.djangoproject.com/en/3.1/ref/settings/#authentication-backends
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'registration.backends.EmailBackend',
+    # `allauth` authentication by specific allowed methods
+    # https://django-allauth.readthedocs.io/en/latest/overview.html
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -188,8 +227,8 @@ LANGUAGE_CODE = 'en'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#languages
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('es', _('Spanish')),
+    ('en', _('english')),
+    ('es', _('spanish')),
 ]
 
 TIME_ZONE = 'UTC'
@@ -203,13 +242,23 @@ USE_TZ = True
 # Translation files
 
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale/')
+    BASE_DIR / 'locale/',
 ]
+
+# Session expire date
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-age
+
+SESSION_COOKIE_AGE = 172800
+
+# Session accesible from JavaScript
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-httponly
+
+SESSION_COOKIE_HTTPONLY = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static/'))
+STATIC_ROOT = os.getenv('STATIC_ROOT', BASE_DIR / 'static/')
 STATIC_URL = os.getenv('STATIC_URL', '/static/')
 
 # Login System
@@ -222,7 +271,7 @@ LOGOUT_REDIRECT_URL = 'registration:login'
 # Media files
 # https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
 
-MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(BASE_DIR, 'media/'))
+MEDIA_ROOT = os.getenv('MEDIA_ROOT', BASE_DIR / 'media/')
 MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 
 # The maximum size (in bytes)
@@ -234,6 +283,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 6291456
 # https://docs.djangoproject.com/en/3.0/ref/settings/#data-upload-max-memory-size
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = FILE_UPLOAD_MAX_MEMORY_SIZE
+
+# Using Pytest as test runner
+# https://pytest-django.readthedocs.io/en/latest/faq.html#how-can-i-use-manage-py-test-with-pytest-django
+
+TEST_RUNNER = 'oilandrope.runner.PytestTestRunner'
 
 # CKEditor
 # https://django-ckeditor.readthedocs.io/en/latest/#optional-customizing-ckeditor-editor
@@ -264,12 +318,13 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
 }
 
 # Email System
@@ -277,11 +332,58 @@ REST_FRAMEWORK = {
 
 DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[Oil & Rope] '
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST = os.environ['EMAIL_HOST'],
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER'],
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD'],
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
+
+# CORS System
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_methods
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# https://github.com/adamchainz/django-cors-headers#cors_urls_regex
+
+CORS_URLS_REGEX = r'^/\w+/api/.*$'
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_headers
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+    },
+}
 
 # Discord
 
@@ -293,6 +395,22 @@ BOT_INVITATION = os.getenv(
     'BOT_INVITATION',
     'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
 )
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.environ['BOT_TOKEN']
 BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
 BOT_DESCRIPTION = os.getenv('BOT_DESCRIPTION', 'Oil & Rope Bot: Managing sessions was never this easy!')
+
+# Extra stuff just for fun
+SLOGANS = (
+    'Being Ahead through Natural 20',
+    'I\'m Rollin\' it',
+    'I\'m Oilin\' it',
+    'Rol Runs on Oil&Rope',
+    'Stronger than Rope',
+    'Sheer Rolling Pleasure',
+    'Rol It Your Way',
+    'It keeps rolling... and rolling... and rolling',
+    'The Relentless Pursuit of Oil & Rope',
+    'Taste the Oil',
+    'Just Roll It',
+    'Where\'s the Oil?',
+)

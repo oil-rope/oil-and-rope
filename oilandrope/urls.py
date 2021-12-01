@@ -19,34 +19,36 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
-    re_path(r'^ws/bot/', include('bot.routing'))
+    # JavaScript translations
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
 urlpatterns += i18n_patterns(
-    # JavaScript translations
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     # Main site
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
+    # API
+    path('api/', include('api.urls')),
     # Common
     path('common/', include('common.urls')),
     # Auth system
     path('accounts/', include('registration.urls')),
+    # oAuth
+    path('oauth/', include('allauth.urls')),
     # Bot
     path('bot/', include('bot.urls')),
-    # Chat
-    path('chat/', include('chat.urls')),
     # Dynamic Menu
     path('dynamic_menu/', include('dynamic_menu.urls')),
     # React FrontEnd
     path('frontend/', include('frontend.urls')),
     # Roleplay
     path('roleplay/', include('roleplay.urls')),
+    prefix_default_language=True,
 )
 
 if settings.DEBUG:  # pragma: no cover

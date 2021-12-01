@@ -1,0 +1,51 @@
+{% extends 'email_templates/email_layout.html' %}
+{% load i18n %}
+
+{% block style %}
+  <style>
+    {{ style }}
+  </style>
+{% endblock style %}
+
+{% block title %}{% trans "You've been invited!" %}{% endblock title %}
+
+{% block content %}
+  <main class="container py-5">
+    <h1 class="text-center">
+      {% blocktrans with name=object.name %}
+        You've been invited to {{ name }}!
+      {% endblocktrans %}
+    </h1>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col-12">
+        <p class="lead text-center">
+          {% url "roleplay:world_detail" object.world.pk as world_link %}
+          {% blocktrans with gm=object.game_master world_name=object.world.name %}
+            {{ gm }} invites you to join into an epic quest in the world of
+            <a class="btn btn-link"
+               href="{{ protocol }}://{{ domain }}{{ world_link }}"
+            >
+              {{ world_name }}
+            </a>.
+          {% endblocktrans %}
+        </p>
+        <h4 class="text-center">
+          {% blocktrans with name=object.name %}
+            The adventure of <em>"{{ name }}"</em> awaits for you!
+          {% endblocktrans %}
+        </h4>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-5">
+        {% url "roleplay:session:join" object.pk as join_url %}
+        <a href="{{ protocol }}://{{ domain }}{{ join_url }}"
+           class="btn btn-lg btn-primary w-100"
+        >
+          {% trans "Join now!" %}
+        </a>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

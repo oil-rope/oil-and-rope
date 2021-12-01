@@ -1,76 +1,71 @@
-version: "3.9"
+version: '3.9'
 
 volumes:
-  postgres_db_data:
-  gunicorn_sockets:
-  daphne_sockets:
+  db_data:
+
+networks:
+  external_network:
+    driver: bridge
+    attachable: true
+    name: oilandrope_external
+  internal_network:
+    driver: bridge
+    attachable: false
+    name: oilandrope_internal
 
 services:
-  postgres_db:
-    image: postgres:11.7
+  database:
+    image: postgres:14.0-alpine
+    restart: unless-stopped
     env_file:
-      - ./compose/postgres/postgres.env
-    # Saving data on local
+      - ./.env
+    networks:
+      internal_network:
+        aliases:
+          - database
+          - postgres
     volumes:
-      - "postgres_db_data:/var/lib/postgresql/data/"
+      - type: volume
+        source: db_data
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: p4ssw0rd
+      POSTGRES_DB: oilandrope
 
-  django:
-    image: oil-and-rope:latest
+  oilandrope:
     build:
       context: .
-      dockerfile: ./compose/django/Dockerfile
-    command: /command.sh
-    depends_on:
-      - postgres_db
-    dns_search: oilandrope-project.com
-    entrypoint: /entrypoint.sh
-    env_file:
-      - ./compose/django/django.env
-    expose:
-      - "80"
-    volumes:
-      - "./:/app/"
-      - "./compose/django/entrypoint.sh:/entrypoint.sh"
-      - "./compose/django/command.sh:/command.sh"
-      - "./compose/django/logs/:/var/log/gunicorn/"
-      - "gunicorn_sockets:/var/run/gunicorn/"
+      dockerfile: ./compose/oilandrope/Dockerfile
+    image: lecuay/oilandrope:dev
     working_dir: /app/
-
-  channels:
-    image: oil-and-rope:latest
-    command: /command.sh
-    depends_on:
-      - django
-      - postgres_db
-    dns_search: live.oilandrope.com
-    entrypoint: /entrypoint.sh
     env_file:
-      - ./compose/django/django.env
-    expose:
-      - "80"
-    volumes:
-      - "./:/app/"
-      - "./compose/django/entrypoint.sh:/entrypoint.sh"
-      - "./compose/channels/command.sh:/command.sh"
-      - "./compose/channels/logs/:/var/log/daphne/"
-      - "daphne_sockets:/var/run/daphne/"
-    working_dir: /app/
+      - ./.env
+    networks:
+      internal_network:
+        aliases:
+          - oilandrope
+          - django
+      external_network:
+        aliases:
+          - oilandrope
+          - django
 
-  nginx:
-    image: nginx:latest
-    depends_on:
-      - django
-      - channels
+  proxy:
+    image: nginx:1.21.3-alpine
     ports:
-      - "127.0.0.1:8000:80/tcp"
-      - "127.0.0.1:443:433/tcp"
+      - target: 80
+        published: 8080
+        protocol: tcp
+    networks:
+      external_network:
+        aliases:
+          - web
+          - nginx
+          - proxy
     volumes:
-      - "./static:/static"
-      - "./media:/media"
-      - "./compose/nginx/conf.d/:/etc/nginx/conf.d/"
-      - "./compose/nginx/sites-available/:/etc/nginx/sites-available/"
-      - "./compose/nginx/sites-available/:/etc/nginx/sites-enabled/"
-      - "./compose/nginx/nginx.conf:/etc/nginx/nginx.conf"
-      - "./compose/nginx/logs/:/var/log/nginx/"
-      - "gunicorn_sockets:/var/run/gunicorn/"
-      - "daphne_sockets:/var/run/daphne/"
+      - type: bind
+        source: ./static/
+        target: /usr/share/static/
+      - type: bind
+        source: ./media/
+        target: /usr/share/media/

@@ -21,10 +21,9 @@ class TestDynamicMenuForm(TestCase):
             'name': self.faker.name(),
             'appended_text': random.choice(self.icons),
             'url_resolver': 'core:home',
-            'permissions_required': 'auth.view_user, auth.change_user, auth.add_user',
-            'related_models': 'auth.User, auth.Group',
+            'permissions_required': 'registration.view_user, registration.change_user, registration.add_user',
+            'related_models': 'registration.User, auth.Group',
             'staff_required': self.faker.pybool(),
-            'superuser_required': self.faker.pybool(),
             'order': 0,
             'menu_type': enums.MenuTypes.MAIN_MENU
         }
@@ -72,13 +71,6 @@ class TestDynamicMenuForm(TestCase):
     def test_data_without_staff_required_ok(self):
         data_ko = self.data_ok.copy()
         del data_ko['staff_required']
-        form = self.form_class(data=data_ko)
-
-        self.assertTrue(form.is_valid())
-
-    def test_data_without_superuser_required_ok(self):
-        data_ko = self.data_ok.copy()
-        del data_ko['superuser_required']
         form = self.form_class(data=data_ko)
 
         self.assertTrue(form.is_valid())

@@ -66,14 +66,7 @@ $(() => {
 	 */
 	const handleChangeEvent = (e) => {
 		let el = e.target;
-		if (
-			el === prependedSelect ||
-			el === nameInput ||
-			el === appendedSelect
-		) {
-			displayName = `${prependedSelect.value || ""} ${
-				nameInput.value || ""
-			} ${appendedSelect.value || ""}`;
+		if (el === prependedSelect || el === nameInput || el === appendedSelect) {
 			changeDisplayName();
 		}
 

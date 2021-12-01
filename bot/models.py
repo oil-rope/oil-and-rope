@@ -1,197 +1,188 @@
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
-from core.models import TracingMixin
+from bot.enums import ChannelTypes, MessageTypes
+from bot.exceptions import HelpfulError
+from bot.utils import discord_api_get, discord_api_patch, discord_api_post
 
 
-class DiscordUser(TracingMixin):
+class ApiMixin:
     """
-    Model that manages Discord Users.
-
-    Parameters
-    ----------
-    id: :class:`str`
-        Identifier for the user (same as Discord).
-    user: Optional[:class:`User`]
-        User associated to this model if there's any.
-    code: :class:`int`
-        Code discriminator for the name.
-    avatar_url: Optional[:class:`str`]
-        URL to the Discord User's avatar.
-    locale: Optional[:class:`str`]
-        IETF language tag.
-    premium: :class:`int`
-        Declares if discord user is premium.
-    created_at: :class:`datetime.datetime`
-        Declares when user joined Discord.
+    This class loads content from `response` into class attributtes.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    user = models.OneToOneField('auth.User', verbose_name=_('User'), on_delete=models.CASCADE,
-                                related_name='discord_user', blank=True, null=True)
-    nick = models.CharField(verbose_name=_('Nick'), max_length=50)
-    code = models.PositiveSmallIntegerField(verbose_name=_('Code'))
-    avatar_url = models.URLField(verbose_name=_('Avatar URL'), max_length=254, null=True, blank=True)
-    locale = models.CharField(verbose_name=_('Locale'), max_length=10, null=True, blank=True)
-    premium = models.BooleanField(verbose_name=_('Premium'), default=False)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
+    def __init__(self, url=None, *, response=None):
+        self.url = self.get_url(url)
 
-    class Meta:
-        verbose_name = _('Discord User')
-        verbose_name_plural = _('Discord Users')
-        ordering = ['nick', '-created_at', '-entry_updated_at']
+        if not self.url:
+            raise HelpfulError('URL cannot be None.', 'Please declare a url or overwrite `get_url` method.')
+
+        if response:
+            self.response = response
+        else:
+            self.response = discord_api_get(self.url)
+        self.json_response = self.response.json()
+
+        # Magic attributes
+        for key, value in self.json_response.items():
+            setattr(self, key, value)
+
+        # Turning ID into int again
+        # This will about some parsing issues
+        self.id = int(self.id)
+
+    def get_url(self, url=None):
+        return url
+
+
+class User(ApiMixin):
+    """
+    Represents a Discord User.
+    """
+
+    def __init__(self, id, *, response=None):
+        self.id = id
+        self.base_url = self.get_base_url()
+        super().__init__(self.get_url(), response=response)
+
+    @classmethod
+    def from_bot(cls):
+        url = f'{cls.get_base_url()}@me'
+        response = discord_api_get(url)
+        response_json = response.json()
+        return cls(response_json['id'], response=response)
+
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}users/'
+
+    def get_url(self, url=None):
+        return f'{self.base_url}{self.id}'
+
+    def create_dm(self):
+        """
+        Creates a DM with this User.
+        """
+
+        url = f'{self.base_url}@me/channels'
+        data = {
+            'recipient_id': self.id
+        }
+        response = discord_api_post(url, data)
+        json_response = response.json()
+        channel_id = json_response['id']
+
+        # Creating object from response should be faster
+        return Channel(channel_id, response=response)
+
+    def send_message(self, content, embed=None):
+        """
+        Sends a message to this user.
+        """
+
+        dm = self.create_dm()
+        response = dm.send_message(content, embed=embed)
+        return response
 
     def __str__(self):
-        return '{}#{}'.format(self.nick, self.code)
+        return f'{self.username} ({self.id})'
+
+    def __repr__(self):
+        return self.__str__()
 
 
-class DiscordServer(TracingMixin):
+class Channel(ApiMixin):
     """
-    Model that manages Discord Servers.
-
-    Parameters
-    ----------
-    id: :class:`str`
-        Identifier for the server.
-    name: :class:`str`
-        The name of the server.
-    region: :class:`str`
-        Declares region of the server.
-    icon_url: Optional[:class:`str`]
-        URL to the server's icon.
-    owner: :class:`DiscordUser`
-        Owner of the server.
-    description: :class:`str`
-        Description about the server.
-    member_count: :class:`int`
-        Quantity of members.
-    created_at: :class:`datetime.datetime`
-        Declares when the server was created.
-    discord_users: List[:class:`DiscordUser`]
-        List with all Discord Users in this server.
+    Represents a Discord Channel.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    region = models.CharField(verbose_name=_('Region'), max_length=20)
-    icon_url = models.URLField(verbose_name=_('Icon URL'), max_length=254, null=True, blank=True)
-    owner = models.ForeignKey('bot.DiscordUser', verbose_name=_('Owner'), on_delete=models.CASCADE,
-                              related_name='owner_servers', db_index=True)
-    description = models.TextField(verbose_name=_('Description'), null=True, blank=True)
-    member_count = models.PositiveSmallIntegerField(verbose_name=_('Member count'), default=0)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_servers')
+    def __init__(self, id, *, response=None):
+        self.id = id
+        self.base_url = self.get_base_url()
 
-    class Meta:
-        verbose_name = _('Discord Server')
-        verbose_name_plural = _('Discord Servers')
-        ordering = ['name', '-created_at', '-entry_updated_at']
+        super().__init__(self.get_url(), response=response)
+        self.type = ChannelTypes(self.type)
+
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}channels/'
+
+    def get_url(self, url=None):
+        return f'{self.base_url}{self.id}'
+
+    def send_message(self, content, embed=None):
+        url = f'{self.url}/messages'
+        data = {
+            'content': content
+        }
+
+        if embed:
+            data['embed'] = embed.data
+
+        response = discord_api_post(url, data)
+        msg_id = response.json()['id']
+
+        # Creating message from given response should be faster
+        msg = Message(self, msg_id, embed=embed, response=response)
+        return msg
 
     def __str__(self):
-        return 'Server {} ({})'.format(self.name, self.pk)
+        if hasattr(self, 'name'):
+            return f'Channel {self.name} ({self.id})'
+        return f'Channel {self.type.name} ({self.id})'
+
+    def __repr__(self):
+        return self.__str__()
 
 
-class DiscordChannelMixin(models.Model):
+class Message(ApiMixin):
     """
-    Base model for a Discord channel.
+    Represents a Discord Message.
 
     Parameters
     ----------
-    id: :class:`str`
-        Identifier for the channel.
-    name: :class:`str`
-        The name of the channel.
-    position: :class:`int`
-        The position of the channel.
-    created_at: :class:`datetime.datetime`
-        Declares when the server was created.
+    channel: :class:`Channel` or :class:`str` or :class:`int`
+        Instance of channel or ID.
+    id: :class:`str` or :class:`int`
+        ID of the message.
+    response: :class:`requests.models.Response`
+        Response attached to this message.
     """
 
-    id = models.CharField(verbose_name=_('Identifier'), max_length=254, primary_key=True)
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    position = models.PositiveSmallIntegerField(verbose_name=_('Position'), default=0)
-    created_at = models.DateTimeField(verbose_name=_('Created at'))
+    def __init__(self, channel, id, *, embed=None, response=None):
+        self.base_url = self.get_base_url()
+        if isinstance(channel, Channel):
+            self.channel = channel
+        else:
+            self.channel = Channel(channel)
+        self.base_url = f'{self.base_url}{self.channel.id}/messages'
+        self.id = id
+        self.embed = embed
 
-    class Meta:
-        abstract = True
+        super().__init__(self.get_url(), response=response)
+        self.type = MessageTypes(self.type)
 
+    def edit(self, content):
+        """
+        Edits the given message.
+        """
 
-class DiscordTextChannel(TracingMixin, DiscordChannelMixin):
-    """
-    Model that manages a Discord Text Channel.
+        url = f'{self.base_url}/{self.id}'
+        data = {
+            'content': content
+        }
+        response = discord_api_patch(url, data)
 
-    Parameters
-    ----------
-    id: :class:`str`
-        Identifier for the channel.
-    name: :class:`str`
-        The name of the channel.
-    position: :class:`int`
-        The position of the channel.
-    nsfw: :class:`bool`
-        Declares if the channel is NSFW.
-    topic: Optional[:class:`str`]
-        Topic of the channel.
-    news: :class:`bool`
-        Declares is channel is New.
-    created_at: :class:`datetime.datetime`
-        Declares when the server was created.
-    server: :class:`bot.DiscordServer`
-        The serve where this text channel is hosted.
-    discord_users: List[:class:`DiscordUser`]
-        List with all Discord Users in this text channel.
-    """
+        return Message(self.channel, self.id, response=response)
 
-    nsfw = models.BooleanField(verbose_name=_('NSFW'), default=False, blank=True)
-    topic = models.CharField(verbose_name=_('Topic'), max_length=100, null=True, blank=True)
-    news = models.BooleanField(verbose_name=_('News'), default=False, blank=True)
-    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
-                               on_delete=models.CASCADE, related_name='discord_text_channels')
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_text_channels')
+    @classmethod
+    def get_base_url(cls):
+        return f'{settings.DISCORD_API_URL}channels/'
 
-    class Meta:
-        verbose_name = _('Discord Text Channel')
-        verbose_name_plural = _('Discord Text Channels')
-        ordering = ['name', '-created_at', '-entry_updated_at']
+    def get_url(self, url=None):
+        return f'{self.base_url}/{self.id}'
 
     def __str__(self):
-        return 'Text Channel {} ({})'.format(self.name, self.pk)
+        return f'({self.id}): {self.content}'
 
-
-class DiscordVoiceChannel(TracingMixin, DiscordChannelMixin):
-    """
-    Model that manages a Discord Voice Channel.
-
-    Parameters
-    ----------
-    id: :class:`str`
-        Identifier for the channel.
-    name: :class:`str`
-        The name of the channel.
-    position: :class:`int`
-        The position of the channel.
-    bitrate: :class:`int`
-        Declares the bitrate of the channel.
-    created_at: :class:`datetime.datetime`
-        Declares when the server was created.
-    server: :class:`bot.DiscordServer`
-        The serve where this voice channel is hosted.
-    discord_users: List[:class:`DiscordUser`]
-        List with all Discord Users in this voice channel.
-    """
-
-    bitrate = models.PositiveSmallIntegerField(verbose_name=_('Bitrate'))
-    server = models.ForeignKey("bot.DiscordServer", verbose_name=_("Discord Server"),
-                               on_delete=models.CASCADE, related_name='discord_voice_channels')
-    discord_users = models.ManyToManyField('bot.DiscordUser', verbose_name=_('Discord Users'),
-                                           related_name='discord_voice_channels')
-
-    class Meta:
-        verbose_name = _('Discord Voice Channel')
-        verbose_name_plural = _('Discord Voice Channels')
-        ordering = ['name', '-created_at', '-entry_updated_at']
-
-    def __str__(self):
-        return self.name
+    def __repr__(self):
+        return self.__str__()

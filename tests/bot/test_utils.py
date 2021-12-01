@@ -1,70 +1,86 @@
+import unittest
 
-import pytest
-from django.contrib.sites.models import Site
-from django.shortcuts import reverse
-from model_bakery import baker
+from django.conf import settings
+from django.test import TestCase, override_settings
+from faker.proxy import Faker
 
-from bot.models import DiscordServer, DiscordTextChannel, DiscordUser
-from bot.utils import (get_or_create_discord_server, get_or_create_discord_text_channel, get_or_create_discord_user,
-                       get_url_from)
-from common.tools.sync import async_get
-
-from .helpers import mocks
-
-
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.asyncio
-async def test_get_or_create_discord_user_ok():
-    member = mocks.MemberMock()
-
-    discord_user = await get_or_create_discord_user(member)
-    await async_get(DiscordUser, pk=discord_user.pk)
+from bot.exceptions import DiscordApiException
+from bot.utils import discord_api_get, discord_api_patch, discord_api_post
+from tests.bot.helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
+                                         USER_WITH_SAME_SERVER)
+from tests.utils import check_litecord_connection
 
 
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.asyncio
-async def test_get_or_create_discord_server_ok():
-    guild = mocks.GuildMock()
-    member = guild.owner
-    await get_or_create_discord_user(member)
+@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable')
+@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+class TestDiscordApiRequest(TestCase):
 
-    discord_server = await get_or_create_discord_server(guild)
-    await async_get(DiscordServer, pk=discord_server.pk)
+    def setUp(self):
+        self.faker = Faker()
+        self.users_url = f'{settings.DISCORD_API_URL}users'
+        self.bot_url = f'{self.users_url}/@me'
+        self.dm_url = f'{self.users_url}/@me/channels'
+        self.channels_url = f'{settings.DISCORD_API_URL}channels'
 
+    def test_discord_api_get_ok(self):
+        url = f'{self.users_url}/{USER_WITH_SAME_SERVER}'
+        response = discord_api_get(url)
 
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.asyncio
-async def test_get_or_create_discord_text_channel_ok():
-    channel = mocks.TextChannelMock()
-    guild = channel.guild
-    member = guild.owner
-    await get_or_create_discord_user(member)
-    await get_or_create_discord_server(guild)
+        self.assertEqual(200, response.status_code)
 
-    discord_text_channel = await get_or_create_discord_text_channel(channel, guild)
-    await async_get(DiscordTextChannel, pk=discord_text_channel.pk)
+    def test_discord_api_get_ko(self):
+        url = f'{self.dm_url}/{self.faker.pyint(min_value=1)}'
 
+        with self.assertRaises(DiscordApiException) as ex:
+            discord_api_get(url)
+        ex = ex.exception
+        self.assertEqual(404, ex.error_code)
 
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.asyncio
-async def test_get_url_from_without_kwargs_ok():
-    site = Site.objects.first()
-    url = reverse('core:home')
-    expected = f'http://{site.domain}{url}'
-    result = await get_url_from('core:home')
+    def test_discord_api_post_ok(self):
+        data = {
+            'recipient_id': USER_WITH_SAME_SERVER
+        }
+        response = discord_api_post(f'{self.dm_url}', data=data)
 
-    assert expected == result
+        self.assertEqual(200, response.status_code)
 
+    # Accessing unexistent user as bot
+    @override_settings(BOT_TOKEN='this_is_an_unexistent_token')
+    def test_discord_api_post_ko(self):
+        data = {
+            'recipient_id': USER_WITH_DIFFERENT_SERVER
+        }
 
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.asyncio
-async def test_get_url_from_with_kwargs_ok():
-    # We setup a world for testing
-    world = baker.make('roleplay.Place')
-    url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+        with self.assertRaises(DiscordApiException) as ex:
+            discord_api_post(f'{self.dm_url}', data=data)
+        ex = ex.exception
+        self.assertEqual(401, ex.error_code)
 
-    site = Site.objects.first()
-    expected = f'http://{site.domain}{url}'
-    result = await get_url_from('roleplay:world_detail', kwargs={'pk': world.pk})
+    def test_discord_api_patch_ok(self):
+        url = f'{self.channels_url}/{CHANNEL}'
+        msg_url = f'{url}/messages'
+        msg_json = discord_api_post(msg_url, data={'content': self.faker.word()}).json()
+        msg_id = msg_json['id']
+        url = f'{msg_url}/{msg_id}'
+        response = discord_api_patch(url, data={'content': self.faker.word()})
 
-    assert expected == result
+        self.assertEqual(200, response.status_code)
+
+    def test_discord_api_patch_ko(self):
+        url = f'{self.channels_url}/{CHANNEL}/messages/{self.faker.pyint(min_value=1)}'
+
+        with self.assertRaises(DiscordApiException) as ex:
+            discord_api_patch(url, data={'content': self.faker.word()})
+        ex = ex.exception
+        self.assertEqual(ex.error_code, 403)
+
+    def test_internal_server_error(self):
+        url = f'{self.dm_url}'
+        data = {
+            'recipient_id': self.faker.pyint(min_value=1)
+        }
+
+        with self.assertRaises(DiscordApiException) as ex:
+            discord_api_post(url, data=data)
+        ex = ex.exception
+        self.assertEqual(500, ex.error_code)
