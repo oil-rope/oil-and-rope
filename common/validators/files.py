@@ -15,9 +15,9 @@ def validate_file_size(value):
     max_size = settings.FILE_UPLOAD_MAX_MEMORY_SIZE
     if value.size > max_size:
         mb_size = max_size_file_mb()
-        max_size_msg = _('Size should not exceed %(megabytes)s MiB') % {'megabytes': mb_size}
-        msg = _('File too large')
-        raise ValidationError(f'{msg}. {max_size_msg}.')
+        max_size_msg = _('size should not exceed %(megabytes)s MiB') % {'megabytes': mb_size}
+        msg = _('file too large')
+        raise ValidationError(f'{msg.capitalize()}. {max_size_msg.capitalize()}.')
 
 
 def validate_music_file(value):
@@ -27,5 +27,5 @@ def validate_music_file(value):
 
     extensions = [key for key, value in mimetypes.types_map.items() if 'audio/' in value]
     if not value.name.endswith(tuple(extensions)):
-        msg = _('File is not an audio')
-        raise ValidationError(f'{msg}.')
+        msg = _('file is not an audio')
+        raise ValidationError(f'{msg.capitalize()}.')

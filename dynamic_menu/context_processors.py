@@ -1,5 +1,4 @@
 from . import models
-from .enums import MenuTypes
 
 
 def filter_menus(menus, user):

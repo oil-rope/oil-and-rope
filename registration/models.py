@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.functional import keep_lazy
+from django.utils.functional import cached_property, keep_lazy
 from django.utils.translation import gettext_lazy as _
 
 from common.constants import models as constants

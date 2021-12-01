@@ -9,7 +9,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from common.constants import models as constants
 from common.files.upload import default_upload_to
-from common.validators import validate_file_size, validate_music_file
+from common.validators import validate_file_size
 from core.models import TracingMixin
 from roleplay.enums import RoleplaySystems
 
