@@ -56,8 +56,8 @@ jobs:
 
       - name: Django Check
         run: |
-          python manage.py migrate
-          python manage.py check
+          python manage.py migrate --settings oilandrope.dev_settings
+          python manage.py check --settings oilandrope.dev_settings
 
   node-build:
     name: Node Build
