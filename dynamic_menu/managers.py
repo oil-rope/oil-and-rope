@@ -22,7 +22,7 @@ class DynamicMenuManager(models.Manager):
 
         # Getting all menus and union
         non_perms_menus = self.filter(permissions_required__isnull=True)
-        menus = self.filter(pk__in=menus).union(non_perms_menus).distinct()
+        menus = self.filter(pk__in=menus).union(non_perms_menus)
         menus = list(menus)
 
         # Filter by staff and superuser

@@ -145,24 +145,6 @@ class TestMenuContextProcessor(TestCase):
 
         self.assertEqual(count, len(menus['context_menus']))
 
-    def test_non_existent_menu_parent_ko(self):
-        menu = DynamicMenu.objects.create(
-            name=self.faker.word(),
-            menu_type=MenuTypes.MAIN_MENU
-        )
-        DynamicMenu.objects.create(
-            name=self.faker.word(),
-            menu_type=MenuTypes.CONTEXT_MENU,
-            parent=menu
-        )
-        request = RequestFactory().get('/')
-        request.user = self.user
-        request.COOKIES['_auth_user_menu_referrer'] = self.faker.pyint(100, 1000)
-        menus = context_processors.menus(request)
-
-        self.assertEqual(0, len(menus['context_menus']))
-        self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])
-
 
 class TestFilterMenus(TestCase):
 
