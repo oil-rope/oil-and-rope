@@ -160,7 +160,7 @@ class TestMenuContextProcessor(TestCase):
         request.COOKIES['_auth_user_menu_referrer'] = self.faker.pyint(100, 1000)
         menus = context_processors.menus(request)
 
-        self.assertEqual(0, menus['context_menus'].count())
+        self.assertEqual(0, len(menus['context_menus']))
         self.assertIsNone(request.COOKIES['_auth_user_menu_referrer'])
 
 
