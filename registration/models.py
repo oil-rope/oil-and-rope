@@ -116,9 +116,6 @@ class Profile(TracingMixin):
         # Filtering by staff required
         if not user.is_staff:
             menus = {menu for menu in menus if not menu.staff_required}
-        # Filtering by superuser
-        if not user.is_superuser:
-            menus = {menu for menu in menus if not menu.superuser_required}
 
         return list(menus)
     menus = cached_property(get_menus, name='menus')

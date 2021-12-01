@@ -143,7 +143,7 @@ class TestMenuContextProcessor(TestCase):
         request.COOKIES['_auth_user_menu_referrer'] = menu.id
         menus = context_processors.menus(request)
 
-        self.assertEqual(count, menus['context_menus'].count())
+        self.assertEqual(count, len(menus['context_menus']))
 
     def test_non_existent_menu_parent_ko(self):
         menu = DynamicMenu.objects.create(

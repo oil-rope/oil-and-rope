@@ -28,7 +28,5 @@ class DynamicMenuManager(models.Manager):
         # Filter by staff and superuser
         if not user.is_staff:
             menus = [menu for menu in menus if not menu.staff_required]
-        if not user.is_superuser:
-            menus = [menu for menu in menus if not menu.superuser_required]
 
         return menus
