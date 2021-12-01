@@ -10,7 +10,6 @@ jobs:
     name: Python Build
     runs-on: ubuntu-latest
     env:
-      DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     # Redis
@@ -52,7 +51,7 @@ jobs:
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test
+          coverage run manage.py test --settings oilandrope.dev_settings
           coverage xml
 
       - name: Django Check
