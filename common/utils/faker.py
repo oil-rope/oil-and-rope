@@ -2,10 +2,11 @@ from django.conf import settings
 from faker import Faker
 
 
-def create_faker() -> Faker:
+def create_faker(locales: list = []) -> Faker:
     """
     Creates a :class:`Faker` setting locales from django settings languages.
     """
 
-    fake = Faker([lan[0] for lan in settings.LANGUAGES])
+    locales = locales or [lan[0] for lan in settings.LANGUAGES]
+    fake = Faker(locales)
     return fake

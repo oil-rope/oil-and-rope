@@ -151,7 +151,7 @@ class Profile(TracingMixin):
 @receiver(post_save, sender=get_user_model())
 def create_profile_post_save_receiver(instance, **kwargs):
     """
-    Creates a :class:`Profile` once a :class:`auth.User` is created.
+    Creates a :class:`Profile` once a :class:`registration.User` is created.
     """
 
     if kwargs.get('created', False):

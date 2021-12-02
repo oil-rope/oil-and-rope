@@ -74,9 +74,9 @@ class Place(MPTTModel, TracingMixin):
         Path to the image.
     parent_site: :class:`int`
        If the place is child of another Place, this is where it can be settled.
-    user: :class:`auth.User`
+    user: :class:`registration.User`
         Declares this maps belongs to a user.
-    owner: :class:`auth.User`
+    owner: :class:`registration.User`
         The person who created this map.
     """
 
@@ -437,7 +437,7 @@ class Session(TracingMixin):
         Next session's date.
     system: :class:`int`
         System used.
-    game_master: :class:`auth.User`
+    game_master: :class:`registration.User`
         The GM of the session.
     world: :class:`roleplay.Place`
         The world where this session is played.

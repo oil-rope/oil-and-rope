@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 class IsUserProfileOrAdmin(permissions.BasePermission):
     """
-    Checks if :class:`auth.User` is the owner of the object.
+    Checks if :class:`registration.User` is the owner of the object.
     """
 
     def has_object_permission(self, request, view, obj) -> bool:

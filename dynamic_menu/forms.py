@@ -39,7 +39,7 @@ class DynamicMenuForm(TranslationModelForm):
     )
 
     related_models = forms.CharField(
-        help_text=_('Models must be separated by \',\' (auth.User, roleplay.World, auth.Group, ...)'),
+        help_text=_('Models must be separated by \',\' (registration.User, roleplay.World, auth.Group, ...)'),
         required=False
     )
 
