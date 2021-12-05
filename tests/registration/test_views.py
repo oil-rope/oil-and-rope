@@ -91,8 +91,8 @@ class TestLoginView(TestCase):
         self.assertFalse(get_user(self.client).is_authenticated, 'Inactive user is logged.')
 
         warn_message = '{}. {}'.format(
-            _('Seems like this user is inactive'),
-            _('Have you confirmed your email?')
+            _('seems like this user is inactive').capitalize(),
+            _('have you confirmed your email?').capitalize(),
         )
         mock_call.warning.assert_called_with(
             response.wsgi_request,

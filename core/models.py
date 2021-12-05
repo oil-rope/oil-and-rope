@@ -14,8 +14,8 @@ class TracingMixin(models.Model):
         Last time model was updated.
     """
 
-    entry_created_at = models.DateTimeField(verbose_name=_('Entry created at'), auto_now=False, auto_now_add=True)
-    entry_updated_at = models.DateTimeField(verbose_name=_('Entry updated at'), auto_now=True, auto_now_add=False)
+    entry_created_at = models.DateTimeField(verbose_name=_('entry created at'), auto_now=False, auto_now_add=True)
+    entry_updated_at = models.DateTimeField(verbose_name=_('entry updated at'), auto_now=True, auto_now_add=False)
 
     class Meta:
         abstract = True

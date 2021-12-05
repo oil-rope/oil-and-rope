@@ -205,8 +205,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
         self.permissions_required.add(*parsed_objs)
 
     class Meta:
-        verbose_name = _('Dynamic Menu')
-        verbose_name_plural = _('Dynamic Menus')
+        verbose_name = _('dynamic menu')
+        verbose_name_plural = _('dynamic menus')
 
     class MPTTMeta:
         order_insertion_by = ['order', 'name']

@@ -24,7 +24,7 @@ class UserListMixin:
         related_name = self.get_related_name()
         if not hasattr(user, related_name):
             raise AttributeError(
-                _('User doesn\'t have %(related_name)s attribute.') % {
+                _('user doesn\'t have %(related_name)s attribute.') % {
                     'related_name': related_name
                 }
             )
