@@ -27,7 +27,7 @@ def check_env_file(env_file: pathlib.Path):
         raise Warning(f'Some values are missing from \'{env_file}\': {missing_values}')
 
 
-def load_env_file(env_file: pathlib.Path):
+def load_env_file(env_file: pathlib.Path or str):
     """
     Looks for the given .env file and sets up Environment Variables.
     """

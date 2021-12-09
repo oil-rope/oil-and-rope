@@ -20,11 +20,11 @@ class TestTrack(TestCase):
         cls.user = baker.make_recipe('registration.user')
 
     def setUp(self):
-        tmp_img_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/')
-        with open(tmp_img_file.name, 'rb') as tmp_content:
-            self.image_file = SimpleUploadedFile(
-                name=fake.file_name(extension='jpg'), content=tmp_content.read(), content_type='image/jpeg'
-            )
+        tmp_img_file = tempfile.NamedTemporaryFile(mode='wb+', dir='./tests/')
+        self.image_file = SimpleUploadedFile(
+            name=fake.file_name(extension='jpg'), content=tmp_img_file.read(), content_type='image/jpeg'
+        )
+        tmp_img_file.close()
 
     def test_file_extesion_not_audio_ko(self):
         track_instance = self.model(name=fake.word(), owner=self.user, file=self.image_file)
