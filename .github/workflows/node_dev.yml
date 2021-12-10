@@ -1,14 +1,9 @@
-name: Node checker
+name: Feature Checker (Node)
 
 on:
   push:
     branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
+      - feature/*
 
 jobs:
   node-build:
@@ -17,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['14.x']
+        node-version: ['10.x', '12.x', '14.x']
 
     steps:
       - uses: actions/checkout@v2
