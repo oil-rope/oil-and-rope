@@ -1,9 +1,6 @@
-import os
 import pathlib
-import platform
 import shutil
 import tempfile
-import unittest
 
 from django.test import TestCase
 
