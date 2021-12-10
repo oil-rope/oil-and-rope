@@ -95,7 +95,6 @@ class Profile(TracingMixin):
         """
 
         DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
-        Permission = apps.get_model(constants.PERMISSION_MODEL)
 
         # Filtering by permissions
         user = self.user
