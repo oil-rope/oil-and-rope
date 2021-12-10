@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Create your account" %}{% endblock title %}
+{% block title %}{% trans "create your account"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Register' %}

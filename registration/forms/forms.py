@@ -31,11 +31,7 @@ class LoginForm(auth_forms.AuthenticationForm):
         super().__init__(request=request, *args, **kwargs)
 
         # Changing Username label on the go
-        username_label = '{} {} {}'.format(
-            _('username').capitalize(),
-            _('or'),
-            _('email').capitalize()
-        )
+        username_label = _('username or email').capitalize()
         self.fields['username'].label = username_label
 
         self.helper = FormHelper(self)
@@ -178,9 +174,9 @@ class ResendEmailForm(forms.Form):
     """
 
     email = forms.EmailField(
-        label=_('Email address'),
-        help_text=_('Enter your email address and we\'ll resend you the confirmation email') + '.',
-        required=True
+        label=_('email address').capitalize(),
+        help_text=_('enter your email address and we\'ll resend you the confirmation email').capitalize() + '.',
+        required=True,
     )
 
     def __init__(self, *args, **kwargs):
@@ -193,7 +189,7 @@ class ResendEmailForm(forms.Form):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Resend email'), css_class='w-100'),
+                    Submit('submit', _('resend email').capitalize(), css_class='w-100'),
                     css_class='col-md-10 col-lg-6'
                 ),
                 css_class='justify-content-md-around'
@@ -203,7 +199,7 @@ class ResendEmailForm(forms.Form):
     def clean_email(self):
         data = self.cleaned_data.get('email')
         if not get_user_model().objects.filter(email=data).exists():
-            msg = _('This email doesn\'t belong to a user') + '.'
+            msg = _('this email doesn\'t belong to a user').capitalize() + '.'
             self.add_error('email', msg)
         return data
 
@@ -215,7 +211,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        msg = '{}.'.format(_('We will send you a recovery link to this email'))
+        msg = '{}.'.format(_('we will send you a recovery link to this email').capitalize())
         self.add_help_text('email', msg)
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
@@ -224,7 +220,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Send email'), css_class='w-100')
+                    Submit('submit', _('send email').capitalize(), css_class='w-100')
                 )
             )
         )
@@ -235,7 +231,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
     def clean_email(self):
         data = self.cleaned_data.get('email')
         if not get_user_model().objects.filter(email=data).exists():
-            msg = _('This email doesn\'t belong to a user') + '.'
+            msg = _('this email doesn\'t belong to a user').capitalize() + '.'
             self.add_error('email', msg)
         return data
 
@@ -256,7 +252,7 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Change password'), css_class='w-100'),
+                    Submit('submit', _('change password').capitalize(), css_class='w-100'),
                     css_class='col-12 col-lg-6'
                 ),
                 css_class='justify-content-around'

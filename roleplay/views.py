@@ -145,7 +145,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'owner': self.object.owner,
-            'submit_text': _('Update')
+            'submit_text': _('update').capitalize()
         })
 
         return kwargs
@@ -226,8 +226,8 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
         players = self.object.players.all()
 
         if user not in players:
-            msg = _('You are not part of this session')
-            messages.error(request, f'{msg}.')
+            msg = _('you are not part of this session')
+            messages.error(request, f'{msg.capitalize()}.')
             return HttpResponseForbidden(content=f'{msg}.')
 
         return super().dispatch(request, *args, **kwargs)

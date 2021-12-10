@@ -1,6 +1,6 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
-{% block title %}{% trans "Delete" %} {{ object.name }}{% endblock title %}
+{% block title %}{% trans "delete"|capfirst %} {{ object.name }}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Delete ('|add:object.name|add:')' %}
@@ -19,20 +19,20 @@
             </p>
             <h4 class="card-title text-center">
               <i class="display-4 ic ic-circle-cross-thin text-danger"></i><br>
-              {% trans "Are you sure traveller?" %}
+              {% trans "are you sure traveller?"|capfirst %}
             </h4>
             <p class="card-text text-center">
-              {% trans "Do you really want to erase this world and all its inhabitants?" %}<br>
-              {% trans "This action cannot be undone" %}.
+              {% trans "do you really want to erase this world and all its inhabitants?"|capfirst %}<br>
+              {% trans "this action cannot be undone."|capfirst %}
             </p>
           </div>
           <div class="card-body mt-xl-5">
             <form class="d-flex justify-content-around" action="{% url 'roleplay:world_delete' object.pk %}"
                   method="post">
               {% csrf_token %}
-              <input type="button" onclick="goBack();" value="{% trans 'Cancel' %}"
+              <input type="button" onclick="goBack();" value="{% trans 'cancel'|capfirst %}"
                      class="col-5 col-xl-4 btn btn-secondary">
-              <input type="submit" value="{% trans 'Erase' %}" class="col-5 col-xl-4 btn btn-danger">
+              <input type="submit" value="{% trans 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
             </form>
           </div>
         </div>

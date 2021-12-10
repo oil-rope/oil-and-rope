@@ -7,7 +7,7 @@
   </style>
 {% endblock style %}
 
-{% block title %}{% trans "You've been invited!" %}{% endblock title %}
+{% block title %}{% trans "you've been invited!"|capfirst %}{% endblock title %}
 
 {% block content %}
   <main class="container py-5">
@@ -43,7 +43,7 @@
         <a href="{{ protocol }}://{{ domain }}{{ join_url }}"
            class="btn btn-lg btn-primary w-100"
         >
-          {% trans "Join now!" %}
+          {% trans "join now!"|capfirst %}
         </a>
       </div>
     </div>
