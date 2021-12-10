@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
+
 from . import enums, models
 
 LOGGER = logging.getLogger(__name__)
@@ -35,7 +36,10 @@ class WorldForm(forms.ModelForm):
                 Column(
                     Field(
                         'description',
-                        placeholder=_('write something about your world, its civilizations, its culture...').capitalize()
+                        placeholder=_(
+                            # NOTE: Character length 121 -.-
+                            'write something about your world, its civilizations, its culture...'
+                        ).capitalize()
                     ),
                     css_class='col-12 col-lg-7'
                 ),
