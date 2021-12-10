@@ -23,7 +23,7 @@ async def test_websocket_sends_error():
     await communicator.send_json_to(data)
 
     error_response = {
-        'error': _('No type given') + '.'
+        'error': 'No type given.'
     }
     response = await communicator.receive_json_from()
     assert response == error_response, 'Incorrect response.'
@@ -42,7 +42,7 @@ async def test_websocket_handler_non_existent_function():
     response = await communicator.receive_json_from()
 
     error_response = {
-        'error': _('Non existent type') + '.'
+        'error': 'Non existent type.'
     }
     assert response == error_response, 'Incorrect response.'
 

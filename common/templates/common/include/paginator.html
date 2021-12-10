@@ -1,22 +1,22 @@
 {% load i18n %}
 
 {% with page_kwarg=page_kwarg|default:'page' %}
-  <nav aria-label="{% blocktrans with model=paginator.queryset %}Pagination for {{ model }}{% endblocktrans %}">
+  <nav aria-label="{% blocktrans with model=paginator.queryset %}pagination for {{ model }}{% endblocktrans %}">
     <ul class="pagination justify-content-{{ align|default:'end' }}">
       <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
-        <a class="page-link" href="{{ path }}?{{ page_kwarg }}=1" aria-label="{% trans 'First' %}">
+        <a class="page-link" href="{{ path }}?{{ page_kwarg }}=1" aria-label="{% trans 'first'|capfirst %}">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
       {% if page_obj.has_previous %}
         <li class="page-item disabled">
           <a href="{{ path }}?{{ page_kwarg }}={{ page_obj.previous_page_number }}" class="page-link" tabindex="-1"
-             aria-disabled="true">{% trans "Previous" %}</a>
+             aria-disabled="true">{% trans "previous"|capfirst %}</a>
         </li>
       {% else %}
         <li class="page-item disabled">
           <a href="{{ path }}?{{ page_kwarg }}=1" class="page-link" tabindex="-1"
-             aria-disabled="true">{% trans "Previous" %}</a>
+             aria-disabled="true">{% trans "previous"|capfirst %}</a>
         </li>
       {% endif %}
       {% for page in paginator.page_range %}
@@ -29,15 +29,17 @@
       {% endfor %}
       {% if page_obj.has_next %}
         <li class="page-item">
-          <a href="{{ path }}?{{ page_kwarg }}={{ page_obj.next_page_number }}" class="page-link">{% trans "Next" %}</a>
+          <a href="{{ path }}?{{ page_kwarg }}={{ page_obj.next_page_number }}"
+             class="page-link">{% trans "next"|capfirst %}
+          </a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <a href="{{ path }}?{{ page_kwarg }}=1" class="page-link">{% trans "Next" %}</a>
+          <a href="{{ path }}?{{ page_kwarg }}=1" class="page-link">{% trans "next"|capfirst %}</a>
         </li>
       {% endif %}
       <li class="page-item{% if page_obj.number == paginator.num_pages %} disabled{% endif %}">
-        <a class="page-link" href="{{ path }}?{{ page_kwarg }}=last" aria-label="{% trans 'Last' %}">
+        <a class="page-link" href="{{ path }}?{{ page_kwarg }}=last" aria-label="{% trans 'last'|capfirst %}">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>

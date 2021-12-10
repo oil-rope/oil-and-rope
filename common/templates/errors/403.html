@@ -1,18 +1,18 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Forbidden" %}{% endblock title %}
+{% block title %}{% trans "forbidden"|capfirst %}{% endblock title %}
 
 {% block body_content %}
   <main class="container py-5">
-    <h2 class="display-4 text-center font-ds-bold">{% trans "You shall not pass!" %}</h2>
+    <h2 class="display-4 text-center font-ds-bold">{% trans "you shall not pass!"|capfirst %}</h2>
     <small class="d-block text-muted text-center">{% trans "'cause page returned 403" %}...</small>
     <hr class="mx-5">
     <div class="row pt-5">
       <div class="col-12">
         <p class="lead text-center">
-          {% trans "It seems you are trying to perform an action for which you are not allowed" %}...<br>
-          {% trans "Maybe you should" %} <a href="{% url 'core:home' %}">{% trans "go back" %}?</a>
+          {% trans "it seems you are trying to perform an action for which you are not allowed"|capfirst %}...<br>
+          {% trans "maybe you should"|capfirst %} <a href="{% url 'core:home' %}">{% trans "go back" %}?</a>
         </p>
       </div>
     </div>

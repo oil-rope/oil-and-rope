@@ -1,5 +1,4 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import gettext_lazy as _
 
 
 class UserListMixin:
@@ -12,10 +11,8 @@ class UserListMixin:
     def get_related_name(self):
         if not self.related_name:
             raise ImproperlyConfigured(
-                _('%(class_name)s should either include a `related_name` attribute, \
-                  or override the `get_related_name` method.') % {
-                    'class_name': self.__class__.__name__
-                }
+                f'{self.__class__.__name__} should either include a `related_name` attribute, \
+                  or override the `get_related_name` method.'
             )
         return self.related_name
 
@@ -23,11 +20,7 @@ class UserListMixin:
         user = self.request.user
         related_name = self.get_related_name()
         if not hasattr(user, related_name):
-            raise AttributeError(
-                _('user doesn\'t have %(related_name)s attribute.') % {
-                    'related_name': related_name
-                }
-            )
+            raise AttributeError(f'User doesn\'t have {related_name} attribute.')
         return getattr(user, related_name)
 
     def get_queryset(self):

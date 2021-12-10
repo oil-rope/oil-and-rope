@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 class WorldForm(forms.ModelForm):
 
-    def __init__(self, owner, user=None, submit_text=_('Create'), *args, **kwargs):
+    def __init__(self, owner, user=None, submit_text=_('create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
         self.owner = owner
@@ -126,7 +126,7 @@ class SessionForm(forms.ModelForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Create'), css_class='w-100'),
+                    Submit('submit', _('create'), css_class='w-100'),
                     css_class='col-md-6'
                 ),
                 css_class='justify-content-md-center',

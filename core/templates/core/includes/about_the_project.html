@@ -3,48 +3,48 @@
 <div class="row bg-primary min-vh-100 py-5 text-white {% if no_margin %}mx-0{% endif %}" id="about-the-project">
   <section class="col-12">
     <h2 class="display-3 text-center">
-      {% trans "About the project" %}
+      {% trans "about the project"|capfirst %}
     </h2>
     <hr class="mx-md-5 bg-light">
     <p class="lead text-center">
       {% blocktrans %}Oil &amp; Rope was born from the problem that some websites for managing roleplay games are quite <i>rough</i>.{% endblocktrans %}
       <br>
-      {% trans "So the very goal of this website is to bring something fresh" %}.<br>
-      {% trans "Something useful" %}.<br>
-      {% trans "Something intuitive" %}.<br><br>
-      <i class="font-weight-bold">{% trans "A web manager made by roleplayers for roleplayers" %}.</i>
+      {% trans "so the very goal of this website is to bring something fresh."|capfirst %}<br>
+      {% trans "something useful."|capfirst %}<br>
+      {% trans "something intuitive."|capfirst %}<br><br>
+      <i class="font-weight-bold">{% trans "a web manager made by roleplayers for roleplayers."|capfirst %}</i>
     </p>
   </section>
   <section class="col-12 pt-5">
     <h2 class="display-4 text-center">
-      {% trans "Contributing" %}
+      {% trans "contributing"|capfirst %}
     </h2>
     <hr class="mx-md-5 bg-light">
     <p class="lead text-center">
       {% blocktrans %}Oil &amp; Rope is an open-source project and can be found on <a href="https://github.com/oil-rope/oil-and-rope/" class="text-white">GitHub</a>.{% endblocktrans %}
       <br>
-      {% trans "The best way to contribute with us apart from helping us to code is enjoying the website itself, sharing with friends, giving us some feedback..." %}
+      {% trans "the best way to contribute with us apart from helping us to code is enjoying the website itself, sharing with friends, giving us some feedback..."|capfirst %}
       <br>
-      {% trans "We really appreciate any kind of effort" %}.
+      {% trans "we really appreciate any kind of effort."|capfirst %}
     </p>
     <div class="row justify-content-around pt-5">
       <div class="col-6">
         <a href="{% url 'registration:register' %}" class="btn btn-info w-100">
           <i class="ic ic-join"></i>
-          {% trans "Begin the experience!" %}
+          {% trans "begin the experience!"|capfirst %}
         </a>
       </div>
       <div class="col-6">
         <a target="_blank" href="https://github.com/oil-rope/oil-and-rope/" class="btn btn-secondary w-100">
           <i class="ic ic-github"></i>
-          {% trans "Check us out on GitHub" %}
+          {% trans "check us out on GitHub"|capfirst %}
         </a>
       </div>
       <div class="dropdown col-8 col-md-6 pt-4 pt-md-5">
         <button class="btn btn-extra w-100" type="button" id="shareMenu" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
           <i class="ic ic-share"></i>
-          {% trans "Share" %}
+          {% trans "share"|capfirst %}
         </button>
         <div class="dropdown-menu" aria-labelledby="shareMenu">
           <a class="dropdown-item"

@@ -7,12 +7,12 @@
       {% url 'core:index' as home %}
       {% if actual_path == home %}
         <li class="breadcrumb-item active" aria-current="page">
-          {% trans "Home" %}
+          {% trans "home"|capfirst %}
         </li>
       {% else %}
         <li class="breadcrumb-item">
           <a class="text-light" href="{{ home }}">
-            {% trans "Home" %}
+            {% trans "home"|capfirst %}
           </a>
         </li>
       {% endif %}

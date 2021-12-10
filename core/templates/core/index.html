@@ -1,7 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Home" %}{% endblock title %}
+{% block title %}{% trans "home"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with no_separation=True %}

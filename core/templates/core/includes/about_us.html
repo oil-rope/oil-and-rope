@@ -4,7 +4,7 @@
   <!-- About us -->
   <section class="col-12">
     <h2 class="display-3 text-center">
-      {% trans "About us" %}
+      {% trans "about us"|capfirst %}
     </h2>
     <hr class="mx-md-5 md">
     <p class="lead text-center">
@@ -15,9 +15,9 @@
   <!-- How -->
   <section class="col-12 py-3" id="how">
     <h2 class="display-3 text-center">
-      {% trans "How?" %}<br>
+      {% trans "how?"|capfirst %}<br>
       <small class="lead">
-        {% trans "Helping you to" %}...
+        {% trans "helping you to..."|capfirst %}
       </small>
     </h2>
 
@@ -29,7 +29,7 @@
         <div class="w-100"></div>
         <p class="lead">
           ...{% trans "build" %}.<br>
-          {% trans "Worlds, cities, races, stories..." %}
+          {% trans "worlds, cities, races, stories..."|capfirst %}
         </p>
       </div>
 
@@ -39,7 +39,7 @@
         <div class="w-100"></div>
         <p class="lead">
           ...{% trans "play secure" %}.<br>
-          {% trans "All your data is stored and encrypted" %}.
+          {% trans "all your data is stored and encrypted."|capfirst %}
         </p>
       </div>
 
@@ -49,7 +49,7 @@
         <div class="w-100"></div>
         <p class="lead">
           ...{% trans "connect" %}.<br>
-          {% trans "Make relationships in-between your world" %}.
+          {% trans "make relationships in-between your world."|capfirst %}
         </p>
       </div>
 
@@ -59,7 +59,7 @@
         <div class="w-100"></div>
         <p class="lead">
           ...{% trans "play" %}!<br>
-          {% trans "Create, fight, explore and have fun!" %}
+          {% trans "create, fight, explore and have fun!"|capfirst %}
         </p>
       </div>
 
@@ -69,7 +69,7 @@
         <div class="w-100"></div>
         <p class="lead">
             ...{% trans "write" %}.<br>
-            {% trans "Your own story, your epic revolution" %}.
+            {% trans "your own story, your epic revolution."|capfirst %}
         </p>
       </div>
 
@@ -79,7 +79,7 @@
         <div class="w-100"></div>
         <p class="lead">
             ...{% trans "adapt" %}.<br>
-            {% trans "Control your game in every device" %}.
+            {% trans "control your game in every device."|capfirst %}
         </p>
       </div>
 
@@ -89,7 +89,7 @@
         <div class="w-100"></div>
         <p class="lead">
             ...{% trans "communicate" %}.<br>
-            {% trans "Playing in both website and Discord server" %}.
+            {% trans "playing in both website and Discord server."|capfirst %}
         </p>
       </div>
 
@@ -99,13 +99,13 @@
         <div class="w-100"></div>
         <p class="lead">
             ...{% trans "share" %}.<br>
-            {% trans "Make amazing worlds for everyone to enjoy" %}.
+            {% trans "make amazing worlds for everyone to enjoy."|capfirst %}
         </p>
       </div>
 
       <a href="{% url 'registration:register' %}" class="btn btn-lg btn-primary col-6 my-lg-5">
         <i class="ic ic-join"></i>
-        {% trans "Join now!" %}
+        {% trans "join now!"|capfirst %}
       </a>
     </div>
   </section>
