@@ -99,10 +99,7 @@ class Profile(TracingMixin):
 
         # Filtering by permissions
         user = self.user
-        if user.is_superuser:
-            menus_pks = Permission.objects.values_list('menus', flat=True)
-        else:
-            menus_pks = user.user_permissions.values_list('menus', flat=True)
+        menus_pks = user.user_permissions.values_list('menus', flat=True)
         menus_pks = [menu for menu in menus_pks if menu is not None]
 
         menus = DynamicMenu.objects.filter(

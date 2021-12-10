@@ -148,18 +148,6 @@ class DynamicMenu(MPTTModel, TracingMixin):
         permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
         return permissions
 
-    def _get_models(self) -> set:
-        """
-        Executes Query to get related models.
-        """
-
-        models = self.related_models.values_list(
-            'app_label',
-            'model'
-        )
-        models = {f'{app_label}.{codename.capitalize()}' for app_label, codename in models}
-        return models
-
     def get_permissions(self) -> set:
         """
         Returns a set of permissions for this menu.
