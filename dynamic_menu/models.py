@@ -4,6 +4,7 @@ from django.apps import apps
 from django.db import models
 from django.shortcuts import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from mptt.fields import TreeForeignKey
@@ -12,6 +13,7 @@ from mptt.models import MPTTModel
 from common.constants import models as constants
 from core.models import TracingMixin
 
+from . import managers
 from .enums import MenuTypes
 
 PERMISSION_CLASS = constants.PERMISSION_MODEL
@@ -109,6 +111,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
         verbose_name=_('menu type'), default=MenuTypes.MAIN_MENU, choices=MenuTypes.choices
     )
 
+    objects = managers.DynamicMenuManager()
+
     @property
     def url(self) -> str:
         """
@@ -133,6 +137,10 @@ class DynamicMenu(MPTTModel, TracingMixin):
             return url
 
     def _get_permissions(self) -> set:
+        """
+        Executes Query to get related permissions.
+        """
+
         permissions = self.permissions_required.values_list(
             'content_type__app_label',
             'codename'
@@ -140,21 +148,14 @@ class DynamicMenu(MPTTModel, TracingMixin):
         permissions = {f'{app_label}.{codename}' for app_label, codename in permissions}
         return permissions
 
-    @property
-    def permissions(self) -> set:
+    def get_permissions(self) -> set:
         """
         Returns a set of permissions for this menu.
         """
 
-        if hasattr(self, '_permissions_cache'):
-            if not self._permissions_cache and self.permissions_required.exists():
-                self._permissions_cache = self._get_permissions()
-            return self._permissions_cache
-
         permissions = self._get_permissions()
-        setattr(self, '_permissions_cache', permissions)
-
-        return self._permissions_cache
+        return permissions
+    permissions = cached_property(get_permissions, name='permissions')
 
     @property
     def display_menu_name(self):
@@ -192,8 +193,8 @@ class DynamicMenu(MPTTModel, TracingMixin):
         self.permissions_required.add(*parsed_objs)
 
     class Meta:
-        verbose_name = _('Dynamic Menu')
-        verbose_name_plural = _('Dynamic Menus')
+        verbose_name = _('dynamic menu')
+        verbose_name_plural = _('dynamic menus')
 
     class MPTTMeta:
         order_insertion_by = ['order', 'name']

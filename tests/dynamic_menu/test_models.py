@@ -125,7 +125,7 @@ class TestDynamicMenuModel(TestCase):
             'registration.delete_user', 'registration.view_user'
         ]
         self.instance.add_permissions(*perms)
-        all_perms = all([perm in perms for perm in self.instance.permissions])
+        all_perms = all([perm in self.instance.permissions for perm in perms])
 
         self.assertTrue(all_perms)
 
@@ -138,18 +138,18 @@ class TestDynamicMenuModel(TestCase):
 
         with self.assertNumQueries(1):
             self.instance.permissions
-            all_perms = all([perm in perms for perm in self.instance.permissions])
+            all_perms = all([perm in self.instance.permissions for perm in perms])
 
             self.assertTrue(all_perms)
-            self.assertTrue(hasattr(self.instance, '_permissions_cache'))
 
-    def test_reset_cache_ok(self):
+    def test_reset_permissions_cache_ok(self):
         self.instance.permissions
         perms = [
             'registration.add_user', 'registration.change_user',
             'registration.delete_user', 'registration.view_user'
         ]
         self.instance.add_permissions(*perms)
-        all_perms = all([perm in perms for perm in self.instance.permissions])
+        self.instance.get_permissions()
+        all_perms = all([perm in self.instance.get_permissions() for perm in perms])
 
         self.assertTrue(all_perms)

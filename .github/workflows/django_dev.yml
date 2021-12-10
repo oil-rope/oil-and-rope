@@ -1,38 +1,19 @@
-name: Django checker
+name: (Django) Feature Checker
 
 on:
   push:
     branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
-      - develop
+      - feature/*
 
 jobs:
-  python:
-    name: Python with PostgreSQL & Redis
+  python-build-without-postgres:
+    name: Python Build
     runs-on: ubuntu-latest
     env:
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-    # Set up Postgres and Redis
+    # Redis
     services:
-      postgres:
-        image: postgres:13.3
-        env:
-          POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: postgres
-          POSTGRES_DB: oilandrope
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
       redis:
         image: redis
         ports:
@@ -41,7 +22,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.8', '3.9']
 
     steps:
       - uses: actions/checkout@v2
@@ -70,18 +51,10 @@ jobs:
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test --settings oilandrope.settings
+          coverage run manage.py test --settings oilandrope.dev_settings
           coverage xml
 
       - name: Django Check
         run: |
-          python manage.py migrate --settings oilandrope.settings
-          python manage.py check --settings oilandrope.settings
-
-      - name: Updating Codecov (coverage)
-        if: ${{ success() && matrix.python-version==3.9 }}
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          file: ./coverage.xml
+          python manage.py migrate --settings oilandrope.dev_settings
+          python manage.py check --settings oilandrope.dev_settings

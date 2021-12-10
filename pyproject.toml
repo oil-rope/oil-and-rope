@@ -35,6 +35,7 @@ xlrd = "^2.0"
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6"
 coverage = "^6.2"
+django-debug-toolbar = "^3.2"
 django-extensions = "^3.1"
 django-pdb = "^0.6"
 dpytest = "^0.5"

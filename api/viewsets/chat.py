@@ -74,8 +74,8 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
         chat = data['chat']
 
         if user not in chat.users.all():
-            msg = _('User not in chat')
-            raise ValidationError({'author': f'{msg}.'})
+            msg = _('user not in chat')
+            raise ValidationError({'author': f'{msg.capitalize()}.'})
 
     def get_serializer(self, *args, **kwargs):
         if 'data' not in kwargs:

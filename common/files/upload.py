@@ -1,7 +1,8 @@
+from django.db import models
 from django.utils import timezone
 
 
-def default_upload_to(instance, file):
+def default_upload_to(instance: models.Model, filename: str) -> str:
     """
     Uploads images to /app/model/date(Y/m/d/)/id/filename.
     It's generic for every model
@@ -20,4 +21,4 @@ def default_upload_to(instance, file):
         else:  # pragma: no cover
             identifier = 'unknown_identifier'
 
-    return '{}/{}/{}/{}/{}'.format(app, model, formatted_date, identifier, file)
+    return '{}/{}/{}/{}/{}'.format(app, model, formatted_date, identifier, filename)

@@ -1,7 +1,4 @@
-import logging
-
 from . import models
-from .enums import MenuTypes
 
 
 def filter_menus(menus, user):
@@ -43,6 +40,11 @@ def menus(request) -> dict:
     Checks for menus, their permissions and return a queryset filtered.
     """
 
+    menus_dict = {
+        'menus': list(),
+        'context_menus': list()
+    }
+
     user = request.user
 
     if not user.is_authenticated:
@@ -58,36 +60,10 @@ def menus(request) -> dict:
         }
         return menus_dict
 
-    # Initialize dicts
-    menus_dict = {
-        'menus': models.DynamicMenu.objects.none(),
-        'context_menus': models.DynamicMenu.objects.none()
-    }
-
-    # Getting menus
-    qs = models.DynamicMenu.objects.filter(menu_type=MenuTypes.MAIN_MENU)
-    if not qs.exists():  # Empty query does not need to continue
-        return menus_dict
-
-    qs = filter_menus(qs, user)
-    menus_dict['menus'] = qs
-
-    # Getting referrer
-    menu_referrer = request.COOKIES.get('_auth_user_menu_referrer', None)
-    if not menu_referrer or menu_referrer == 'None':  # Because of JavaScript
-        return menus_dict
-
-    try:
-        menu_parent = models.DynamicMenu.objects.get(pk=menu_referrer)
-        context_menus = menu_parent.get_children().filter(
-            menu_type=MenuTypes.CONTEXT_MENU
-        )
-        context_menus = filter_menus(context_menus, user)
-    except models.DynamicMenu.DoesNotExist as ex:
-        request.COOKIES['_auth_user_menu_referrer'] = None
-        context_menus = models.DynamicMenu.objects.none()
-        logging.warning('Trying to access an non-existent menu.\n%s', ex)
-
+    profile = user.profile
+    menus = profile.menus
+    context_menus = profile.get_context_menus(request)
+    menus_dict['menus'] = menus
     menus_dict['context_menus'] = context_menus
 
     return menus_dict

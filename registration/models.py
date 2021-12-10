@@ -1,5 +1,6 @@
 from ckeditor.fields import RichTextField
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 from django.conf import settings
 from django.conf.global_settings import LANGUAGES
 from django.contrib.auth import get_user_model
@@ -8,12 +9,13 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.functional import keep_lazy
+from django.utils.functional import cached_property, keep_lazy
 from django.utils.translation import gettext_lazy as _
 
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
+from dynamic_menu.enums import MenuTypes
 
 
 class User(AbstractUser):
@@ -87,6 +89,46 @@ class Profile(TracingMixin):
         verbose_name=_('avatar'), upload_to=default_upload_to, blank=True, null=True
     )
 
+    def get_menus(self):
+        """
+        Gets all user's menus by its permissions.
+        """
+
+        DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
+
+        # Filtering by permissions
+        user = self.user
+        menus_pks = user.user_permissions.values_list('menus', flat=True)
+        menus_pks = [menu for menu in menus_pks if menu is not None]
+
+        menus = DynamicMenu.objects.filter(
+            models.Q(pk__in=menus_pks) | models.Q(permissions_required__isnull=True)
+        ).filter(
+            menu_type=MenuTypes.MAIN_MENU
+        )
+        # Getting uniques
+        menus = set(menus)
+
+        # Filtering by staff required
+        if not user.is_staff:
+            menus = {menu for menu in menus if not menu.staff_required}
+
+        return list(menus)
+    menus = cached_property(get_menus, name='menus')
+
+    def get_context_menus(self, request):
+        DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
+
+        menu_referrer = request.COOKIES.get('_auth_user_menu_referrer', None)
+        if not menu_referrer or menu_referrer == 'None':  # Because of JavaScript
+            return list()
+
+        context_menus = DynamicMenu.objects.filter(
+            parent_id=menu_referrer,
+            menu_type=MenuTypes.CONTEXT_MENU
+        )
+        return list(context_menus)
+
     @property
     def age(self):
         rdelta = relativedelta(timezone.datetime.today().date(), self.birthday)
@@ -105,7 +147,7 @@ class Profile(TracingMixin):
 @receiver(post_save, sender=get_user_model())
 def create_profile_post_save_receiver(instance, **kwargs):
     """
-    Creates a :class:`Profile` once a :class:`auth.User` is created.
+    Creates a :class:`Profile` once a :class:`registration.User` is created.
     """
 
     if kwargs.get('created', False):

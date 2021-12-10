@@ -1,12 +1,15 @@
 from django.conf import settings
 
 # Auth
-USER_MODEL = settings.AUTH_USER_MODEL
 GROUP_MODEL = 'auth.Group'
 PERMISSION_MODEL = 'auth.Permission'
 
 # Registration
+USER_MODEL = settings.AUTH_USER_MODEL
 PROFILE_MODEL = 'registration.Profile'
+
+# Common
+TRACK_MODEL = 'common.Track'
 
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'

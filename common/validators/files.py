@@ -1,3 +1,5 @@
+import mimetypes
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -13,8 +15,17 @@ def validate_file_size(value):
     max_size = settings.FILE_UPLOAD_MAX_MEMORY_SIZE
     if value.size > max_size:
         mb_size = max_size_file_mb()
-        max_size_msg = _('Size should not exceed %(megabytes)s MiB') % {'megabytes': mb_size}
-        raise ValidationError('{file_too_large}. {max_size}.'.format(
-            file_too_large=_('File too large'),
-            max_size=max_size_msg
-        ))
+        max_size_msg = _('size should not exceed %(megabytes)s MiB') % {'megabytes': mb_size}
+        msg = _('file too large')
+        raise ValidationError(f'{msg.capitalize()}. {max_size_msg.capitalize()}.')
+
+
+def validate_music_file(value):
+    """
+    Check if file is a music type.
+    """
+
+    extensions = [key for key, value in mimetypes.types_map.items() if 'audio/' in value]
+    if not value.name.endswith(tuple(extensions)):
+        msg = _('file is not an audio')
+        raise ValidationError(f'{msg.capitalize()}.')
