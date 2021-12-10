@@ -1,3 +1,5 @@
+import os
+import pathlib
 import platform
 import shutil
 import tempfile
@@ -12,24 +14,27 @@ fake = create_faker()
 
 
 class TestEnv(TestCase):
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.tmp_file = pathlib.Path(self.tmp_dir) / fake.file_name(extension='env')
+        self.tmp_file.touch()
+
+    def tearDown(self):
+        self.tmp_file.unlink()
+        pathlib.Path(self.tmp_dir).rmdir()
+
     def test_load_env_with_all_expected_values_ok(self):
         # NOTE: Windows doesn't have writting permission on %AppData%\Temp
-        env_file = tempfile.NamedTemporaryFile(dir='./tests/')
-        env_file.close()
+        env_file = self.tmp_file
         # We basically copy .env.example file
-        shutil.copy('.env.example', env_file.name)
+        shutil.copy('.env.example', str(env_file))
         # Then we load environment variables
-        load_env_file(env_file.name)
+        load_env_file(str(env_file))
 
-    @unittest.skipIf(
-        condition=lambda: platform.system() == 'Windows',
-        reason='Windows system doesn\'t properly work with tempfile'
-    )
     def test_load_env_without_expected_values_ko(self):
-        env_file = tempfile.NamedTemporaryFile(dir='./tests/')
-        env_file.close()
+        env_file = self.tmp_file
         with self.assertRaisesRegex(Warning, r'Some values are missing from .+'):
-            load_env_file(env_file.name)
+            load_env_file(str(env_file))
 
     def test_load_env_non_existent_file_ko(self):
         env_file = fake.file_path()
