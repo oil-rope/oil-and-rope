@@ -17,7 +17,7 @@ from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.utils.auth import generate_token
 
-from .layouts import LoginFormLayout
+from .layout import LoginFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
