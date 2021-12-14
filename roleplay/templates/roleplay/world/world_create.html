@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "create"|capfirst %} {% trans "world"|capfirst %}{% endblock title %}
+{% block title %}{% translate "create"|capfirst %} {% translate "world"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,Create World' %}
@@ -10,7 +10,7 @@
 
 {% block body_content %}
   <main class="container pb-5">
-    <h1 class="text-center font-weight-lighter">{% trans "create your world!"|capfirst %}</h1>
+    <h1 class="text-center font-weight-lighter">{% translate "create your world!"|capfirst %}</h1>
     <hr class="mx-3 pb-3">
     <div class="row px-1">
       {% crispy form %}

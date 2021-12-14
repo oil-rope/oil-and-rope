@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 16:45+0000\n"
+"POT-Creation-Date: 2021-12-14 12:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -236,9 +236,7 @@ msgstr "basura"
 msgid "town"
 msgstr "pueblo"
 
-#: .\common\enums.py:34 .\common\templates\common\include\breadcrumb.html:10
-#: .\common\templates\common\include\breadcrumb.html:15
-#: .\core\templates\core\index.html:4
+#: .\common\enums.py:34
 msgid "home"
 msgstr "hogar"
 
@@ -345,6 +343,15 @@ msgstr "público"
 #| msgid "Profile"
 msgid "file"
 msgstr "archivo"
+
+#: .\common\templates\common\include\breadcrumb.html:10
+#: .\common\templates\common\include\breadcrumb.html:15
+#: .\core\templates\core\index.html:4
+#, fuzzy
+#| msgid "home"
+msgctxt "menu name"
+msgid "home"
+msgstr "inicio"
 
 #: .\common\templates\common\include\paginator.html:4
 #, fuzzy, python-format
@@ -741,16 +748,16 @@ msgid "toggle navigation"
 msgstr "activar navegación"
 
 #: .\core\templates\core\includes\menu.html:72
-#: .\registration\forms\layouts.py:11
-#: .\registration\templates\registration\login.html:6
+#: .\registration\forms\layout.py:18
+#: .\registration\templates\registration\login.html:7
+#: .\registration\templates\registration\login.html:33
 #, fuzzy
 #| msgid "Login"
 msgid "login"
 msgstr "acceder"
 
 #: .\core\templates\core\includes\menu.html:79
-#: .\registration\templates\registration\register.html:6
-#: .\registration\templates\registration\register.html:19
+#: .\registration\templates\registration\register.html:7
 #, fuzzy
 #| msgid "Create your account"
 msgid "create your account"
@@ -775,7 +782,7 @@ msgstr "panel de admin"
 #: .\core\templates\core\includes\menu.html:109 .\dynamic_menu\forms.py:104
 #: .\dynamic_menu\templates\dynamic_menu\dynamic_menu\create.html:6
 #: .\dynamic_menu\templates\dynamic_menu\dynamic_menu\create.html:16
-#: .\roleplay\forms.py:24 .\roleplay\forms.py:132
+#: .\roleplay\forms.py:25 .\roleplay\forms.py:136
 #: .\roleplay\templates\roleplay\session\session_create.html:6
 #: .\roleplay\templates\roleplay\session\session_create.html:10
 #: .\roleplay\templates\roleplay\world\world_create.html:5
@@ -1051,13 +1058,13 @@ msgstr "sistema de registro"
 msgid "username or email"
 msgstr "nombre de usuario"
 
-#: .\registration\forms\forms.py:49
+#: .\registration\forms\forms.py:53
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
 msgstr "identificador de discord"
 
-#: .\registration\forms\forms.py:52
+#: .\registration\forms\forms.py:56
 #, fuzzy
 #| msgid ""
 #| "If you have a Discord Account you want to link with just give us your ID!"
@@ -1067,17 +1074,18 @@ msgstr ""
 "si tienes una cuenta de Discord que quieras asociar con la web tan solo "
 "danos el ID"
 
-#: .\registration\forms\forms.py:94
+#: .\registration\forms\forms.py:98
 msgid "invite our bot to your server!"
 msgstr "¡invita nuestro bot a tu server!"
 
-#: .\registration\forms\forms.py:103
+#: .\registration\forms\forms.py:107
+#: .\registration\templates\registration\register.html:10
 #, fuzzy
 #| msgid "Register"
 msgid "register"
 msgstr "registrarse"
 
-#: .\registration\forms\forms.py:116
+#: .\registration\forms\forms.py:120
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1085,32 +1093,32 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: .\registration\forms\forms.py:136
+#: .\registration\forms\forms.py:140
 #, fuzzy, python-format
 #| msgid "Welcome to Oil & Rope!"
 msgid "welcome to %(title)s"
 msgstr "¡bienvenido a %(title)s!"
 
-#: .\registration\forms\forms.py:167
+#: .\registration\forms\forms.py:171
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account"
 msgstr "te enviaremos un email para confirmar tu cuenta"
 
-#: .\registration\forms\forms.py:177 .\registration\models.py:22
+#: .\registration\forms\forms.py:181 .\registration\models.py:22
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: .\registration\forms\forms.py:178
+#: .\registration\forms\forms.py:182
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email"
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación"
 
-#: .\registration\forms\forms.py:192
+#: .\registration\forms\forms.py:196
 #: .\registration\templates\registration\login.html:60
 #: .\registration\templates\registration\resend_email.html:13
 #, fuzzy
@@ -1118,29 +1126,34 @@ msgstr ""
 msgid "resend email"
 msgstr "reenviar email"
 
-#: .\registration\forms\forms.py:202 .\registration\forms\forms.py:234
+#: .\registration\forms\forms.py:206 .\registration\forms\forms.py:238
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user"
 msgstr "este email no pertenece a ningún usuario"
 
-#: .\registration\forms\forms.py:214
+#: .\registration\forms\forms.py:218
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email"
 msgstr "te enviaremos un link de recuperación a este email"
 
-#: .\registration\forms\forms.py:223
+#: .\registration\forms\forms.py:227
 #, fuzzy
 #| msgid "Resend email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: .\registration\forms\forms.py:255
+#: .\registration\forms\forms.py:259
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
 msgstr "cambiar contraseña"
+
+#: .\registration\forms\layout.py:21
+#, python-format
+msgid "login with %(social_media)s"
+msgstr "acceder con %(social_media)s"
 
 #: .\registration\models.py:23
 #, fuzzy
@@ -1237,19 +1250,25 @@ msgstr "¿no tienes una cuenta?"
 msgid "new password"
 msgstr "nueva contraseña"
 
-#: .\registration\templates\registration\register.html:15
+#: .\registration\templates\registration\register.html:17
 #, fuzzy
 #| msgid "Start your adventure"
 msgid "start your adventure!"
 msgstr "¡comienza tu aventura!"
 
-#: .\registration\templates\registration\register.html:19
+#: .\registration\templates\registration\register.html:21
 #, fuzzy
 #| msgid "Take the first step"
-msgid "take the first step"
-msgstr "da el primer paso"
+msgid "take the first step."
+msgstr "da el primer paso."
 
-#: .\registration\templates\registration\register.html:21
+#: .\registration\templates\registration\register.html:22
+#, fuzzy
+#| msgid "Create your account"
+msgid "create your account."
+msgstr "crea tu cuenta."
+
+#: .\registration\templates\registration\register.html:24
 #, fuzzy
 #| msgid "Your world awaits"
 msgid "your world awaits!"
@@ -1433,55 +1452,55 @@ msgstr "continente"
 msgid "ocean"
 msgstr "océano"
 
-#: .\roleplay\forms.py:38
+#: .\roleplay\forms.py:41
 #, fuzzy
 #| msgid "Write something about your world, its civilizations, its culture..."
 msgid "write something about your world, its civilizations, its culture..."
 msgstr "escribe algo sobre tu mundo, sus civilizaciones, sus culturas..."
 
-#: .\roleplay\forms.py:50
+#: .\roleplay\forms.py:54
 #, fuzzy
 #| msgid "Clean"
 msgid "clean"
 msgstr "limpiar"
 
-#: .\roleplay\forms.py:60
+#: .\roleplay\forms.py:64
 #, fuzzy
 #| msgid "A picture is worth a thousand words"
 msgid "a picture is worth a thousand words"
 msgstr "una imagen vale más que mil palabras"
 
-#: .\roleplay\forms.py:61
+#: .\roleplay\forms.py:65
 #, fuzzy
 #| msgid "Max size file"
 msgid "max size file"
 msgstr "tamaño máximo del archivo"
 
-#: .\roleplay\forms.py:91
+#: .\roleplay\forms.py:95
 msgid "listed players will be notified"
 msgstr "los jugadores listados serán notificados"
 
-#: .\roleplay\forms.py:96
+#: .\roleplay\forms.py:100
 #, fuzzy
 #| msgid "Send email"
 msgid "type an email"
 msgstr "escribir un email"
 
-#: .\roleplay\forms.py:115 .\roleplay\models.py:457
+#: .\roleplay\forms.py:119 .\roleplay\models.py:457
 msgid "next session"
 msgstr "siguiente sesión"
 
-#: .\roleplay\forms.py:121
+#: .\roleplay\forms.py:125
 #, fuzzy
 #| msgid "play"
 msgid "invite players"
 msgstr "invitar jugadores"
 
-#: .\roleplay\forms.py:125
+#: .\roleplay\forms.py:129
 msgid "add"
 msgstr "añadir"
 
-#: .\roleplay\forms.py:154
+#: .\roleplay\forms.py:158
 #, fuzzy, python-format
 #| msgid "users invited!"
 msgid "you've been invited to %(world)s!"

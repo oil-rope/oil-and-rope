@@ -16,6 +16,7 @@ class LoginFormLayout(layout.Layout):
                 ),
                 layout.Row(
                     layout.Submit('login', _('login').capitalize(), css_class='col col-md-9 btn-lg text-white'),
+                    layout.Div(css_class='w-100'),
                     common_layout.Link(
                         content=_('login with %(social_media)s').capitalize() % {'social_media': 'Google'},
                         url=reverse('google_login'),

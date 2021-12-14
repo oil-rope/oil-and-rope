@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 {% load string_utils %}
 
-{% block title %}{% trans "login"|capfirstletter %}{% endblock title %}
+{% block title %}{% translate "login"|capfirst %}{% endblock title %}
 
 {% block css %}
   <!--suppress CssReplaceWithShorthandSafely -->
@@ -30,7 +30,8 @@
 {% endblock css %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='login' no_separation=True %}
+  {% translate "login"|capfirst as login_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs=login_page no_separation=True %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -53,10 +54,10 @@
         {% crispy form %}
         <div class="row justify-content-around mt-3 mt-md-5 mb-5">
           <a href="{% url 'registration:password_reset' %}">
-            {% trans "forgot password?"|capfirstletter %}
+            {% translate "forgot password?"|capfirstletter %}
           </a>
           <a href="{% url 'registration:resend_email' %}">
-            {% trans "resend email"|capfirstletter %}
+            {% translate "resend email"|capfirst %}
           </a>
         </div>
       </div>
@@ -64,9 +65,9 @@
       <!-- Join -->
       <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0 py-lg-3 pt-xl-0 pb-xl-5">
         <p class="lead text-white mr-sm-3 mb-md-0">
-          {% trans "don't have an account?"|capfirstletter %}
+          {% translate "don't have an account?"|capfirstletter %}
         </p>
-        <a class="lead" href="{% url 'registration:register' %}">{% trans "join now!"|capfirstletter %}</a>
+        <a class="lead" href="{% url 'registration:register' %}">{% translate "join now!"|capfirstletter %}</a>
       </div>
 
       <!-- Arrow -->

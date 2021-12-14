@@ -3,19 +3,19 @@
 
 {% block content %}
 <header class="container">
-  <h2 class="display-2 text-center">{% trans "welcome to Oil &amp; Rope traveller!"|capfirst %}</h2>
+  <h2 class="display-2 text-center">{% translate "welcome to Oil &amp; Rope traveller!"|capfirst %}</h2>
 </header>
 <main class="container p-5">
   <div class="row">
     <div class="col-8">
       <p class="text-center">
-      {% trans "before you start, please make sure to activate your account by clicking in the link below"|capfirst %}.
+      {% translate "before you start, please make sure to activate your account by clicking in the link below"|capfirst %}.
       </p>
     </div>
   </div>
   <div class="row justify-content-center">
     <a href="{{ domain }}{% url 'registration:activate' token object.pk %}" class="btn btn-primary">
-      {% trans "activate account"|capfirst %}
+      {% translate "activate account"|capfirst %}
     </a>
   </div>
 </main>
