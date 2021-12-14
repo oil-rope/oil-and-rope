@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-14 12:35+0000\n"
+"POT-Creation-Date: 2021-12-14 12:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1295,8 +1295,8 @@ msgstr "¿has confirmado tu email?"
 #: .\registration\views.py:72
 #, fuzzy
 #| msgid "User created"
-msgid "user created"
-msgstr "usuario creado"
+msgid "user created!"
+msgstr "¡usuario creado!"
 
 #: .\registration\views.py:73
 #, fuzzy

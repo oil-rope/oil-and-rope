@@ -68,8 +68,8 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     def get_success_message(self) -> str:
         if self.success_message:  # pragma: no cover
             return self.success_message
-        success_message = '{}! {}.'.format(
-            _('user created').capitalize(),
+        success_message = '{} {}.'.format(
+            _('user created!').capitalize(),
             _('please confirm your email').capitalize()
         )
         return success_message
