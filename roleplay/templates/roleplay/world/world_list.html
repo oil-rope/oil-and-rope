@@ -1,7 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
-{% block title %}{% trans 'Worlds' %}{% endblock title %}
+{% block title %}{% translate 'worlds'|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds' %}
@@ -13,18 +13,18 @@
     <!-- User's worlds -->
     {% if not user_worlds.exists %}
       <h2 class="display-4 text-center">
-        {% trans "Seems like you haven't any world" %}.<br>
-        {% trans "Create one" %}!
+        {% translate "seems like you haven't any world."|capfirst %}<br>
+        {% translate "create one!"|capfirst %}
       </h2>
       <div class="row justify-content-center py-5">
         <a href="{% url 'roleplay:world_create' %}?user"
-           class="btn btn-lg btn-primary">{% trans "Create world" %}!</a>
+           class="btn btn-lg btn-primary">{% translate "create world!"|capfirst %}</a>
       </div>
       <div class="w-100 my-5"></div>
     {% else %}
       <h2 class="display-4 text-center">
         {% blocktrans count counter=user_worlds_full.count %}Your world{% plural %}Your worlds{% endblocktrans %}
-        <a title="{% trans 'Create new world' %}" href="{% url 'roleplay:world_create' %}?user"
+        <a title="{% translate 'create new world'|capfirst %}" href="{% url 'roleplay:world_create' %}?user"
            class="btn btn-lg btn-primary">
           <span class="ic-plus"></span>
         </a>
@@ -35,30 +35,34 @@
       {% endif %}
       <div class="row justify-content-around pb-5">
         {% for world in user_worlds_page_obj %}
-          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
+          <div
+            class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 {% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>
       <div class="row justify-content-center pb-5">
         <a href="{% url 'roleplay:world_create' %}?user"
-           class="btn btn-lg btn-primary">{% trans "Create private world" %}!</a>
+           class="btn btn-lg btn-primary">{% translate "create private world!"|capfirst %}</a>
       </div>
     {% endif %}
 
     <!-- Community worlds -->
     {% if not object_list.exists %}
       <h2 class="display-4 text-center">
-        {% trans "Seems like we don't have comunity worlds" %}<br>
-        {% trans "Would you like to create one?" %}
+        {% translate "seems like we don't have comunity worlds"|capfirst %}<br>
+        {% translate "would you like to create one?"|capfirst %}
       </h2>
       <div class="row justify-content-center py-5">
-        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">{% trans "Create world" %}!</a>
+        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">
+          {% translate "create world"|capfirst %}
+        </a>
       </div>
     {% else %}
       <h2 class="display-4 text-center">
-        {% blocktrans count counter=object_list_full.count %}Checkout our community world{% plural %}Checkout our {{ counter }} community worlds{% endblocktrans %}
-        <a title="{% trans 'Create community world' %}" href="{% url 'roleplay:world_create' %}"
+        {% blocktrans count counter=object_list_full.count %}Checkout our community world{% plural %}Checkout our
+          {{ counter }} community worlds{% endblocktrans %}
+        <a title="{% translate 'create community world'|capfirst %}" href="{% url 'roleplay:world_create' %}"
            class="btn btn-lg btn-secondary">
           <span class="ic-plus"></span>
         </a>
@@ -69,14 +73,16 @@
       {% endif %}
       <div class="row justify-content-around pb-5">
         {% for world in page_obj %}
-          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
+          <div
+            class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4{% if not forloop.first %} mt-5 mt-sm-0 mt-md-5 mt-lg-0{% endif %}">
             {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
           </div>
         {% endfor %}
       </div>
       <div class="row justify-content-center pb-5">
-        <a href="{% url 'roleplay:world_create' %}"
-           class="btn btn-lg btn-secondary">{% trans "Create public world" %}!</a>
+        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">
+          {% translate "create public world!"|capfirst %}
+        </a>
       </div>
     {% endif %}
   </div>

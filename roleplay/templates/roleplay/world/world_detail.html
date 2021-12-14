@@ -29,7 +29,7 @@
   </style>
 {% endblock css %}
 
-{% block title %}{{ object.name }} {% trans 'Detail' %}{% endblock title %}
+{% block title %}{{ object.name }} {% translate 'detail'|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Detail' %}
@@ -66,13 +66,13 @@
                 <div class="col-5">
                   <a href="{% url 'roleplay:world_edit' object.pk %}" class="btn btn-primary w-100">
                     <i class="ic ic-edit"></i>
-                    {% trans "Edit" %}
+                    {% translate "edit"|capfirst %}
                   </a>
                 </div>
                 <div class="col-5">
                   <a href="{% url 'roleplay:world_delete' object.pk %}" class="btn btn-danger w-100">
                     <i class="ic ic-trash"></i>
-                    {% trans "Delete" %}
+                    {% translate "delete"|capfirst %}
                   </a>
                 </div>
               {% endif %}

@@ -1,7 +1,7 @@
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from common.templatetags.string_utils import generate_breadcrumbs, startswith
+from common.templatetags.string_utils import capfirstletter, generate_breadcrumbs, startswith
 
 
 class TestStartsWithTemplateFilter(TestCase):
@@ -49,3 +49,12 @@ class TestGenerateBreadcrumbsFilter(TestCase):
         result = generate_breadcrumbs(text)
 
         self.assertDictEqual(expected, result)
+
+
+class TestCapFirstLetterFilter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.text = '¿¡¿pregunta?!?'
+
+    def test_capfirstletter_ok(self):
+        self.assertEqual('¿¡¿Pregunta?!?', capfirstletter(self.text))

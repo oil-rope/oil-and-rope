@@ -9,7 +9,7 @@
     <h5 class="card-title text-center">{{ world.name }}</h5>
     <hr class="w-50">
     <p class="card-text text-justify">
-      {{ world.description|truncatechars_html:250|default:_("No description provided")|add:"." }}
+      {{ world.description|truncatechars_html:250|default:_("no description provided")|add:"."|capfirst }}
     </p>
   </div>
   <div class="card-body">
@@ -18,12 +18,12 @@
 
         <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra mr-1">
           <i class="ic ic-world"></i>
-          {% trans "View details" %}
+          {% translate "view details"|capfirst %}
         </a>
         {% if world.owner == user %}
           <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary ml-1">
             <i class="ic ic-edit"></i>
-            {% trans "Edit" %}
+            {% translate "edit"|capfirst %}
           </a>
         {% endif %}
         <div class="btn-group dropright align-self-end ml-auto">
@@ -34,21 +34,21 @@
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
             <a href="#no-url" class="dropdown-item disabled">
               <span class="ic-quill"></span>
-              {% trans "Create campaign" %}
+              {% translate "create campaign"|capfirst %}
             </a>
             {% if world.owner == user %}
               <a href="#no-url" class="dropdown-item disabled">
                 <span class="ic-city"></span>
-                {% trans "Create city" %}
+                {% translate "create city"|capfirst %}
               </a>
               <a href="#no-url" class="dropdown-item disabled">
                 <span class="ic-cogs"></span>
-                {% trans "Settings" %}
+                {% translate "settings"|capfirst %}
               </a>
               <div class="dropdown-divider"></div>
               <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
                 <span class="ic-trash text-danger"></span>
-                {% trans "Delete" %} {% trans "world" %}
+                {% translate "delete"|capfirst %} {% translate "world" %}
               </a>
             {% endif %}
           </div>

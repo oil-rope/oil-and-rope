@@ -1,7 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "request token"|title %}{% endblock title %}
+{% block title %}{% translate "request token"|title %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Token' no_separation=True %}
@@ -14,10 +14,10 @@
         <div class="card">
           <div class="card-header">
             <h5 class="card-title text-center">
-              {% trans "your token"|title %}
+              {% translate "your token"|title %}
             </h5>
             <h6 class="card-subtitle text-muted text-center">
-              {% trans "you can always look it up by comming back here"|capfirst %}
+              {% translate "you can always look it up by comming back here"|capfirst %}
             </h6>
           </div>
           <div class="card-body">

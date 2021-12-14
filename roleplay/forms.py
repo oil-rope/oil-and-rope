@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 class WorldForm(forms.ModelForm):
 
-    def __init__(self, owner, user=None, submit_text=_('Create'), *args, **kwargs):
+    def __init__(self, owner, user=None, submit_text=_('create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
         self.owner = owner
@@ -34,8 +34,13 @@ class WorldForm(forms.ModelForm):
                     css_class='col-12 col-lg-7'
                 ),
                 Column(
-                    Field('description',
-                          placeholder=_('Write something about your world, its civilizations, its culture...')),
+                    Field(
+                        'description',
+                        placeholder=_(
+                            # NOTE: Character length 121 -.-
+                            'write something about your world, its civilizations, its culture...'
+                        ).capitalize()
+                    ),
                     css_class='col-12 col-lg-7'
                 ),
                 Column(
@@ -46,7 +51,7 @@ class WorldForm(forms.ModelForm):
             ),
             Row(
                 Submit('submit', submit_text, css_class='btn btn-primary col-5 col-lg-6'),
-                Reset('reset', _('Clean'), css_class='btn btn-secondary col-5 d-lg-none'),
+                Reset('reset', _('clean'), css_class='btn btn-secondary col-5 d-lg-none'),
                 css_class='justify-content-around'
             )
         )
@@ -56,7 +61,9 @@ class WorldForm(forms.ModelForm):
         model = models.Place
         help_texts = {
             'image': '{}. {} {} MiB.'.format(
-                _('A picture is worth a thousand words'), _('Max size file'), utils.max_size_file_mb()
+                _('a picture is worth a thousand words').capitalize(),
+                _('max size file').capitalize(),
+                utils.max_size_file_mb()
             )
         }
 
@@ -85,12 +92,12 @@ class SessionForm(forms.ModelForm):
         label='',
         choices=(),
         required=False,
-        help_text=_('Listed players will be notified'),
+        help_text=_('listed players will be notified').capitalize(),
     )
     invite_player_input = forms.EmailField(
         label='',
         required=False,
-        help_text=_('Type and email'),
+        help_text=_('type an email').capitalize(),
     )
 
     def __init__(self, request, *args, **kwargs):
@@ -109,24 +116,24 @@ class SessionForm(forms.ModelForm):
                 Column('description'),
             ),
             Fieldset(
-                _('Next session'),
+                _('next session').capitalize(),
                 Column('next_game_date', css_class='col-6'),
                 Column('next_game_time', css_class='col-6'),
                 css_class='form-row text-center',
             ),
             Fieldset(
-                _('Invite players'),
+                _('invite players').capitalize(),
                 Column(Field('invited_players', id='playersInvitedContainer')),
                 Column(Field('invite_player_input', id='invitePlayerInput')),
                 Column(
-                    Button('', _('Add'), css_class='btn btn-info w-100', css_id='playerAddButton'),
+                    Button('', _('add').capitalize(), css_class='btn btn-info w-100', css_id='playerAddButton'),
                     css_class='form-group',
                 ),
                 css_class='form-row text-center',
             ),
             Row(
                 Column(
-                    Submit('submit', _('Create'), css_class='w-100'),
+                    Submit('submit', _('create').capitalize(), css_class='w-100'),
                     css_class='col-md-6'
                 ),
                 css_class='justify-content-md-center',
@@ -148,7 +155,7 @@ class SessionForm(forms.ModelForm):
                 'object': self.instance,
             }
         )
-        subject = _('You\'ve been invited to %(world)s!') % {'world': self.instance.name}
+        subject = _('you\'ve been invited to %(world)s!').capitalize() % {'world': self.instance.name}
         invitations = self.cleaned_data['invited_players']
 
         try:

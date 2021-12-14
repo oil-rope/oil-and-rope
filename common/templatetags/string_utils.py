@@ -1,6 +1,6 @@
 from django import template
 from django.shortcuts import reverse
-from django.template.defaultfilters import stringfilter
+from django.template.defaultfilters import capfirst, stringfilter
 from django.urls.exceptions import NoReverseMatch
 
 register = template.Library()
@@ -33,3 +33,19 @@ def generate_breadcrumbs(text):
         values.update({breadcrumb: url})
 
     return values
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def capfirstletter(text: str):
+    """
+    Same behaviour as `django.template.defaultfilters.capfirst` but only uppercase if is letter.
+    """
+
+    first_letter = 0
+    for letter in text:
+        if letter.isalpha():
+            break
+        first_letter += 1
+
+    return text[:first_letter] + capfirst(text[first_letter:])

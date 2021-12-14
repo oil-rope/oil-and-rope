@@ -1,0 +1,7 @@
+<a
+  href="{{ link.url }}"
+  {{ link.flat_attrs|safe }}
+  class="{% if div.css_class %}{{ div.css_class }}{% else %}btn-link{% endif %}"
+>
+  {{ link.content|safe }}
+</a>

@@ -26,12 +26,12 @@ class MultiplePaginatorListView(ListView):
                 page_number = paginator.num_pages
             # TODO: Test case for this (it cannot be tested now due to inheritance from ListView)
             else:  # pragma: no cover
-                raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
+                raise Http404(_('page is not “last”, nor can it be converted to an int.'))
         try:
             page = paginator.page(page_number)
             return paginator, page, page.object_list, page.has_other_pages()
         except InvalidPage as e:
-            raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
+            raise Http404(_('invalid page (%(page_number)s): %(message)s') % {
                 'page_number': page_number,
                 'message': str(e)
             })

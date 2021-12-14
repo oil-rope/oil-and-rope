@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load crispy_forms_tags %}
-{% block title %}{% trans "Resend confirmation email" %}{% endblock title %}
+{% block title %}{% translate "resend confirmation email"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='Login=registration:login,Resend Email' %}
@@ -10,14 +10,14 @@
 
 {% block body_content %}
 <div class="container py-5">
-  <h2 class="display-5 text-center">{% trans "Resend email" %}</h2>
+  <h2 class="display-5 text-center">{% translate "resend email"|capfirst %}</h2>
   <hr>
   {% crispy form %}
   <div class="row justify-content-md-around mt-3 mt-xl-5">
     <div class="col-12 col-md-10 col-lg-6">
       <button onclick="goBack();" class="btn btn-secondary w-100">
         <i class="ic ic-arrow-left"></i>
-        {% trans "Go back" %}
+        {% translate "go back"|capfirst %}
       </button>
     </div>
   </div>

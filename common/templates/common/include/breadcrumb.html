@@ -7,12 +7,12 @@
       {% url 'core:index' as home %}
       {% if actual_path == home %}
         <li class="breadcrumb-item active" aria-current="page">
-          {% trans "Home" %}
+          {% translate "home"|capfirst context "menu name" %}
         </li>
       {% else %}
         <li class="breadcrumb-item">
           <a class="text-light" href="{{ home }}">
-            {% trans "Home" %}
+            {% translate "home"|capfirst context "menu name" %}
           </a>
         </li>
       {% endif %}
@@ -21,12 +21,12 @@
           {% for breadcrumb, breadcrumb_url in breadcrumbs.items %}
             {% if forloop.last %}
               <li class="breadcrumb-item active" aria-current="page">
-                {% trans breadcrumb %}
+                {{ breadcrumb|title }}
               </li>
             {% else %}
               <li class="breadcrumb-item" aria-current="page">
                 <a href="{{ breadcrumb_url }}" class="text-light">
-                  {% trans breadcrumb %}
+                  {{ breadcrumb|title }}
                 </a>
               </li>
             {% endif %}

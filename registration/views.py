@@ -68,9 +68,9 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     def get_success_message(self) -> str:
         if self.success_message:  # pragma: no cover
             return self.success_message
-        success_message = '{}! {}.'.format(
-            _('User created'),
-            _('Please confirm your email')
+        success_message = '{} {}.'.format(
+            _('user created!').capitalize(),
+            _('please confirm your email').capitalize()
         )
         return success_message
 
@@ -141,7 +141,7 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
         if self.validate_token():
             self.user.is_active = True
             self.user.save()
-            messages.success(request, _('Your email has been confirmed') + '!')
+            messages.success(request, _('your email has been confirmed!').capitalize())
         return super(ActivateAccountView, self).get(request, *args, **kwargs)
 
 
@@ -191,7 +191,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         })
 
         try:
-            user.email_user(_('Welcome to Oil & Rope!'), '', html_message=msg_html)
+            user.email_user(_('welcome to Oil & Rope!'), '', html_message=msg_html)
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
@@ -199,7 +199,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         cleaned_data = form.cleaned_data
         user = self.get_user(cleaned_data['email'])
         self.send_email(user)
-        messages.success(self.request, _('Your confirmation email has been sent') + '!')
+        messages.success(self.request, _('your confirmation email has been sent!').capitalize())
         return super().form_valid(form)
 
 
@@ -212,7 +212,7 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
     email_template_name = 'email_templates/password_reset_email.html'
 
     extra_email_context = {
-        'title': _('Password reset')
+        'title': _('password reset')
     }
     form_class = forms.PasswordResetForm
     html_email_template_name = 'email_templates/password_reset_email.html'
@@ -221,8 +221,8 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        msg = '{}'.format(_('Email for password reset request sent!'))
-        messages.success(self.request, msg)
+        msg = _('email for password reset request sent!')
+        messages.success(self.request, f'{msg.capitalize()}')
         return response
 
 

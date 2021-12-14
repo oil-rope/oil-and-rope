@@ -29,9 +29,6 @@ MIDDLEWARE.extend([
 INSTALLED_APPS.insert(0, 'django_pdb')
 MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
 
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.mailtrap.io')
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER'],
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD'],
 EMAIL_PORT = os.getenv('EMAIL_PORT', '2525')
 EMAIL_USE_TLS = False
 

@@ -16,30 +16,30 @@ class DynamicMenuForm(TranslationModelForm):
     """
 
     parent = TreeNodeChoiceField(
-        label=_('Parent menu'),
+        label=_('parent menu'),
         queryset=models.DynamicMenu.objects.all(),
         required=False
     )
 
     prepended_text = forms.ChoiceField(
-        label=_('Prepended icon'),
+        label=_('prepended icon'),
         choices=AvailableIcons.choices_with_empty,
         required=False
     )
 
     appended_text = forms.ChoiceField(
-        label=_('Appended icon'),
+        label=_('appended icon'),
         choices=AvailableIcons.choices_with_empty,
         required=False
     )
 
     permissions_required = forms.CharField(
-        help_text=_('Permissions must be separated by \',\' (auth.view_user, roleplay.delete_world, ...)'),
+        help_text=_('permissions must be separated by \',\' (auth.view_user, roleplay.delete_world, ...)'),
         required=False
     )
 
     related_models = forms.CharField(
-        help_text=_('Models must be separated by \',\' (registration.User, roleplay.World, auth.Group, ...)'),
+        help_text=_('models must be separated by \',\' (registration.User, roleplay.World, auth.Group, ...)'),
         required=False
     )
 
@@ -51,7 +51,7 @@ class DynamicMenuForm(TranslationModelForm):
         self.display_url_resolver_id = 'menuDisplayURLResolver'
         self.helper.layout = Layout(
             Fieldset(
-                _('Naming'),
+                _('naming'),
                 Row(
                     Column('prepended_text', css_class='col-md-4 col-lg-3'),
                     Column('name', css_class='col-md-4 col-lg-3'),
@@ -66,7 +66,7 @@ class DynamicMenuForm(TranslationModelForm):
                 css_class='mb-3'
             ),
             Fieldset(
-                _('Direction'),
+                _('direction'),
                 Row(
                     Column('url_resolver', css_class='col-md-6 col-lg-4'),
                     Column('extra_urls_args', css_class='col-md-6 col-lg-4'),
@@ -80,7 +80,7 @@ class DynamicMenuForm(TranslationModelForm):
                 css_class='mb-3'
             ),
             Fieldset(
-                _('Permissions'),
+                _('permissions'),
                 Row(
                     Column('permissions_required', css_class='col-md-6 col-lg-3'),
                     Column('related_models', css_class='col-md-6 col-lg-3'),
@@ -101,11 +101,11 @@ class DynamicMenuForm(TranslationModelForm):
             ),
             Row(
                 Column(
-                    Submit('submit', _('Create'), css_class='w-100'),
+                    Submit('submit', _('create'), css_class='w-100'),
                     css_class='col-6 col-lg-4'
                 ),
                 Column(
-                    Reset('reset', _('Clear'), css_class='w-100 btn-secondary'),
+                    Reset('reset', _('clear'), css_class='w-100 btn-secondary'),
                     css_class='col-6 col-lg-4'
                 ),
                 css_class='justify-content-around'

@@ -13,7 +13,7 @@ class HandlerJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
         func = content['type']
         if not hasattr(self, func):
             content = {
-                'error': _('Non existent type') + '.'
+                'error': _('non existent type').capitalize() + '.'
             }
             await super().send_json(content, True)
         else:
@@ -24,7 +24,7 @@ class HandlerJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content, **kwargs):
         if 'type' not in content:
             content = {
-                'error': _('No type given') + '.'
+                'error': _('no type given').capitalize() + '.'
             }
             await super().send_json(content, True)
         else:

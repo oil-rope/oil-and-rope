@@ -14,8 +14,8 @@ class StaffRequiredMixin(View):
         user = request.user
 
         if not user.is_authenticated or not user.is_staff:
-            msg = _('You are trying to access an Staff page but you are not staff')
-            messages.warning(request, f'{msg}.')
+            msg = _('you are trying to access an staff page but you are not staff')
+            messages.warning(request, f'{msg.capitalize()}.')
             return redirect(to=settings.LOGIN_URL)
 
         return super().dispatch(request, *args, **kwargs)

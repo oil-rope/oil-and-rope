@@ -3,18 +3,18 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% trans "Create" %} {% trans "Menu" %}{% endblock title %}
+{% block title %}{% translate "create"|capfirst %} {% translate "menu"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Menus=dynamic_menu:dynamic_menu:create,Create' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Menus=dynamic_menu:dynamic_menu:create,create' %}
 {% endblock breadcrumb %}
 
 
 {% block body_content %}
   <main class="container py-5">
     <h1 class="text-center font-weight-lighter">
-      {% trans "Create" %} {% trans "Menu" %}
-    </h2>
+      {% translate "create"|capfirst %} {% translate "menu"|capfirst %}
+    </h1>
     <hr class="mx-5 mb-5">
     <div class="row">
       <div class="col-12">

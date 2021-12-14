@@ -144,10 +144,7 @@ class TestSignUpView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_can_register_ok(self, mock_call: mock.MagicMock):
         response = self.client.post(self.url, data=self.data_ok)
-        success_message = '{}! {}.'.format(
-            _('User created'),
-            _('Please confirm your email')
-        )
+        success_message = 'User created! Please confirm your email.'
         mock_call.success.assert_called_with(
             response.wsgi_request,
             success_message
@@ -158,10 +155,7 @@ class TestSignUpView(TestCase):
         data_ok = self.data_ok.copy()
         response = self.client.post(self.url, data=data_ok)
 
-        succes_message = '{} {}.'.format(
-            _('User created!'),
-            _('Please confirm your email')
-        )
+        succes_message = 'User created! Please confirm your email.'
         mock_call.success.assert_called_with(
             response.wsgi_request,
             succes_message
@@ -264,7 +258,7 @@ class TestResendConfirmationEmailView(TestCase):
     def test_ok(self, mock_call):
         response = self.client.post(self.url, data=self.data_ok)
         self.assertEqual(302, response.status_code, 'User is no redirected.')
-        success_message = _('Your confirmation email has been sent') + '!'
+        success_message = 'Your confirmation email has been sent!'
         mock_call.success.assert_called_with(
             response.wsgi_request,
             success_message
@@ -315,7 +309,7 @@ class TestResetPasswordView(TestCase):
     def test_ok(self, mock_call):
         response = self.client.post(self.url, data=self.data_ok)
         self.assertEqual(302, response.status_code, 'User is no redirected.')
-        success_message = _('Email for password reset request sent!')
+        success_message = 'Email for password reset request sent!'
         mock_call.success.assert_called_with(
             response.wsgi_request,
             success_message
@@ -365,7 +359,7 @@ class TestPasswordResetConfirmView(TestCase):
         url = response.url
         response = self.client.post(url, data=self.data_ok)
         self.assertEqual(302, response.status_code, 'User is no redirected.')
-        success_message = _('Password changed successfully!')
+        success_message = 'Password changed successfully!'
         mock_call.success.assert_called_with(
             response.wsgi_request,
             success_message

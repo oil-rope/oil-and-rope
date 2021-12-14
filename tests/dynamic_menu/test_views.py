@@ -27,7 +27,7 @@ class TestDynamicMenuCreateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(302, response.status_code)
-        warn_message = 'You are trying to access an Staff page but you are not staff.'
+        warn_message = 'You are trying to access an staff page but you are not staff.'
 
         mock_call.warning.assert_called_with(
             response.wsgi_request,

@@ -2,23 +2,26 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load string_utils %}
 
-{% block title %}{% trans "Create your account" %}{% endblock title %}
+{% block title %}{% translate "create your account"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Register' %}
+  {% translate "register"|capfirst as register_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs=register_page %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
   <header class="container">
     <h1 class="display-4 text-center">
-      {% trans "start your adventure!"|capfirst %}
+      {% translate "start your adventure!"|capfirstletter %}
     </h1>
     <hr>
     <p class="lead text-center">
-      {% trans "take the first step"|capfirst %}. {% trans "create your account"|capfirst %}.
+      {% translate "take the first step."|capfirst %}
+      {% translate "create your account."|capfirst %}
       <br>
-      {% trans "your world awaits!"|capfirst %}
+      {% translate "your world awaits!"|capfirstletter %}
     </p>
   </header>
   <main class="container pb-3">

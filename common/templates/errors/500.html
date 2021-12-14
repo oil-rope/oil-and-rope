@@ -1,20 +1,20 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Boom" %}!{% endblock title %}
+{% block title %}{% translate "boom!"|capfirst %}{% endblock title %}
 
 {% block body_content %}
   <main class="container py-5">
-    <h2 class="display-3 text-center">{% trans "One of our robots have just exploded" %}.</h2>
+    <h2 class="display-3 text-center">{% translate "one of our robots have just exploded."|capfirst %}</h2>
     <small class="lead text-muted">
-      {% trans "But don't panic, it's not like they're gonna reveal against us... Right?" %}
+      {% translate "but don't panic, it's not like they're gonna reveal against us..."|capfirst %} {% translate "right?"|capfirst %}
     </small>
     <hr class="mx-5">
     <div class="row pt-5">
       <div class="col-12">
         <p class="lead text-center">
-          {% trans "Meanwhile why don't you try to escap... I mean" %}
-          <a href="{% url 'core:home' %}">{% trans "go back" %}?</a>
+          {% translate "meanwhile why don't you try to escap... I mean"|capfirst %}
+          <a href="{% url 'core:home' %}">{% translate "go back" %}?</a>
         </p>
       </div>
     </div>
