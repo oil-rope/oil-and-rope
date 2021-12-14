@@ -221,8 +221,8 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        msg = '{}'.format(_('email for password reset request sent!'))
-        messages.success(self.request, msg)
+        msg = _('email for password reset request sent!')
+        messages.success(self.request, f'{msg.capitalize()}')
         return response
 
 
