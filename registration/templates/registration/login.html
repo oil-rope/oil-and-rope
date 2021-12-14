@@ -2,8 +2,9 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load string_utils %}
 
-{% block title %}{% trans "login"|capfirst %}{% endblock title %}
+{% block title %}{% trans "login"|capfirstletter %}{% endblock title %}
 
 {% block css %}
   <!--suppress CssReplaceWithShorthandSafely -->
@@ -43,21 +44,19 @@
           Oil &amp; Rope
         </h2>
         <small class="lead text-white">
-          <em>&laquo;{{ slogan|default:"i'm rollin' it"|capfirst }}&raquo;</em>
+          <em>&laquo;{{ slogan|default:"i'm rollin' it"|capfirstletter }}&raquo;</em>
         </small>
       </div>
 
       <!-- Form -->
       <div class="col-12 col-xl-6">
-        <form method="post" action="{% url 'registration:login' %}" id="loginForm">
-          {% crispy form %}
-        </form>
+        {% crispy form %}
         <div class="row justify-content-around mt-3 mt-md-5 mb-5">
           <a href="{% url 'registration:password_reset' %}">
-            {% trans "forgot password?"|capfirst %}
+            {% trans "forgot password?"|capfirstletter %}
           </a>
           <a href="{% url 'registration:resend_email' %}">
-            {% trans "resend email"|capfirst %}
+            {% trans "resend email"|capfirstletter %}
           </a>
         </div>
       </div>
@@ -65,9 +64,9 @@
       <!-- Join -->
       <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0 py-lg-3 pt-xl-0 pb-xl-5">
         <p class="lead text-white mr-sm-3 mb-md-0">
-          {% trans "don't have an account?"|capfirst %}
+          {% trans "don't have an account?"|capfirstletter %}
         </p>
-        <a class="lead" href="{% url 'registration:register' %}">{% trans "join now!"|capfirst %}</a>
+        <a class="lead" href="{% url 'registration:register' %}">{% trans "join now!"|capfirstletter %}</a>
       </div>
 
       <!-- Arrow -->

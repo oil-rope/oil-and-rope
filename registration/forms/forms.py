@@ -37,7 +37,11 @@ class LoginForm(auth_forms.AuthenticationForm):
         self.helper = FormHelper(self)
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
-        self.helper.layout = LoginFormLayout
+        self.helper.form_method = 'POST'
+        self.helper.form_action = reverse('registration:login')
+        self.helper.form_id = 'formLogin'
+        self.helper.include_media = False
+        self.helper.layout = LoginFormLayout()
 
 
 class SignUpForm(auth_forms.UserCreationForm):

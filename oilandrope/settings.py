@@ -332,9 +332,9 @@ REST_FRAMEWORK = {
 
 DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[Oil & Rope] '
-EMAIL_HOST = os.environ['EMAIL_HOST'],
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER'],
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD'],
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
 EMAIL_USE_TLS = True
 
