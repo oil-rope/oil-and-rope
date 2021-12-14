@@ -8,8 +8,8 @@ from common.forms import layout as common_layout
 class DynamicMenuLayout(layout.Layout):
     def __init__(self):
         super().__init__(layout.Layout(
-            bootstrap.Accordion(
-                bootstrap.AccordionGroup(
+            bootstrap.TabHolder(
+                bootstrap.Tab(
                     _p('noun', 'naming').title(),
                     layout.Row(
                         layout.Column('prepended_text', css_class='col-12 col-md-4'),
@@ -23,7 +23,7 @@ class DynamicMenuLayout(layout.Layout):
                         layout.Column('description', css_class='col-12'),
                     ),
                 ),
-                bootstrap.AccordionGroup(
+                bootstrap.Tab(
                     _('direction').title(),
                     layout.Row(
                         layout.Column('url_resolver', css_class='col-12 col-md-6'),
@@ -35,7 +35,7 @@ class DynamicMenuLayout(layout.Layout):
                         ),
                     ),
                 ),
-                bootstrap.AccordionGroup(
+                bootstrap.Tab(
                     _('permissions').title(),
                     layout.Row(
                         layout.Column('permissions_required', css_class='col-12 col-md-6 col-lg-4'),
@@ -45,7 +45,7 @@ class DynamicMenuLayout(layout.Layout):
                         layout.Column('staff_required', css_class='col'),
                     )
                 ),
-                bootstrap.AccordionGroup(
+                bootstrap.Tab(
                     _('submenu configuration').title(),
                     layout.Row(
                         layout.Column('parent', css_class='col-md-4'),
