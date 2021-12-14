@@ -6,7 +6,7 @@ from common.forms import layout as common_layout
 
 
 class LoginFormLayout(layout.Layout):
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         super().__init__(
             layout.Layout(
                 layout.Row(

@@ -1,10 +1,22 @@
-from crispy_forms.layout import LayoutObject
+from crispy_forms import layout
 from crispy_forms.utils import TEMPLATE_PACK, flatatt
 from django.template.base import Template
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
 
 
-class Link(LayoutObject):
+class CreateClearLayout(layout.Layout):
+    def __init__(self, reset_text=_('clear'), create_text=_('create')):
+        super().__init__(
+            layout.Row(
+                layout.Reset('reset', reset_text.title(), css_class='btn btn-secondary col-5'),
+                layout.Submit('create', create_text.title(), css_class='btn btn-primary col-5'),
+                css_class='justify-content-around',
+            ),
+        )
+
+
+class Link(layout.LayoutObject):
     field_classes = "btn"
     template = '%s/layout/link.html'
 

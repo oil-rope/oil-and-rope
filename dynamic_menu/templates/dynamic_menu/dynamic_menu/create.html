@@ -29,8 +29,8 @@
   <script
     src="{% static 'dynamic_menu/js/createMenu.js' %}"
     data-form-id="{{ form.helper.form_id }}"
-    data-name-container-id="{{ name_container_display_id }}"
+    data-name-container-id="menuDisplayNameContainer"
     data-url-resolver="{% url 'common:utils:get_url' %}"
-    data-url-resolver-container-id="{{ display_url_resolver_id }}"
+    data-url-resolver-container-id="menuDisplayURLResolver"
   ></script>
 {% endblock javascript %}
