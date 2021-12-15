@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # LeCuay <suso.becerra98@gmail.com>, 2020.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 09:46+0000\n"
+"POT-Creation-Date: 2021-12-15 18:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1073,9 +1073,10 @@ msgstr "identificador de discord"
 msgid ""
 "if you have a discord account you want to link with just give us your ID!"
 msgstr ""
-"si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo danos el ID!"
+"si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo "
+"danos el ID!"
 
-#: .\registration\forms\forms.py:73
+#: .\registration\forms\forms.py:80
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1083,32 +1084,32 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: .\registration\forms\forms.py:93
+#: .\registration\forms\forms.py:100 .\registration\views.py:193
 #, fuzzy, python-format
 #| msgid "Welcome to Oil & Rope!"
 msgid "welcome to %(title)s!"
 msgstr "¡bienvenido a %(title)s!"
 
-#: .\registration\forms\forms.py:124
+#: .\registration\forms\forms.py:131
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: .\registration\forms\forms.py:134 .\registration\models.py:22
+#: .\registration\forms\forms.py:141 .\registration\models.py:22
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: .\registration\forms\forms.py:135
+#: .\registration\forms\forms.py:142
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación."
 
-#: .\registration\forms\forms.py:149
+#: .\registration\forms\forms.py:156
 #: .\registration\templates\registration\login.html:60
 #: .\registration\templates\registration\resend_email.html:13
 #, fuzzy
@@ -1116,31 +1117,31 @@ msgstr ""
 msgid "resend email"
 msgstr "reenviar email"
 
-#: .\registration\forms\forms.py:159
+#: .\registration\forms\forms.py:166
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: .\registration\forms\forms.py:171
+#: .\registration\forms\forms.py:178
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: .\registration\forms\forms.py:180
+#: .\registration\forms\forms.py:187
 #, fuzzy
 #| msgid "Resend email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: .\registration\forms\forms.py:191
+#: .\registration\forms\forms.py:198
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user"
 msgstr "este email no pertenece a ningún usuario"
 
-#: .\registration\forms\forms.py:212
+#: .\registration\forms\forms.py:219
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
@@ -1287,41 +1288,35 @@ msgstr "¡tu mundo espera!"
 msgid "resend confirmation email"
 msgstr "reenviar email de confirmación"
 
-#: .\registration\views.py:38 .\tests\registration\test_views.py:94
+#: .\registration\views.py:40
 #, fuzzy
 #| msgid "Seems like this user is inactive"
-msgid "seems like this user is inactive"
+msgid "seems like this user is inactive."
 msgstr "parece que este usuario está inactivo"
 
-#: .\registration\views.py:39 .\tests\registration\test_views.py:95
+#: .\registration\views.py:41
 #, fuzzy
 #| msgid "Have you confirmed your email?"
 msgid "have you confirmed your email?"
 msgstr "¿has confirmado tu email?"
 
-#: .\registration\views.py:72
+#: .\registration\views.py:71
 #, fuzzy
 #| msgid "User created"
 msgid "user created!"
 msgstr "¡usuario creado!"
 
-#: .\registration\views.py:73
+#: .\registration\views.py:72
 #, fuzzy
 #| msgid "Please confirm your email"
-msgid "please confirm your email"
-msgstr "por favor confirma tu email"
+msgid "please confirm your email."
+msgstr "por favor confirma tu email."
 
-#: .\registration\views.py:144
+#: .\registration\views.py:143
 #, fuzzy
 #| msgid "Your email has been confirmed"
 msgid "your email has been confirmed!"
-msgstr "¡Tu email ha sido confirmado!"
-
-#: .\registration\views.py:194
-#, fuzzy
-#| msgid "Welcome to Oil & Rope!"
-msgid "welcome to Oil & Rope!"
-msgstr "¡bienvenido a Oil & Rope!"
+msgstr "¡tu email ha sido confirmado!"
 
 #: .\registration\views.py:202
 #, fuzzy
@@ -1339,7 +1334,7 @@ msgstr "restaurar contraseña"
 #, fuzzy
 #| msgid "Email for password reset request sent!"
 msgid "email for password reset request sent!"
-msgstr "se ha enviado un email con la petición de restauración de contraseña"
+msgstr "¡se ha enviado un email con la petición de restauración de contraseña!"
 
 #: .\registration\views.py:239
 #, fuzzy
@@ -1900,6 +1895,16 @@ msgstr "actualizar"
 #| msgid "you've invited to a session!"
 msgid "you are not part of this session"
 msgstr "¡has sido invitado a una partida!"
+
+#, fuzzy
+#~| msgid "Seems like this user is inactive"
+#~ msgid "seems like this user is inactive"
+#~ msgstr "parece que este usuario está inactivo"
+
+#, fuzzy
+#~| msgid "Welcome to Oil & Rope!"
+#~ msgid "welcome to Oil & Rope!"
+#~ msgstr "¡bienvenido a Oil & Rope!"
 
 #~ msgid "naming"
 #~ msgstr "nombre"

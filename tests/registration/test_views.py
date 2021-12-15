@@ -7,7 +7,6 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.utils.translation import gettext_lazy as _
 from faker import Faker
 from model_bakery import baker
 
@@ -90,10 +89,7 @@ class TestLoginView(TestCase):
         response = self.client.post(self.url, data=data)
         self.assertFalse(get_user(self.client).is_authenticated, 'Inactive user is logged.')
 
-        warn_message = '{}. {}'.format(
-            _('seems like this user is inactive').capitalize(),
-            _('have you confirmed your email?').capitalize(),
-        )
+        warn_message = 'Seems like this user is inactive. Have you confirmed your email?'
         mock_call.warning.assert_called_with(
             response.wsgi_request,
             warn_message

@@ -15,6 +15,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView, TemplateView
 from rest_framework.authtoken.models import Token
 
+from common.templatetags.string_utils import capfirstletter as cfl
+
 from . import forms
 from .mixins import RedirectAuthenticatedUserMixin
 
@@ -34,9 +36,9 @@ class LoginView(auth_views.LoginView):
         try:
             user = get_user_model().objects.get(username=cleaned_data['username'])
             if not user.is_active:
-                warn_message = '{}. {}'.format(
-                    _('seems like this user is inactive').capitalize(),
-                    _('have you confirmed your email?').capitalize(),
+                warn_message = '{} {}'.format(
+                    _('seems like this user is inactive.').capitalize(),
+                    cfl(_('have you confirmed your email?')),
                 )
                 messages.warning(self.request, warn_message)
         except get_user_model().DoesNotExist:
@@ -58,7 +60,6 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     model = get_user_model()
     form_class = forms.SignUpForm
     template_name = 'registration/register.html'
-    success_message = None
     success_url = reverse_lazy('registration:login')
 
     def get_context_data(self, **kwargs):
@@ -66,11 +67,9 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return context
 
     def get_success_message(self) -> str:
-        if self.success_message:  # pragma: no cover
-            return self.success_message
-        success_message = '{} {}.'.format(
-            _('user created!').capitalize(),
-            _('please confirm your email').capitalize()
+        success_message = '{} {}'.format(
+            cfl(_('user created!')),
+            _('please confirm your email.').capitalize()
         )
         return success_message
 
@@ -141,7 +140,7 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
         if self.validate_token():
             self.user.is_active = True
             self.user.save()
-            messages.success(request, _('your email has been confirmed!').capitalize())
+            messages.success(request, cfl(_('your email has been confirmed!')))
         return super(ActivateAccountView, self).get(request, *args, **kwargs)
 
 
@@ -191,7 +190,8 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         })
 
         try:
-            user.email_user(_('welcome to Oil & Rope!'), '', html_message=msg_html)
+            msg = cfl(_('welcome to %(title)s!')) % {'title': 'Oil & Rope'}
+            user.email_user(msg, '', html_message=msg_html)
         except SMTPAuthenticationError:  # pragma: no cover
             LOGGER.exception('Unable to logging email server with given credentials.')
 
@@ -199,7 +199,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         cleaned_data = form.cleaned_data
         user = self.get_user(cleaned_data['email'])
         self.send_email(user)
-        messages.success(self.request, _('your confirmation email has been sent!').capitalize())
+        messages.success(self.request, cfl(_('your confirmation email has been sent!')))
         return super().form_valid(form)
 
 
@@ -221,8 +221,8 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        msg = _('email for password reset request sent!')
-        messages.success(self.request, f'{msg.capitalize()}')
+        msg = cfl(_('email for password reset request sent!'))
+        messages.success(self.request, msg)
         return response
 
 
@@ -236,8 +236,8 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     template_name = 'registration/password_change.html'
 
     def form_valid(self, form):
-        msg = '{}'.format(_('password changed successfully!'))
-        messages.success(self.request, msg.capitalize())
+        msg = cfl(_('password changed successfully!'))
+        messages.success(self.request, msg)
         return super().form_valid(form)
 
 

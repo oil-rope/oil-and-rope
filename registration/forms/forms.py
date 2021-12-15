@@ -57,6 +57,13 @@ class SignUpForm(auth_forms.UserCreationForm):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # NOTE: Using `.title()`, `capitalize()` or any string methods into variable declaration results
+        # into not translating the field.
+        discord_id_field = self.fields['discord_id']
+        discord_id_field.label = discord_id_field.label.title()
+        discord_id_field.help_text = discord_id_field.help_text.capitalize()
+
         self.request = request
         self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
