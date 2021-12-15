@@ -4,7 +4,6 @@ from smtplib import SMTPAuthenticationError
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Column, Layout, Row, Submit
 from django import forms
-from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -17,7 +16,7 @@ from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.utils.auth import generate_token
 
-from .layout import LoginFormLayout
+from .layout import LoginFormLayout, SignUpFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,10 +49,10 @@ class SignUpForm(auth_forms.UserCreationForm):
     """
 
     discord_id = forms.CharField(
-        label=_('discord identifier').title(),
+        label=_('discord identifier'),
         max_length=254,
         required=False,
-        help_text=_('if you have a discord account you want to link with just give us your ID!').capitalize()
+        help_text=_('if you have a discord account you want to link with just give us your ID!')
     )
 
     def __init__(self, request, *args, **kwargs):
@@ -61,55 +60,9 @@ class SignUpForm(auth_forms.UserCreationForm):
         self.request = request
         self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
+        self.helper.form_action = reverse('registration:register')
         self.helper.id = 'registerForm'
-        self.helper.form_class = 'container-fluid'
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    'username',
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                Column(
-                    'email',
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                css_class='justify-content-xl-between'
-            ),
-            Row(
-                Column(
-                    'password1',
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                Column(
-                    'password2',
-                    css_class='col-12 col-lg-6 col-xl-5'
-                ),
-                css_class='justify-content-xl-between'
-            ),
-            Row(
-                Column(
-                    'discord_id',
-                    css_class='col-12 col-md-8 col-lg-6 col-xl-5'
-                ),
-                Column(
-                    HTML(
-                        '<a target="_blank" class="btn btn-info w-100" href="{url}">{text}</a>'.format(
-                            url=settings.BOT_INVITATION,
-                            text=_('invite our bot to your server!').capitalize(),
-                        )
-                    ),
-                    css_class='col-12 col-md-8 col-lg-6 col-xl-5',
-                ),
-                css_class='justify-content-lg-between'
-            ),
-            Row(
-                Column(
-                    Submit('submit', _('register').capitalize(), css_class='btn-lg w-100'),
-                    css_class='col-12 col-xl-6'
-                ),
-                css_class='mt-4 mt-md-0 mt-xl-5 justify-content-xl-center'
-            )
-        )
+        self.helper.layout = SignUpFormLayout()
 
     def clean_discord_id(self):
         data = self.cleaned_data.get('discord_id')
@@ -136,8 +89,8 @@ class SignUpForm(auth_forms.UserCreationForm):
         })
 
         try:
-            title = 'Oil & Rope!'
-            subject = _('welcome to %(title)s') % {'title': title}
+            title = 'Oil & Rope'
+            subject = _('welcome to %(title)s!') % {'title': title}
             send_mail(
                 subject=str(subject).capitalize(), message='', from_email=None,
                 recipient_list=[user.email], html_message=html_msg,
@@ -168,7 +121,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         fields = ('username', 'email')
         field_classes = {'username': auth_forms.UsernameField}
         help_texts = {
-            'email': _('we will send you an email to confirm your account').capitalize() + '.'
+            'email': _('we will send you an email to confirm your account.')
         }
 
 
@@ -178,8 +131,8 @@ class ResendEmailForm(forms.Form):
     """
 
     email = forms.EmailField(
-        label=_('email address').capitalize(),
-        help_text=_('enter your email address and we\'ll resend you the confirmation email').capitalize() + '.',
+        label=_('email address'),
+        help_text=_('enter your email address and we\'ll resend you the confirmation email.'),
         required=True,
     )
 
@@ -203,7 +156,7 @@ class ResendEmailForm(forms.Form):
     def clean_email(self):
         data = self.cleaned_data.get('email')
         if not get_user_model().objects.filter(email=data).exists():
-            msg = _('this email doesn\'t belong to a user').capitalize() + '.'
+            msg = _('this email doesn\'t belong to a user.').capitalize()
             self.add_error('email', msg)
         return data
 
@@ -215,7 +168,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        msg = '{}.'.format(_('we will send you a recovery link to this email').capitalize())
+        msg = _('we will send you a recovery link to this email.').capitalize()
         self.add_help_text('email', msg)
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
