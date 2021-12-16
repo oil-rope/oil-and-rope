@@ -7,8 +7,7 @@
 {% block title %}{% translate "create your account"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% translate "register"|capfirst as register_page %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs=register_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='register' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}

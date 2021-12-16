@@ -8,7 +8,6 @@ from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.shortcuts import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
@@ -16,7 +15,7 @@ from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.utils.auth import generate_token
 
-from .layout import LoginFormLayout, SignUpFormLayout
+from .layout import LoginFormLayout, ResendEmailFormLayout, SignUpFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -34,12 +33,12 @@ class LoginForm(auth_forms.AuthenticationForm):
         self.fields['username'].label = username_label
 
         self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.form_action = 'registration:login'
+        self.helper.include_media = False
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
-        self.helper.form_method = 'POST'
-        self.helper.form_action = reverse('registration:login')
         self.helper.form_id = 'formLogin'
-        self.helper.include_media = False
         self.helper.layout = LoginFormLayout()
 
 
@@ -65,9 +64,9 @@ class SignUpForm(auth_forms.UserCreationForm):
         discord_id_field.help_text = discord_id_field.help_text.capitalize()
 
         self.request = request
-        self.send_invitation_url = reverse('bot:utils:send_invitation')
         self.helper = FormHelper(self)
-        self.helper.form_action = reverse('registration:register')
+        self.helper.form_action = 'registration:register'
+        self.helper.include_media = False
         self.helper.id = 'registerForm'
         self.helper.layout = SignUpFormLayout()
 
@@ -145,20 +144,16 @@ class ResendEmailForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        email_field = self.fields['email']
+        email_field.label = email_field.label.capitalize()
+        email_field.help_text = email_field.help_text.capitalize()
+
         self.helper = FormHelper(self)
-        self.helper.layout = Layout(
-            Row(
-                Column('email', css_class='col-12 col-xl-8'),
-                css_class='justify-content-around'
-            ),
-            Row(
-                Column(
-                    Submit('submit', _('resend email').capitalize(), css_class='w-100'),
-                    css_class='col-md-10 col-lg-6'
-                ),
-                css_class='justify-content-md-around'
-            )
-        )
+        self.helper.form_method = 'POST'
+        self.helper.form_action = 'registration:resend_email'
+        self.helper.include_media = False
+        self.helper.layout = ResendEmailFormLayout()
 
     def clean_email(self):
         data = self.cleaned_data.get('email')

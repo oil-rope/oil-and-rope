@@ -7,7 +7,7 @@ from common.forms import layout as common_layout
 
 class DynamicMenuLayout(layout.Layout):
     def __init__(self):
-        super().__init__(layout.Layout(
+        super().__init__(
             bootstrap.TabHolder(
                 bootstrap.Tab(
                     _p('noun', 'naming').title(),
@@ -60,4 +60,4 @@ class DynamicMenuLayout(layout.Layout):
                 ),
                 css_class='mt-5'
             ),
-        ))
+        )

@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # LeCuay <suso.becerra98@gmail.com>, 2020.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-15 18:04+0000\n"
+"POT-Creation-Date: 2021-12-16 11:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -604,7 +604,7 @@ msgstr "un gestor de juegos de mesa para jugadores."
 #, fuzzy
 #| msgid "Contributing"
 msgid "contributing"
-msgstr "contribuir."
+msgstr "contribuir"
 
 #: .\core\templates\core\includes\about_the_project.html:24
 msgid ""
@@ -747,7 +747,7 @@ msgstr "haz cosas increíbles que todos puedan disfrutar."
 
 #: .\core\templates\core\includes\about_us.html:108
 #: .\email\templates\email_templates\invitation_email.html:46
-#: .\registration\templates\registration\login.html:70
+#: .\registration\templates\registration\login.html:69
 #, fuzzy
 #| msgid "Join now"
 msgid "join now!"
@@ -766,9 +766,8 @@ msgid "toggle navigation"
 msgstr "activar navegación"
 
 #: .\core\templates\core\includes\menu.html:72
-#: .\registration\forms\layout.py:20
+#: .\registration\forms\layout.py:19
 #: .\registration\templates\registration\login.html:7
-#: .\registration\templates\registration\login.html:33
 #, fuzzy
 #| msgid "Login"
 msgid "login"
@@ -1054,19 +1053,19 @@ msgstr "español"
 msgid "registration system"
 msgstr "sistema de registro"
 
-#: .\registration\forms\forms.py:33
+#: .\registration\forms\forms.py:32
 #, fuzzy
 #| msgid "username"
 msgid "username or email"
 msgstr "nombre de usuario o email"
 
-#: .\registration\forms\forms.py:52
+#: .\registration\forms\forms.py:51
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
 msgstr "identificador de discord"
 
-#: .\registration\forms\forms.py:55
+#: .\registration\forms\forms.py:54
 #, fuzzy
 #| msgid ""
 #| "If you have a Discord Account you want to link with just give us your ID!"
@@ -1076,7 +1075,7 @@ msgstr ""
 "si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo "
 "danos el ID!"
 
-#: .\registration\forms\forms.py:80
+#: .\registration\forms\forms.py:79
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1084,84 +1083,83 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: .\registration\forms\forms.py:100 .\registration\views.py:193
+#: .\registration\forms\forms.py:99 .\registration\views.py:193
 #, fuzzy, python-format
 #| msgid "Welcome to Oil & Rope!"
 msgid "welcome to %(title)s!"
 msgstr "¡bienvenido a %(title)s!"
 
-#: .\registration\forms\forms.py:131
+#: .\registration\forms\forms.py:130
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: .\registration\forms\forms.py:141 .\registration\models.py:22
+#: .\registration\forms\forms.py:140 .\registration\models.py:22
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: .\registration\forms\forms.py:142
+#: .\registration\forms\forms.py:141
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación."
 
-#: .\registration\forms\forms.py:156
-#: .\registration\templates\registration\login.html:60
-#: .\registration\templates\registration\resend_email.html:13
-#, fuzzy
-#| msgid "Resend email"
-msgid "resend email"
-msgstr "reenviar email"
-
-#: .\registration\forms\forms.py:166
+#: .\registration\forms\forms.py:161
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: .\registration\forms\forms.py:178
+#: .\registration\forms\forms.py:173
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: .\registration\forms\forms.py:187
+#: .\registration\forms\forms.py:182
 #, fuzzy
 #| msgid "Resend email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: .\registration\forms\forms.py:198
+#: .\registration\forms\forms.py:193
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user"
 msgstr "este email no pertenece a ningún usuario"
 
-#: .\registration\forms\forms.py:219
+#: .\registration\forms\forms.py:214
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
 msgstr "cambiar contraseña"
 
-#: .\registration\forms\layout.py:23
+#: .\registration\forms\layout.py:22
 #, python-format
 msgid "login with %(social_media)s"
 msgstr "acceder con %(social_media)s"
 
-#: .\registration\forms\layout.py:50
+#: .\registration\forms\layout.py:47
 msgid "invite our bot to your server!"
 msgstr "¡invita nuestro bot a tu server!"
 
-#: .\registration\forms\layout.py:59
-#: .\registration\templates\registration\register.html:10
+#: .\registration\forms\layout.py:56
 #, fuzzy
 #| msgid "Register"
 msgid "register"
 msgstr "registrarse"
+
+#: .\registration\forms\layout.py:73
+#: .\registration\templates\registration\login.html:59
+#: .\registration\templates\registration\resend_email.html:13
+#, fuzzy
+#| msgid "Resend email"
+msgid "resend email"
+msgstr "reenviar email"
 
 #: .\registration\models.py:23
 #, fuzzy
@@ -1240,13 +1238,13 @@ msgstr ""
 "            Para más información comprueba nuestra %(api)s.\n"
 "          "
 
-#: .\registration\templates\registration\login.html:57
+#: .\registration\templates\registration\login.html:56
 #, fuzzy
 #| msgid "Forgot password?"
 msgid "forgot password?"
 msgstr "¿olvidaste la contraseña?"
 
-#: .\registration\templates\registration\login.html:68
+#: .\registration\templates\registration\login.html:67
 #, fuzzy
 #| msgid "Don't have an account?"
 msgid "don't have an account?"
@@ -1258,25 +1256,25 @@ msgstr "¿no tienes una cuenta?"
 msgid "new password"
 msgstr "nueva contraseña"
 
-#: .\registration\templates\registration\register.html:17
+#: .\registration\templates\registration\register.html:16
 #, fuzzy
 #| msgid "Start your adventure"
 msgid "start your adventure!"
 msgstr "¡comienza tu aventura!"
 
-#: .\registration\templates\registration\register.html:21
+#: .\registration\templates\registration\register.html:20
 #, fuzzy
 #| msgid "Take the first step"
 msgid "take the first step."
 msgstr "da el primer paso."
 
-#: .\registration\templates\registration\register.html:22
+#: .\registration\templates\registration\register.html:21
 #, fuzzy
 #| msgid "Create your account"
 msgid "create your account."
 msgstr "crea tu cuenta."
 
-#: .\registration\templates\registration\register.html:24
+#: .\registration\templates\registration\register.html:23
 #, fuzzy
 #| msgid "Your world awaits"
 msgid "your world awaits!"
@@ -1895,6 +1893,9 @@ msgstr "actualizar"
 #| msgid "you've invited to a session!"
 msgid "you are not part of this session"
 msgstr "¡has sido invitado a una partida!"
+
+#~ msgid "restore password"
+#~ msgstr "reestablecer contraseña"
 
 #, fuzzy
 #~| msgid "Seems like this user is inactive"

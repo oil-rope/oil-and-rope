@@ -21,12 +21,12 @@
           {% for breadcrumb, breadcrumb_url in breadcrumbs.items %}
             {% if forloop.last %}
               <li class="breadcrumb-item active" aria-current="page">
-                {{ breadcrumb|title }}
+                {% translate breadcrumb|title %}
               </li>
             {% else %}
               <li class="breadcrumb-item" aria-current="page">
                 <a href="{{ breadcrumb_url }}" class="text-light">
-                  {{ breadcrumb|title }}
+                  {% translate breadcrumb|title %}
                 </a>
               </li>
             {% endif %}
