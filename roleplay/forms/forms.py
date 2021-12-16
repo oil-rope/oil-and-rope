@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
-from . import enums, models
+from .. import enums, models
 
 LOGGER = logging.getLogger(__name__)
 

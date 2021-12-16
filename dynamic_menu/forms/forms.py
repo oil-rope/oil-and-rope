@@ -51,6 +51,7 @@ class DynamicMenuForm(TranslationModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
+        self.helper.form_action = 'dynamic_menu:dynamic_menu:create'
         self.helper.form_id = 'createMenuForm'
         self.helper.layout = DynamicMenuLayout()
 

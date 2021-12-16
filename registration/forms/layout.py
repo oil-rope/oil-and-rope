@@ -53,7 +53,7 @@ class SignUpFormLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.CreateClearLayout(reset_button=False, create_text=_('register').title()),
+                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('register').title()),
                     css_class='col-lg-8 col-xl-6'
                 ),
                 css_class='justify-content-lg-around'
@@ -70,7 +70,7 @@ class ResendEmailFormLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.CreateClearLayout(reset_button=False, create_text=_('resend email').capitalize()),
+                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('resend email').capitalize()),
                     css_class='col-md-10 col-lg-6'
                 ),
                 css_class='justify-content-md-around'
@@ -86,7 +86,7 @@ class PasswordResetFormLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.CreateClearLayout(reset_button=False, create_text=_('send email').capitalize()),
+                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('send email').capitalize()),
                 )
             )
         )
@@ -102,7 +102,7 @@ class SetPasswordFormLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.CreateClearLayout(reset_button=False, create_text=_('change password').capitalize()),
+                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('change password').capitalize()),
                     css_class='col-12 col-lg-6'
                 ),
                 css_class='justify-content-around'

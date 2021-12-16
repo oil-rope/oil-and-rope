@@ -5,19 +5,25 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 
-class CreateClearLayout(layout.Layout):
+class SubmitClearLayout(layout.Layout):
     """
     Simple layout with :class:`layout.Submit` button and optional `layout.Reset` button.
     """
 
     def __init__(self, **kwargs):
-        self.create_text = kwargs.pop('create_text', _('create').title())
+        self.submit_text = kwargs.pop('submit_text', _('create').title())
         self.reset_button = kwargs.pop('reset_button', True)
         self.reset_text = kwargs.pop('reset_text', _('clear').title())
-        self.buttons = (layout.Submit('create', self.create_text, css_class='btn btn-primary col'), )
+        self.reset_css_class = kwargs.pop('reset_css_class', '')
+        self.submit_css_class = kwargs.pop('submit_css_class', '')
+        self.buttons = (
+            layout.Submit('create', self.submit_text, css_class=f'btn btn-primary col {self.submit_css_class}'),
+        )
 
         if self.reset_button:
-            self.buttons += (layout.Reset('reset', self.reset_text, css_class='btn btn-secondary col'), )
+            self.buttons += (
+                layout.Reset('reset', self.reset_text, css_class=f'btn btn-secondary col {self.reset_css_class}'),
+            )
 
         super().__init__(
             layout.Row(

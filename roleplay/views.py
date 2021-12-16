@@ -94,7 +94,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
     template_name = 'roleplay/world/world_create.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -140,7 +140,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     template_name = 'roleplay/world/world_update.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -154,7 +154,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
 class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
-    success_url = reverse_lazy('roleplay:world_list')
+    success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/world/world_confirm_delete.html'
 
 

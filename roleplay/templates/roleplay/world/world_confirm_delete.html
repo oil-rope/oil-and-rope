@@ -3,7 +3,7 @@
 {% block title %}{% translate "delete"|capfirst %} {{ object.name }}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Delete ('|add:object.name|add:')' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world:list,World Delete ('|add:object.name|add:')' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -27,7 +27,7 @@
             </p>
           </div>
           <div class="card-body mt-xl-5">
-            <form class="d-flex justify-content-around" action="{% url 'roleplay:world_delete' object.pk %}"
+            <form class="d-flex justify-content-around" action="{% url 'roleplay:world:delete' object.pk %}"
                   method="post">
               {% csrf_token %}
               <input type="button" onclick="goBack();" value="{% translate 'cancel'|capfirst %}"

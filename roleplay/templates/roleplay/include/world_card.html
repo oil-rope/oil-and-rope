@@ -16,12 +16,12 @@
     <div class="container">
       <div class="row">
 
-        <a href="{% url 'roleplay:world_detail' world.pk %}" class="btn btn-extra mr-1">
+        <a href="{% url 'roleplay:world:detail' world.pk %}" class="btn btn-extra mr-1">
           <i class="ic ic-world"></i>
           {% translate "view details"|capfirst %}
         </a>
         {% if world.owner == user %}
-          <a href="{% url 'roleplay:world_edit' world.pk %}" class="btn btn-primary ml-1">
+          <a href="{% url 'roleplay:world:edit' world.pk %}" class="btn btn-primary ml-1">
             <i class="ic ic-edit"></i>
             {% translate "edit"|capfirst %}
           </a>
@@ -46,7 +46,7 @@
                 {% translate "settings"|capfirst %}
               </a>
               <div class="dropdown-divider"></div>
-              <a href="{% url 'roleplay:world_delete' world.pk %}" class="dropdown-item">
+              <a href="{% url 'roleplay:world:delete' world.pk %}" class="dropdown-item">
                 <span class="ic-trash text-danger"></span>
                 {% translate "delete"|capfirst %} {% translate "world" %}
               </a>

@@ -56,7 +56,10 @@ class DynamicMenuLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.CreateClearLayout(),
+                    common_layout.SubmitClearLayout(
+                        submit_css_class='col-12 col-md-5',
+                        reset_css_class='col-12 col-md-5',
+                    ),
                 ),
                 css_class='mt-5'
             ),

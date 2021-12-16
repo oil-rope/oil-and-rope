@@ -32,7 +32,7 @@
 {% block title %}{{ object.name }} {% translate 'detail'|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world_list,World Detail' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world:list,World Detail' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -64,13 +64,13 @@
               </div>
               {% if object.owner == request.user %}
                 <div class="col-5">
-                  <a href="{% url 'roleplay:world_edit' object.pk %}" class="btn btn-primary w-100">
+                  <a href="{% url 'roleplay:world:edit' object.pk %}" class="btn btn-primary w-100">
                     <i class="ic ic-edit"></i>
                     {% translate "edit"|capfirst %}
                   </a>
                 </div>
                 <div class="col-5">
-                  <a href="{% url 'roleplay:world_delete' object.pk %}" class="btn btn-danger w-100">
+                  <a href="{% url 'roleplay:world:delete' object.pk %}" class="btn btn-danger w-100">
                     <i class="ic ic-trash"></i>
                     {% translate "delete"|capfirst %}
                   </a>

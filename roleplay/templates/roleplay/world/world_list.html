@@ -17,14 +17,14 @@
         {% translate "create one!"|capfirst %}
       </h2>
       <div class="row justify-content-center py-5">
-        <a href="{% url 'roleplay:world_create' %}?user"
+        <a href="{% url 'roleplay:world:create' %}?user"
            class="btn btn-lg btn-primary">{% translate "create world!"|capfirst %}</a>
       </div>
       <div class="w-100 my-5"></div>
     {% else %}
       <h2 class="display-4 text-center">
         {% blocktrans count counter=user_worlds_full.count %}Your world{% plural %}Your worlds{% endblocktrans %}
-        <a title="{% translate 'create new world'|capfirst %}" href="{% url 'roleplay:world_create' %}?user"
+        <a title="{% translate 'create new world'|capfirst %}" href="{% url 'roleplay:world:create' %}?user"
            class="btn btn-lg btn-primary">
           <span class="ic-plus"></span>
         </a>
@@ -42,7 +42,7 @@
         {% endfor %}
       </div>
       <div class="row justify-content-center pb-5">
-        <a href="{% url 'roleplay:world_create' %}?user"
+        <a href="{% url 'roleplay:world:create' %}?user"
            class="btn btn-lg btn-primary">{% translate "create private world!"|capfirst %}</a>
       </div>
     {% endif %}
@@ -54,7 +54,7 @@
         {% translate "would you like to create one?"|capfirst %}
       </h2>
       <div class="row justify-content-center py-5">
-        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">
+        <a href="{% url 'roleplay:world:create' %}" class="btn btn-lg btn-secondary">
           {% translate "create world"|capfirst %}
         </a>
       </div>
@@ -62,7 +62,7 @@
       <h2 class="display-4 text-center">
         {% blocktrans count counter=object_list_full.count %}Checkout our community world{% plural %}Checkout our
           {{ counter }} community worlds{% endblocktrans %}
-        <a title="{% translate 'create community world'|capfirst %}" href="{% url 'roleplay:world_create' %}"
+        <a title="{% translate 'create community world'|capfirst %}" href="{% url 'roleplay:world:create' %}"
            class="btn btn-lg btn-secondary">
           <span class="ic-plus"></span>
         </a>
@@ -80,7 +80,7 @@
         {% endfor %}
       </div>
       <div class="row justify-content-center pb-5">
-        <a href="{% url 'roleplay:world_create' %}" class="btn btn-lg btn-secondary">
+        <a href="{% url 'roleplay:world:create' %}" class="btn btn-lg btn-secondary">
           {% translate "create public world!"|capfirst %}
         </a>
       </div>

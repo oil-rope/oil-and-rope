@@ -19,12 +19,12 @@ class TestStartsWithTemplateFilter(TestCase):
 class TestGenerateBreadcrumbsFilter(TestCase):
 
     def setUp(self):
-        self.text = 'Home=core:home,Worlds=roleplay:world_list'
+        self.text = 'Home=core:home,Worlds=roleplay:world:list'
 
     def test_generate_breadcrumbs_ok(self):
         expected = {
             'Home': reverse('core:home'),
-            'Worlds': reverse('roleplay:world_list')
+            'Worlds': reverse('roleplay:world:list')
         }
         result = generate_breadcrumbs(self.text)
 
