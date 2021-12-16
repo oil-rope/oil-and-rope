@@ -12,6 +12,7 @@ from django.views.generic.detail import SingleObjectMixin
 from rest_framework.authtoken.models import Token
 
 from api.serializers.registration import UserSerializer
+from common.templatetags.string_utils import capfirstletter as cfl
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
 
@@ -226,9 +227,9 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
         players = self.object.players.all()
 
         if user not in players:
-            msg = _('you are not part of this session')
-            messages.error(request, f'{msg.capitalize()}.')
-            return HttpResponseForbidden(content=f'{msg}.')
+            msg = cfl(_('you are not part of this session!'))
+            messages.error(request, msg)
+            return HttpResponseForbidden(content=msg)
 
         return super().dispatch(request, *args, **kwargs)
 

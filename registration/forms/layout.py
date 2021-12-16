@@ -76,3 +76,35 @@ class ResendEmailFormLayout(layout.Layout):
                 css_class='justify-content-md-around'
             )
         )
+
+
+class PasswordResetFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column('email')
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.CreateClearLayout(reset_button=False, create_text=_('send email').capitalize()),
+                )
+            )
+        )
+
+
+class SetPasswordFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column('new_password1', css_class='col-12 col-lg-5'),
+                layout.Column('new_password2', css_class='col-12 col-lg-5'),
+                css_class='justify-content-around'
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.CreateClearLayout(reset_button=False, create_text=_('change password').capitalize()),
+                    css_class='col-12 col-lg-6'
+                ),
+                css_class='justify-content-around'
+            )
+        )

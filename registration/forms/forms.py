@@ -15,7 +15,8 @@ from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.utils.auth import generate_token
 
-from .layout import LoginFormLayout, ResendEmailFormLayout, SignUpFormLayout
+from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLayout, SetPasswordFormLayout,
+                     SignUpFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -173,16 +174,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
         msg = _('we will send you a recovery link to this email.').capitalize()
         self.add_help_text('email', msg)
         self.helper = FormHelper(self)
-        self.helper.layout = Layout(
-            Row(
-                Column('email')
-            ),
-            Row(
-                Column(
-                    Submit('submit', _('send email').capitalize(), css_class='w-100')
-                )
-            )
-        )
+        self.helper.layout = PasswordResetFormLayout()
 
     def add_help_text(self, field, help_text):
         self.fields[field].help_text = help_text
@@ -190,7 +182,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
     def clean_email(self):
         data = self.cleaned_data.get('email')
         if not get_user_model().objects.filter(email=data).exists():
-            msg = _('this email doesn\'t belong to a user').capitalize() + '.'
+            msg = _('this email doesn\'t belong to a user.').capitalize()
             self.add_error('email', msg)
         return data
 
@@ -203,17 +195,4 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
-        self.helper.layout = Layout(
-            Row(
-                Column('new_password1', css_class='col-12 col-lg-5'),
-                Column('new_password2', css_class='col-12 col-lg-5'),
-                css_class='justify-content-around'
-            ),
-            Row(
-                Column(
-                    Submit('submit', _('change password').capitalize(), css_class='w-100'),
-                    css_class='col-12 col-lg-6'
-                ),
-                css_class='justify-content-around'
-            )
-        )
+        self.helper.layout = SetPasswordFormLayout()

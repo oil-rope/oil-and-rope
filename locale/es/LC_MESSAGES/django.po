@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-16 11:04+0000\n"
+"POT-Creation-Date: 2021-12-16 12:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -143,7 +143,7 @@ msgstr "herramientas comunes"
 msgid "join"
 msgstr "unirse"
 
-#: .\common\enums.py:11 .\core\templates\core\includes\about_us.html:51
+#: .\common\enums.py:11 .\core\templates\core\includes\about_us.html:52
 msgid "connect"
 msgstr "conectar"
 
@@ -178,8 +178,8 @@ msgid "mail"
 msgstr "correo"
 
 #: .\common\enums.py:20
-#: .\core\templates\core\includes\about_the_project.html:47
-#: .\core\templates\core\includes\about_us.html:101
+#: .\core\templates\core\includes\about_the_project.html:48
+#: .\core\templates\core\includes\about_us.html:102
 msgid "share"
 msgstr "compartir"
 
@@ -562,13 +562,13 @@ msgstr "registro creado el"
 msgid "entry updated at"
 msgstr "registro actualizado el"
 
-#: .\core\templates\core\includes\about_the_project.html:6
+#: .\core\templates\core\includes\about_the_project.html:7
 #, fuzzy
 #| msgid "About the project"
 msgid "about the project"
 msgstr "sobre el proyecto"
 
-#: .\core\templates\core\includes\about_the_project.html:10
+#: .\core\templates\core\includes\about_the_project.html:11
 msgid ""
 "Oil &amp; Rope was born from the problem that some websites for managing "
 "roleplay games are quite <i>rough</i>."
@@ -576,37 +576,37 @@ msgstr ""
 "Oil &amp; Rope nació como solución a un problema: la gestión <i>tosca</i> de "
 "juegos de mesa en línea."
 
-#: .\core\templates\core\includes\about_the_project.html:12
+#: .\core\templates\core\includes\about_the_project.html:13
 #, fuzzy
 #| msgid "So the very goal of this website is to bring something fresh"
 msgid "so the very goal of this website is to bring something fresh."
 msgstr "el objetivo final de esta web es traer algo nuevo."
 
-#: .\core\templates\core\includes\about_the_project.html:13
+#: .\core\templates\core\includes\about_the_project.html:14
 #, fuzzy
 #| msgid "Something useful"
 msgid "something useful."
 msgstr "algo útil."
 
-#: .\core\templates\core\includes\about_the_project.html:14
+#: .\core\templates\core\includes\about_the_project.html:15
 #, fuzzy
 #| msgid "Something intuitive"
 msgid "something intuitive."
 msgstr "algo intuitivo."
 
-#: .\core\templates\core\includes\about_the_project.html:15
+#: .\core\templates\core\includes\about_the_project.html:16
 #, fuzzy
 #| msgid "A web manager made by roleplayers for roleplayers"
 msgid "a web manager made by roleplayers for roleplayers."
 msgstr "un gestor de juegos de mesa para jugadores."
 
-#: .\core\templates\core\includes\about_the_project.html:20
+#: .\core\templates\core\includes\about_the_project.html:21
 #, fuzzy
 #| msgid "Contributing"
 msgid "contributing"
 msgstr "contribuir"
 
-#: .\core\templates\core\includes\about_the_project.html:24
+#: .\core\templates\core\includes\about_the_project.html:25
 msgid ""
 "Oil &amp; Rope is an open-source project and can be found on <a href="
 "\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white\">GitHub</"
@@ -616,7 +616,7 @@ msgstr ""
 "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white"
 "\">GitHub</a>."
 
-#: .\core\templates\core\includes\about_the_project.html:26
+#: .\core\templates\core\includes\about_the_project.html:27
 #, fuzzy
 #| msgid ""
 #| "The best way to contribute with us apart from helping us to code is "
@@ -629,31 +629,31 @@ msgstr ""
 "la mejor manera de contribuir sin aportar al código es disfruntando de la "
 "web en sí, compartiendo y enviándonos comentarios..."
 
-#: .\core\templates\core\includes\about_the_project.html:28
+#: .\core\templates\core\includes\about_the_project.html:29
 #, fuzzy
 #| msgid "We really appreciate any kind of effort"
 msgid "we really appreciate any kind of effort."
 msgstr "apreciamos cualquier tipo de esfuerzo."
 
-#: .\core\templates\core\includes\about_the_project.html:34
+#: .\core\templates\core\includes\about_the_project.html:35
 #, fuzzy
 #| msgid "Begin the experience"
 msgid "begin the experience!"
 msgstr "¡comienza tu aventura!"
 
-#: .\core\templates\core\includes\about_the_project.html:40
+#: .\core\templates\core\includes\about_the_project.html:41
 #, fuzzy
 #| msgid "Check us out on GitHub"
 msgid "check us out on GitHub"
 msgstr "visítanos en GitHub"
 
-#: .\core\templates\core\includes\about_us.html:7
+#: .\core\templates\core\includes\about_us.html:8
 #, fuzzy
 #| msgid "About us"
 msgid "about us"
 msgstr "sobre nosotros"
 
-#: .\core\templates\core\includes\about_us.html:11
+#: .\core\templates\core\includes\about_us.html:12
 msgid ""
 "We are a group of people with different professional profiles (developers, "
 "designers, composers, …) and one thought in common,<br><i class=\"font-"
@@ -663,89 +663,89 @@ msgstr ""
 "(desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i "
 "class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
 
-#: .\core\templates\core\includes\about_us.html:18
+#: .\core\templates\core\includes\about_us.html:19
 msgid "how?"
 msgstr "¿cómo?"
 
-#: .\core\templates\core\includes\about_us.html:20
+#: .\core\templates\core\includes\about_us.html:21
 #, fuzzy
 #| msgid "Helping you to"
 msgid "helping you to..."
 msgstr "ayudándote a"
 
-#: .\core\templates\core\includes\about_us.html:31
+#: .\core\templates\core\includes\about_us.html:32
 msgid "build"
 msgstr "construir"
 
-#: .\core\templates\core\includes\about_us.html:32
+#: .\core\templates\core\includes\about_us.html:33
 #, fuzzy
 #| msgid "Worlds, cities, races, stories..."
 msgid "worlds, cities, races, stories..."
 msgstr "Mundos, ciudades, razas, historias..."
 
-#: .\core\templates\core\includes\about_us.html:41
+#: .\core\templates\core\includes\about_us.html:42
 msgid "play secure"
 msgstr "jugar de manera segura"
 
-#: .\core\templates\core\includes\about_us.html:42
+#: .\core\templates\core\includes\about_us.html:43
 #, fuzzy
 #| msgid "All your data is stored and encrypted"
 msgid "all your data is stored and encrypted."
 msgstr "todos tus datos almacenados son encriptados."
 
-#: .\core\templates\core\includes\about_us.html:52
+#: .\core\templates\core\includes\about_us.html:53
 #, fuzzy
 #| msgid "Make relationships in-between your world"
 msgid "make relationships in-between your world."
 msgstr "organiza las relaciones de tu mundo"
 
-#: .\core\templates\core\includes\about_us.html:61
+#: .\core\templates\core\includes\about_us.html:62
 msgid "play"
 msgstr "jugar"
 
-#: .\core\templates\core\includes\about_us.html:62
+#: .\core\templates\core\includes\about_us.html:63
 #, fuzzy
 #| msgid "Create, fight, explore and have fun!"
 msgid "create, fight, explore and have fun!"
 msgstr "crear, luchar, explorar ¡y divertirse!"
 
-#: .\core\templates\core\includes\about_us.html:71
+#: .\core\templates\core\includes\about_us.html:72
 msgid "write"
 msgstr "escribir"
 
-#: .\core\templates\core\includes\about_us.html:72
+#: .\core\templates\core\includes\about_us.html:73
 #, fuzzy
 #| msgid "Your own story, your epic revolution"
 msgid "your own story, your epic revolution."
 msgstr "tu propia historia, tu épica revolución."
 
-#: .\core\templates\core\includes\about_us.html:81
+#: .\core\templates\core\includes\about_us.html:82
 msgid "adapt"
 msgstr "adaptarte"
 
-#: .\core\templates\core\includes\about_us.html:82
+#: .\core\templates\core\includes\about_us.html:83
 #, fuzzy
 #| msgid "Control your game in every device"
 msgid "control your game in every device."
 msgstr "controla tu partida desde cualquier dispositivo."
 
-#: .\core\templates\core\includes\about_us.html:91
+#: .\core\templates\core\includes\about_us.html:92
 msgid "communicate"
 msgstr "comunicar"
 
-#: .\core\templates\core\includes\about_us.html:92
+#: .\core\templates\core\includes\about_us.html:93
 #, fuzzy
 #| msgid "Playing in both website and Discord server"
 msgid "playing in both website and Discord server."
 msgstr "juega tanto en la web como a través de Discord."
 
-#: .\core\templates\core\includes\about_us.html:102
+#: .\core\templates\core\includes\about_us.html:103
 #, fuzzy
 #| msgid "Make amazing worlds for everyone to enjoy"
 msgid "make amazing worlds for everyone to enjoy."
 msgstr "haz cosas increíbles que todos puedan disfrutar."
 
-#: .\core\templates\core\includes\about_us.html:108
+#: .\core\templates\core\includes\about_us.html:109
 #: .\email\templates\email_templates\invitation_email.html:46
 #: .\registration\templates\registration\login.html:69
 #, fuzzy
@@ -1053,19 +1053,19 @@ msgstr "español"
 msgid "registration system"
 msgstr "sistema de registro"
 
-#: .\registration\forms\forms.py:32
+#: .\registration\forms\forms.py:33
 #, fuzzy
 #| msgid "username"
 msgid "username or email"
 msgstr "nombre de usuario o email"
 
-#: .\registration\forms\forms.py:51
+#: .\registration\forms\forms.py:52
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
 msgstr "identificador de discord"
 
-#: .\registration\forms\forms.py:54
+#: .\registration\forms\forms.py:55
 #, fuzzy
 #| msgid ""
 #| "If you have a Discord Account you want to link with just give us your ID!"
@@ -1075,7 +1075,7 @@ msgstr ""
 "si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo "
 "danos el ID!"
 
-#: .\registration\forms\forms.py:79
+#: .\registration\forms\forms.py:80
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1083,60 +1083,42 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: .\registration\forms\forms.py:99 .\registration\views.py:193
+#: .\registration\forms\forms.py:100 .\registration\views.py:193
 #, fuzzy, python-format
 #| msgid "Welcome to Oil & Rope!"
 msgid "welcome to %(title)s!"
 msgstr "¡bienvenido a %(title)s!"
 
-#: .\registration\forms\forms.py:130
+#: .\registration\forms\forms.py:131
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: .\registration\forms\forms.py:140 .\registration\models.py:22
+#: .\registration\forms\forms.py:141 .\registration\models.py:22
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: .\registration\forms\forms.py:141
+#: .\registration\forms\forms.py:142
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación."
 
-#: .\registration\forms\forms.py:161
+#: .\registration\forms\forms.py:162 .\registration\forms\forms.py:185
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: .\registration\forms\forms.py:173
+#: .\registration\forms\forms.py:174
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
-
-#: .\registration\forms\forms.py:182
-#, fuzzy
-#| msgid "Resend email"
-msgid "send email"
-msgstr "reenviar email"
-
-#: .\registration\forms\forms.py:193
-#, fuzzy
-#| msgid "This email doesn't belong to a user"
-msgid "this email doesn't belong to a user"
-msgstr "este email no pertenece a ningún usuario"
-
-#: .\registration\forms\forms.py:214
-#, fuzzy
-#| msgid "Change password"
-msgid "change password"
-msgstr "cambiar contraseña"
 
 #: .\registration\forms\layout.py:22
 #, python-format
@@ -1160,6 +1142,18 @@ msgstr "registrarse"
 #| msgid "Resend email"
 msgid "resend email"
 msgstr "reenviar email"
+
+#: .\registration\forms\layout.py:89
+#, fuzzy
+#| msgid "Resend email"
+msgid "send email"
+msgstr "reenviar email"
+
+#: .\registration\forms\layout.py:105
+#, fuzzy
+#| msgid "Change password"
+msgid "change password"
+msgstr "cambiar contraseña"
 
 #: .\registration\models.py:23
 #, fuzzy
@@ -1255,6 +1249,12 @@ msgstr "¿no tienes una cuenta?"
 #| msgid "New password"
 msgid "new password"
 msgstr "nueva contraseña"
+
+#: .\registration\templates\registration\password_change.html:9
+#, fuzzy
+#| msgid "New password"
+msgid "set new password"
+msgstr "indicar nueva contraseña"
 
 #: .\registration\templates\registration\register.html:16
 #, fuzzy
@@ -1882,17 +1882,22 @@ msgstr "crear mundo público"
 msgid "editting"
 msgstr "editando"
 
-#: .\roleplay\views.py:148
+#: .\roleplay\views.py:149
 #, fuzzy
 #| msgid "Update"
 msgid "update"
 msgstr "actualizar"
 
-#: .\roleplay\views.py:229
+#: .\roleplay\views.py:230
 #, fuzzy
 #| msgid "you've invited to a session!"
-msgid "you are not part of this session"
+msgid "you are not part of this session!"
 msgstr "¡has sido invitado a una partida!"
+
+#, fuzzy
+#~| msgid "This email doesn't belong to a user"
+#~ msgid "this email doesn't belong to a user"
+#~ msgstr "este email no pertenece a ningún usuario"
 
 #~ msgid "restore password"
 #~ msgstr "reestablecer contraseña"
