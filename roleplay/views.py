@@ -12,8 +12,8 @@ from django.views.generic.detail import SingleObjectMixin
 from rest_framework.authtoken.models import Token
 
 from api.serializers.registration import UserSerializer
-from common.templatetags.string_utils import capfirstletter as cfl
 from common.mixins import OwnerRequiredMixin
+from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
 
 from . import enums, forms, models
