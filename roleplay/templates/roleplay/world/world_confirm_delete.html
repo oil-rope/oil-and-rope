@@ -1,9 +1,11 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 {% block title %}{% translate "delete"|capfirst %} {{ object.name }}{% endblock title %}
+{% load string_utils %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world:list,World Delete ('|add:object.name|add:')' %}
+  {% translate "world delete" as world_delete_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,world delete' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -19,10 +21,10 @@
             </p>
             <h4 class="card-title text-center">
               <i class="display-4 ic ic-circle-cross-thin text-danger"></i><br>
-              {% translate "are you sure traveller?"|capfirst %}
+              {% translate "are you sure traveller?"|capfirstletter %}
             </h4>
             <p class="card-text text-center">
-              {% translate "do you really want to erase this world and all its inhabitants?"|capfirst %}<br>
+              {% translate "do you really want to erase this world and all its inhabitants?"|capfirstletter %}<br>
               {% translate "this action cannot be undone."|capfirst %}
             </p>
           </div>

@@ -32,7 +32,8 @@
 {% block title %}{{ object.name }} {% translate 'detail'|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world:list,World Detail' %}
+  {% translate "world detail" as world_detail_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,world detail' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}

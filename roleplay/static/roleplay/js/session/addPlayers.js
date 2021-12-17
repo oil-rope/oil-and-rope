@@ -20,8 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	addPlayersButton.addEventListener("click", addPlayerToContainer);
 	addPlayerInput.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
-			event.preventDefault();
-			addPlayerToContainer();
+			addPlayersButton.click();
 		}
 	});
 });

@@ -5,7 +5,7 @@
 {% block title %}{% translate "edit"|capfirst %} {{ object.name }}{% endblock %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='Worlds=roleplay:world:list,Edit '|add:object.name %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,edit' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}

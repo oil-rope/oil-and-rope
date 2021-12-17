@@ -9,7 +9,7 @@
     <h5 class="card-title text-center">{{ world.name }}</h5>
     <hr class="w-50">
     <p class="card-text text-justify">
-      {{ world.description|truncatechars_html:250|default:_("no description provided")|add:"."|capfirst }}
+      {{ world.description|truncatechars_html:250|default:_("no description provided.")|capfirst }}
     </p>
   </div>
   <div class="card-body">
@@ -32,16 +32,16 @@
             <i class="ic ic-dots-horizontal-triple"></i>
           </button>
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
-            <a href="#no-url" class="dropdown-item disabled">
+            <a href="#" class="dropdown-item disabled">
               <span class="ic-quill"></span>
               {% translate "create campaign"|capfirst %}
             </a>
             {% if world.owner == user %}
-              <a href="#no-url" class="dropdown-item disabled">
+              <a href="#" class="dropdown-item disabled">
                 <span class="ic-city"></span>
                 {% translate "create city"|capfirst %}
               </a>
-              <a href="#no-url" class="dropdown-item disabled">
+              <a href="#" class="dropdown-item disabled">
                 <span class="ic-cogs"></span>
                 {% translate "settings"|capfirst %}
               </a>

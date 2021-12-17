@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
@@ -169,6 +170,14 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
             'request': self.request,
         })
         return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update({
+            'next_game_date': timezone.now().strftime('%Y-%m-%d'),
+            'next_game_time': timezone.now().strftime('%H:%M'),
+        })
+        return initial
 
     def get_worlds(self):
         """

@@ -4,7 +4,6 @@ import pathlib
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Button, Column, Field, Fieldset, Layout, Reset, Row, Submit
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
@@ -16,6 +15,7 @@ from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
 from .. import enums, models
+from .layout import SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,45 +26,20 @@ class WorldForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user
         self.owner = owner
+
         self.helper = FormHelper(self)
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('name', placeholder='Middle-Earth, Narnia, Argos...'),
-                    css_class='col-12 col-lg-7'
-                ),
-                Column(
-                    Field(
-                        'description',
-                        placeholder=_(
-                            # NOTE: Character length 121 -.-
-                            'write something about your world, its civilizations, its culture...'
-                        ).capitalize()
-                    ),
-                    css_class='col-12 col-lg-7'
-                ),
-                Column(
-                    Field('image'),
-                    css_class='col-12 col-lg-7'
-                ),
-                css_class='justify-content-lg-around'
-            ),
-            Row(
-                Submit('submit', submit_text, css_class='btn btn-primary col-5 col-lg-6'),
-                Reset('reset', _('clean'), css_class='btn btn-secondary col-5 d-lg-none'),
-                css_class='justify-content-around'
-            )
-        )
+        self.helper.form_action = 'roleplay:world:create'
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+        self.helper.layout = WorldFormLayout(submit_text=submit_text)
 
     class Meta:
         exclude = ('user', 'parent_site', 'site_type', 'owner')
         model = models.Place
         help_texts = {
-            'image': '{}. {} {} MiB.'.format(
-                _('a picture is worth a thousand words').capitalize(),
-                _('max size file').capitalize(),
-                utils.max_size_file_mb()
-            )
+            'image': _(
+                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
+            ) % {'max_size': utils.max_size_file_mb()}
         }
 
     def save(self, commit=True):
@@ -79,66 +54,38 @@ class SessionForm(forms.ModelForm):
     next_game_date = forms.DateField(
         label='',
         widget=DateWidget,
-        initial=timezone.now().date(),
         required=True,
     )
     next_game_time = forms.TimeField(
         label='',
         widget=TimeWidget,
-        initial=timezone.now().time().strftime('%H:%M'),
         required=True,
     )
     invited_players = forms.MultipleChoiceField(
         label='',
         choices=(),
         required=False,
-        help_text=_('listed players will be notified').capitalize(),
+        help_text=_('listed players will be notified'),
     )
     invite_player_input = forms.EmailField(
         label='',
         required=False,
-        help_text=_('type an email').capitalize(),
+        help_text=_('type an email'),
     )
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        invited_players_field = self.fields['invited_players']
+        invited_players_field.help_text = invited_players_field.help_text.capitalize()
+        invite_player_input_field = self.fields['invite_player_input']
+        invite_player_input_field.help_text = invite_player_input_field.help_text.capitalize()
+
         self.request = request
         self.game_master = request.user
 
         self.helper = FormHelper(self)
-        self.helper.layout = Layout(
-            Row(
-                Column('name'),
-                Column('system'),
-                Column('world'),
-            ),
-            Row(
-                Column('description'),
-            ),
-            Fieldset(
-                _('next session').capitalize(),
-                Column('next_game_date', css_class='col-6'),
-                Column('next_game_time', css_class='col-6'),
-                css_class='form-row text-center',
-            ),
-            Fieldset(
-                _('invite players').capitalize(),
-                Column(Field('invited_players', id='playersInvitedContainer')),
-                Column(Field('invite_player_input', id='invitePlayerInput')),
-                Column(
-                    Button('', _('add').capitalize(), css_class='btn btn-info w-100', css_id='playerAddButton'),
-                    css_class='form-group',
-                ),
-                css_class='form-row text-center',
-            ),
-            Row(
-                Column(
-                    Submit('submit', _('create').capitalize(), css_class='w-100'),
-                    css_class='col-md-6'
-                ),
-                css_class='justify-content-md-center',
-            ),
-        )
+        self.helper.layout = SessionFormLayout()
 
     class Meta:
         model = models.Session
