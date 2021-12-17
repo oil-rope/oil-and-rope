@@ -20,7 +20,7 @@
     <div class="row">
       <div class="col-12">
         <p class="lead text-center">
-          {% url "roleplay:world_detail" object.world.pk as world_link %}
+          {% url "roleplay:world:detail" object.world.pk as world_link %}
           {% blocktrans with gm=object.game_master world_name=object.world.name %}
             {{ gm }} invites you to join into an epic quest in the world of
             <a class="btn btn-link"

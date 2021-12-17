@@ -22,7 +22,7 @@ class TestWorldListView(TestCase):
         cls.model = models.Place
         cls.enum = enums.SiteTypes
         cls.view = views.WorldListView
-        cls.url = reverse('roleplay:world_list')
+        cls.url = reverse('roleplay:world:list')
 
     def setUp(self):
         self.pagination = self.view.paginate_by
@@ -252,7 +252,7 @@ class TestWorldCreateView(TestCase):
         cls.enum = enums.SiteTypes
         cls.model = models.Place
         cls.view = views.WorldCreateView
-        cls.url = reverse('roleplay:world_create')
+        cls.url = reverse('roleplay:world:create')
 
     def setUp(self):
         self.user = baker.make(get_user_model())
@@ -297,7 +297,7 @@ class TestWorldCreateView(TestCase):
 
         self.assertTrue(self.model.objects.exists())
         self.assertEqual(1, self.model.objects.count())
-        self.assertRedirects(response, reverse('roleplay:world_detail', kwargs={'pk': self.model.objects.first().pk}))
+        self.assertRedirects(response, reverse('roleplay:world:detail', kwargs={'pk': self.model.objects.first().pk}))
 
     def test_community_world_data_is_correct_ok(self):
         self.client.force_login(self.user)
@@ -343,7 +343,7 @@ class TestWorldDetailView(TestCase):
     def setUp(self):
         self.user = baker.make(get_user_model())
         self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
-        self.url = reverse('roleplay:world_detail', kwargs={'pk': self.world.pk})
+        self.url = reverse('roleplay:world:detail', kwargs={'pk': self.world.pk})
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -362,7 +362,7 @@ class TestWorldDetailView(TestCase):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
         world = baker.make(self.model, name=fake.country(), owner=self.user)
-        url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+        url = reverse('roleplay:world:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
@@ -370,7 +370,7 @@ class TestWorldDetailView(TestCase):
     def test_access_default_world_ok(self):
         self.client.force_login(self.user)
         world = baker.make(self.model, name=fake.country())
-        url = reverse('roleplay:world_detail', kwargs={'pk': world.pk})
+        url = reverse('roleplay:world:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
@@ -399,8 +399,8 @@ class TestWorldDeleteView(TestCase):
             owner=self.user,
             user=self.user
         )
-        self.url = reverse('roleplay:world_delete', kwargs={'pk': self.world.pk})
-        self.private_world_url = reverse('roleplay:world_delete', kwargs={'pk': self.private_world.pk})
+        self.url = reverse('roleplay:world:delete', kwargs={'pk': self.world.pk})
+        self.private_world_url = reverse('roleplay:world:delete', kwargs={'pk': self.private_world.pk})
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -418,7 +418,7 @@ class TestWorldDeleteView(TestCase):
     def test_non_existent_world_ko(self):
         self.client.force_login(self.user)
         non_existent_pk = self.model.objects.last().pk + 1
-        url = reverse('roleplay:world_delete', kwargs={'pk': non_existent_pk})
+        url = reverse('roleplay:world:delete', kwargs={'pk': non_existent_pk})
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
@@ -459,7 +459,7 @@ class TestWorldUpdateView(TestCase):
         self.user = baker.make(get_user_model())
         self.world = self.model.objects.create(name=fake.city(), user=self.user, owner=self.user)
         self.community_world = self.model.objects.create(name=fake.city(), owner=self.user)
-        self.url = reverse('roleplay:world_edit', kwargs={'pk': self.world.pk})
+        self.url = reverse('roleplay:world:edit', kwargs={'pk': self.world.pk})
         self.data_ok = {
             'name': fake.city(),
             'description': fake.paragraph(),
@@ -485,7 +485,7 @@ class TestWorldUpdateView(TestCase):
     def test_non_existent_world_ko(self):
         self.client.force_login(self.user)
         non_existent_pk = self.model.objects.last().pk + 1
-        url = reverse('roleplay:world_edit', kwargs={'pk': non_existent_pk})
+        url = reverse('roleplay:world:edit', kwargs={'pk': non_existent_pk})
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
@@ -548,7 +548,7 @@ class TestWorldUpdateView(TestCase):
 
     def test_update_community_world_ok(self):
         self.client.force_login(self.user)
-        url = reverse('roleplay:world_edit', kwargs={'pk': self.community_world.pk})
+        url = reverse('roleplay:world:edit', kwargs={'pk': self.community_world.pk})
         data = self.data_ok.copy()
         # TODO: Figure out why image is failing
         del data['image']

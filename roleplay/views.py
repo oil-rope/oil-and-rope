@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.shortcuts import reverse
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
@@ -13,6 +14,7 @@ from rest_framework.authtoken.models import Token
 
 from api.serializers.registration import UserSerializer
 from common.mixins import OwnerRequiredMixin
+from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
 
 from . import enums, forms, models
@@ -93,7 +95,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
     template_name = 'roleplay/world/world_create.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -139,7 +141,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     template_name = 'roleplay/world/world_update.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world_detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -153,7 +155,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
 class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = models.Place
-    success_url = reverse_lazy('roleplay:world_list')
+    success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/world/world_confirm_delete.html'
 
 
@@ -168,6 +170,14 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
             'request': self.request,
         })
         return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update({
+            'next_game_date': timezone.now().strftime('%Y-%m-%d'),
+            'next_game_time': timezone.now().strftime('%H:%M'),
+        })
+        return initial
 
     def get_worlds(self):
         """
@@ -226,9 +236,9 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
         players = self.object.players.all()
 
         if user not in players:
-            msg = _('you are not part of this session')
-            messages.error(request, f'{msg.capitalize()}.')
-            return HttpResponseForbidden(content=f'{msg}.')
+            msg = cfl(_('you are not part of this session!'))
+            messages.error(request, msg)
+            return HttpResponseForbidden(content=msg)
 
         return super().dispatch(request, *args, **kwargs)
 

@@ -1,5 +1,6 @@
 {# This section constitudes an About Us basic #}
 {% load i18n %}
+{% load string_utils %}
 <div class="row bg-extra min-vh-100 py-5 {% if no_margin %}mx-0{% endif %}" id="about-us">
   <!-- About us -->
   <section class="col-12">
@@ -15,7 +16,7 @@
   <!-- How -->
   <section class="col-12 py-3" id="how">
     <h2 class="display-3 text-center">
-      {% translate "how?"|capfirst %}<br>
+      {% translate "how?"|capfirstletter %}<br>
       <small class="lead">
         {% translate "helping you to..."|capfirst %}
       </small>
@@ -59,7 +60,7 @@
         <div class="w-100"></div>
         <p class="lead">
           ...{% translate "play" %}!<br>
-          {% translate "create, fight, explore and have fun!"|capfirst %}
+          {% translate "create, fight, explore and have fun!"|capfirstletter %}
         </p>
       </div>
 
@@ -105,7 +106,7 @@
 
       <a href="{% url 'registration:register' %}" class="btn btn-lg btn-primary col-6 my-lg-5">
         <i class="ic ic-join"></i>
-        {% translate "join now!"|capfirst %}
+        {% translate "join now!"|capfirstletter %}
       </a>
     </div>
   </section>

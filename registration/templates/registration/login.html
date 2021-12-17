@@ -30,8 +30,7 @@
 {% endblock css %}
 
 {% block breadcrumb %}
-  {% translate "login"|capfirst as login_page %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs=login_page no_separation=True %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='login' no_separation=True %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
