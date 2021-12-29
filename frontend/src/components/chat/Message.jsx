@@ -37,7 +37,7 @@ const Message = ({ message }) => {
         <Col
           xs={colWidthXS}
           md={colWidthMD}
-          className="bg-extra border"
+          className="bg-secondary border"
           style={{ borderRadius: "10px" }}
         >
           {renderMessage()}

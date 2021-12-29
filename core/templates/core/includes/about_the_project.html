@@ -1,7 +1,7 @@
 {# This section constitudes basic information about the project #}
 {% load i18n %}
 {% load string_utils %}
-<div class="row bg-primary min-vh-100 py-5 text-white {% if no_margin %}mx-0{% endif %}" id="about-the-project">
+<div class="row bg-primary min-vh-100 h-100 py-5 text-white {% if no_margin %}mx-0{% endif %}" id="about-the-project">
   <section class="col-12">
     <h2 class="display-3 text-center">
       {% translate "about the project"|capfirst %}
@@ -36,13 +36,13 @@
         </a>
       </div>
       <div class="col-6">
-        <a target="_blank" href="https://github.com/oil-rope/oil-and-rope/" class="btn btn-secondary w-100">
+        <a target="_blank" href="https://github.com/oil-rope/oil-and-rope/" class="btn btn-dark w-100">
           <i class="ic ic-github"></i>
           {% translate "check us out on GitHub"|capfirst %}
         </a>
       </div>
       <div class="dropdown col-8 col-md-6 pt-4 pt-md-5">
-        <button class="btn btn-extra w-100" type="button" id="shareMenu" data-toggle="dropdown"
+        <button class="btn btn-secondary w-100" type="button" id="shareMenu" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
           <i class="ic ic-share"></i>
           {% translate "share"|capfirst %}

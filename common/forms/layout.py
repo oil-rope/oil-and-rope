@@ -22,7 +22,7 @@ class SubmitClearLayout(layout.Layout):
 
         if self.reset_button:
             self.buttons += (
-                layout.Reset('reset', self.reset_text, css_class=f'btn btn-secondary col {self.reset_css_class}'),
+                layout.Reset('reset', self.reset_text, css_class=f'btn btn-dark col {self.reset_css_class}'),
             )
 
         super().__init__(

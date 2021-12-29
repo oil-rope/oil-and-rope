@@ -33,7 +33,7 @@
                   method="post">
               {% csrf_token %}
               <input type="button" onclick="goBack();" value="{% translate 'cancel'|capfirst %}"
-                     class="col-5 col-xl-4 btn btn-secondary">
+                     class="col-5 col-xl-4 btn btn-dark">
               <input type="submit" value="{% translate 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
             </form>
           </div>

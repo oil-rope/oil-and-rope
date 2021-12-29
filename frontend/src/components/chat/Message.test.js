@@ -50,7 +50,7 @@ describe("tests for messages", () => {
 			</AuthContext.Provider>
 		);
 		component.getByText("Random message");
-		expect(component.container.querySelector(".bg-extra")).toBeNull();
+		expect(component.container.querySelector(".bg-secondary")).toBeNull();
 	});
 
 	test("should render extra color if author", () => {
@@ -60,6 +60,6 @@ describe("tests for messages", () => {
 			</AuthContext.Provider>
 		);
 		component.getByText("Random message");
-		expect(component.container.querySelector(".bg-extra")).not.toBeNull();
+		expect(component.container.querySelector(".bg-secondary")).not.toBeNull();
 	});
 });
