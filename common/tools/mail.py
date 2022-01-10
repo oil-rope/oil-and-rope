@@ -26,6 +26,10 @@ class ThreadMail(threading.Thread):
 
 
 class HtmlThreadMail(threading.Thread):
+    """
+    :class:`.HtmlThreadMail` inherits from :class:`django.core.mail.EmailMessage` and :class:`threading.Thread` in order
+    to send emails without having server waiting for task to complete.
+    """
 
     def __init__(self, template_name, context=None, subject='', from_email=None, to=None):
         super().__init__()

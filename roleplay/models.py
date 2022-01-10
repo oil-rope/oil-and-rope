@@ -427,19 +427,19 @@ class Session(TracingMixin):
 
     Parameters
     ----------
-    name: :class:`str`
+    name : str
         Name of the session.
-    players: List[:class:`User`]
+    players : List[:class:`~registration.models.User`]
         Players in session.
-    chat: Optional[:class:`Chat`]
+    chat : Optional[:class:`~chat.model.Chat`]
         Chat used for this session.
-    next_game: :class:`datetime.datetime`
+    next_game : :class:`datetime.datetime`
         Next session's date.
-    system: :class:`int`
+    system : int
         System used.
-    game_master: :class:`registration.User`
+    game_master : :class:`~registration.models.User`
         The GM of the session.
-    world: :class:`roleplay.Place`
+    world : :class:`~roleplay.models.Place`
         The world where this session is played.
     """
 

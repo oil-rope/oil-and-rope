@@ -49,6 +49,7 @@ pytest-asyncio = "^0.16"
 pytest-django = "^4.4"
 pytest-mock = "^3.6"
 pytest-xdist = "^2.4"
+Sphinx = "^4.3"
 werkzeug = "^2.0"
 
 [build-system]
