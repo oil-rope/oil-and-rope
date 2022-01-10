@@ -17,8 +17,15 @@ class TestCommand(TestCase):
             call_command(self.command_name, app_label)
 
     @patch('core.management.commands.makedocs.main')
-    def test_syntax_with_excludes_ok(self, mocker: MagicMock):
+    def test_syntax_with_exclude_ok(self, mocker: MagicMock):
         call_command(self.command_name, 'common', exclude=['**/migrations', 'random', 'excellent'])
+
+        mocker.assert_called_once()
+        self.assertIn('**/migrations', mocker.call_args[0][0])
+
+    @patch('core.management.commands.makedocs.main')
+    def test_syntax_without_exclude_ok(self, mocker: MagicMock):
+        call_command(self.command_name, 'common')
 
         mocker.assert_called_once()
         self.assertIn('**/migrations', mocker.call_args[0][0])
