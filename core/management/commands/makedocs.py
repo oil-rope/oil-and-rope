@@ -23,5 +23,5 @@ class Command(AppCommand):
         docs_dir = pathlib.Path(settings.BASE_DIR) / 'docs'
         excludes = options['exclude']
         if not excludes:
-            excludes = ['**/migrations']
+            excludes = ['**/migrations', '**/apps.py', '**/urls.py', '**/admin.py']
         main(['-o', str(docs_dir), app_config.path, *excludes])
