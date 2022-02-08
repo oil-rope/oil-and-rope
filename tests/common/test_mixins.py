@@ -5,13 +5,22 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
+from django.views import View
+from django.views.generic.detail import SingleObjectMixin
 from model_bakery import baker
 
 from common import mixins
 
 
 class TestOwnerRequiredMixin(TestCase):
-    view = mixins.OwnerRequiredMixin
+    mixin = mixins.OwnerRequiredMixin
+
+    @classmethod
+    def setUpTestData(cls):
+        class TestView(cls.mixin, SingleObjectMixin, View):
+            pass
+
+        cls.view = TestView
 
     def setUp(self):
         self.user = baker.make(get_user_model())

@@ -1,9 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.views.generic import View
-from django.views.generic.detail import SingleObjectMixin
 
 
-class OwnerRequiredMixin(SingleObjectMixin, View):
+class OwnerRequiredMixin:
     """
     Checks if user is owner by :class:`owner_attribute`.
     """
