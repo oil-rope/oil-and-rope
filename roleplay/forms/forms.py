@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
+from mptt.forms import TreeNodeChoiceField
 
 from .. import enums, models
 from .layout import SessionFormLayout, WorldFormLayout
@@ -21,6 +22,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 class PlaceForm(forms.ModelForm):
+    parent_site = TreeNodeChoiceField(queryset=models.Place.objects.all(), required=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -29,7 +32,7 @@ class PlaceForm(forms.ModelForm):
         self.helper.include_media = True
 
     class Meta:
-        exclude = ('user', 'owner')
+        exclude = ('owner', 'user')
         help_texts = {
             'image': _(
                 'A picture is worth a thousand words. Max size file %(max_size)s MiB.'

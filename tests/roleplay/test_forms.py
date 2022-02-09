@@ -20,24 +20,14 @@ class TestPlaceForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.owner = baker.make_recipe('registration.user')
-        cls.parent_site = models.Place.objects.create(
-            name=fake.country(),
-            description=fake.paragraph(),
-            site_type=enums.SiteTypes.WORLD,
-            owner=cls.owner,
-        )
-
-        cls.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(cls.tmp.name)
-        with open(cls.tmp.name, 'rb') as img_content:
-            cls.image = SimpleUploadedFile(name=cls.tmp.name, content=img_content.read(), content_type='image/jpeg')
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tmp.close()
-        os.unlink(cls.tmp.name)
+        cls.parent_site = baker.make_recipe('roleplay.place', owner=cls.owner)
 
     def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        with open(self.tmp_file.name, 'rb') as img_content:
+           image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
+
         self.data_ok = {
             'name': fake.country(),
             'description': fake.paragraph(),
@@ -45,8 +35,43 @@ class TestPlaceForm(TestCase):
             'parent_site': self.parent_site.pk,
         }
         self.files = {
-            'image': self.image
+            'image': image,
         }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_data_ok(self):
+        form = self.form_class(data=self.data_ok, files=self.files)
+
+        self.assertTrue(form.is_valid())
+
+    def test_optional_data_ok(self):
+        # Without image
+        form = self.form_class(data=self.data_ok)
+        self.assertTrue(form.is_valid())
+
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        form = self.form_class(data=data_without_description)
+        self.assertTrue(form.is_valid())
+
+    def test_required_data_ko(self):
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+        form = self.form_class(data=data_without_name)
+        self.assertFalse(form.is_valid())
+
+        data_without_site_type = self.data_ok.copy()
+        del data_without_site_type['site_type']
+        form = self.form_class(data=data_without_site_type)
+        self.assertFalse(form.is_valid())
+
+        data_without_parent_site = self.data_ok.copy()
+        del data_without_parent_site['parent_site']
+        form = self.form_class(data=data_without_parent_site)
+        self.assertFalse(form.is_valid())
 
 
 class TestWorldForm(TestCase):
