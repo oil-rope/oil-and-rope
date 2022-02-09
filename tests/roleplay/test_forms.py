@@ -80,7 +80,6 @@ class TestPlaceForm(TestCase):
         self.assertEqual(place.user, self.parent_site.user)
 
 
-
 class TestWorldForm(TestCase):
     form_class = forms.WorldForm
     model = models.Place

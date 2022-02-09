@@ -4,6 +4,10 @@ from . import views
 
 app_name = 'roleplay'
 
+PLACE_PATTERNS = [
+    path('create/<int:pk>/', views.PlaceCreateView.as_view(), name='create'),
+]
+
 WORLD_PATTERNS = [
     path('', views.WorldListView.as_view(), name='list'),
     path('create/', views.WorldCreateView.as_view(), name='create'),
@@ -19,6 +23,7 @@ SESSION_PATTERNS = [
 ]
 
 urlpatterns = [
+    path('place/', include((PLACE_PATTERNS, 'place'))),
     path('world/', include((WORLD_PATTERNS, 'world'))),
     path('session/', include((SESSION_PATTERNS, 'session'))),
 ]

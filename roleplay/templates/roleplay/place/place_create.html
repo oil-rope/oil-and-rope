@@ -1,0 +1,19 @@
+{% extends 'core/layout.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% translate "add"|capfirst %} {% translate "place"|capfirst %}{% endblock title %}
+
+{% block main %}
+  <main class="container pb-5">
+    <h1 class="text-center font-weight-lighter">
+      {% blocktranslate %}
+        Add geography to {{ parent_site.name }}!
+      {% endblocktranslate %}
+    </h1>
+    <hr class="mx-3 pb-3">
+    <div class="row px-1">
+      {% crispy form %}
+    </div>
+  </main>
+{% endblock main %}

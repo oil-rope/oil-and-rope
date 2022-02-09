@@ -1,4 +1,5 @@
 import os
+import random
 import tempfile
 
 from django.conf import settings
@@ -12,8 +13,97 @@ from model_bakery import baker
 from PIL import Image
 
 from roleplay import enums, models, views
+from tests import fake
 
-fake = Faker()
+
+class TestPlaceCreateView(TestCase):
+    resolver = 'roleplay:place:create'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.parent_place = baker.make_recipe('roleplay.world', owner=cls.user)
+        cls.url = reverse(cls.resolver, kwargs={'pk': cls.parent_place.pk})
+
+    def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        with open(self.tmp_file.name, 'rb') as img_content:
+            image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
+
+        self.data_ok = {
+            'name': fake.country(),
+            'description': fake.paragraph(),
+            'site_type': random.choice(enums.SiteTypes.values),
+            'parent_site': self.parent_place.pk,
+            'image': image,
+        }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_access_anonymous_ko(self):
+        response = self.client.get(self.url)
+        login_url = reverse('registration:login')
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_access_not_owner_ko(self):
+        user = baker.make_recipe('registration.user')
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_owner_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_post_data_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.data_ok, follow=True)
+
+        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
+        self.assertIsNotNone(self.parent_place.get_children())
+
+    def test_post_data_without_optional_ok(self):
+        self.client.force_login(self.user)
+
+        data_without_image = self.data_ok.copy()
+        del data_without_image['image']
+        response = self.client.post(self.url, data=data_without_image, follow=True)
+        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
+        self.assertTrue(self.parent_place.get_children())
+
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        response = self.client.post(self.url, data=data_without_description, follow=True)
+        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
+        self.assertTrue(self.parent_place.get_children())
+
+    def test_post_data_without_required_ok(self):
+        self.client.force_login(self.user)
+
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+        response = self.client.post(self.url, data=data_without_name)
+        self.assertFormError(response, form='form', field='name', errors=['This field is required.'])
+        self.assertFalse(self.parent_place.get_children())
+
+        data_without_parent_site = self.data_ok.copy()
+        del data_without_parent_site['parent_site']
+        response = self.client.post(self.url, data=data_without_parent_site)
+        self.assertFormError(response, form='form', field='parent_site', errors=['This field is required.'])
+        self.assertFalse(self.parent_place.get_children())
+
+        data_without_site_type = self.data_ok.copy()
+        del data_without_site_type['site_type']
+        response = self.client.post(self.url, data=data_without_site_type)
+        self.assertFormError(response, form='form', field='site_type', errors=['This field is required.'])
+        self.assertFalse(self.parent_place.get_children())
 
 
 class TestWorldListView(TestCase):

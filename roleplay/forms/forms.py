@@ -40,7 +40,7 @@ class PlaceForm(forms.ModelForm):
         }
         model = models.Place
 
-    def save(self, commit = True):
+    def save(self, commit=True):
         parent_site = self.instance.parent_site
         self.instance.owner = parent_site.owner
         self.instance.user = parent_site.user

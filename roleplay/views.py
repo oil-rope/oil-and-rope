@@ -22,6 +22,15 @@ from . import enums, forms, models
 LOGGER = logging.getLogger(__name__)
 
 
+class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+    form_class = forms.PlaceForm
+    model = models.Place
+    template_name = 'roleplay/place/place_create.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:world:detail', kwargs={'pk': self.get_object().pk})
+
+
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     enum = enums.SiteTypes
     model = models.Place
