@@ -20,6 +20,24 @@ from .layout import SessionFormLayout, WorldFormLayout
 LOGGER = logging.getLogger(__name__)
 
 
+class PlaceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+
+    class Meta:
+        exclude = ('user', 'owner')
+        help_texts = {
+            'image': _(
+                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
+            ) % {'max_size': utils.max_size_file_mb()}
+        }
+        model = models.Place
+
+
 class WorldForm(forms.ModelForm):
 
     def __init__(self, owner, user=None, submit_text=_('create'), *args, **kwargs):

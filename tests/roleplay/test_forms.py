@@ -1,4 +1,5 @@
 import os
+import random
 import tempfile
 
 from django.contrib.auth import get_user_model
@@ -10,6 +11,42 @@ from model_bakery import baker
 from PIL import Image
 
 from roleplay import enums, forms, models
+from tests import fake
+
+
+class TestPlaceForm(TestCase):
+    form_class = forms.PlaceForm
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner = baker.make_recipe('registration.user')
+        cls.parent_site = models.Place.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            site_type=enums.SiteTypes.WORLD,
+            owner=cls.owner,
+        )
+
+        cls.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(cls.tmp.name)
+        with open(cls.tmp.name, 'rb') as img_content:
+            cls.image = SimpleUploadedFile(name=cls.tmp.name, content=img_content.read(), content_type='image/jpeg')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.close()
+        os.unlink(cls.tmp.name)
+
+    def setUp(self):
+        self.data_ok = {
+            'name': fake.country(),
+            'description': fake.paragraph(),
+            'site_type': random.choice(enums.SiteTypes.values),
+            'parent_site': self.parent_site.pk,
+        }
+        self.files = {
+            'image': self.image
+        }
 
 
 class TestWorldForm(TestCase):

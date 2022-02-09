@@ -1,5 +1,5 @@
-from .forms import SessionForm, WorldForm
+from .forms import PlaceForm, SessionForm, WorldForm
 
 __all__ = [
-    'WorldForm', 'SessionForm'
+    'PlaceForm', 'SessionForm', 'WorldForm'
 ]
