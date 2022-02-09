@@ -71,6 +71,15 @@ class TestPlaceForm(TestCase):
         form = self.form_class(data=data_without_parent_site)
         self.assertFalse(form.is_valid())
 
+    def test_place_and_parent_has_same_owner_and_user_ok(self):
+        form = self.form_class(data=self.data_ok, files=self.files)
+        form.is_valid()
+        place = form.save()
+
+        self.assertEqual(place.owner, self.parent_site.owner)
+        self.assertEqual(place.user, self.parent_site.user)
+
+
 
 class TestWorldForm(TestCase):
     form_class = forms.WorldForm
