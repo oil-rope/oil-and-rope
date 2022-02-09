@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class DomainTypes(models.IntegerChoices):
-    DOMAIN = 0, _('domain')
-    SUBDOMAIN = 1, _('subdomain')
+    DOMAIN = 0, _('domain').title()
+    SUBDOMAIN = 1, _('subdomain').title()
 
 
 class RoleplaySystems(models.IntegerChoices):
@@ -13,25 +13,25 @@ class RoleplaySystems(models.IntegerChoices):
 
 
 class SiteTypes(models.IntegerChoices):
-    HOUSE = 0, _('house')
-    TOWN = 1, _('town')
-    VILLAGE = 2, _('village')
-    CITY = 3, _('city')
-    METROPOLIS = 4, _('metropolis')
-    FOREST = 5, _('forest')
-    HILLS = 6, _('hills')
-    MOUNTAINS = 7, _('mountains')
-    MINES = 8, _('mines')
-    RIVER = 9, _('river')
-    SEA = 10, _('sea')
-    DESERT = 11, _('desert')
-    TUNDRA = 12, _('tundra')
-    UNUSUAL = 13, _('unusual')
-    ISLAND = 14, _('island')
-    COUNTRY = 15, _('country')
-    CONTINENT = 16, _('continent')
-    WORLD = 17, _('world')
-    OCEAN = 18, _('ocean')
+    HOUSE = 0, _('house').title()
+    TOWN = 1, _('town').title()
+    VILLAGE = 2, _('village').title()
+    CITY = 3, _('city').title()
+    METROPOLIS = 4, _('metropolis').title()
+    FOREST = 5, _('forest').title()
+    HILLS = 6, _('hills').title()
+    MOUNTAINS = 7, _('mountains').title()
+    MINES = 8, _('mines').title()
+    RIVER = 9, _('river').title()
+    SEA = 10, _('sea').title()
+    DESERT = 11, _('desert').title()
+    TUNDRA = 12, _('tundra').title()
+    UNUSUAL = 13, _('unusual').title()
+    ISLAND = 14, _('island').title()
+    COUNTRY = 15, _('country').title()
+    CONTINENT = 16, _('continent').title()
+    WORLD = 17, _('world').title()
+    OCEAN = 18, _('ocean').title()
 
 
 ICON_RESOLVERS = {
