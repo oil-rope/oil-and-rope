@@ -10,10 +10,10 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from mptt.forms import TreeNodeChoiceField
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
-from mptt.forms import TreeNodeChoiceField
 
 from .. import enums, models
 from .layout import SessionFormLayout, WorldFormLayout
