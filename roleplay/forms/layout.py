@@ -4,6 +4,33 @@ from django.utils.translation import gettext_lazy as _
 from common.forms import layout as common_layout
 
 
+class PlaceLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column(
+                    layout.Field('parent_site'),
+                ),
+            ),
+            layout.Row(
+                layout.Column('name'),
+                layout.Column('description'),
+            ),
+            layout.Row(
+                layout.Column('site_type'),
+                layout.Column('image'),
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(
+                        submit_css_class='col-5',
+                        reset_css_class='col-5',
+                    ),
+                ),
+            ),
+        )
+
+
 class WorldFormLayout(layout.Layout):
     def __init__(self, submit_text):
         super().__init__(

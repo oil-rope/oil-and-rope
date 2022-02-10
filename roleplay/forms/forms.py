@@ -16,20 +16,29 @@ from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
 from .. import enums, models
-from .layout import SessionFormLayout, WorldFormLayout
+from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
 
 class PlaceForm(forms.ModelForm):
-    parent_site = TreeNodeChoiceField(queryset=models.Place.objects.all(), required=True)
+    parent_site = TreeNodeChoiceField(
+        queryset=models.Place.objects.none(),
+        label=_('this place belongs to...').capitalize(),
+        required=True,
+    )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent_site_queryset=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if not parent_site_queryset:
+            self.fields['parent_site'].queryset = models.Place.objects.all()
+        else:
+            self.fields['parent_site'].queryset = parent_site_queryset
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
         self.helper.include_media = True
+        self.helper.layout = PlaceLayout()
 
     class Meta:
         exclude = ('owner', 'user')

@@ -27,8 +27,44 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     model = models.Place
     template_name = 'roleplay/place/place_create.html'
 
+    def get_parent_site(self):
+        parent_site = self.model.objects.get(pk=self.kwargs['pk'])
+        return parent_site
+
+    def get_site_type(self):
+        site_type = int(self.request.GET.get('site_type', enums.SiteTypes.CITY))
+        return site_type
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update({
+            'site_type': self.get_site_type(),
+            'parent_site': self.get_parent_site(),
+        })
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'parent_site_queryset': self.model.objects.filter(pk=self.get_parent_site().pk),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # NOTE: We make 'parent_site' hidden since user is not supposed to edit it
+        # Label shouldn't be shown since field is hidden
+        form.helper['parent_site'].update_attributes(hidden=True)
+        form.fields['parent_site'].label = ''
+        return form
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['parent_site'] = self.get_parent_site()
+        return context
+
     def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.get_object().pk})
+        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
 
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):

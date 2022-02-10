@@ -17,12 +17,18 @@ from tests import fake
 
 
 class TestPlaceCreateView(TestCase):
+    model = models.Place
     resolver = 'roleplay:place:create'
 
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
-        cls.parent_place = baker.make_recipe('roleplay.world', owner=cls.user)
+        cls.parent_place = cls.model.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            site_type=enums.SiteTypes.WORLD,
+            owner=cls.user,
+        )
         cls.url = reverse(cls.resolver, kwargs={'pk': cls.parent_place.pk})
 
     def setUp(self):
@@ -65,45 +71,82 @@ class TestPlaceCreateView(TestCase):
     def test_post_data_ok(self):
         self.client.force_login(self.user)
         response = self.client.post(self.url, data=self.data_ok, follow=True)
+        self.parent_place.refresh_from_db()
+        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
 
-        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
-        self.assertIsNotNone(self.parent_place.get_children())
+        self.assertEqual(1, self.parent_place.get_descendant_count())
+        self.assertRedirects(response, redirect_url)
 
-    def test_post_data_without_optional_ok(self):
+    def test_post_data_without_optional_image_ok(self):
         self.client.force_login(self.user)
-
         data_without_image = self.data_ok.copy()
         del data_without_image['image']
         response = self.client.post(self.url, data=data_without_image, follow=True)
-        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
-        self.assertTrue(self.parent_place.get_children())
+        self.parent_place.refresh_from_db()
+        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
 
+        self.assertEqual(1, self.parent_place.get_descendant_count())
+        self.assertRedirects(response, redirect_url)
+
+    def test_post_data_without_optional_description_ok(self):
+        self.client.force_login(self.user)
         data_without_description = self.data_ok.copy()
         del data_without_description['description']
         response = self.client.post(self.url, data=data_without_description, follow=True)
-        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
-        self.assertTrue(self.parent_place.get_children())
+        self.parent_place.refresh_from_db()
+        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
 
-    def test_post_data_without_required_ok(self):
+        self.assertEqual(1, self.parent_place.get_descendant_count())
+        self.assertRedirects(response, redirect_url)
+
+    def test_post_data_without_required_name_ko(self):
         self.client.force_login(self.user)
-
         data_without_name = self.data_ok.copy()
         del data_without_name['name']
         response = self.client.post(self.url, data=data_without_name)
-        self.assertFormError(response, form='form', field='name', errors=['This field is required.'])
-        self.assertFalse(self.parent_place.get_children())
+        self.parent_place.refresh_from_db()
 
+        self.assertEqual(0, self.parent_place.get_descendant_count())
+        self.assertFormError(response, form='form', field='name', errors=['This field is required.'])
+
+    def test_post_data_without_required_parent_site_ko(self):
+        self.client.force_login(self.user)
         data_without_parent_site = self.data_ok.copy()
         del data_without_parent_site['parent_site']
         response = self.client.post(self.url, data=data_without_parent_site)
-        self.assertFormError(response, form='form', field='parent_site', errors=['This field is required.'])
-        self.assertFalse(self.parent_place.get_children())
+        self.parent_place.refresh_from_db()
 
+        self.assertEqual(0, self.parent_place.get_descendant_count())
+        self.assertFormError(response, form='form', field='parent_site', errors=['This field is required.'])
+
+    def test_post_data_without_required_site_type_ko(self):
+        self.client.force_login(self.user)
         data_without_site_type = self.data_ok.copy()
         del data_without_site_type['site_type']
         response = self.client.post(self.url, data=data_without_site_type)
+        self.parent_place.refresh_from_db()
+
+        self.assertEqual(0, self.parent_place.get_descendant_count())
         self.assertFormError(response, form='form', field='site_type', errors=['This field is required.'])
-        self.assertFalse(self.parent_place.get_children())
+
+    def test_post_data_private_world_ko(self):
+        another_user = baker.make_recipe('registration.user')
+        private_world = self.model.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            site_type=enums.SiteTypes.WORLD,
+            owner=another_user,
+            user=another_user,
+        )
+        data_with_private_world = self.data_ok.copy()
+        data_with_private_world['parent_site'] = private_world.pk
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data_with_private_world)
+        private_world.refresh_from_db()
+
+        self.assertEqual(0, private_world.get_descendant_count())
+        # NOTE: For some reason even tho instance isn't created no error is returned
+        # self.assertFormError(response, form='form', field='parent_site', errors=['Error'])
 
 
 class TestWorldListView(TestCase):

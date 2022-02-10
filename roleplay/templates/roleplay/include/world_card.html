@@ -37,9 +37,9 @@
               {% translate "create campaign"|capfirst %}
             </a>
             {% if world.owner == user %}
-              <a href="#" class="dropdown-item disabled">
-                <span class="ic-city"></span>
-                {% translate "create city"|capfirst %}
+              <a href="{% url 'roleplay:place:create' world.pk %}" class="dropdown-item">
+                <span class="ic ic-map"></span>
+                {% translate "add"|capfirst %} {% translate "geography" %}
               </a>
               <a href="#" class="dropdown-item disabled">
                 <span class="ic-cogs"></span>
