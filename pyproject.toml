@@ -28,7 +28,7 @@ psycopg2 = "^2.8"
 python-dateutil = "^2.8"
 python-dotenv = "^0.19"
 requests = "^2.24"
-Twisted = {extras = ["tls", "http2"], version = "^21.2"}
+Twisted = {extras = ["tls", "http2"], version = "^22.1"}
 xlrd = "^2.0"
 
 [tool.poetry.dev-dependencies]
