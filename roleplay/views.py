@@ -157,7 +157,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 
 class WorldDetailView(LoginRequiredMixin, DetailView):
     model = models.Place
-    template_name = 'roleplay/world/world_detail.html'
+    template_name = 'roleplay/place/place_detail.html'
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)

@@ -483,7 +483,7 @@ class TestWorldDetailView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world/world_detail.html')
+        self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)

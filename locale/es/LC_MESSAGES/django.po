@@ -246,7 +246,7 @@ msgstr "ciudad"
 
 #: .\common\enums.py:36
 #: .\roleplay\templates\roleplay\include\world_card.html:26
-#: .\roleplay\templates\roleplay\world\world_detail.html:70
+#: .\roleplay\templates\roleplay\place\place_detail.html:70
 #: .\roleplay\templates\roleplay\world\world_update.html:5
 msgid "edit"
 msgstr "editar"
@@ -1703,7 +1703,7 @@ msgstr "opciones"
 
 #: .\roleplay\templates\roleplay\include\world_card.html:51
 #: .\roleplay\templates\roleplay\world\world_confirm_delete.html:3
-#: .\roleplay\templates\roleplay\world\world_detail.html:76
+#: .\roleplay\templates\roleplay\place\place_detail.html:76
 #, fuzzy
 #| msgid "Delete"
 msgid "delete"
@@ -1789,19 +1789,19 @@ msgstr "crear mundo"
 msgid "create your world!"
 msgstr "crear mundo"
 
-#: .\roleplay\templates\roleplay\world\world_detail.html:32
+#: .\roleplay\templates\roleplay\place\place_detail.html:32
 #, fuzzy
 #| msgid "Detail"
 msgid "detail"
 msgstr "detalle"
 
-#: .\roleplay\templates\roleplay\world\world_detail.html:35
+#: .\roleplay\templates\roleplay\place\place_detail.html:35
 #, fuzzy
 #| msgid "View details"
 msgid "world detail"
 msgstr "detalles del mundo"
 
-#: .\roleplay\templates\roleplay\world\world_detail.html:45
+#: .\roleplay\templates\roleplay\place\place_detail.html:45
 #, python-format
 msgid "Created by %(creator)s (%(created)s)"
 msgstr "Creado por %(creator)s (%(created)s)"
