@@ -1,5 +1,7 @@
-const url = document.currentScript.getAttribute("place-api-url");
-let element = document.currentScript.getAttribute("source-view-element");
+const { currentScript } = document;
+const url = currentScript.getAttribute("data-api-url");
+let element = currentScript.getAttribute("data-root-element");
+
 // Random ID so never conflicts
 const loadingId = Math.round(Math.random() * 100);
 const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
@@ -14,7 +16,7 @@ $(() => {
 	// Selecting de SVG element for D3 and setting Height and Width
 	const svg = d3.select(element);
 	// Margin convention
-	const margin = { top: 0, right: 150, bottom: 0, left: 70 };
+	const margin = {top: 0, right: 150, bottom: 0, left: 70};
 	const innerWidth = width - margin.left - margin.right;
 	const innerHeight = height - margin.bottom - margin.top;
 	const tree = d3.tree().size([innerHeight, innerWidth]);
@@ -25,11 +27,9 @@ $(() => {
 		.append("g")
 		.attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-	svg.call(
-		d3.zoom().on("zoom", () => {
-			zoomG.attr("transform", d3.event.transform);
-		})
-	);
+	svg.call(d3.zoom().on("zoom", () => {
+		zoomG.attr("transform", d3.event.transform);
+	}));
 
 	// GET from API
 	fetch(url)
