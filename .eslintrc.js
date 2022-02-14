@@ -4,6 +4,7 @@ module.exports = {
 		es2021: true,
 		node: true,
 		"jest/globals": true,
+		jquery: true,
 	},
 	extends: ["plugin:react/recommended", "airbnb", "prettier"],
 	parser: "@babel/eslint-parser",
@@ -26,5 +27,6 @@ module.exports = {
 	},
 	globals: {
 		gettext: "readonly",
+		d3: "readonly",
 	},
 };
