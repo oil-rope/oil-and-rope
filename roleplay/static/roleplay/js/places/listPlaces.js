@@ -2,7 +2,7 @@ const url = document.currentScript.getAttribute("place-api-url");
 let element = document.currentScript.getAttribute("source-view-element");
 // Random ID so never conflicts
 const loadingId = Math.round(Math.random() * 100);
-let loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
+const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
 
 $(() => {
 	element = document.querySelector(element);
@@ -33,9 +33,7 @@ $(() => {
 
 	// GET from API
 	fetch(url)
-		.then((response) => {
-			return response.json();
-		})
+		.then((response) => response.json())
 		.then((data) => {
 			// Loaded!
 			$(`#${loadingId}`).remove();
@@ -65,8 +63,6 @@ $(() => {
 				// Font size from bigger to smaller
 				.attr("font-size", (d) => `${3.25 - d.depth}rem`)
 				// Text itself
-				.text((d) => {
-					return d.data.name;
-				});
+				.text((d) => d.data.name);
 		});
 });

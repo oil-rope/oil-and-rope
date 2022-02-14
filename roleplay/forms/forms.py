@@ -7,6 +7,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
+from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -64,7 +65,10 @@ class WorldForm(forms.ModelForm):
         self.owner = owner
 
         self.helper = FormHelper(self)
-        self.helper.form_action = 'roleplay:world:create'
+        self.helper.form_action = resolve_url('roleplay:world:create')
+        # NOTE: Since user is gotten from '?user? QueryParam, `form_action` must replicate this behaviour
+        if self.user:
+            self.helper.form_action = f'{self.helper.form_action}?user'
         self.helper.form_method = 'POST'
         self.helper.include_media = True
         self.helper.layout = WorldFormLayout(submit_text=submit_text)

@@ -22,12 +22,20 @@ class DomainSerializer(serializers.ModelSerializer):
 
 
 class PlaceSerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        children = obj.get_children()
+        if not children:
+            return []
+        serialized_children = PlaceSerializer(children, many=True, read_only=True)
+        return serialized_children.data
 
     class Meta:
         model = Place
         fields = (
             'id', 'name', 'description', 'site_type', 'image', 'parent_site', 'user', 'owner', 'entry_created_at',
-            'entry_updated_at',
+            'entry_updated_at', 'children',
         )
 
 
