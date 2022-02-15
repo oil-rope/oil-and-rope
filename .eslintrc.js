@@ -27,6 +27,5 @@ module.exports = {
 	},
 	globals: {
 		gettext: "readonly",
-		d3: "readonly",
 	},
 };
