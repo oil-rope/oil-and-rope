@@ -1,68 +1,196 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-underscore-dangle */
+/* global d3 */
+
 const { currentScript } = document;
-const url = currentScript.getAttribute("data-api-url");
-let element = currentScript.getAttribute("data-root-element");
+const apiURL = currentScript.getAttribute("data-api-url");
+const element = document.querySelector(
+	currentScript.getAttribute("data-root-element")
+);
 
 // Random ID so never conflicts
 const loadingId = Math.round(Math.random() * 100);
-const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
+const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">${gettext(
+	"loading"
+)}...</span></div>`;
+
+const Tree = (data) => {
+	const width = element.offsetWidth;
+	const margin = { top: 10, right: 120, bottom: 10, left: 40 };
+	const dy = width / 6;
+	const dx = 10;
+
+	const tree = d3.tree().nodeSize([dx, dy]);
+	const diagonal = d3
+		.linkHorizontal()
+		.x((d) => d.y)
+		.y((d) => d.x);
+
+	const root = d3.hierarchy(data);
+
+	root.x0 = dy / 2;
+	root.y0 = 0;
+	root.descendants().forEach((d, i) => {
+		d.id = i;
+		d._children = d.children;
+		if (d.depth && d.data.name.length !== 7) d.children = null;
+	});
+
+	const svg = d3
+		.create("svg")
+		.attr("viewBox", [-margin.left, -margin.top, width, dx])
+		.style("font", "10px sans-serif")
+		.style("user-select", "none");
+
+	const gLink = svg
+		.append("g")
+		.attr("fill", "none")
+		.attr("stroke", "#555")
+		.attr("stroke-opacity", 0.4)
+		.attr("stroke-width", 1.5);
+
+	const gNode = svg
+		.append("g")
+		.attr("cursor", "pointer")
+		.attr("pointer-events", "all");
+
+	const update = (source) => {
+		const duration = d3.event && d3.event.altKey ? 2500 : 250;
+		const nodes = root.descendants().reverse();
+		const links = root.links();
+
+		// Compute the new tree layout.
+		tree(root);
+
+		let left = root;
+		let right = root;
+		root.eachBefore((node) => {
+			if (node.x < left.x) left = node;
+			if (node.x > right.x) right = node;
+		});
+
+		const height = right.x - left.x + margin.top + margin.bottom;
+
+		const transition = svg
+			.transition()
+			.duration(duration)
+			.attr("viewBox", [-margin.left, left.x - margin.top, width, height])
+			.tween(
+				"resize",
+				window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
+			);
+
+		// Update the nodes…
+		const node = gNode.selectAll("g").data(nodes, (d) => d.id);
+
+		// Enter any new nodes at the parent's previous position.
+		const nodeEnter = node
+			.enter()
+			.append("g")
+			.attr("transform", (_d) => `translate(${source.y0},${source.x0})`)
+			.attr("fill-opacity", 0)
+			.attr("stroke-opacity", 0)
+			.on("click", (event, d) => {
+				d.children = d.children ? null : d._children;
+				update(d);
+			});
+
+		nodeEnter
+			.append("circle")
+			.attr("r", 2.5)
+			.attr("fill", (d) => (d._children ? "#555" : "#999"))
+			.attr("stroke-width", 10);
+
+		nodeEnter
+			.append("text")
+			.attr("dy", "0.31em")
+			.attr("x", (d) => (d._children ? -6 : 6))
+			.attr("text-anchor", (d) => (d._children ? "end" : "start"))
+			.text((d) => d.data.name)
+			.clone(true)
+			.lower()
+			.attr("stroke-linejoin", "round")
+			.attr("stroke-width", 3)
+			.attr("stroke", "white");
+
+		// Transition nodes to their new position.
+		node
+			.merge(nodeEnter)
+			.transition(transition)
+			.attr("transform", (d) => `translate(${d.y},${d.x})`)
+			.attr("fill-opacity", 1)
+			.attr("stroke-opacity", 1);
+
+		// Transition exiting nodes to the parent's new position.
+		node
+			.exit()
+			.transition(transition)
+			.remove()
+			.attr("transform", (_d) => `translate(${source.y},${source.x})`)
+			.attr("fill-opacity", 0)
+			.attr("stroke-opacity", 0);
+
+		// Update the links…
+		const link = gLink.selectAll("path").data(links, (d) => d.target.id);
+
+		// Enter any new links at the parent's previous position.
+		const linkEnter = link
+			.enter()
+			.append("path")
+			.attr("d", (_d) => {
+				const o = { x: source.x0, y: source.y0 };
+				return diagonal({ source: o, target: o });
+			});
+
+		// Transition links to their new position.
+		link.merge(linkEnter).transition(transition).attr("d", diagonal);
+
+		// Transition exiting nodes to the parent's new position.
+		link
+			.exit()
+			.transition(transition)
+			.remove()
+			.attr("d", (_d) => {
+				const o = { x: source.x, y: source.y };
+				return diagonal({ source: o, target: o });
+			});
+
+		// Stash the old positions for transition.
+		root.eachBefore((d) => {
+			d.x0 = d.x;
+			d.y0 = d.y;
+		});
+	};
+
+	update(root);
+
+	// Zoom
+	const handleZoom = ({ transform }) => {
+		svg.style("transform", `scale(${transform.k})`);
+	};
+
+	d3.select(element).call(d3.zoom().on("zoom", handleZoom));
+
+	element.append(svg.node());
+};
+
+const loadData = () => {
+	$.ajax({
+		url: apiURL,
+		type: "GET",
+		crossDomain: false,
+		dataType: "json",
+		success: (resData) => {
+			Tree(resData);
+		},
+		error: console.error,
+		complete: () => {
+			$(`#${loadingId}`).remove();
+		},
+	});
+};
 
 $(() => {
-	element = document.querySelector(element);
-	// Loading...
-	$(element).parent().prepend(loadingElement);
-	const height = $(element).height();
-	const width = $(element).width();
-
-	// Selecting de SVG element for D3 and setting Height and Width
-	const svg = d3.select(element);
-	// Margin convention
-	const margin = {top: 0, right: 150, bottom: 0, left: 70};
-	const innerWidth = width - margin.left - margin.right;
-	const innerHeight = height - margin.bottom - margin.top;
-	const tree = d3.tree().size([innerHeight, innerWidth]);
-
-	const zoomG = svg.attr("width", width).attr("height", height).append("g");
-
-	const g = zoomG
-		.append("g")
-		.attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-	svg.call(d3.zoom().on("zoom", () => {
-		zoomG.attr("transform", d3.event.transform);
-	}));
-
-	// GET from API
-	fetch(url)
-		.then((response) => response.json())
-		.then((data) => {
-			// Loaded!
-			$(`#${loadingId}`).remove();
-
-			const root = d3.hierarchy(data);
-			const links = tree(root).links();
-			const linkPathGenerator = d3
-				.linkHorizontal()
-				.x((d) => d.y)
-				.y((d) => d.x);
-
-			g.selectAll("path")
-				.data(links)
-				.enter()
-				.append("path")
-				.attr("d", linkPathGenerator);
-
-			g.selectAll("text")
-				.data(root.descendants())
-				.enter()
-				.append("text")
-				.attr("x", (d) => d.y)
-				.attr("y", (d) => d.x)
-				.attr("dy", () => "0.32em")
-				// Tex align Middle for everything except leaf
-				.attr("text-anchor", (d) => (d.children ? "middle" : "start"))
-				// Font size from bigger to smaller
-				.attr("font-size", (d) => `${3.25 - d.depth}rem`)
-				// Text itself
-				.text((d) => d.data.name);
-		});
+	$(element).append(loadingElement);
+	loadData();
 });
