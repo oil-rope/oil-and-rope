@@ -260,3 +260,95 @@ class TestSessionForm(TestCase):
         instance = form.save()
 
         self.assertEqual(expected_date, instance.next_game)
+
+class TestRaceForm(TestCase):
+    form_class = forms.RaceForm
+    model = models.Race
+
+    def setUp(self):
+        self.user = baker.make(get_user_model())
+        self.faker = Faker()
+        self.data_ok = {
+            'name': self.faker.word(),
+            'description': self.faker.paragraph(),
+            'strength' : self.faker.random_int(min=-5, max=5),
+            'dexterity' : self.faker.random_int(min=-5, max=5),
+            'charisma' : self.faker.random_int(min=-5, max=5),
+            'constitution' : self.faker.random_int(min=-5, max=5),
+            'intelligence' : self.faker.random_int(min=-5, max=5),
+            'affected_by_armor' : self.faker.boolean(),
+            'wisdom' : self.faker.random_int(min=-5, max=5),
+            'users' : [self.user.pk]
+        }
+
+        self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        image_file = self.tmp.name
+        Image.new('RGB', (30, 60), color='red').save(image_file)
+        with open(image_file, 'rb') as image_content:
+            image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
+        self.files_ok = {
+            'image': image
+        }
+
+    def tearDown(self):
+        self.tmp.close()
+        os.unlink(self.tmp.name)
+
+    def test_data_ok(self):
+        form = self.form_class(data=self.data_ok, files=self.files_ok)
+
+        self.assertTrue(form.is_valid(), 'Errors: {}'.format(form.errors.values()))
+
+    def test_data_without_name_ko(self):
+        data_ko = self.data_ok.copy()
+        del data_ko['name']
+        form = self.form_class(data=data_ko, files=self.files_ok)
+
+        self.assertFalse(form.is_valid())
+
+    def test_data_without_description_ok(self):
+        data_ok = self.data_ok.copy()
+        del data_ok['description']
+        form = self.form_class(data=data_ok, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_image_ok(self):
+        data_ok = self.data_ok.copy()
+        form = self.form_class(data=data_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_save_ok(self):
+        form = self.form_class(data=self.data_ok, files=self.files_ok)
+        instance = form.save()
+
+        self.assertTrue(self.model.objects.filter(pk=instance.pk))
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertEqual(self.data_ok['description'], instance.description)
+        self.assertIsNotNone(instance.users)
+        self.assertIsNotNone(instance.image)
+
+        os.unlink(instance.image.path)
+
+    def test_save_without_description_ok(self):
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        form = self.form_class(data=data_without_description, files=self.files_ok)
+        instance = form.save()
+
+        self.assertTrue(self.model.objects.filter(pk=instance.pk))
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertIsNotNone(instance.users)
+        self.assertIsNotNone(instance.image)
+
+        os.unlink(instance.image.path)
+
+    def test_save_without_image_ok(self):
+        form = self.form_class(data=self.data_ok)
+        instance = form.save()
+
+        self.assertTrue(self.model.objects.filter(pk=instance.pk))
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertEqual(self.data_ok['description'], instance.description)
+        self.assertIsNotNone(instance.users)

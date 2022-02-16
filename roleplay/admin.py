@@ -32,3 +32,47 @@ class SessionAdmin(admin.ModelAdmin):
     list_display_links = ('__str__', )
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
+
+@admin.register(models.Race)
+class RaceAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'entry_created_at',
+        'entry_updated_at',
+        'name',
+        'description',
+        'strength',
+        'dexterity',
+        'constitution',
+        'intelligence',
+        'wisdom',
+        'charisma',
+        'affected_by_armor',
+        'image',
+    )
+    list_filter = (
+        'entry_created_at',
+        'entry_updated_at',
+        'affected_by_armor',
+    )
+    raw_id_fields = ('users',)
+    search_fields = ('name',)
+
+
+@admin.register(models.RaceUser)
+class RaceUserAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'entry_created_at',
+        'entry_updated_at',
+        'user',
+        'race',
+        'is_owner',
+    )
+    list_filter = (
+        'entry_created_at',
+        'entry_updated_at',
+        'user',
+        'race',
+        'is_owner',
+    )

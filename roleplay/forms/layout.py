@@ -147,3 +147,44 @@ class SessionFormLayout(layout.Layout):
                 css_class='justify-content-md-center',
             ),
         )
+
+class RaceFormLayout(layout.Layout):
+    def __init__(self, submit_text):
+        super().__init__(
+            bootstrap.TabHolder(
+                bootstrap.Tab(
+                    _('basic information').title(),
+                    layout.Row(
+                        layout.Column('name'),
+                    ),
+                    layout.Row(
+                        layout.Column('description'),
+                    ),
+                    layout.Row(
+                        layout.Column('image'),
+                    ),
+                ),
+                bootstrap.Tab(
+                    _('Attributes').title(),
+                    layout.Row(
+                        layout.Column('strength'),
+                        layout.Column('dexterity'),
+                        layout.Column('constitution'),
+                        layout.Column('intelligence'),
+                        layout.Column('wisdom'),
+                        layout.Column('charisma'),
+                        layout.Column('affected_by_armor', css_class='col-3'),
+                    ),
+                    layout.Row(
+                        layout.Column('users')
+                    )
+                ),
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(reset_button=False),
+                    css_class='col-md-6'
+                ),
+                css_class='justify-content-md-center',
+            ),
+        )

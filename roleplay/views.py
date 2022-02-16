@@ -302,3 +302,45 @@ class SessionDetailView(LoginRequiredMixin, DetailView):
         self._check_user_has_token()
         context['serialized_user'] = json.dumps(UserSerializer(self.request.user).data)
         return context
+
+class RaceCreateView(CreateView):
+    form_class = forms.RaceForm
+    model = models.Race
+    template_name = 'roleplay/race/race_create.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:race:detail', kwargs={'pk': self.object.pk})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+
+        return kwargs
+
+    def clean(self):
+        cd = self.cleaned_data
+        import ipdb;ipdb.set_trace()
+        return cd
+
+
+class RaceDetailView(LoginRequiredMixin, DetailView):
+    model = models.Race
+    template_name = 'roleplay/race/race_detail.html'
+
+class RaceUpdateView(LoginRequiredMixin, UpdateView):
+    model = models.Race
+    form_class = forms.RaceForm
+    template_name = 'roleplay/race/race_update.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:race:detail', kwargs={'pk': self.object.pk})
+
+class RaceDeleteView(LoginRequiredMixin, DeleteView):
+    model = models.Race
+
+    template_name = 'roleplay/race/race_delte.html'
+
+    def get_success_url(self):
+        return reverse('roleplay:race:detail', kwargs={'pk': self.object.pk})
+        success_url = reverse_lazy('roleplay:race:list')
+        template_name = 'roleplay/race/race_confirm_delete.html'

@@ -15,7 +15,7 @@ from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
 from .. import enums, models
-from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
+from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout, RaceFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -168,3 +168,27 @@ class SessionForm(forms.ModelForm):
         asyncio.run(self.send_invitations())
 
         return self.instance
+
+class RaceForm(forms.ModelForm):
+
+    def __init__(self, user=None, submit_text=_('create'), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.user = user
+        # self.owner = owner
+
+        self.helper = FormHelper(self)
+        self.helper.form_action = 'roleplay:race:create'
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+        self.helper.layout = RaceFormLayout(submit_text=submit_text)
+
+    class Meta:
+        exclude = ()
+        model = models.Race
+        help_texts = {
+            'image': _(
+                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
+            ) % {'max_size': utils.max_size_file_mb()}
+        }
+
+

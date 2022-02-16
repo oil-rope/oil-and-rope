@@ -23,8 +23,16 @@ SESSION_PATTERNS = [
     path('<int:pk>/join/', views.SessionJoinView.as_view(), name='join'),
 ]
 
+RACE_PATTERNS = [
+    path('create/', views.RaceCreateView.as_view(), name='create'),
+    path('<int:pk>/', views.RaceDetailView.as_view(), name='detail'),
+    path('edit/<int:pk>/', views.RaceUpdateView.as_view(), name='update'),
+    path('delete/<int:pk>/', views.RaceDeleteView.as_view(), name='delete'),
+]
+
 urlpatterns = [
     path('place/', include((PLACE_PATTERNS, 'place'))),
     path('world/', include((WORLD_PATTERNS, 'world'))),
     path('session/', include((SESSION_PATTERNS, 'session'))),
+    path('race/', include((RACE_PATTERNS, 'race'))),
 ]

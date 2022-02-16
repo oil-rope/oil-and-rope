@@ -924,3 +924,48 @@ class TestSessionDetailView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(403, response.status_code)
+
+
+
+class TestRaceCreateView(TestCase):
+    fake = Faker()
+    login_url = reverse('registration:login')
+    model = models.Race
+    resolver = 'roleplay:race:create'
+    template = 'roleplay/race/race_create.html'
+    view = views.RaceCreateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make(get_user_model())
+        cls.race = baker.make(models.Race)
+
+    def setUp(self):
+        self.url = reverse(self.resolver)
+        self.data_ok = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'strength' : fake.random_int(min=-5, max=5),
+            'dexterity' : fake.random_int(min=-5, max=5),
+            'charisma' : fake.random_int(min=-5, max=5),
+            'constitution' : fake.random_int(min=-5, max=5),
+            'intelligence' : fake.random_int(min=-5, max=5),
+            'affected_by_armor' : fake.boolean(),
+            'wisdom' : fake.random_int(min=-5, max=5),
+            'image' : fake.image_url(),
+        }
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, self.template)
+
+    def test_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+        instance = self.model.objects.first()
+
+        self.assertEqual(self.data_ok['name'], instance.name)
+        self.assertEqual(self.data_ok['description'], instance.description)
