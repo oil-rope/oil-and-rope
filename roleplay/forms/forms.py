@@ -169,7 +169,10 @@ class SessionForm(forms.ModelForm):
 
         return self.instance
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5de0985 (feat(roleplay view): update of race create view and form)
 class RaceForm(forms.ModelForm):
 
     def __init__(self, user=None, submit_text=_('create'), *args, **kwargs):
@@ -191,3 +194,8 @@ class RaceForm(forms.ModelForm):
                 'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
             ) % {'max_size': utils.max_size_file_mb()}
         }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 5de0985 (feat(roleplay view): update of race create view and form)
