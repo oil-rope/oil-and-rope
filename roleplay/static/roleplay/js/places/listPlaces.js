@@ -4,9 +4,8 @@
 
 const { currentScript } = document;
 const apiURL = currentScript.getAttribute("data-api-url");
-const element = document.querySelector(
-	currentScript.getAttribute("data-root-element")
-);
+const elementSelector = currentScript.getAttribute("data-root-element");
+const element = document.querySelector(elementSelector);
 
 // Random ID so never conflicts
 const loadingId = Math.round(Math.random() * 100);
@@ -162,15 +161,21 @@ const Tree = (data) => {
 		});
 	};
 
-	update(root);
-
 	// Zoom
-	const handleZoom = ({ transform }) => {
-		svg.style("transform", `scale(${transform.k})`);
+	const handleZoom = (e) => {
+		d3.selectAll("svg").attr("transform", e.transform);
+	};
+	const zoom = d3
+		.zoom()
+		.scaleExtent([1, 4])
+		.on("zoom", handleZoom);
+
+	const initZoom = () => {
+		d3.select(element).call(zoom);
 	};
 
-	d3.select(element).call(d3.zoom().on("zoom", handleZoom));
-
+	initZoom();
+	update(root);
 	element.append(svg.node());
 };
 
