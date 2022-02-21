@@ -7,7 +7,7 @@ from django.test import TestCase
 from core.checks import get_argument
 
 
-class DummyModel(models.Model):
+class DummyModel(models.Model):  # noqa: DJ08,DJ10,DJ11
     dummy_arg = models.CharField('Random')
     dummy_arg_2 = models.CharField(verbose_name='Random')
 

@@ -32,7 +32,7 @@ class Track(TracingMixin):
 
     id = models.AutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
     name = models.CharField(verbose_name=_('name'), max_length=50)
-    description = models.TextField(verbose_name=_('description'), blank=True, null=True)
+    description = models.TextField(verbose_name=_('description'), blank=True, null=False)
     owner = models.ForeignKey(
         verbose_name=_('owner'), to=constants.USER_MODEL, to_field='id', on_delete=models.CASCADE,
         related_name='owner', db_index=True, null=True, blank=True,

@@ -30,7 +30,7 @@ class Domain(TracingMixin):
     """
 
     name = models.CharField(verbose_name=_('name'), max_length=25, null=False, blank=False)
-    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     domain_type = models.PositiveSmallIntegerField(
         verbose_name=_('domain type'), choices=DomainTypes.choices, default=DomainTypes.DOMAIN, null=False, blank=False
     )
@@ -83,7 +83,7 @@ class Place(MPTTModel, TracingMixin):
     ICON_RESOLVERS = ICON_RESOLVERS
 
     name = models.CharField(verbose_name=_('name'), max_length=100, null=False, blank=False)
-    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     site_type = models.PositiveSmallIntegerField(
         verbose_name=_('site type'), choices=SiteTypes.choices, default=SiteTypes.TOWN, null=False, blank=False
     )
@@ -350,7 +350,7 @@ class Race(TracingMixin):
     """
 
     name = models.CharField(verbose_name=_('name'), max_length=50)
-    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     strength = models.SmallIntegerField(verbose_name=_('strength'), default=0)
     dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0)
     constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0)
@@ -444,7 +444,7 @@ class Session(TracingMixin):
     """
 
     name = models.CharField(verbose_name=_('name'), max_length=100)
-    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     players = models.ManyToManyField(
         to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session',
         through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')

@@ -39,7 +39,7 @@ class URLResolverViewSet(ViewSet):
         if isinstance(resolver, list):
             resolver = resolver[0]
         extra_params = {}
-        for key,  value in data.items():
+        for key, value in data.items():
             extra_params[key] = value
 
         try:
