@@ -10,5 +10,8 @@ class TestCheckCommand(TestCase):
         out = StringIO()
         call_command('check', stdout=out)
         msg = 'System check identified no issues (0 silenced).\n'
-        self.assertEqual(msg, out.getvalue(), 'Seems like you have check issues.' +
-                         '\nPlease run \'python manage.py check\'')
+        self.assertEqual(
+            msg,
+            out.getvalue(),
+            'Seems like you have check issues.\nPlease run \'python manage.py check\''
+        )

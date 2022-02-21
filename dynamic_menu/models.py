@@ -87,20 +87,20 @@ class DynamicMenu(MPTTModel, TracingMixin):
     """
 
     name = models.CharField(verbose_name=_('name'), max_length=100)
-    description = models.TextField(verbose_name=_('description'), null=True, blank=True)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     prepended_text = models.CharField(
-        verbose_name=_('prepended text'), max_length=50, null=True, blank=True
+        verbose_name=_('prepended text'), max_length=50, null=False, blank=True
     )
     appended_text = models.CharField(
-        verbose_name=_('appended text'), max_length=50, null=True, blank=True
+        verbose_name=_('appended text'), max_length=50, null=False, blank=True
     )
     parent = TreeForeignKey(
         to='self', on_delete=models.CASCADE, related_name='menus', null=True, blank=True, verbose_name=_('parent menu'),
         db_index=True,
     )
-    url_resolver = models.CharField(verbose_name=_('resolver'), max_length=50, null=True, blank=True)
+    url_resolver = models.CharField(verbose_name=_('resolver'), max_length=50, null=False, blank=True)
     extra_urls_args = models.CharField(
-        verbose_name=_('extra parameters'), max_length=254, null=True, blank=True
+        verbose_name=_('extra parameters'), max_length=254, null=False, blank=True
     )
     order = models.PositiveSmallIntegerField(verbose_name=_('order'), default=0)
     permissions_required = models.ManyToManyField(
