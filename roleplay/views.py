@@ -64,7 +64,32 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
         return context
 
     def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
+
+
+class PlaceDetailView(LoginRequiredMixin, DetailView):
+    model = models.Place
+    template_name = 'roleplay/place/place_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        user = request.user
+
+        # Community world
+        if not self.object.user or not self.object.owner:
+            return response
+
+        # Private world
+        if user == self.object.user:
+            return response
+
+        return HttpResponseForbidden()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['world_structure'] = self.object.get_descendants(include_self=True)
+
+        return context
 
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
@@ -140,7 +165,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
     template_name = 'roleplay/world/world_create.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -155,38 +180,13 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
 
-class WorldDetailView(LoginRequiredMixin, DetailView):
-    model = models.Place
-    template_name = 'roleplay/place/place_detail.html'
-
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        user = request.user
-
-        # Community world
-        if not self.object.user or not self.object.owner:
-            return response
-
-        # Private world
-        if user == self.object.user:
-            return response
-
-        return HttpResponseForbidden()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['world_structure'] = self.object.get_descendants(include_self=True)
-
-        return context
-
-
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
     model = models.Place
     template_name = 'roleplay/world/world_update.html'
 
     def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
+        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

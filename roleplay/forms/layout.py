@@ -13,12 +13,26 @@ class PlaceLayout(layout.Layout):
                 ),
             ),
             layout.Row(
-                layout.Column('name'),
-                layout.Column('description'),
+                layout.Column(
+                    'name',
+                    css_class='col-sm-12 col-lg-10',
+                ),
+                layout.Column(
+                    layout.Field('description', style='resize: none'),
+                    css_class='col-sm-12 col-lg-10',
+                ),
+                css_class='justify-content-lg-around',
             ),
             layout.Row(
-                layout.Column('site_type'),
-                layout.Column('image'),
+                layout.Column(
+                    'site_type',
+                    css_class='col-sm-6 col-lg-5'
+                ),
+                layout.Column(
+                    'image',
+                    css_class='col-sm-6 col-lg-5'
+                ),
+                css_class='justify-content-lg-around',
             ),
             layout.Row(
                 layout.Column(
@@ -44,7 +58,8 @@ class WorldFormLayout(layout.Layout):
                         'description',
                         placeholder=_(
                             'write something about your world, its civilizations, its culture...'
-                        ).capitalize()
+                        ).capitalize(),
+                        style='resize: none',
                     ),
                     css_class='col-12 col-lg-7'
                 ),

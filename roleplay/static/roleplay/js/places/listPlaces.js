@@ -14,8 +14,9 @@ const loadingElement = `<div id="${loadingId}" class="spinner-border" role="stat
 )}...</span></div>`;
 
 const Tree = (data) => {
-	const width = element.offsetWidth;
-	const margin = { top: 10, right: 120, bottom: 10, left: 40 };
+	// NOTE: This arrangement is because of `element.offsetWidth = 0` on accordion collapsed
+	const width = element.offsetWidth || window.innerWidth - 20;
+	const margin = { top: 10, right: 120, bottom: 10, left: 120 };
 	const dy = width / 6;
 	const dx = 10;
 
@@ -163,7 +164,7 @@ const Tree = (data) => {
 
 	// Zoom
 	const handleZoom = (e) => {
-		d3.selectAll("svg").attr("transform", e.transform);
+		svg.attr("transform", e.transform);
 	};
 	const zoom = d3
 		.zoom()

@@ -83,7 +83,7 @@ class PlaceManager(TreeManager):
     def tundras(self):
         return super().get_queryset().filter(site_type=SiteTypes.TUNDRA)
 
-    def unusuals(self):
+    def unusual(self):
         return super().get_queryset().filter(site_type=SiteTypes.UNUSUAL)
 
     def islands(self):

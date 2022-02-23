@@ -6,12 +6,12 @@ app_name = 'roleplay'
 
 PLACE_PATTERNS = [
     path('create/<int:pk>/', views.PlaceCreateView.as_view(), name='create'),
+    path('<int:pk>/', views.PlaceDetailView.as_view(), name='detail'),
 ]
 
 WORLD_PATTERNS = [
     path('', views.WorldListView.as_view(), name='list'),
     path('create/', views.WorldCreateView.as_view(), name='create'),
-    path('<int:pk>/', views.WorldDetailView.as_view(), name='detail'),
     path('edit/<int:pk>/', views.WorldUpdateView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.WorldDeleteView.as_view(), name='delete'),
 ]

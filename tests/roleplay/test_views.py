@@ -72,7 +72,7 @@ class TestPlaceCreateView(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(self.url, data=self.data_ok, follow=True)
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
@@ -83,7 +83,7 @@ class TestPlaceCreateView(TestCase):
         del data_without_image['image']
         response = self.client.post(self.url, data=data_without_image, follow=True)
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
@@ -94,7 +94,7 @@ class TestPlaceCreateView(TestCase):
         del data_without_description['description']
         response = self.client.post(self.url, data=data_without_description, follow=True)
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:world:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
@@ -430,7 +430,7 @@ class TestWorldCreateView(TestCase):
 
         self.assertTrue(self.model.objects.exists())
         self.assertEqual(1, self.model.objects.count())
-        self.assertRedirects(response, reverse('roleplay:world:detail', kwargs={'pk': self.model.objects.first().pk}))
+        self.assertRedirects(response, reverse('roleplay:place:detail', kwargs={'pk': self.model.objects.first().pk}))
 
     def test_community_world_data_is_correct_ok(self):
         self.client.force_login(self.user)
@@ -467,16 +467,16 @@ class TestWorldCreateView(TestCase):
         self.assertIsNotNone(entry.image)
 
 
-class TestWorldDetailView(TestCase):
+class TestPlaceDetailView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = models.Place
-        cls.view = views.WorldDetailView
+        cls.view = views.PlaceDetailView
 
     def setUp(self):
         self.user = baker.make(get_user_model())
         self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
-        self.url = reverse('roleplay:world:detail', kwargs={'pk': self.world.pk})
+        self.url = reverse('roleplay:place:detail', kwargs={'pk': self.world.pk})
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -495,7 +495,7 @@ class TestWorldDetailView(TestCase):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
         world = baker.make(self.model, name=fake.country(), owner=self.user)
-        url = reverse('roleplay:world:detail', kwargs={'pk': world.pk})
+        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
@@ -503,7 +503,7 @@ class TestWorldDetailView(TestCase):
     def test_access_default_world_ok(self):
         self.client.force_login(self.user)
         world = baker.make(self.model, name=fake.country())
-        url = reverse('roleplay:world:detail', kwargs={'pk': world.pk})
+        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)

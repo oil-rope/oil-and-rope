@@ -302,6 +302,9 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['RemoveFormat', 'Source'],
         ],
+        'uiColor': '#EE7A55',
+        'resize_enabled': False,
+        'width': 'auto',
     },
 }
 
