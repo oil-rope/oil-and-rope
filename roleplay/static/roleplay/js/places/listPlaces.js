@@ -166,10 +166,7 @@ const Tree = (data) => {
 	const handleZoom = (e) => {
 		svg.attr("transform", e.transform);
 	};
-	const zoom = d3
-		.zoom()
-		.scaleExtent([1, 4])
-		.on("zoom", handleZoom);
+	const zoom = d3.zoom().scaleExtent([1, 4]).on("zoom", handleZoom);
 
 	const initZoom = () => {
 		d3.select(element).call(zoom);

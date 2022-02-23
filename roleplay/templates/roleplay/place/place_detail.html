@@ -105,9 +105,12 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
           <a
-            href=""
-            class="dropdown-item"
-          ></a>
+            href="#no-url"
+            class="dropdown-item disabled"
+          >
+            <i class="ic ic-quill"></i>
+            {% translate "create campaign"|capfirst %}
+          </a>
           {% if object.owner == request.user %}
             <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
               <i class="ic ic-map"></i>

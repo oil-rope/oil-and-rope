@@ -10,7 +10,7 @@ from common.constants import models
 from common.tools.mail import HtmlThreadMail
 
 from ..permissions import common
-from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff
+from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff, IsPublicOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
 
@@ -41,6 +41,10 @@ class PlaceViewSet(UserListMixin, viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'update':
             self.permission_classes = [permissions.IsAdminUser]
+        if self.action == 'retrieve':
+            # NOTE: Quick fix to avoid flake8 E501
+            perms = api_settings.DEFAULT_PERMISSION_CLASSES + [IsPublicOrStaff | common.IsOwnerOrStaff]
+            self.permission_classes = perms
         return super(PlaceViewSet, self).get_permissions()
 
     def get_serializer(self, *args, **kwargs):
