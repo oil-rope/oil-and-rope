@@ -941,6 +941,7 @@ class TestRaceCreateView(TestCase):
         cls.race = baker.make(models.Race)
 
     def setUp(self):
+        self.user = baker.make(get_user_model())
         self.url = reverse(self.resolver)
         self.data_ok = {
             'name': fake.word(),
@@ -953,6 +954,7 @@ class TestRaceCreateView(TestCase):
             'affected_by_armor' : fake.boolean(),
             'wisdom' : fake.random_int(min=-5, max=5),
             'image' : fake.image_url(),
+            'users' : [self.user.pk]
         }
 
     def test_access_logged_user_ok(self):
@@ -966,6 +968,7 @@ class TestRaceCreateView(TestCase):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.data_ok)
         instance = self.model.objects.first()
+        import ipdb;ipdb.set_trace()
 
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)

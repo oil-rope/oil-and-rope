@@ -1,0 +1,25 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+  {% blocktrans with name=object.name %}
+    Playing {{ name }}
+  {% endblocktrans %}
+{% endblock title %}
+
+{% block body_content %}
+  <main class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div id="raceDisplay"></div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <!-- <script src="{% static 'frontend/dist/session.bundle.js' %}"
+          data-user="{{ serialized_user }}"
+  ></script> -->
+{% endblock javascript %}
