@@ -1,5 +1,5 @@
 import logging
-from smtplib import SMTPAuthenticationError
+from smtplib import SMTPException
 
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -94,15 +94,12 @@ class SignUpForm(auth_forms.UserCreationForm):
             'object': user
         })
 
-        try:
-            title = 'Oil & Rope'
-            subject = _('welcome to %(title)s!') % {'title': title}
-            send_mail(
-                subject=str(subject).capitalize(), message='', from_email=None,
-                recipient_list=[user.email], html_message=html_msg,
-            )
-        except SMTPAuthenticationError:  # pragma: no cover
-            LOGGER.exception('Unable to logging email server with given credentials.')
+        title = 'Oil & Rope'
+        subject = _('welcome to %(title)s!') % {'title': title}
+        send_mail(
+            subject=str(subject).capitalize(), message='', from_email=None,
+            recipient_list=[user.email], html_message=html_msg,
+        )
 
     def save(self, commit=True):
         """
@@ -119,7 +116,13 @@ class SignUpForm(auth_forms.UserCreationForm):
         instance.is_active = False
         if commit:
             instance.save()
-            self._send_email_confirmation(instance)
+            try:
+                self._send_email_confirmation(instance)
+            # NOTE: ConnectionError is when SMTP server is unreachable, SMTPException is for credentials, bad format...
+            except (ConnectionError, SMTPException) as ex:
+                LOGGER.exception(ex)
+                instance.delete()
+                raise ex
         return instance
 
     class Meta:

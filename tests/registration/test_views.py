@@ -7,10 +7,12 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from faker import Faker
 from model_bakery import baker
 
+from common.utils.faker import create_faker
 from registration.views import ActivateAccountView
+
+fake = create_faker()
 
 
 class TestLoginView(TestCase):
@@ -18,7 +20,6 @@ class TestLoginView(TestCase):
     Checks LoginView works correctly.
     """
 
-    faker = Faker()
     resolver = 'registration:login'
 
     def setUp(self):
@@ -32,7 +33,7 @@ class TestLoginView(TestCase):
 
     def test_user_can_login_ok(self):
         # Change password so we can control input
-        password = self.faker.password()
+        password = fake.password()
         self.user.set_password(password)
         self.user.save()
         data = {
@@ -46,7 +47,7 @@ class TestLoginView(TestCase):
 
     def test_user_login_with_email_ok(self):
         # Change password so we can control input
-        password = self.faker.password()
+        password = fake.password()
         self.user.set_password(password)
         self.user.save()
 
@@ -60,12 +61,12 @@ class TestLoginView(TestCase):
 
     def test_user_login_with_email_ko(self):
         # Change password so we can control input
-        password = self.faker.password()
+        password = fake.password()
         self.user.set_password(password)
         self.user.save()
 
         data = {
-            'username': self.faker.email(),
+            'username': fake.email(),
             'password': password
         }
         self.assertFalse(get_user(self.client).is_authenticated, 'User is logged before post to Login.')
@@ -75,7 +76,7 @@ class TestLoginView(TestCase):
     @mock.patch('registration.views.messages')
     def test_user_inactive_warning_ko(self, mock_call: mock.MagicMock):
         # Change password so we can control input
-        password = self.faker.password()
+        password = fake.password()
         self.user.set_password(password)
         # Set user as inactive
         self.user.is_active = False
@@ -101,8 +102,8 @@ class TestLoginView(TestCase):
         """
 
         data = {
-            'username': self.faker.user_name(),
-            'password': self.faker.word()
+            'username': fake.user_name(),
+            'password': fake.word()
         }
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 200, 'Request gives {status}.'.format(
@@ -117,15 +118,14 @@ class TestLoginView(TestCase):
 
 class TestSignUpView(TestCase):
     """
-    Checks if SignUpview works correctly.
+    Checks if SignUpView works correctly.
     """
 
     def setUp(self):
-        self.faker = Faker()
-        email = self.faker.safe_email()
-        password = self.faker.password()
+        email = fake.safe_email()
+        password = fake.password()
         self.data_ok = {
-            'username': self.faker.user_name(),
+            'username': fake.user_name(),
             'email': email,
             'password1': password,
             'password2': password
@@ -151,10 +151,10 @@ class TestSignUpView(TestCase):
         data_ok = self.data_ok.copy()
         response = self.client.post(self.url, data=data_ok)
 
-        succes_message = 'User created! Please confirm your email.'
+        success_message = 'User created! Please confirm your email.'
         mock_call.success.assert_called_with(
             response.wsgi_request,
-            succes_message
+            success_message
         )
 
     def test_user_is_created_ok(self):
@@ -163,13 +163,32 @@ class TestSignUpView(TestCase):
         self.assertTrue(user_exists, 'User is not created.')
 
     def test_email_sent_ok(self):
-        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
-            self.client.post(self.url, data=self.data_ok, follow=True)
-            self.assertTrue(len(mail.outbox) == 1, 'Email wasn\'t sent.')
+        # NOTE: Not necessary since for tests this backend is default
+        # with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+
+        self.client.post(self.url, data=self.data_ok, follow=True)
+        self.assertTrue(len(mail.outbox) == 1, 'Email wasn\'t sent.')
+
+    @mock.patch('registration.views.messages')
+    def test_email_exception_ko(self, mock_call: mock.MagicMock):
+        error_message = 'Seems like we are experimenting issues with our mail automatization. Please try later.'
+
+        with self.settings(
+            EMAIL_HOST='smtp.mailtrap.io', EMAIL_HOST_USER=fake.user_name(),
+            EMAIL_HOST_PASSWORD=fake.password(), EMAIL_PORT=2525,
+            EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
+        ):
+            response = self.client.post(self.url, data=self.data_ok, follow=True)
+
+            mock_call.error.assert_called_with(
+                response.wsgi_request,
+                error_message,
+                extra_tags='danger',
+            )
 
     def test_wrong_confirm_password(self):
         data_ko = self.data_ok.copy()
-        data_ko['password2'] = self.faker.word()
+        data_ko['password2'] = fake.word()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'password2', 'The two password fields didn’t match.')
 
@@ -203,13 +222,12 @@ class TestSignUpView(TestCase):
 
 class TestActivateAccountView(TestCase):
     """
-    Checks correct behaviour for ActivateAccountView.
+    Checks correct behavior for ActivateAccountView.
 
     We don't validate `access_ok` since a 200 code is not expected from this view.
     """
 
     def setUp(self):
-        self.faker = Faker()
         token_generator = PasswordResetTokenGenerator()
         self.user = baker.make(get_user_model())
         self.user.is_active = False
@@ -238,8 +256,7 @@ class TestResendConfirmationEmailView(TestCase):
     """
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.data_ok = {
             'email': self.user.email
         }
@@ -274,7 +291,7 @@ class TestResendConfirmationEmailView(TestCase):
 
     def test_email_does_not_exists_ko(self):
         data_ko = self.data_ok.copy()
-        data_ko['email'] = self.faker.email()
+        data_ko['email'] = fake.email()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
 
@@ -282,8 +299,7 @@ class TestResendConfirmationEmailView(TestCase):
 class TestResetPasswordView(TestCase):
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.data_ok = {
             'email': self.user.email
         }
@@ -319,7 +335,7 @@ class TestResetPasswordView(TestCase):
 
     def test_email_does_not_exists_ko(self):
         data_ko = self.data_ok.copy()
-        data_ko['email'] = self.faker.email()
+        data_ko['email'] = fake.email()
         response = self.client.post(self.url, data=data_ko)
         self.assertFormError(response, 'form', 'email', 'This email doesn\'t belong to a user.')
 
@@ -327,8 +343,7 @@ class TestResetPasswordView(TestCase):
 class TestPasswordResetConfirmView(TestCase):
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.password = 'a_p4ssw0rd@'
         self.data_ok = {
             'new_password1': self.password,
@@ -351,7 +366,7 @@ class TestPasswordResetConfirmView(TestCase):
     @mock.patch('registration.views.messages')
     def test_ok(self, mock_call):
         response = self.client.get(self.url)
-        # Unencrypted URL
+        # Decrypted URL
         url = response.url
         response = self.client.post(url, data=self.data_ok)
         self.assertEqual(302, response.status_code, 'User is no redirected.')
