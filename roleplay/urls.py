@@ -5,8 +5,9 @@ from . import views
 app_name = 'roleplay'
 
 PLACE_PATTERNS = [
-    path('create/<int:pk>/', views.PlaceCreateView.as_view(), name='create'),
     path('<int:pk>/', views.PlaceDetailView.as_view(), name='detail'),
+    path('create/<int:pk>/', views.PlaceCreateView.as_view(), name='create'),
+    path('edit/<int:pk>/', views.PlaceUpdateView.as_view(), name='edit'),
 ]
 
 WORLD_PATTERNS = [

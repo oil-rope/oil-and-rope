@@ -63,8 +63,19 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
         context['parent_site'] = self.get_parent_site()
         return context
 
-    def get_success_url(self):
-        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
+
+class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
+    form_class = forms.PlaceForm
+    model = models.Place
+    template_name = 'roleplay/place/place_update.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'parent_site_queryset': self.object.get_root().get_family(),
+            'submit_text': _('update'),
+        })
+        return kwargs
 
 
 class PlaceDetailView(LoginRequiredMixin, DetailView):
@@ -164,9 +175,6 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
     model = models.Place
     template_name = 'roleplay/world/world_create.html'
 
-    def get_success_url(self):
-        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         user = self.request.user
@@ -183,10 +191,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
     model = models.Place
-    template_name = 'roleplay/world/world_update.html'
-
-    def get_success_url(self):
-        return reverse('roleplay:place:detail', kwargs={'pk': self.object.pk})
+    template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

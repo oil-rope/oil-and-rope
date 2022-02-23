@@ -117,6 +117,9 @@ class Place(MPTTModel, TracingMixin):
     def resolve_icon(self):
         return '<i class="{}"></i>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
 
+    def get_absolute_url(self):
+        return reverse('roleplay:place:detail', kwargs={'pk': self.pk})
+
     def get_houses(self):
         houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
         houses = list(houses)

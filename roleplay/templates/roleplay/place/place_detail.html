@@ -149,7 +149,12 @@
               <i class="ic ic-map"></i>
               {% translate "add"|capfirst %} {% translate "geography" %}
             </a>
-            <a class="dropdown-item" href="{% url 'roleplay:world:edit' object.pk %}">
+            {% if object.get_root == object %}
+              {% url 'roleplay:world:edit' object.pk as place_edit_url %}
+            {% else %}
+              {% url 'roleplay:place:edit' object.pk as place_edit_url %}
+            {% endif %}
+            <a class="dropdown-item" href="{{ place_edit_url }}">
               <i class="ic ic-edit"></i>
               {% translate "edit"|capfirst %}
             </a>

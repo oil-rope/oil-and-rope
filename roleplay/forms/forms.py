@@ -29,7 +29,7 @@ class PlaceForm(forms.ModelForm):
         required=True,
     )
 
-    def __init__(self, parent_site_queryset=None, *args, **kwargs):
+    def __init__(self, parent_site_queryset=None, submit_text=_('create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not parent_site_queryset:
             self.fields['parent_site'].queryset = models.Place.objects.all()
@@ -39,7 +39,7 @@ class PlaceForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
         self.helper.include_media = True
-        self.helper.layout = PlaceLayout()
+        self.helper.layout = PlaceLayout(submit_text)
 
     class Meta:
         exclude = ('owner', 'user')

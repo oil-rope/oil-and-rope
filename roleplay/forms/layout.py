@@ -5,12 +5,14 @@ from common.forms import layout as common_layout
 
 
 class PlaceLayout(layout.Layout):
-    def __init__(self):
+    def __init__(self, submit_text=_('create')):
         super().__init__(
             layout.Row(
                 layout.Column(
-                    layout.Field('parent_site'),
+                    'parent_site',
+                    css_class='col-sm-12 col-lg-10'
                 ),
+                css_class='justify-content-lg-around',
             ),
             layout.Row(
                 layout.Column(
@@ -26,19 +28,20 @@ class PlaceLayout(layout.Layout):
             layout.Row(
                 layout.Column(
                     'site_type',
-                    css_class='col-sm-6 col-lg-5'
+                    css_class='col-sm-6 col-md-10'
                 ),
                 layout.Column(
                     'image',
-                    css_class='col-sm-6 col-lg-5'
+                    css_class='col-sm-6 col-md-10'
                 ),
-                css_class='justify-content-lg-around',
+                css_class='justify-content-md-around',
             ),
             layout.Row(
                 layout.Column(
                     common_layout.SubmitClearLayout(
-                        submit_css_class='col-5',
-                        reset_css_class='col-5',
+                        submit_text=submit_text.capitalize(),
+                        submit_css_class='col-5 col-lg-10',
+                        reset_css_class='col-5 d-lg-none',
                     ),
                 ),
             ),

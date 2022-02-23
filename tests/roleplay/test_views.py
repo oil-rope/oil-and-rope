@@ -144,9 +144,59 @@ class TestPlaceCreateView(TestCase):
         self.client.post(self.url, data=data_with_private_world)
         private_world.refresh_from_db()
 
-        self.assertEqual(0, private_world.get_descendant_count())
         # NOTE: For some reason even tho instance isn't created no error is returned
         # self.assertFormError(response, form='form', field='parent_site', errors=['Error'])
+        self.assertEqual(0, private_world.get_descendant_count())
+
+
+class TestPlaceDetailView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.model = models.Place
+        cls.view = views.PlaceDetailView
+
+    def setUp(self):
+        self.user = baker.make(get_user_model())
+        self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
+        self.url = reverse('roleplay:place:detail', kwargs={'pk': self.world.pk})
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+
+        self.assertNotEqual(200, response.status_code)
+        self.assertEqual(302, response.status_code)
+
+    def test_access_community_world_ok(self):
+        another_user = baker.make(get_user_model())
+        self.client.force_login(another_user)
+        world = baker.make(self.model, name=fake.country(), owner=self.user)
+        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_default_world_ok(self):
+        self.client.force_login(self.user)
+        world = baker.make(self.model, name=fake.country())
+        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_not_owner_ko(self):
+        another_user = baker.make(get_user_model())
+        self.client.force_login(another_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
 
 
 class TestWorldListView(TestCase):
@@ -467,55 +517,6 @@ class TestWorldCreateView(TestCase):
         self.assertIsNotNone(entry.image)
 
 
-class TestPlaceDetailView(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = models.Place
-        cls.view = views.PlaceDetailView
-
-    def setUp(self):
-        self.user = baker.make(get_user_model())
-        self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
-        self.url = reverse('roleplay:place:detail', kwargs={'pk': self.world.pk})
-
-    def test_access_ok(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
-
-    def test_anonymous_access_ko(self):
-        response = self.client.get(self.url)
-
-        self.assertNotEqual(200, response.status_code)
-        self.assertEqual(302, response.status_code)
-
-    def test_access_community_world_ok(self):
-        another_user = baker.make(get_user_model())
-        self.client.force_login(another_user)
-        world = baker.make(self.model, name=fake.country(), owner=self.user)
-        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
-        response = self.client.get(url)
-
-        self.assertEqual(200, response.status_code)
-
-    def test_access_default_world_ok(self):
-        self.client.force_login(self.user)
-        world = baker.make(self.model, name=fake.country())
-        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
-        response = self.client.get(url)
-
-        self.assertEqual(200, response.status_code)
-
-    def test_access_not_owner_ko(self):
-        another_user = baker.make(get_user_model())
-        self.client.force_login(another_user)
-        response = self.client.get(self.url)
-
-        self.assertEqual(403, response.status_code)
-
-
 class TestWorldDeleteView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -607,7 +608,7 @@ class TestWorldUpdateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world/world_update.html')
+        self.assertTemplateUsed(response, 'roleplay/place/place_update.html')
 
     def test_access_anonymous_user_ko(self):
         response = self.client.get(self.url)
