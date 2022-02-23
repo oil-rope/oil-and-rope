@@ -300,7 +300,7 @@ CKEDITOR_CONFIGS = {
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
              'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['Link', 'Unlink'],
-            ['RemoveFormat', 'Source'],
+            ['RemoveFormat'],
         ],
         'uiColor': '#EE7A55',
         'resize_enabled': False,
