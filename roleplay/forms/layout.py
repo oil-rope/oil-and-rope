@@ -148,6 +148,7 @@ class SessionFormLayout(layout.Layout):
             ),
         )
 
+
 class RaceFormLayout(layout.Layout):
     def __init__(self, submit_text):
         super().__init__(

@@ -261,6 +261,7 @@ class TestSessionForm(TestCase):
 
         self.assertEqual(expected_date, instance.next_game)
 
+
 class TestRaceForm(TestCase):
     form_class = forms.RaceForm
     model = models.Race
@@ -271,14 +272,14 @@ class TestRaceForm(TestCase):
         self.data_ok = {
             'name': self.faker.word(),
             'description': self.faker.paragraph(),
-            'strength' : self.faker.random_int(min=-5, max=5),
-            'dexterity' : self.faker.random_int(min=-5, max=5),
-            'charisma' : self.faker.random_int(min=-5, max=5),
-            'constitution' : self.faker.random_int(min=-5, max=5),
-            'intelligence' : self.faker.random_int(min=-5, max=5),
-            'affected_by_armor' : self.faker.boolean(),
-            'wisdom' : self.faker.random_int(min=-5, max=5),
-            'users' : [self.user.pk]
+            'strength': self.faker.random_int(min=-5, max=5),
+            'dexterity': self.faker.random_int(min=-5, max=5),
+            'charisma': self.faker.random_int(min=-5, max=5),
+            'constitution': self.faker.random_int(min=-5, max=5),
+            'intelligence': self.faker.random_int(min=-5, max=5),
+            'affected_by_armor': self.faker.boolean(),
+            'wisdom': self.faker.random_int(min=-5, max=5),
+            'users': [self.user.pk]
         }
 
         self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
