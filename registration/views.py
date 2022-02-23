@@ -1,6 +1,6 @@
 import logging
 import random
-from smtplib import SMTPAuthenticationError
+from smtplib import SMTPAuthenticationError, SMTPException
 
 from django.conf import settings
 from django.contrib import messages
@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -81,9 +80,20 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        self.object = form.save()
-        messages.success(self.request, self.get_success_message())
-        return redirect(self.success_url)
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, self.get_success_message())
+        # NOTE: If SMTP is unreachable one of those exceptions will be raised
+        except (ConnectionError, SMTPException):
+            msg = '{} {}'.format(
+                _('seems like we are experimenting issues with our mail automatization.').capitalize(),
+                _('please try later.').capitalize(),
+            )
+            messages.error(self.request, msg, extra_tags='danger')
+            # NOTE: We return response as is form has failed so user doesn't have to write everything again
+            response = super().form_invalid(form)
+        finally:
+            return response
 
 
 class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):

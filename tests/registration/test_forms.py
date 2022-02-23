@@ -1,16 +1,19 @@
 import unittest
+from smtplib import SMTPException
 
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import RequestFactory, TestCase
-from faker import Faker
 from model_bakery import baker
 
+from common.utils import create_faker
 from registration import forms
 
 from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
                                      USER_WITH_SAME_SERVER)
 from ..utils import check_litecord_connection
+
+fake = create_faker()
 
 
 class TestLoginForm(TestCase):
@@ -19,10 +22,9 @@ class TestLoginForm(TestCase):
     """
 
     def setUp(self):
-        self.faker = Faker()
         self.user = baker.make(get_user_model())
         # Reset password so we can control input
-        password = self.faker.password()
+        password = fake.password()
         self.user.set_password(password)
         self.user.save()
         self.data_ok = {
@@ -37,7 +39,7 @@ class TestLoginForm(TestCase):
 
     def test_form_invalid_password_ko(self):
         data_ko = self.data_ok.copy()
-        data_ko['password'] = self.faker.word()
+        data_ko['password'] = fake.word()
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
@@ -48,11 +50,10 @@ class TestSignUpForm(TestCase):
     """
 
     def setUp(self):
-        self.faker = Faker()
-        email = self.faker.safe_email()
-        password = self.faker.password()
+        email = fake.safe_email()
+        password = fake.password()
         self.data_ok = {
-            'username': self.faker.user_name(),
+            'username': fake.user_name(),
             'email': email,
             'password1': password,
             'password2': password,
@@ -83,13 +84,13 @@ class TestSignUpForm(TestCase):
 
     def test_form_wrong_confirm_password_ko(self):
         data_ko = self.data_ok.copy()
-        data_ko['password2'] = self.faker.word()
+        data_ko['password2'] = fake.word()
         form = forms.SignUpForm(self.request, data=data_ko)
         self.assertFalse(form.is_valid(), 'Form is valid but it shouldn\'t.')
 
     def test_form_taken_email_ko(self):
         # First we create a user
-        user = baker.make(get_user_model(), email=self.faker.email())
+        user = baker.make(get_user_model(), email=fake.email())
         data_ko = self.data_ok.copy()
         data_ko['email'] = user.email
         form = forms.SignUpForm(self.request, data=data_ko)
@@ -122,11 +123,23 @@ class TestSignUpForm(TestCase):
         self.assertFalse(user.is_active, 'User is active before activating email.')
 
     def test_email_sent_ok(self):
+        # NOTE: Not necessary anymore since it does it by default
         # Changing Django Settings to get email sent
-        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+        # with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+
+        form = forms.SignUpForm(self.request, data=self.data_ok)
+        form.save()
+        self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')
+
+    def test_email_exception_ko(self):
+        with self.settings(
+            EMAIL_HOST='smtp.mailtrap.io', EMAIL_HOST_USER=fake.user_name(),
+            EMAIL_HOST_PASSWORD=fake.password(), EMAIL_PORT=2525,
+            EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
+        ):
             form = forms.SignUpForm(self.request, data=self.data_ok)
-            form.save()
-            self.assertTrue(len(mail.outbox) == 1, 'Email aren\'t been sent.')
+            with self.assertRaises(SMTPException):
+                form.save()
 
 
 class TestResendEmailForm(TestCase):
@@ -135,8 +148,7 @@ class TestResendEmailForm(TestCase):
     """
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.data_ok = {
             'email': self.user.email
         }
@@ -153,7 +165,7 @@ class TestResendEmailForm(TestCase):
 
     def test_email_does_not_exist(self):
         self.data_ko = self.data_ok.copy()
-        self.data_ko['email'] = self.faker.email()
+        self.data_ko['email'] = fake.email()
         form = forms.ResendEmailForm(data=self.data_ko)
         self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
 
@@ -162,8 +174,7 @@ class TestPasswordResetForm(TestCase):
     form_class = forms.PasswordResetForm
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.data_ok = {
             'email': self.user.email
         }
@@ -180,7 +191,7 @@ class TestPasswordResetForm(TestCase):
 
     def test_email_does_not_exist(self):
         self.data_ko = self.data_ok.copy()
-        self.data_ko['email'] = self.faker.email()
+        self.data_ko['email'] = fake.email()
         form = self.form_class(data=self.data_ko)
         self.assertFalse(form.is_valid(), 'Form is taken as valid but it shouldn\'t.')
 
@@ -189,8 +200,7 @@ class TestSetPasswordForm(TestCase):
     form_class = forms.SetPasswordForm
 
     def setUp(self):
-        self.faker = Faker()
-        self.user = baker.make(get_user_model(), email=self.faker.email())
+        self.user = baker.make(get_user_model(), email=fake.email())
         self.password = 'a_p4ssw0rd@'
         self.data_ok = {
             'new_password1': self.password,
