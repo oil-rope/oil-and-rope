@@ -5,8 +5,8 @@ import tempfile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.shortcuts import reverse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from faker import Faker
 from model_bakery import baker
@@ -149,54 +149,150 @@ class TestPlaceCreateView(TestCase):
         self.assertEqual(0, private_world.get_descendant_count())
 
 
-class TestPlaceDetailView(TestCase):
+class TestPlaceUpdateView(TestCase):
+    model = models.Place
+    resolver = 'roleplay:place:edit'
+
     @classmethod
-    def setUpTestData(cls):
-        cls.model = models.Place
-        cls.view = views.PlaceDetailView
+    def setUpTestData(cls) -> None:
+        cls.owner = baker.make_recipe('registration.user')
+        cls.public_world = cls.model.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            site_type=enums.SiteTypes.WORLD,
+            owner=cls.owner,
+        )
+        cls.place = cls.model.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            site_type=random.choice(enums.SiteTypes.values),
+            owner=cls.owner,
+            parent_site=cls.public_world,
+        )
+        cls.url = reverse('roleplay:place:edit', kwargs={'pk': cls.place.pk})
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
-        self.world = baker.make(models.Place, name=fake.country(), owner=self.user, user=self.user)
-        self.url = reverse('roleplay:place:detail', kwargs={'pk': self.world.pk})
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        with open(self.tmp_file.name, 'rb') as img_content:
+            image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
 
-    def test_access_ok(self):
-        self.client.force_login(self.user)
+        self.data_ok = {
+            'name': fake.country(),
+            'description': fake.paragraph(),
+            'site_type': random.choice(enums.SiteTypes.values),
+            'parent_site': self.public_world.pk,
+            'image': image,
+        }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_anonymous_access_ko(self):
+        login_url = reverse('registration:login')
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_access_not_owner_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_owner_ok(self):
+        self.client.force_login(self.owner)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
+
+    def test_anonymous_post_data_ko(self):
+        login_url = reverse('registration:login')
+        response = self.client.post(self.url, data=self.data_ok)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_post_data_ok(self):
+        self.client.force_login(self.owner)
+        current_name = self.place.name
+        new_name = self.data_ok['name']
+        response = self.client.post(self.url, data=self.data_ok)
+        self.place.refresh_from_db()
+
+        self.assertRedirects(response, reverse('roleplay:place:detail', kwargs={'pk': self.place.pk}))
+        self.assertNotEqual(current_name, new_name)
+        self.assertEqual(self.place.name, new_name)
+
+
+class TestPlaceDetailView(TestCase):
+    model = models.Place
+    resolver = 'roleplay:place:detail'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner = baker.make(get_user_model())
+
+        cls.private_world = models.Place.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            owner=cls.owner,
+            user=cls.owner,
+            site_type=enums.SiteTypes.WORLD,
+        )
+        cls.private_world_url = reverse(cls.resolver, kwargs={'pk': cls.private_world.pk})
+
+        cls.public_world = models.Place.objects.create(
+            name=fake.country(),
+            description=fake.paragraph(),
+            owner=cls.owner,
+            # NOTE: This is what defines a private world. This must be changed at some point
+            user=None,
+            site_type=enums.SiteTypes.WORLD,
+        )
+        cls.public_world_url = reverse(cls.resolver, kwargs={'pk': cls.public_world.pk})
 
     def test_anonymous_access_ko(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.private_world_url)
 
         self.assertNotEqual(200, response.status_code)
         self.assertEqual(302, response.status_code)
 
+    def test_access_not_owner_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.private_world_url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_not_owner_public_world_ok(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.public_world_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_owner_ok(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(self.private_world_url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
+
     def test_access_community_world_ok(self):
         another_user = baker.make(get_user_model())
         self.client.force_login(another_user)
-        world = baker.make(self.model, name=fake.country(), owner=self.user)
+        world = baker.make(self.model, name=fake.country(), owner=self.owner)
         url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
 
     def test_access_default_world_ok(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.owner)
         world = baker.make(self.model, name=fake.country())
         url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
-
-    def test_access_not_owner_ko(self):
-        another_user = baker.make(get_user_model())
-        self.client.force_login(another_user)
-        response = self.client.get(self.url)
-
-        self.assertEqual(403, response.status_code)
-
 
 
 class TestWorldListView(TestCase):
@@ -480,7 +576,10 @@ class TestWorldCreateView(TestCase):
 
         self.assertTrue(self.model.objects.exists())
         self.assertEqual(1, self.model.objects.count())
-        self.assertRedirects(response, reverse('roleplay:place:detail', kwargs={'pk': self.model.objects.first().pk}))
+        self.assertRedirects(
+            response,
+            reverse('roleplay:place:detail', kwargs={'pk': self.model.objects.first().pk})
+        )
 
     def test_community_world_data_is_correct_ok(self):
         self.client.force_login(self.user)
