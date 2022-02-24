@@ -53,6 +53,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt update
+          sudo apt install -y firefox-geckodriver
           python -m pip install --upgrade pip poetry
           poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
           pip install -r /tmp/requirements.txt
