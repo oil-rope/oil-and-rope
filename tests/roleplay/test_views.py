@@ -71,8 +71,9 @@ class TestPlaceCreateView(TestCase):
     def test_post_data_ok(self):
         self.client.force_login(self.user)
         response = self.client.post(self.url, data=self.data_ok, follow=True)
+        created_place = response.context['object']
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': created_place.pk})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
@@ -82,8 +83,9 @@ class TestPlaceCreateView(TestCase):
         data_without_image = self.data_ok.copy()
         del data_without_image['image']
         response = self.client.post(self.url, data=data_without_image, follow=True)
+        created_place = response.context['object']
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': created_place.pk})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
@@ -93,8 +95,9 @@ class TestPlaceCreateView(TestCase):
         data_without_description = self.data_ok.copy()
         del data_without_description['description']
         response = self.client.post(self.url, data=data_without_description, follow=True)
+        created_place = response.context['object']
         self.parent_place.refresh_from_db()
-        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': 2})
+        redirect_url = reverse('roleplay:place:detail', kwargs={'pk': created_place.pk})
 
         self.assertEqual(1, self.parent_place.get_descendant_count())
         self.assertRedirects(response, redirect_url)
