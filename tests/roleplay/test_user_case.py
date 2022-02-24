@@ -20,7 +20,9 @@ class SeleniumPlaceDetail(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.browser = webdriver.Firefox()
+        options = webdriver.FirefoxOptions()
+        options.add_argument('--headless')
+        cls.browser = webdriver.Firefox(options=options)
         cls.browser.implicitly_wait(2)
 
     @classmethod
@@ -57,6 +59,7 @@ class SeleniumPlaceDetail(StaticLiveServerTestCase):
         password_input.send_keys(password)
         # NOTE: This button click doesn't seem legible
         submit_button = self.browser.find_element(by=By.NAME, value='login')
+        self.browser.execute_script('window.scrollTo(0, 200)')
         submit_button.click()
 
     def test_not_owner_does_not_see_dangerous_options_ok(self):
