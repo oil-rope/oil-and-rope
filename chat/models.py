@@ -17,7 +17,7 @@ class Chat(TracingMixin):
         Users in this chat.
     """
 
-    id = models.AutoField(primary_key=True, verbose_name=_('identifier'))
+    id = models.BigAutoField(primary_key=True, verbose_name=_('identifier'))
     name = models.CharField(verbose_name=_('name'), max_length=50)
     users = models.ManyToManyField(to=USER_MODEL, verbose_name=_('users'), related_name='chat_set')
 
@@ -43,7 +43,7 @@ class ChatMessage(TracingMixin):
         Person who sent the message.
     """
 
-    id = models.AutoField(primary_key=True, verbose_name=_('identifier'))
+    id = models.BigAutoField(primary_key=True, verbose_name=_('identifier'))
     chat = models.ForeignKey(
         to=CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE, related_name='chat_message_set', db_index=True
     )

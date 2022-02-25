@@ -524,7 +524,7 @@ class Session(TracingMixin):
 
 
 class PlayerInSession(TracingMixin):
-    id = models.AutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
     session = models.ForeignKey(
         to=constants.SESSION_MODEL, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
         db_index=True, verbose_name=_('session'),
