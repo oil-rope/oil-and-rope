@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('roleplay', '0003_alter_domain_description_alter_domain_domain_type_and_more'),
+        ('roleplay', '0004_alter_playerinsession_id'),
     ]
 
     operations = [
