@@ -30,7 +30,7 @@ class Track(TracingMixin):
         The file with the track.
     """
 
-    id = models.AutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
     name = models.CharField(verbose_name=_('name'), max_length=50)
     description = models.TextField(verbose_name=_('description'), blank=True, null=False)
     owner = models.ForeignKey(
