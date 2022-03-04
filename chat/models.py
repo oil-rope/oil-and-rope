@@ -13,7 +13,7 @@ class Chat(TracingMixin):
     ----------
     name: :class:`str`
         Name of the Chat Room.
-    users: List[:class:`User`]
+    users: List[:class:`~registration.models.User`]
         Users in this chat.
     """
 
@@ -31,15 +31,15 @@ class Chat(TracingMixin):
 
 class ChatMessage(TracingMixin):
     """
-    Ingame chat messages.
+    In-game chat messages.
 
     Parameters
     ----------
-    chat: :class:`Chat`
+    chat: :class:`~chat.models.Chat`
         Chat associated to this message.
     message: :class:`str`
         Message itself.
-    author: :class:`User`
+    author: :class:`~registration.models.User`
         Person who sent the message.
     """
 
@@ -54,8 +54,8 @@ class ChatMessage(TracingMixin):
     )
 
     class Meta:
-        verbose_name = _('chat message')
-        verbose_name_plural = _('chat messages')
+        verbose_name = _('message')
+        verbose_name_plural = _('messages')
 
     def __str__(self):
         return f'{self.message} ({self.entry_created_at})'

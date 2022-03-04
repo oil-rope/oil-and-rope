@@ -11,7 +11,7 @@ class OilAndRopeDefaultRouter(DefaultRouter):
 
     def get_api_root_view(self, api_urls=None):
         """
-        Exact same behaviour as DefaultRouter but allowing any only on APIRootView.
+        Exact same behavior as DefaultRouter but allowing any only on APIRootView.
         """
 
         api_root_dict = OrderedDict()
