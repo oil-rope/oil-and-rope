@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-24 15:34+0000\n"
+"POT-Creation-Date: 2022-03-07 13:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgstr "chat"
 msgid "chats"
 msgstr "chats"
 
-#: chat/models.py:50
+#: chat/models.py:50 chat/models.py:57
 #, fuzzy
 #| msgid "Message"
 msgid "message"
@@ -113,17 +113,11 @@ msgstr "mensaje"
 msgid "author"
 msgstr "autor"
 
-#: chat/models.py:57
-#, fuzzy
-#| msgid "Chat Message"
-msgid "chat message"
-msgstr "mensaje de chat"
-
 #: chat/models.py:58
 #, fuzzy
-#| msgid "Chat Messages"
-msgid "chat messages"
-msgstr "mensajes de chat"
+#| msgid "Message"
+msgid "messages"
+msgstr "mensaje"
 
 #: common/admin.py:19
 msgid "mark selected tracks as public"
@@ -962,16 +956,20 @@ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
 #| "in the link below"
 msgid ""
 "before you start, please make sure to activate your account by clicking in "
-"the link below"
+"the link below."
 msgstr ""
 "antes de empezar, por favor asegúrese de activar su cuenta accediendo al "
-"link de debajo"
+"link de debajo."
 
 #: email/templates/email_templates/confirm_email.html:18
 #, fuzzy
 #| msgid "Activate account"
 msgid "activate account"
 msgstr "activar cuenta"
+
+#: email/templates/email_templates/confirm_email.html:23
+msgid "if you can't click on the link here's raw"
+msgstr "si no puede entrar al enlace, aquí lo tiene plano"
 
 #: email/templates/email_templates/invitation_email.html:10
 #, fuzzy
@@ -1325,7 +1323,8 @@ msgstr "por favor confirma tu email."
 
 #: registration/views.py:89
 msgid "seems like we are experimenting issues with our mail automatization."
-msgstr "parece ser que estamos experimentandos problemas con el sistema de emails."
+msgstr ""
+"parece ser que estamos experimentandos problemas con el sistema de emails."
 
 #: registration/views.py:90
 msgid "please try later."
@@ -1969,6 +1968,16 @@ msgstr "actualizar"
 #| msgid "you've invited to a session!"
 msgid "you are not part of this session!"
 msgstr "¡has sido invitado a una partida!"
+
+#, fuzzy
+#~| msgid "Chat Message"
+#~ msgid "chat message"
+#~ msgstr "mensaje de chat"
+
+#, fuzzy
+#~| msgid "Chat Messages"
+#~ msgid "chat messages"
+#~ msgstr "mensajes de chat"
 
 #, fuzzy
 #~| msgid "Create city"
