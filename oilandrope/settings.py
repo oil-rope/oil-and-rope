@@ -252,10 +252,14 @@ LOCALE_PATHS = [
 
 SESSION_COOKIE_AGE = 172800
 
-# Session accesible from JavaScript
+# Session accessible from JavaScript
 # https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-httponly
 
 SESSION_COOKIE_HTTPONLY = False
+
+# https://docs.djangoproject.com/en/4.0/ref/settings/#session-cookie-samesite
+
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -363,7 +367,7 @@ CORS_ALLOW_METHODS = [
 
 # https://github.com/adamchainz/django-cors-headers#cors_urls_regex
 
-CORS_URLS_REGEX = r'^/\w+/api/.*$'
+CORS_URLS_REGEX = r'^/(en|es)/api/.*$'
 
 # https://github.com/adamchainz/django-cors-headers#cors_allow_headers
 
@@ -378,6 +382,10 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# https://github.com/adamchainz/django-cors-headers#cors_allow_credentials-bool
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
