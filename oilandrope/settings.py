@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
     'channels',
+    # Bootstrap5 template
+    'crispy_bootstrap5',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
     # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
@@ -310,7 +312,9 @@ CKEDITOR_CONFIGS = {
 }
 
 # Crispy Configuration
-# https://django-crispy-forms.readthedocs.io
+# https://django-crispy-forms.readthedocs.io/en/latest/
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap4', 'bootstrap5')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 

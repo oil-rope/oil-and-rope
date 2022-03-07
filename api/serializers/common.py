@@ -6,7 +6,7 @@ class MappedSerializerMixin:
     Parameters
     ----------
     serializers_map: :class:`str`:
-        Dictionary with field name and value to substitude.
+        Dictionary with field name and value to substitute.
     """
 
     serializers_map = None
@@ -25,7 +25,7 @@ class MappedSerializerMixin:
         if self.map_fields:
             for field in self.map_fields:
                 override_field = self.serializers_map[field]
-                # TODO: This error is special due to RestFramework behaviour, we gotta test it somehow
+                # TODO: This error is special due to RestFramework behavior, we gotta test it somehow
                 if getattr(override_field, 'source', None) == field:  # pragma: no cover
                     # Avoiding AssertionError
                     setattr(override_field, 'source', None)
