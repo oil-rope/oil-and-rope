@@ -35,7 +35,7 @@ class Domain(TracingMixin):
     domain_type = models.PositiveSmallIntegerField(
         verbose_name=_('domain type'), choices=DomainTypes.choices, default=DomainTypes.DOMAIN, null=False, blank=False
     )
-    image = models.ImageField(verbose_name=_('image'), upload_to=default_upload_to, null=True, blank=True)
+    image = models.ImageField(verbose_name=_('image'), upload_to=default_upload_to, null=False, blank=True)
 
     objects = managers.DomainManager()
 
@@ -89,7 +89,7 @@ class Place(MPTTModel, TracingMixin):
         verbose_name=_('site type'), choices=SiteTypes.choices, default=SiteTypes.TOWN, null=False, blank=False
     )
     image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, null=True, blank=True, validators=[validate_file_size]
+        verbose_name=_('image'), upload_to=default_upload_to, null=False, blank=True, validators=[validate_file_size]
     )
     parent_site = TreeForeignKey(
         to='self', verbose_name=_('parent site'), on_delete=models.CASCADE, null=True, blank=True,
@@ -366,7 +366,7 @@ class Race(TracingMixin):
         help_text=_('declares if this race is affected by armor penalties')
     )
     image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=True, blank=True
+        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True
     )
     users = models.ManyToManyField(
         verbose_name=_('users'), to=constants.USER_MODEL, related_name='race_set', db_index=True,

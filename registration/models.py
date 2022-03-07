@@ -86,7 +86,7 @@ class Profile(TracingMixin):
     alias = models.CharField(verbose_name=_('alias'), max_length=30, blank=True, null=False)
     web = models.URLField(verbose_name=_('website'), max_length=200, blank=True, null=False)
     image = models.ImageField(
-        verbose_name=_('avatar'), upload_to=default_upload_to, blank=True, null=True
+        verbose_name=_('avatar'), upload_to=default_upload_to, blank=True, null=False
     )
 
     def get_menus(self):
