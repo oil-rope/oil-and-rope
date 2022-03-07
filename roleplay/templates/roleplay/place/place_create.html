@@ -1,0 +1,26 @@
+{% extends 'core/layout.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% translate "add"|capfirst %} {% translate "place"|capfirst %}{% endblock title %}
+
+{% block breadcrumb %}
+  {% translate "create world" as create_world_page %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,add geography' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-5">
+    <h1 class="text-center font-weight-lighter">
+      {% blocktranslate with name=parent_site.name %}
+        Add geography to {{ name }}!
+      {% endblocktranslate %}
+    </h1>
+    <hr class="mx-3 pb-3">
+    <div class="row px-1">
+      <div class="col">
+        {% crispy form %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}

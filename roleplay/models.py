@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
@@ -56,7 +57,7 @@ class Domain(TracingMixin):
         return f'{self.name} [{domain_type.label.title()}]'
 
 
-# TODO: MPTTModel is unmaintaned, we need to change it
+# TODO: MPTTModel is unmaintained, we need to change it
 class Place(MPTTModel, TracingMixin):
     """
     Declares where did the creature grown, how it was, what does it belong to?
@@ -83,7 +84,7 @@ class Place(MPTTModel, TracingMixin):
     ICON_RESOLVERS = ICON_RESOLVERS
 
     name = models.CharField(verbose_name=_('name'), max_length=100, null=False, blank=False)
-    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    description = RichTextField(verbose_name=_('description'), null=False, blank=True)
     site_type = models.PositiveSmallIntegerField(
         verbose_name=_('site type'), choices=SiteTypes.choices, default=SiteTypes.TOWN, null=False, blank=False
     )
@@ -114,7 +115,10 @@ class Place(MPTTModel, TracingMixin):
         return images
 
     def resolve_icon(self):
-        return '<span class="{}"></span>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
+        return '<i class="{}"></i>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
+
+    def get_absolute_url(self):
+        return reverse('roleplay:place:detail', kwargs={'pk': self.pk})
 
     def get_houses(self):
         houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
@@ -194,11 +198,11 @@ class Place(MPTTModel, TracingMixin):
         return tundras
     tundras = cached_property(get_tundras, name='tundras')
 
-    def get_unusuals(self):
-        unusuals = self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
-        unusuals = list(unusuals)
-        return unusuals
-    unusuals = cached_property(get_unusuals, name='unusuals')
+    def get_unusual(self):
+        unusual = self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
+        unusual = list(unusual)
+        return unusual
+    unusual = cached_property(get_unusual, name='unusual')
 
     def get_islands(self):
         islands = self.get_descendants().filter(site_type=SiteTypes.ISLAND)
@@ -340,7 +344,7 @@ class Race(TracingMixin):
     wisdom: :class:`int`
         Modifier for wisdom.
     charisma: :class:`int`
-        Modfier for charisma.
+        Modifier for charisma.
     affected_by_armor: :class:`boolean`
         Declares if this race is affected by any penalty that armor can give.
     image: :class:`file`

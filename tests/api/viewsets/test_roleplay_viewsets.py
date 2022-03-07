@@ -237,7 +237,7 @@ class TestPlaceViewSet(APITestCase):
 
     def test_authenticated_not_admin_not_owner_place_detail_ko(self):
         self.client.force_login(self.user)
-        place = bake_places(_quantity=1, owner=self.admin_user)
+        place = bake_places(_quantity=1, owner=self.admin_user, user=self.admin_user)
         url = reverse(f'{base_resolver}:place-detail', kwargs={'pk': place.pk})
         response = self.client.get(url)
 

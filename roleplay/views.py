@@ -4,7 +4,6 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +19,87 @@ from common.views import MultiplePaginatorListView
 from . import enums, forms, models
 
 LOGGER = logging.getLogger(__name__)
+
+
+class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
+    form_class = forms.PlaceForm
+    model = models.Place
+    template_name = 'roleplay/place/place_create.html'
+
+    def get_parent_site(self):
+        parent_site = self.model.objects.get(pk=self.kwargs['pk'])
+        return parent_site
+
+    def get_site_type(self):
+        site_type = int(self.request.GET.get('site_type', enums.SiteTypes.CITY))
+        return site_type
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update({
+            'site_type': self.get_site_type(),
+            'parent_site': self.get_parent_site(),
+        })
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'parent_site_queryset': self.model.objects.filter(pk=self.get_parent_site().pk),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # NOTE: We make 'parent_site' hidden since user is not supposed to edit it
+        # Label shouldn't be shown since field is hidden
+        form.helper['parent_site'].update_attributes(hidden=True)
+        form.fields['parent_site'].label = ''
+        return form
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['parent_site'] = self.get_parent_site()
+        return context
+
+
+class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
+    form_class = forms.PlaceForm
+    model = models.Place
+    template_name = 'roleplay/place/place_update.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'parent_site_queryset': self.object.get_root().get_family(),
+            'submit_text': _('update'),
+        })
+        return kwargs
+
+
+class PlaceDetailView(LoginRequiredMixin, DetailView):
+    model = models.Place
+    template_name = 'roleplay/place/place_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        user = request.user
+
+        # Community world
+        if not self.object.user or not self.object.owner:
+            return response
+
+        # Private world
+        if user == self.object.user:
+            return response
+
+        return HttpResponseForbidden()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['world_structure'] = self.object.get_descendants(include_self=True)
+
+        return context
 
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
@@ -94,9 +174,6 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
     model = models.Place
     template_name = 'roleplay/world/world_create.html'
 
-    def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         user = self.request.user
@@ -110,38 +187,10 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
 
-class WorldDetailView(LoginRequiredMixin, DetailView):
-    model = models.Place
-    template_name = 'roleplay/world/world_detail.html'
-
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        user = request.user
-
-        # Community world
-        if not self.object.user or not self.object.owner:
-            return response
-
-        # Private world
-        if user == self.object.user:
-            return response
-
-        return HttpResponseForbidden()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['world_structure'] = self.object.get_descendants(include_self=True)
-
-        return context
-
-
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
     model = models.Place
-    template_name = 'roleplay/world/world_update.html'
-
-    def get_success_url(self):
-        return reverse('roleplay:world:detail', kwargs={'pk': self.object.pk})
+    template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

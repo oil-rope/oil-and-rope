@@ -1,0 +1,181 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block css %}
+  <style>
+    /* Styles for SVG */
+    #treeView {
+      min-height: 400px;
+      min-width: 600px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    #treeView path {
+      fill: none;
+      stroke: var(--gray-dark);
+    }
+
+    /* Text glow */
+    #treeView text {
+      text-shadow: -.1rem -.1rem 5px var(--secondary),
+      -.1rem .1rem 5px var(--secondary),
+      .1rem -.1rem 5px var(--secondary),
+      .1rem .1rem 5px var(--secondary);
+      /* Cursor pointer for future 'onclick' go to edit */
+      /* cursor: pointer; */
+      pointer-events: none;
+    }
+  </style>
+{% endblock css %}
+
+{% block title %}{{ object.name }} {% translate 'detail'|capfirst %}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,detail' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-5">
+    <h3 class="font-ds-lighter display-4 text-center">
+      {{ object.name }}
+    </h3>
+    <small class="text-center text-muted d-block">
+      {% blocktrans with creator=object.owner.username|default:"Oil &amp; Rope" created=object.entry_created_at %}
+        Created by {{ creator }} ({{ created }})
+      {% endblocktrans %}
+    </small>
+    <hr class="mx-2">
+
+    <div class="row">
+      <div class="col-12 text-right">
+        {% include 'roleplay/world/include/tree_view.html' %}
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-12">
+        {% static 'roleplay/img/places/default_image.png' as default_image %}
+        <picture>
+          {% include 'roleplay/include/world_image_carousel.html' with world=object controls=True only %}
+        </picture>
+      </div>
+    </div>
+
+    <div class="row justify-content-around">
+      <div class="col-11">
+        <p>
+          {% if object.description %}
+            {{ object.description|safe }}
+          {% else %}
+            {% translate "no description provided..."|capfirst %}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-around mt-4">
+      <div class="col-11 col-sm-5 btn-group dropright mt-3 px-0">
+        <button
+          type="button"
+          class="btn btn-primary dropdown-toggle {% if not object.get_children and object.get_root == object %}disabled{% endif %}"
+          id="dropdownPlaceList"
+          data-toggle="dropdown"
+          aria-expanded="false"
+          title="{% translate "list of places"|capfirst %}"
+        >
+          {% translate "go to"|capfirst %}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownPlaceList">
+          {% if object.get_root != object %}
+            <a
+              href="{% url 'roleplay:place:detail' object.get_root.pk %}"
+              class="dropdown-item"
+              title="{% translate "move to main world"|capfirst %}"
+            >
+              <i class="ic ic-world"></i>
+              {% translate "world"|capfirst %}
+            </a>
+            {% if object.get_root != object.parent_site %}
+              <a
+                href="{% url 'roleplay:place:detail' object.parent_site.pk %}"
+                class="dropdown-item"
+                title="{% translate "go to parent site"|capfirst %}"
+              >
+                {{ object.parent_site.resolve_icon|safe }}
+                {{ object.parent_site.name }}
+              </a>
+            {% endif %}
+            {% if object.get_children %}
+              <div class="dropdown-divider"></div>
+            {% endif %}
+          {% endif %}
+          {% for place in object.get_children %}
+            <a
+              href="{% url 'roleplay:place:detail' place.pk %}"
+              class="dropdown-item"
+              title="{% translate "go to parent site"|capfirst %}"
+            >
+              {{ place.resolve_icon|safe }}
+              {{ place.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div
+        class="col-11 col-sm-5 btn-group dropright mt-3 px-0"
+      >
+        <button
+          class="btn btn-secondary dropdown-toggle"
+          type="button"
+          id="dropdownPlaceOptions"
+          data-toggle="dropdown"
+          aria-expanded="false"
+          title="{% translate "list of options"|capfirst %}"
+          >
+          {% translate "options"|capfirst %}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
+          <a
+            href="#no-url"
+            class="dropdown-item disabled"
+          >
+            <i class="ic ic-quill"></i>
+            {% translate "create campaign"|capfirst %}
+          </a>
+          {% if object.owner == request.user %}
+            <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
+              <i class="ic ic-map"></i>
+              {% translate "add"|capfirst %} {% translate "geography" %}
+            </a>
+            {% if object.get_root == object %}
+              {% url 'roleplay:world:edit' object.pk as place_edit_url %}
+            {% else %}
+              {% url 'roleplay:place:edit' object.pk as place_edit_url %}
+            {% endif %}
+            <a class="dropdown-item" href="{{ place_edit_url }}">
+              <i class="ic ic-edit"></i>
+              {% translate "edit"|capfirst %}
+            </a>
+            <a class="dropdown-item" href="{% url 'roleplay:world:delete' object.pk %}">
+              <i class="ic ic-trash"></i>
+              {% translate "delete"|capfirst %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <!-- D3 CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <script
+    data-api-url="{% url 'api:roleplay:place-detail' object.pk %}"
+    data-root-element="#treeView"
+    src="{% static 'roleplay/js/places/listPlaces.js' %}"
+  ></script>
+{% endblock javascript %}

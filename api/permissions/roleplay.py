@@ -28,3 +28,16 @@ class IsInGameMastersOrStaff(permissions.BasePermission):
             return True
 
         return user in obj.game_masters
+
+
+class IsPublicOrStaff(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj) -> bool:
+        user = request.user
+
+        if user.is_staff:
+            return True
+
+        if not obj.user:
+            return True
+
+        return False

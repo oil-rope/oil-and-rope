@@ -1,5 +1,6 @@
 {% extends 'core/layout.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{% translate "edit"|capfirst %} {{ object.name }}{% endblock %}
@@ -10,10 +11,15 @@
 
 {% block body_content %}
   <main class="container pb-5">
-    <h1 class="text-center font-weight-lighter">{% translate "editting"|capfirst %} {{ object.name }}</h1>
+    <h1 class="text-center font-weight-lighter">{% translate "editing"|capfirst %} {{ object.name }}</h1>
     <hr class="mx-3 pb-3">
-    <div class="row px-1">
+    <div class="row justify-content-around px-1">
       {% crispy form %}
+    </div>
+    <div class="row justify-content-around mt-3">
+      <button onclick="window.history.back();" class="btn btn-dark">
+        <i class="ic ic-arrow-left"></i>
+        {% translate "go back"|capfirst %}</button>
     </div>
   </main>
 {% endblock body_content %}

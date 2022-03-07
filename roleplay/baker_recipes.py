@@ -17,10 +17,19 @@ random_date_after_today = functools.partial(
 )
 random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
+random_site_type = functools.partial(random.choice, SiteTypes.values)
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
+
+place = Recipe(
+    Place,
+    name=fake.country,
+    description=fake.paragraph,
+    site_type=random_site_type,
+    owner=foreign_key(user),
+)
 
 world = Recipe(
     Place,

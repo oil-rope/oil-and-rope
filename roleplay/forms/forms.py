@@ -11,14 +11,50 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from mptt.forms import TreeNodeChoiceField
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
 
 from .. import enums, models
-from .layout import SessionFormLayout, WorldFormLayout
+from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
+
+
+class PlaceForm(forms.ModelForm):
+    parent_site = TreeNodeChoiceField(
+        queryset=models.Place.objects.none(),
+        label=_('this place belongs to...').capitalize(),
+        required=True,
+    )
+
+    def __init__(self, parent_site_queryset=None, submit_text=_('create'), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not parent_site_queryset:
+            self.fields['parent_site'].queryset = models.Place.objects.all()
+        else:
+            self.fields['parent_site'].queryset = parent_site_queryset
+
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+        self.helper.layout = PlaceLayout(submit_text)
+
+    class Meta:
+        exclude = ('owner', 'user')
+        help_texts = {
+            'image': _(
+                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
+            ) % {'max_size': utils.max_size_file_mb()}
+        }
+        model = models.Place
+
+    def save(self, commit=True):
+        parent_site = self.instance.parent_site
+        self.instance.owner = parent_site.owner
+        self.instance.user = parent_site.user
+        return super().save(commit)
 
 
 class WorldForm(forms.ModelForm):

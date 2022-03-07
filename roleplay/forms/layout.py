@@ -4,6 +4,50 @@ from django.utils.translation import gettext_lazy as _
 from common.forms import layout as common_layout
 
 
+class PlaceLayout(layout.Layout):
+    def __init__(self, submit_text=_('create')):
+        super().__init__(
+            layout.Row(
+                layout.Column(
+                    'parent_site',
+                    css_class='col-sm-12 col-lg-10'
+                ),
+                css_class='justify-content-lg-around',
+            ),
+            layout.Row(
+                layout.Column(
+                    'name',
+                    css_class='col-sm-12 col-lg-10',
+                ),
+                layout.Column(
+                    layout.Field('description', style='resize: none'),
+                    css_class='col-sm-12 col-lg-10',
+                ),
+                css_class='justify-content-lg-around',
+            ),
+            layout.Row(
+                layout.Column(
+                    'site_type',
+                    css_class='col-sm-6 col-md-10'
+                ),
+                layout.Column(
+                    'image',
+                    css_class='col-sm-6 col-md-10'
+                ),
+                css_class='justify-content-md-around',
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
+                        submit_css_class='col-5 col-lg-10',
+                        reset_css_class='col-5 d-lg-none',
+                    ),
+                ),
+            ),
+        )
+
+
 class WorldFormLayout(layout.Layout):
     def __init__(self, submit_text):
         super().__init__(
@@ -17,7 +61,8 @@ class WorldFormLayout(layout.Layout):
                         'description',
                         placeholder=_(
                             'write something about your world, its civilizations, its culture...'
-                        ).capitalize()
+                        ).capitalize(),
+                        style='resize: none',
                     ),
                     css_class='col-12 col-lg-7'
                 ),

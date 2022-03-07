@@ -67,8 +67,8 @@ class TestPlaceManager(TestCase):
         baker.make(self.model, self.number_of_deserts, site_type=self.enum.DESERT)
         self.number_of_tundras = random_int()
         baker.make(self.model, self.number_of_tundras, site_type=self.enum.TUNDRA)
-        self.number_of_unusuals = random_int()
-        baker.make(self.model, self.number_of_unusuals, site_type=self.enum.UNUSUAL)
+        self.number_of_unusual = random_int()
+        baker.make(self.model, self.number_of_unusual, site_type=self.enum.UNUSUAL)
         self.number_of_islands = random_int()
         baker.make(self.model, self.number_of_islands, site_type=self.enum.ISLAND)
         self.number_of_countries = random_int()
@@ -81,7 +81,7 @@ class TestPlaceManager(TestCase):
         self.total = self.number_of_houses + self.number_of_towns + self.number_of_villages + self.number_of_cities \
             + self.number_of_metropolis + self.number_of_forests + self.number_of_hills \
             + self.number_of_mountains + self.number_of_mines + self.number_of_rivers + self.number_of_seas \
-            + self.number_of_deserts + self.number_of_tundras + self.number_of_unusuals \
+            + self.number_of_deserts + self.number_of_tundras + self.number_of_unusual \
             + self.number_of_islands + self.number_of_countries + self.number_of_continents \
             + self.number_of_worlds
 
@@ -149,8 +149,8 @@ class TestPlaceManager(TestCase):
     def test_tundras_ok(self):
         self.assertEqual(self.number_of_tundras, self.model.objects.tundras().count())
 
-    def test_unusuals_ok(self):
-        self.assertEqual(self.number_of_unusuals, self.model.objects.unusuals().count())
+    def test_unusual_ok(self):
+        self.assertEqual(self.number_of_unusual, self.model.objects.unusual().count())
 
     def test_islands_ok(self):
         self.assertEqual(self.number_of_islands, self.model.objects.islands().count())

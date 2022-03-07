@@ -9,14 +9,17 @@
     <h5 class="card-title text-center">{{ world.name }}</h5>
     <hr class="w-50">
     <p class="card-text text-justify">
-      {{ world.description|truncatechars_html:250|default:_("no description provided.")|capfirst }}
+      {% if world.description %}
+        {{ world.description|truncatechars_html:250|safe }}
+      {% else %}
+        {% translate "no description provided..."|capfirst %}
+      {% endif %}
     </p>
   </div>
   <div class="card-body">
     <div class="container">
       <div class="row">
-
-        <a href="{% url 'roleplay:world:detail' world.pk %}" class="btn btn-secondary mr-1">
+        <a href="{% url 'roleplay:place:detail' world.pk %}" class="btn btn-secondary mr-1">
           <i class="ic ic-world"></i>
           {% translate "view details"|capfirst %}
         </a>
@@ -27,8 +30,13 @@
           </a>
         {% endif %}
         <div class="btn-group dropright align-self-end ml-auto">
-          <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true"
-                  aria-expanded="false">
+          <button
+            type="button"
+            class="btn"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
             <i class="ic ic-dots-horizontal-triple"></i>
           </button>
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
@@ -37,9 +45,9 @@
               {% translate "create campaign"|capfirst %}
             </a>
             {% if world.owner == user %}
-              <a href="#" class="dropdown-item disabled">
-                <span class="ic-city"></span>
-                {% translate "create city"|capfirst %}
+              <a href="{% url 'roleplay:place:create' world.pk %}" class="dropdown-item">
+                <span class="ic ic-map"></span>
+                {% translate "add"|capfirst %} {% translate "geography" %}
               </a>
               <a href="#" class="dropdown-item disabled">
                 <span class="ic-cogs"></span>

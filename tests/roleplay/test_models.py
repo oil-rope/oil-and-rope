@@ -168,7 +168,7 @@ class TestPlace(TestCase):
         countries = []
         seas = []
         rivers = []
-        unusuals = []
+        unusual = []
         for continent in continents:
             self.assertIn(continent, world.get_continents())
             countries.append(
@@ -182,7 +182,7 @@ class TestPlace(TestCase):
             rivers.append(
                 self.model.objects.create(name=fake.name(), site_type=self.enum.RIVER, parent_site=continent)
             )
-            unusuals.append(
+            unusual.append(
                 self.model.objects.create(name=fake.name(), site_type=self.enum.UNUSUAL, parent_site=continent)
             )
 
@@ -192,8 +192,8 @@ class TestPlace(TestCase):
         for river in rivers:
             self.assertIn(river, world.get_rivers())
 
-        for unusual in unusuals:
-            self.assertIn(unusual, world.get_unusuals())
+        for unusual in unusual:
+            self.assertIn(unusual, world.get_unusual())
 
         islands = []
         cities = []
@@ -371,7 +371,7 @@ class TestPlace(TestCase):
     def test_resolve_icon(self):
         for site_type in self.model.ICON_RESOLVERS.keys():
             obj = self.model.objects.create(name=fake.country(), site_type=site_type)
-            expected_url = '<span class="{}"></span>'.format(self.model.ICON_RESOLVERS.get(site_type, ''))
+            expected_url = '<i class="{}"></i>'.format(self.model.ICON_RESOLVERS.get(site_type, ''))
             self.assertEqual(expected_url, obj.resolve_icon())
 
     def test_user_but_no_owner_save_ko(self):
