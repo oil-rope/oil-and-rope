@@ -67,8 +67,6 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
     'crispy_forms',
-    # Multiple Forms Tools (https://django-formtools.readthedocs.io/)
-    'django_tables2',
     # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
     'ckeditor',
     # API RestFramework (https://www.django-rest-framework.org/)

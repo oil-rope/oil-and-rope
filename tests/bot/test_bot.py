@@ -8,7 +8,6 @@ from common.utils.faker import create_faker
 fake = create_faker()
 
 
-@pytest.mark.asyncio
 def test_bot_init_correctly_ok(bot):
     assert settings.BOT_COMMAND_PREFIX == bot.command_prefix
     assert settings.BOT_TOKEN == bot.token
