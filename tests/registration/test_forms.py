@@ -82,6 +82,13 @@ class TestSignUpForm(TestCase):
             form = forms.SignUpForm(self.request, data=data)
             self.assertTrue(form.is_valid())
 
+    def test_discord_id_is_discriminator_ko(self):
+        data = self.data_ok.copy()
+        data['discord_id'] = f'{fake.user_name()}#1234'
+        form = forms.SignUpForm(self.request, data=data)
+
+        self.assertFalse(form.is_valid())
+
     def test_form_wrong_confirm_password_ko(self):
         data_ko = self.data_ok.copy()
         data_ko['password2'] = fake.word()
