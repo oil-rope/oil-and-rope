@@ -1301,7 +1301,7 @@ msgstr ""
 #, fuzzy
 #| msgid "Continent"
 msgid "continue"
-msgstr "continente"
+msgstr "continuar"
 
 #: registration/templates/allauth/socialaccount/login_cancelled.html:4
 #: registration/templates/allauth/socialaccount/login_cancelled.html:8
