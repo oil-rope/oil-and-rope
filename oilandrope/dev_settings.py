@@ -25,10 +25,6 @@ MIDDLEWARE.extend([
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ])
 
-# Django PDB has special behaviour
-INSTALLED_APPS.insert(0, 'django_pdb')
-MIDDLEWARE.append('django_pdb.middleware.PdbMiddleware')
-
 EMAIL_PORT = os.getenv('EMAIL_PORT', '2525')
 EMAIL_USE_TLS = False
 
