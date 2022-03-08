@@ -4,5 +4,8 @@
   class="{% if div.css_class %}{{ div.css_class }}{% else %}btn-link{% endif %}"
   {% if link.new_tab %}target="_blank"{% endif %}
 >
+  {% if link.icon %}
+    <i class="ic {{ link.icon }}"></i>
+  {% endif %}
   {{ link.content|safe }}
 </a>

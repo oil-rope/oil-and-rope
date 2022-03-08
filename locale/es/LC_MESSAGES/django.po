@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-08 12:00+0000\n"
+"POT-Creation-Date: 2022-03-08 16:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -176,7 +176,7 @@ msgstr "correo"
 msgid "share"
 msgstr "compartir"
 
-#: common/enums.py:21 core/templates/core/includes/menu.html:86
+#: common/enums.py:21 core/templates/core/includes/menu.html:104
 #: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:6
 #: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:16
 #, fuzzy
@@ -314,7 +314,7 @@ msgstr "círculo cruzado fino"
 msgid "cross thin"
 msgstr "equis fina"
 
-#: common/forms/layout.py:14 core/templates/core/includes/menu.html:86
+#: common/forms/layout.py:14 core/templates/core/includes/menu.html:104
 #: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:6
 #: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:16
 #: roleplay/forms/forms.py:32 roleplay/forms/forms.py:62
@@ -768,6 +768,7 @@ msgid "worlds"
 msgstr "mundos"
 
 #: core/templates/core/includes/menu.html:49 registration/forms/layout.py:25
+#: registration/templates/allauth/socialaccount/login.html:4
 #: registration/templates/registration/login.html:7
 #, fuzzy
 #| msgid "Login"
@@ -781,27 +782,37 @@ msgstr "acceder"
 msgid "create your account"
 msgstr "crea tu cuenta"
 
-#: core/templates/core/includes/menu.html:67
+#: core/templates/core/includes/menu.html:69
 #, fuzzy
 #| msgid "a token can be used to make calls to our api!"
 msgid "a token can be used to make calls to our API!"
 msgstr "¡un token puede ser usado para hacer llamadas a nuestra API!"
 
-#: core/templates/core/includes/menu.html:68
+#: core/templates/core/includes/menu.html:72
 msgid "get token"
 msgstr "obtener token"
 
-#: core/templates/core/includes/menu.html:82
+#: core/templates/core/includes/menu.html:77
+msgid "connect to your accounts to get full experience!"
+msgstr "¡conecta tus redes sociales para obtener una experiencia completa!"
+
+#: core/templates/core/includes/menu.html:80
+#, fuzzy
+#| msgid "Create your account"
+msgid "connect accounts"
+msgstr "conectar cuentas"
+
+#: core/templates/core/includes/menu.html:97
 #, fuzzy
 #| msgid "Admin panel"
 msgid "admin panel"
 msgstr "panel de admin"
 
-#: core/templates/core/includes/menu.html:91
+#: core/templates/core/includes/menu.html:111
 msgid "see you soon!"
 msgstr "¡nos vemos!"
 
-#: core/templates/core/includes/menu.html:103
+#: core/templates/core/includes/menu.html:124
 #, fuzzy
 #| msgid "Logout"
 msgid "logout"
@@ -809,6 +820,7 @@ msgstr "salir"
 
 #: core/templates/core/includes/opengraph_protocol.html:5
 #: core/templates/core/includes/opengraph_protocol.html:16
+#: core/templates/core/layout.html:14
 msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
 msgstr ""
 "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
@@ -1048,13 +1060,13 @@ msgstr "restaurar contraseña"
 msgid "frontend"
 msgstr "frontend"
 
-#: oilandrope/settings.py:230
+#: oilandrope/settings.py:231
 #, fuzzy
 #| msgid "English"
 msgid "english"
 msgstr "inglés"
 
-#: oilandrope/settings.py:231
+#: oilandrope/settings.py:232
 #, fuzzy
 #| msgid "Spanish"
 msgid "spanish"
@@ -1145,17 +1157,20 @@ msgstr "te enviaremos un link de recuperación a este email."
 msgid "login with %(social_media)s"
 msgstr "acceder con %(social_media)s"
 
-#: registration/forms/layout.py:53
+#: registration/forms/layout.py:54
 msgid "invite our bot to your server!"
 msgstr "¡invita nuestro bot a tu server!"
 
-#: registration/forms/layout.py:62
+#: registration/forms/layout.py:63
+#: registration/templates/allauth/socialaccount/signup.html:5
+#: registration/templates/allauth/socialaccount/signup.html:10
+#: registration/templates/allauth/socialaccount/signup.html:28
 #, fuzzy
 #| msgid "Register"
 msgid "register"
 msgstr "registrarse"
 
-#: registration/forms/layout.py:79
+#: registration/forms/layout.py:80
 #: registration/templates/registration/login.html:59
 #: registration/templates/registration/resend_email.html:13
 #, fuzzy
@@ -1163,13 +1178,13 @@ msgstr "registrarse"
 msgid "resend email"
 msgstr "reenviar email"
 
-#: registration/forms/layout.py:95
+#: registration/forms/layout.py:96
 #, fuzzy
 #| msgid "Resend email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: registration/forms/layout.py:111
+#: registration/forms/layout.py:112
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
@@ -1228,6 +1243,102 @@ msgstr "perfil"
 #| msgid "Profiles"
 msgid "profiles"
 msgstr "perfiles"
+
+#: registration/templates/allauth/socialaccount/connections.html:5
+#: registration/templates/allauth/socialaccount/connections.html:9
+msgid "account connections"
+msgstr "conexiones de cuenta"
+
+#: registration/templates/allauth/socialaccount/connections.html:15
+#, fuzzy
+#| msgid ""
+#| "You can sign in to your account using any of the following third party "
+#| "accounts:"
+msgid ""
+"you can sign in to your account using any of the following third party "
+"accounts:"
+msgstr ""
+"puedes acceder a tu usuario usando cualquiera de las siguientes cuentas de "
+"terceros:"
+
+#: registration/templates/allauth/socialaccount/connections.html:48
+#, fuzzy
+#| msgid "Remove"
+msgid "remove"
+msgstr "borrar"
+
+#: registration/templates/allauth/socialaccount/connections.html:55
+msgid ""
+"you currently have no social network accounts connected to this account."
+msgstr "actualmente no tienes ninguna red social conectada a esta cuenta."
+
+#: registration/templates/allauth/socialaccount/connections.html:60
+msgid "Add a 3rd Party Account"
+msgstr "Añadir cuenta de terceros"
+
+#: registration/templates/allauth/socialaccount/login.html:10
+#, python-format
+msgid "Connect %(provider)s"
+msgstr "Conectar %(provider)s"
+
+#: registration/templates/allauth/socialaccount/login.html:11
+#, python-format
+msgid "You are about to connect a new third party account from %(provider)s."
+msgstr "Estás a punto de conectar una cuenta de terceros desde %(provider)s."
+
+#: registration/templates/allauth/socialaccount/login.html:15
+#, python-format
+msgid "Sign In Via %(provider)s"
+msgstr "Entrar a través de %(provider)s"
+
+#: registration/templates/allauth/socialaccount/login.html:16
+#, python-format
+msgid "You are about to sign in using a third party account from %(provider)s."
+msgstr ""
+"Estás a punto de entrar usando una cuenta de terceros desde %(provider)s."
+
+#: registration/templates/allauth/socialaccount/login.html:24
+#, fuzzy
+#| msgid "Continent"
+msgid "continue"
+msgstr "continente"
+
+#: registration/templates/allauth/socialaccount/login_cancelled.html:4
+#: registration/templates/allauth/socialaccount/login_cancelled.html:8
+msgid "login cancelled"
+msgstr "inicio de sesión cancelado"
+
+#: registration/templates/allauth/socialaccount/login_cancelled.html:14
+#, python-format
+msgid ""
+"\n"
+"            You decided to cancel logging in to our site using one of your "
+"existing accounts.\n"
+"            If this was a mistake, please proceed to <a href=\"%(login_url)s"
+"\">sign in</a>.\n"
+"          "
+msgstr ""
+"\n"
+"            Has decidido cancelar el inicio de sesión en nuestra web usando "
+"una de tus cuentas existentes.\n"
+"            Si esto ha sido un error, por favor procede a <a href="
+"\"%(login_url)s\">iniciar sesión</a>.\n"
+"          "
+
+#: registration/templates/allauth/socialaccount/signup.html:12
+#, python-format
+msgid ""
+"\n"
+"          You are about to use your %(provider_name)s account to login to "
+"%(site_name)s.\n"
+"          As a final step, please complete the following form:\n"
+"        "
+msgstr ""
+"\n"
+"          Estás a punto de usar tu cuenta de %(provider_name)s para inicia sesión en "
+"%(site_name)s.\n"
+"          Como paso final, por favor completa el siguiente formulario:\n"
+"        "
 
 #: registration/templates/api/request_token.html:4
 msgid "request token"
@@ -2266,9 +2377,6 @@ msgstr "¡has sido invitado a una partida!"
 
 #~ msgid "List"
 #~ msgstr "Listado"
-
-#~ msgid "Remove"
-#~ msgstr "Borrar"
 
 #~ msgid "Nick"
 #~ msgstr "Nick"
