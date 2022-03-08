@@ -1,0 +1,30 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{% block head_title %}{% endblock %}{% endblock title %}
+{% block css %}
+{% block extra_head %}{% endblock %}
+{% endblock css %}
+
+{% block body_content %}
+  {% block body %}
+
+    {# NOTE: This is inherated from `allauth` but not needed at this point #}
+    {% comment %} <div>
+      <strong>{% translate "menu"|capfirst %}:</strong>
+      <ul>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+        <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+        {% else %}
+        <li><a href="{% url 'account_login' %}">Sign In</a></li>
+        <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+        {% endif %}
+      </ul>
+    </div> {% endcomment %}
+
+    {% block content %}{% endblock content %}
+    {% block extra_body %}{% endblock extra_body %}
+  {% endblock body %}
+{% endblock body_content %}
+
