@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block head_title %}{% translate "Account Connections"|capfirst %}{% endblock head_title %}
+{% block head_title %}{% translate "account connections"|title %}{% endblock head_title %}
 
 {% block content %}
   <main class="container pb-5">
@@ -12,7 +12,7 @@
     <div class="row mb-5">
       <div class="col-12">
         {% if form.accounts %}
-          <p>{% blocktrans %}You can sign in to your account using any of the following third party accounts:{% endblocktrans %}</p>
+          <p>{% translate "you can sign in to your account using any of the following third party accounts:"|capfirst %}</p>
 
           <form method="post" action="{% url 'socialaccount_connections' %}">
             {% csrf_token %}
@@ -45,19 +45,19 @@
             </div>
 
             <div class="form-row mt-3">
-              <button class="btn btn-danger" type="submit">{% trans 'remove'|capfirst %}</button>
+              <button class="btn btn-danger" type="submit">{% translate 'remove'|capfirst %}</button>
             </div>
 
             </fieldset>
 
           </form>
         {% else %}
-          <p>{% trans 'You currently have no social network accounts connected to this account.' %}</p>
+          <p>{% translate 'you currently have no social network accounts connected to this account.'|capfirst %}</p>
         {% endif %}
       </div>
     </div>
 
-    <h2 class="text-center">{% trans 'Add a 3rd Party Account' %}</h2>
+    <h2 class="text-center">{% translate 'Add a 3rd Party Account' %}</h2>
     <hr class="mx-5">
 
     <div class="row">
