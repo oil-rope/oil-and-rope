@@ -26,6 +26,7 @@ class LoginFormLayout(layout.Layout):
                 layout.Div(css_class='w-100'),
                 common_layout.Link(
                     content=_('login with %(social_media)s').capitalize() % {'social_media': 'Google'},
+                    icon='ic-google',
                     url=reverse('google_login'),
                     css_class='btn-lg bg-white col col-md-9 mt-2',
                 ),

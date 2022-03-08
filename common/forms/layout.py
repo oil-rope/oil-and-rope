@@ -37,10 +37,11 @@ class Link(layout.LayoutObject):
     field_classes = "btn"
     template = '%s/layout/link.html'
 
-    def __init__(self, content, url, new_tab=False, **kwargs):
+    def __init__(self, content, url, new_tab=False, icon=None, **kwargs):
         self.content = content
         self.url = url
         self.new_tab = new_tab
+        self.icon = icon
         self.template = kwargs.pop("template", self.template)
 
         # We turn  css_class into class

@@ -129,6 +129,7 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'email/templates/',
             BASE_DIR / 'common/templates/errors/',
+            BASE_DIR / 'registration/templates/allauth/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
