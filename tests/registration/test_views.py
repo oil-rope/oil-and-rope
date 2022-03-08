@@ -219,6 +219,15 @@ class TestSignUpView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302, 'User is not redirected.')
 
+    def test_discord_id_is_discriminator_ko(self):
+        data_with_wrong_discord_id = self.data_ok.copy()
+        data_with_wrong_discord_id['discord_id'] = f'{fake.user_name()}#1234'
+        response = self.client.post(self.url, data=data_with_wrong_discord_id)
+        expected_error = 'Seems like that\'s your discord discriminator not your identifier.' + \
+            ' Right click on your user and then click on Copy ID.'
+
+        self.assertFormError(response, 'form', 'discord_id', expected_error)
+
 
 class TestActivateAccountView(TestCase):
     """

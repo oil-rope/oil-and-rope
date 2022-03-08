@@ -7,7 +7,7 @@ from bot.utils import discord_api_get, discord_api_patch, discord_api_post
 
 class ApiMixin:
     """
-    This class loads content from `response` into class attributtes.
+    This class loads content from `response` into class attributes.
     """
 
     def __init__(self, url=None, *, response=None):

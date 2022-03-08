@@ -88,7 +88,11 @@ class DiscordApiException(HelpfulError):
 
     def handle_error_code(self, response):
         try:
-            msg = response.json()['message']
+            json_res = response.json()
+            if 'message' in json_res:
+                msg = json_res['message']
+            else:
+                msg = response.reason
         except JSONDecodeError:
             msg = f'Impossible to format response as JSON.\n{response.text}'
         self.error_code = response.status_code

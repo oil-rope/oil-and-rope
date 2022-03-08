@@ -1,4 +1,5 @@
 import logging
+import re
 from smtplib import SMTPException
 
 from crispy_forms.helper import FormHelper
@@ -73,12 +74,17 @@ class SignUpForm(auth_forms.UserCreationForm):
     def clean_discord_id(self):
         data = self.cleaned_data.get('discord_id')
         if data:
+            if re.match(r'.+#\d+', data):
+                msg = _('seems like that\'s your discord discriminator not your identifier.').capitalize()
+                msg += ' ' + _('right click on your user and then click on %(popup_msg)s.').capitalize() % {
+                    'popup_msg': 'Copy ID'
+                }
+                raise ValidationError(msg)
             try:
                 data = User(data)
             except DiscordApiException:
                 msg = _('seems like your user couldn\'t be found, do you have any server in common with our bot?')
-                msg = msg.capitalize()
-                raise ValidationError(msg)
+                raise ValidationError(msg.capitalize())
 
         return data
 
