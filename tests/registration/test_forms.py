@@ -242,3 +242,84 @@ class TestSetPasswordForm(TestCase):
         self.client.login(username=self.user.username, password=self.password)
 
         self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
+
+
+class TestUserForm(TestCase):
+    form_class = forms.UserForm
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.existing_user = baker.make_recipe('registration.user')
+
+    def setUp(self):
+        self.user = baker.make_recipe('registration.user')
+        self.data_ok = {
+            'username': fake.user_name(),
+            'email': fake.email(),
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name(),
+        }
+
+    def test_data_ok(self):
+        form = self.form_class(data=self.data_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_username_ko(self):
+        data_without_username = self.data_ok.copy()
+        del data_without_username['username']
+        form = self.form_class(data=data_without_username)
+
+        self.assertFalse(form.is_valid())
+
+    def test_data_without_email_ko(self):
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        form = self.form_class(data=data_without_email)
+
+        self.assertFalse(form.is_valid())
+
+    def test_data_without_first_name_ok(self):
+        data_without_first_name = self.data_ok.copy()
+        del data_without_first_name['first_name']
+        form = self.form_class(data=data_without_first_name)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_last_name_ok(self):
+        data_without_last_name = self.data_ok.copy()
+        del data_without_last_name['last_name']
+        form = self.form_class(data=data_without_last_name)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_existing_username_ko(self):
+        data_existing_username = self.data_ok.copy()
+        data_existing_username['username'] = self.existing_user.username
+        form = self.form_class(data=data_existing_username)
+
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.has_error('username'))
+        # NOTE: AssertIn is necessary since `form.errors` returns a list of errors for that field
+        self.assertIn('A user with that username already exists.', form.errors['username'])
+
+    def test_data_existing_email_ko(self):
+        data_existing_email = self.data_ok.copy()
+        data_existing_email['email'] = self.existing_user.email
+        form = self.form_class(data=data_existing_email)
+
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.has_error('email'))
+        # NOTE: AssertIn is necessary since `form.errors` returns a list of errors for that field
+        self.assertIn('User with this Email address already exists.', form.errors['email'])
+
+    def test_user_actually_updates_ok(self):
+        form = self.form_class(data=self.data_ok, instance=self.user)
+        form.is_valid()
+        form.save()
+        self.user.refresh_from_db()
+
+        self.assertEqual(self.data_ok['username'], self.user.username)
+        self.assertEqual(self.data_ok['email'], self.user.email)
+        self.assertEqual(self.data_ok['first_name'], self.user.first_name)
+        self.assertEqual(self.data_ok['last_name'], self.user.last_name)

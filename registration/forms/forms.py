@@ -4,6 +4,7 @@ from smtplib import SMTPException
 
 from crispy_forms.helper import FormHelper
 from django import forms
+from django.apps import apps
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -13,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from bot.exceptions import DiscordApiException
 from bot.models import User
+from common.constants import models
 from common.utils.auth import generate_token
 
 from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLayout, SetPasswordFormLayout,
@@ -204,3 +206,16 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.layout = SetPasswordFormLayout()
+
+
+class UserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+
+    class Meta:
+        model = apps.get_model(models.USER_MODEL)
+        fields = (
+            'username', 'first_name', 'last_name', 'email',
+        )
