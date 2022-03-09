@@ -2,7 +2,6 @@ from ckeditor.fields import RichTextField
 from dateutil.relativedelta import relativedelta
 from django.apps import apps
 from django.conf import settings
-from django.conf.global_settings import LANGUAGES
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -71,17 +70,17 @@ class Profile(TracingMixin):
     user = models.OneToOneField(
         to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='profile', verbose_name=_('user')
     )
-    bio = RichTextField(verbose_name=_('biography'), null=True, blank=True)
+    bio = RichTextField(verbose_name=_('biography'), null=False, blank=True)
     birthday = models.DateField(verbose_name=_('birthday'), null=True, blank=True)
 
     # Translating languages and sorting
     T_LANGUAGES = sorted(
-        [(code, _(language)) for code, language in LANGUAGES],
+        [(code, language) for code, language in settings.LANGUAGES],
         key=lambda x: x[1]
     )
 
     language = models.CharField(
-        verbose_name=_('language'), choices=T_LANGUAGES, default=settings.LANGUAGE_CODE, max_length=30
+        verbose_name=_('language'), choices=T_LANGUAGES, default=settings.LANGUAGE_CODE, max_length=10
     )
     alias = models.CharField(verbose_name=_('alias'), max_length=30, blank=True, null=False)
     web = models.URLField(verbose_name=_('website'), max_length=200, blank=True, null=False)
