@@ -41,14 +41,14 @@
         <ul class="navbar-nav mt-2 mt-lg-0">
           {% if not user.is_authenticated %}
             <li class="nav-item">
-              {% url 'registration:login' as login %}
+              {% url 'registration:auth:login' as login %}
               <a href="{{ login }}"
                 class="nav-link text-uppercase {% if actual_path|startswith:login %}active{% endif %}">
                 {% translate "login"|capfirst %}
               </a>
             </li>
             <li class="nav-item">
-              {% url 'registration:register' as register %}
+              {% url 'registration:auth:register' as register %}
               <a href="{{ register }}"
                 class="nav-link text-uppercase {% if actual_path|startswith:register %}text-danger active{% else %}text-primary{% endif %}">
                 {% translate "create your account"|capfirst %}
@@ -104,7 +104,7 @@
                 {% endif %}
                 <div class="dropdown-divider"></div>
                 <a
-                  href="{% url 'registration:logout' %}"
+                  href="{% url 'registration:auth:logout' %}"
                   class="dropdown-item text-uppercase"
                   title="{% translate "see you soon!"|capfirst %}"
                 >

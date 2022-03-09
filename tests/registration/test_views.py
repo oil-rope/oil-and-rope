@@ -20,7 +20,7 @@ class TestLoginView(TestCase):
     Checks LoginView works correctly.
     """
 
-    resolver = 'registration:login'
+    resolver = 'registration:auth:login'
 
     def setUp(self):
         self.user = baker.make(get_user_model())
@@ -130,7 +130,7 @@ class TestSignUpView(TestCase):
             'password1': password,
             'password2': password
         }
-        self.url = reverse('registration:register')
+        self.url = reverse('registration:auth:register')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -245,7 +245,7 @@ class TestActivateAccountView(TestCase):
 
     @mock.patch('registration.views.messages')
     def test_validates_ok(self, mock_call: mock.MagicMock):
-        url = reverse('registration:activate', kwargs={
+        url = reverse('registration:auth:activate', kwargs={
             'token': self.token,
             'pk': self.user.pk
         })
@@ -269,7 +269,7 @@ class TestResendConfirmationEmailView(TestCase):
         self.data_ok = {
             'email': self.user.email
         }
-        self.url = reverse('registration:resend_email')
+        self.url = reverse('registration:auth:resend_email')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -312,7 +312,7 @@ class TestResetPasswordView(TestCase):
         self.data_ok = {
             'email': self.user.email
         }
-        self.url = reverse('registration:password_reset')
+        self.url = reverse('registration:auth:password_reset')
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -361,7 +361,7 @@ class TestPasswordResetConfirmView(TestCase):
         self.token_generator = PasswordResetTokenGenerator()
         self.token = self.token_generator.make_token(self.user)
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
-        self.url = reverse('registration:password_reset_confirm', kwargs={'uidb64': self.uid, 'token': self.token})
+        self.url = reverse('registration:auth:password_reset_confirm', kwargs={'uidb64': self.uid, 'token': self.token})
 
     def test_access_ok(self):
         response = self.client.get(self.url)
@@ -424,7 +424,7 @@ class TestRequestTokenView(TestCase):
         cls.url = reverse('registration:token')
 
     def test_anonymous_access_ko(self):
-        login_url = reverse('registration:login')
+        login_url = reverse('registration:auth:login')
         response = self.client.get(self.url)
         expected_url = f'{login_url}?next={self.url}'
 
@@ -436,3 +436,7 @@ class TestRequestTokenView(TestCase):
         token = self.user.auth_token
 
         self.assertContains(response, f'{token.key}')
+
+
+class TestUpdateUserView(TestCase):
+    resolver = ''

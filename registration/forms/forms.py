@@ -37,7 +37,7 @@ class LoginForm(auth_forms.AuthenticationForm):
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.form_action = 'registration:login'
+        self.helper.form_action = 'registration:auth:login'
         self.helper.include_media = False
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
@@ -68,7 +68,7 @@ class SignUpForm(auth_forms.UserCreationForm):
 
         self.request = request
         self.helper = FormHelper(self)
-        self.helper.form_action = 'registration:register'
+        self.helper.form_action = 'registration:auth:register'
         self.helper.include_media = False
         self.helper.id = 'registerForm'
         self.helper.layout = SignUpFormLayout()
@@ -162,7 +162,7 @@ class ResendEmailForm(forms.Form):
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.form_action = 'registration:resend_email'
+        self.helper.form_action = 'registration:auth:resend_email'
         self.helper.include_media = False
         self.helper.layout = ResendEmailFormLayout()
 

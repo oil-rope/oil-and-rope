@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="row justify-content-center">
-    <a href="https://{{ domain }}{% url 'registration:activate' token object.pk %}" class="btn btn-primary">
+    <a href="https://{{ domain }}{% url 'registration:auth:activate' token object.pk %}" class="btn btn-primary">
       {% translate "activate account"|capfirst %}
     </a>
   </div>
@@ -22,7 +22,7 @@
     <small class="text-muted">
       {% translate "if you can't click on the link here's raw"|capfirst %}
       <code>
-        https://{{ domain }}{% url 'registration:activate' token object.pk %}
+        https://{{ domain }}{% url 'registration:auth:activate' token object.pk %}
       </code>
     </small>
   </div>

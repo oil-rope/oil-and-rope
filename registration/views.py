@@ -8,15 +8,16 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.http import HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, FormView, RedirectView, TemplateView
+from django.views.generic import CreateView, FormView, RedirectView, TemplateView, UpdateView
 from rest_framework.authtoken.models import Token
 
 from common.templatetags.string_utils import capfirstletter as cfl
 
-from . import forms
+from . import forms, models
 from .mixins import RedirectAuthenticatedUserMixin
 
 LOGGER = logging.getLogger(__name__)
@@ -59,7 +60,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     model = get_user_model()
     form_class = forms.SignUpForm
     template_name = 'registration/register.html'
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,7 +102,7 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
     Gets token and redirects user after activating it.
     """
 
-    url = reverse_lazy('registration:login')
+    url = reverse_lazy('registration:auth:login')
 
     def get_user(self):
         """
@@ -162,7 +163,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
     template_name = 'registration/resend_email.html'
     form_class = forms.ResendEmailForm
     success_message = None
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
 
     def get_user(self, email):
         user = get_user_model().objects.get(email=email)
@@ -226,7 +227,7 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
     }
     form_class = forms.PasswordResetForm
     html_email_template_name = 'email_templates/password_reset_email.html'
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
     template_name = 'registration/password_reset.html'
 
     def form_valid(self, form):
@@ -242,7 +243,7 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     """
 
     form_class = forms.SetPasswordForm
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
     template_name = 'registration/password_change.html'
 
     def form_valid(self, form):
@@ -260,3 +261,14 @@ class RequestTokenView(LoginRequiredMixin, TemplateView):
         context_data['object'] = token
         context_data['created'] = created
         return context_data
+
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = models.User
+    form_class = forms.UserForm
+    template_name = 'registration/user_update.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object() != request.user:
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)

@@ -51,7 +51,7 @@ class SeleniumPlaceDetail(StaticLiveServerTestCase):
             user.set_password(password)
             user.save(update_fields=['password'])
 
-        login_url = resolve_url('registration:login')
+        login_url = resolve_url('registration:auth:login')
         self.browser.get(f'{self.live_server_url}{login_url}')
         username_input = self.browser.find_element(by=By.NAME, value='username')
         username_input.send_keys(user.username)
