@@ -115,3 +115,37 @@ class SetPasswordFormLayout(layout.Layout):
                 css_class='justify-content-around'
             )
         )
+
+
+class UserFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column('username'),
+                layout.Column('email'),
+            ),
+            layout.Row(
+                layout.Column('first_name'),
+                layout.Column('last_name'),
+            ),
+            layout.Row(
+                layout.Column('bio'),
+            ),
+            layout.Row(
+                layout.Column('birthday'),
+                layout.Column('language'),
+                layout.Column('web'),
+            ),
+            layout.Row(
+                layout.Column('image'),
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(
+                        reset_button=False,
+                        submit_text=_('update').capitalize(),
+                        submit_css_class='col-sm-10',
+                    ),
+                ),
+            ),
+        )

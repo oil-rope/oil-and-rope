@@ -56,8 +56,18 @@
             </li>
           {% else %}
             <li class="nav-item dropdown">
-              <a href="javascript:" id="navbarDropdown_userMenu" class="nav-link dropdown-toggle text-uppercase"
-                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a
+                href="javascript:"
+                id="navbarDropdown_userMenu"
+                class="nav-link dropdown-toggle text-uppercase"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {% if user.profile.image %}
+                  <img class="p-1" src="{{ user.profile.image.url }}" width="50" alt="">
+                {% endif %}
                 {{ user.username }}
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown_userMenu">

@@ -9,6 +9,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponseForbidden
+from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -272,3 +273,19 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         if self.get_object() != request.user:
             return HttpResponseForbidden()
         return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        profile = self.request.user.profile
+        initial.update({
+            'bio': profile.bio,
+            'birthday': profile.birthday,
+            'language': profile.language,
+            'web': profile.web,
+        })
+        if profile.image:
+            initial.update({'image': profile.image})
+        return initial
+
+    def get_success_url(self) -> str:
+        return resolve_url('registration:user:edit', pk=self.object.pk)

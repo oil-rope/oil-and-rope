@@ -18,10 +18,11 @@ from django.utils.translation import gettext_lazy as _
 from bot.exceptions import DiscordApiException
 from bot.models import User
 from common.constants import models
+from common.forms.widgets import DateWidget
 from common.utils.auth import generate_token
 
 from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLayout, SetPasswordFormLayout,
-                     SignUpFormLayout)
+                     SignUpFormLayout, UserFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -213,7 +214,7 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
 
 class UserForm(forms.ModelForm):
     bio = RichTextFormField(required=False, label=_('biography'))
-    birthday = forms.DateField(required=False, label=_('birthday'))
+    birthday = forms.DateField(required=False, label=_('birthday'), widget=DateWidget)
     language = forms.ChoiceField(
         choices=settings.LANGUAGES, required=True, initial=settings.LANGUAGE_CODE, label=_('language'),
     )
@@ -225,6 +226,8 @@ class UserForm(forms.ModelForm):
         self.capitalize_labels(['bio', 'birthday', 'language', 'web', 'image'])
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
+        self.helper.include_media = True
+        self.helper.layout = UserFormLayout()
 
     def capitalize_labels(self, fields=None):
         for field in fields:
@@ -245,6 +248,7 @@ class UserForm(forms.ModelForm):
         profile.birthday = self.cleaned_data.get('birthday')
         profile.language = self.cleaned_data['language']
         profile.web = self.cleaned_data.get('web', '')
+        profile.image = self.cleaned_data.get('image') or None
         if commit:
             profile.save()
         return instance
@@ -252,5 +256,5 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = apps.get_model(models.USER_MODEL)
         fields = (
-            'username', 'first_name', 'last_name', 'email',
+            'username', 'email', 'first_name', 'last_name',
         )
