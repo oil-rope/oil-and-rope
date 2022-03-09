@@ -1,10 +1,13 @@
+import datetime
 import logging
 import re
 from smtplib import SMTPException
 
+from ckeditor.fields import RichTextFormField
 from crispy_forms.helper import FormHelper
 from django import forms
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -209,10 +212,42 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
 
 
 class UserForm(forms.ModelForm):
+    bio = RichTextFormField(required=False, label=_('biography'))
+    birthday = forms.DateField(required=False, label=_('birthday'))
+    language = forms.ChoiceField(
+        choices=settings.LANGUAGES, required=True, initial=settings.LANGUAGE_CODE, label=_('language'),
+    )
+    web = forms.URLField(required=False, label=_('website'))
+    image = forms.ImageField(required=False, label=_('avatar'))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.capitalize_labels(['bio', 'birthday', 'language', 'web', 'image'])
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
+
+    def capitalize_labels(self, fields=None):
+        for field in fields:
+            form_field = self.fields[field]
+            form_field.label = form_field.label.capitalize()
+
+    def clean_birthday(self):
+        data = self.cleaned_data.get('birthday')
+        if data and data > datetime.date.today():
+            msg = _('birthday cannot be set after today.')
+            raise ValidationError(msg.capitalize())
+        return data
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        profile = instance.profile
+        profile.bio = self.cleaned_data.get('bio', '')
+        profile.birthday = self.cleaned_data.get('birthday')
+        profile.language = self.cleaned_data['language']
+        profile.web = self.cleaned_data.get('web', '')
+        if commit:
+            profile.save()
+        return instance
 
     class Meta:
         model = apps.get_model(models.USER_MODEL)
