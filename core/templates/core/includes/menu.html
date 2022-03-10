@@ -66,7 +66,13 @@
                 aria-expanded="false"
               >
                 {% if user.profile.image %}
-                  <img class="p-1" src="{{ user.profile.image.url }}" width="50" alt="">
+                  <img
+                    class="p-1 rounded-circle"
+                    src="{{ user.profile.image.url }}"
+                    width="50"
+                    height="50"
+                    alt="{% translate "avatar"|capfirst %}"
+                  >
                 {% endif %}
                 {{ user.username }}
               </a>

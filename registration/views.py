@@ -296,8 +296,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         if profile.image:
             src = profile.image.url
         else:
-            src = f'{settings.STATIC_URL}img/oil_and_rope_logo_color.png'
-        img_element = layout.HTML(f'<img src="{src}"  width="200" />')
+            src = f'{settings.STATIC_URL}img/default_user.png'
+        alt_text = _('avatar').capitalize()
+        img_element = layout.HTML(
+            f'<img alt="{alt_text}" class="rounded-circle" src="{src}" width="200" height="200" />'
+        )
         form.helper.layout[0][1][0].insert(0, img_element)
         return form
 
