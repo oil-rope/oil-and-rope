@@ -1,13 +1,21 @@
+import datetime
+import os
+import pathlib
+import random
+import tempfile
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth import get_user, get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core import mail
-from django.shortcuts import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.shortcuts import resolve_url, reverse
 from django.test import TestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from model_bakery import baker
+from PIL import Image
 
 from common.utils.faker import create_faker
 from registration.views import ActivateAccountView
@@ -407,7 +415,7 @@ class TestPasswordResetConfirmView(TestCase):
         response = self.client.get(self.url)
         # Encrypted URL
         url = response.url
-        response = self.client.post(url, data=self.data_ok)
+        self.client.post(url, data=self.data_ok)
 
         self.client.login(
             username=self.user.username,
@@ -438,5 +446,223 @@ class TestRequestTokenView(TestCase):
         self.assertContains(response, f'{token.key}')
 
 
-class TestUpdateUserView(TestCase):
-    resolver = ''
+class TestUserUpdateView(TestCase):
+    resolver = 'registration:user:edit'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.existing_user = baker.make_recipe('registration.user')
+
+    def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        with open(self.tmp_file.name, 'rb') as img_content:
+            image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
+
+        self.user = baker.make_recipe('registration.user')
+        self.url = resolve_url(self.resolver, pk=self.user.pk)
+        self.data_ok = {
+            'username': fake.user_name(),
+            'email': fake.email(),
+            'first_name': fake.first_name(),
+            'last_name': fake.last_name(),
+            'bio': fake.paragraph(),
+            'birthday': fake.date_object(),
+            'language': random.choice([lan[0] for lan in settings.LANGUAGES]),
+            'web': fake.uri(),
+            'image': image,
+        }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_anonymous_access_ko(self):
+        login_url = resolve_url(settings.LOGIN_URL)
+        response = self.client.get(self.url)
+        expected_url = f'{login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_authenticated_not_user_access_ko(self):
+        self.client.force_login(self.existing_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_authenticated_user_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_anonymous_post_data_ko(self):
+        login_url = resolve_url(settings.LOGIN_URL)
+        response = self.client.post(self.url, self.data_ok)
+        expected_url = f'{login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_authenticated_not_user_post_data_ko(self):
+        self.client.force_login(self.existing_user)
+        response = self.client.post(self.url, self.data_ok)
+
+        self.assertEqual(403, response.status_code)
+
+    @mock.patch('registration.views.messages')
+    def test_authenticated_post_data_ok(self, mocker):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, self.data_ok)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    def test_authenticated_user_post_data_updates_user_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, self.data_ok)
+        self.user.refresh_from_db()
+        profile = self.user.profile
+
+        self.assertEqual(self.data_ok['username'], self.user.username)
+        self.assertEqual(self.data_ok['email'], self.user.email)
+        self.assertEqual(self.data_ok['first_name'], self.user.first_name)
+        self.assertEqual(self.data_ok['last_name'], self.user.last_name)
+        self.assertEqual(self.data_ok['bio'], profile.bio)
+        self.assertEqual(self.data_ok['birthday'], profile.birthday)
+        self.assertEqual(self.data_ok['language'], profile.language)
+        self.assertEqual(self.data_ok['web'], profile.web)
+
+        # NOTE: Checks if image was created and stored
+        image_path = pathlib.Path(settings.MEDIA_ROOT) / 'registration/profile'
+        image_path /= datetime.date.today().strftime('%Y/%m/%d/') + str(profile.pk)
+        image_path /= str(self.data_ok['image'])
+        self.assertTrue(image_path.exists())
+
+    def test_form_without_username_ko(self):
+        self.client.force_login(self.user)
+        data_without_username = self.data_ok.copy()
+        del data_without_username['username']
+        response = self.client.post(self.url, data_without_username)
+
+        self.assertFormError(response, 'form', 'username', ['This field is required.'])
+
+    def test_form_without_email_ko(self):
+        self.client.force_login(self.user)
+        data_without_email = self.data_ok.copy()
+        del data_without_email['email']
+        response = self.client.post(self.url, data_without_email)
+
+        self.assertFormError(response, 'form', 'email', ['This field is required.'])
+
+    def test_form_without_language_ko(self):
+        self.client.force_login(self.user)
+        data_without_language = self.data_ok.copy()
+        del data_without_language['language']
+        response = self.client.post(self.url, data_without_language)
+
+        self.assertFormError(response, 'form', 'language', ['This field is required.'])
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_image_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_image = self.data_ok.copy()
+        del data_without_image['image']
+        response = self.client.post(self.url, data_without_image)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_first_name_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_first_name = self.data_ok.copy()
+        del data_without_first_name['first_name']
+        response = self.client.post(self.url, data_without_first_name)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_last_name_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_last_name = self.data_ok.copy()
+        del data_without_last_name['last_name']
+        response = self.client.post(self.url, data_without_last_name)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_bio_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_bio = self.data_ok.copy()
+        del data_without_bio['bio']
+        response = self.client.post(self.url, data_without_bio)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_birthday_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_birthday = self.data_ok.copy()
+        del data_without_birthday['birthday']
+        response = self.client.post(self.url, data_without_birthday)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    @mock.patch('registration.views.messages')
+    def test_form_without_web_ok(self, mocker):
+        self.client.force_login(self.user)
+        data_without_web = self.data_ok.copy()
+        del data_without_web['web']
+        response = self.client.post(self.url, data_without_web)
+
+        self.assertRedirects(response, self.url)
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'User updated successfully!',
+        )
+
+    def test_form_with_existing_username_ko(self):
+        self.client.force_login(self.user)
+        data_with_existing_username = self.data_ok.copy()
+        data_with_existing_username['username'] = self.existing_user.username
+        response = self.client.post(self.url, data_with_existing_username)
+
+        self.assertFormError(response, 'form', 'username', ['A user with that username already exists.'])
+
+    def test_form_with_existing_email_ko(self):
+        self.client.force_login(self.user)
+        data_with_existing_email = self.data_ok.copy()
+        data_with_existing_email['email'] = self.existing_user.email
+        response = self.client.post(self.url, data_with_existing_email)
+
+        self.assertFormError(response, 'form', 'email', ['User with this Email address already exists.'])
+
+    def test_form_birthday_set_after_today(self):
+        self.client.force_login(self.user)
+        data_birthday_after_today = self.data_ok.copy()
+        data_birthday_after_today['birthday'] = fake.date_between(start_date='today', end_date='+30d')
+        response = self.client.post(self.url, data_birthday_after_today)
+
+        self.assertFormError(response, 'form', 'birthday', ['Birthday cannot be set after today.'])

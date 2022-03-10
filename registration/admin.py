@@ -12,7 +12,7 @@ class ProfileAdmin(TracingMixinAdmin):
     Model manager for :class:Profile.
     """
 
-    search_fields = ('user__username', 'user__first_name', 'alias')
+    search_fields = ('user__username', 'user__first_name')
 
 
 admin.site.register(User, UserAdmin)

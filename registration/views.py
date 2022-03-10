@@ -158,7 +158,7 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
 
 class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
     """
-    In case user needs the email to be resend we create this view.
+    In case user needs the email to be resent we create this view.
     """
 
     template_name = 'registration/resend_email.html'
@@ -172,7 +172,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
 
     def generate_token(self, user) -> str:
         """
-        Generates a token for the user to confirm it's email.
+        Generates a token for the user to confirm its email.
 
         Parameters
         ----------
@@ -270,9 +270,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'registration/user_update.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_object() != request.user:
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        if self.get_object() == request.user:
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden()
 
     def get_initial(self):
         initial = super().get_initial()
@@ -287,5 +289,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
             initial.update({'image': profile.image})
         return initial
 
-    def get_success_url(self) -> str:
+    def get_success_url(self):
         return resolve_url('registration:user:edit', pk=self.object.pk)
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        msg = cfl(_('user updated successfully!'))
+        messages.success(self.request, msg)
+        return res

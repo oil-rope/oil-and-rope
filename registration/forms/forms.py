@@ -3,7 +3,6 @@ import logging
 import re
 from smtplib import SMTPException
 
-from ckeditor.fields import RichTextFormField
 from crispy_forms.helper import FormHelper
 from django import forms
 from django.apps import apps
@@ -213,10 +212,13 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
 
 
 class UserForm(forms.ModelForm):
-    bio = RichTextFormField(required=False, label=_('biography'))
+    bio = forms.CharField(required=False, label=_('biography'), widget=forms.Textarea)
     birthday = forms.DateField(required=False, label=_('birthday'), widget=DateWidget)
     language = forms.ChoiceField(
-        choices=settings.LANGUAGES, required=True, initial=settings.LANGUAGE_CODE, label=_('language'),
+        choices=settings.LANGUAGES,
+        required=True,
+        initial=settings.LANGUAGE_CODE,
+        label=_('language'),
     )
     web = forms.URLField(required=False, label=_('website'))
     image = forms.ImageField(required=False, label=_('avatar'))
