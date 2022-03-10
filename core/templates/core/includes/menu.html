@@ -79,22 +79,6 @@
                   <i class="ic ic-cogs"></i>
                   {% translate "settings"|capfirst %}
                 </a>
-                <a
-                  href="{% url 'registration:token' %}"
-                  class="dropdown-item text-uppercase"
-                  title="{% translate "a token can be used to make calls to our API!"|capfirstletter %}"
-                >
-                  <i class="ic-key"></i>
-                  {% translate "get token" %}
-                </a>
-                <a
-                  href="{% url 'socialaccount_connections' %}"
-                  class="dropdown-item text-uppercase"
-                  title="{% translate "connect to your accounts to get full experience!"|capfirstletter %}"
-                >
-                  <i class="ic ic-connect"></i>
-                  {% translate "connect accounts" %}
-                </a>
                 {% if user.is_staff %}
                   <div class="dropdown-divider"></div>
                   <a

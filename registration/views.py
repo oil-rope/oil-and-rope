@@ -2,6 +2,7 @@ import logging
 import random
 from smtplib import SMTPAuthenticationError, SMTPException
 
+from crispy_forms import layout
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -288,6 +289,17 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         if profile.image:
             initial.update({'image': profile.image})
         return initial
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        profile = self.object.profile
+        if profile.image:
+            src = profile.image.url
+        else:
+            src = f'{settings.STATIC_URL}img/oil_and_rope_logo_color.png'
+        img_element = layout.HTML(f'<img src="{src}"  width="200" />')
+        form.helper.layout[0][1][0].insert(0, img_element)
+        return form
 
     def get_success_url(self):
         return resolve_url('registration:user:edit', pk=self.object.pk)

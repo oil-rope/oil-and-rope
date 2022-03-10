@@ -212,8 +212,8 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
 
 
 class UserForm(forms.ModelForm):
-    bio = forms.CharField(required=False, label=_('biography'), widget=forms.Textarea)
-    birthday = forms.DateField(required=False, label=_('birthday'), widget=DateWidget)
+    bio = forms.CharField(required=False, label=_('biography'), widget=forms.Textarea(attrs={'rows': 3}))
+    birthday = forms.DateField(required=False, label=_('birthday'), widget=DateWidget(format='%Y-%m-%d'))
     language = forms.ChoiceField(
         choices=settings.LANGUAGES,
         required=True,

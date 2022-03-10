@@ -121,31 +121,43 @@ class UserFormLayout(layout.Layout):
     def __init__(self):
         super().__init__(
             layout.Row(
-                layout.Column('username'),
-                layout.Column('email'),
-            ),
-            layout.Row(
-                layout.Column('first_name'),
-                layout.Column('last_name'),
-            ),
-            layout.Row(
-                layout.Column('bio'),
-            ),
-            layout.Row(
-                layout.Column('birthday'),
-                layout.Column('language'),
-                layout.Column('web'),
-            ),
-            layout.Row(
-                layout.Column('image'),
-            ),
-            layout.Row(
                 layout.Column(
-                    common_layout.SubmitClearLayout(
-                        reset_button=False,
-                        submit_text=_('update').capitalize(),
-                        submit_css_class='col-sm-10',
+                    layout.Row(
+                        layout.Column('username'),
+                        layout.Column('email'),
+                    ),
+                    layout.Row(
+                        layout.Column('first_name'),
+                        layout.Column('last_name'),
+                    ),
+                    layout.Row(
+                        layout.Column('bio'),
+                    ),
+                    layout.Row(
+                        layout.Column('birthday'),
+                        layout.Column('language'),
+                    ),
+                    layout.Row(
+                        layout.Column('web'),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            common_layout.SubmitClearLayout(
+                                reset_button=False,
+                                submit_text=_('update').capitalize(),
+                                submit_css_class='col-sm-10 col-xl-8',
+                            ),
+                        ),
+                        css_class='mt-md-2',
                     ),
                 ),
+                layout.Column(
+                    layout.Row(
+                        layout.Div(css_class='w-100'),
+                        layout.Column('image'),
+                        css_class='justify-content-around px-md-4',
+                    ),
+                ),
+                css_class='flex-column-reverse flex-md-row'
             ),
         )
