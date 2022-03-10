@@ -2,21 +2,24 @@ import logging
 import random
 from smtplib import SMTPAuthenticationError, SMTPException
 
+from crispy_forms import layout
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.http import HttpResponseForbidden
+from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, FormView, RedirectView, TemplateView
+from django.views.generic import CreateView, FormView, RedirectView, TemplateView, UpdateView
 from rest_framework.authtoken.models import Token
 
 from common.templatetags.string_utils import capfirstletter as cfl
 
-from . import forms
+from . import forms, models
 from .mixins import RedirectAuthenticatedUserMixin
 
 LOGGER = logging.getLogger(__name__)
@@ -59,7 +62,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
     model = get_user_model()
     form_class = forms.SignUpForm
     template_name = 'registration/register.html'
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,7 +104,7 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
     Gets token and redirects user after activating it.
     """
 
-    url = reverse_lazy('registration:login')
+    url = reverse_lazy('registration:auth:login')
 
     def get_user(self):
         """
@@ -156,13 +159,13 @@ class ActivateAccountView(RedirectAuthenticatedUserMixin, RedirectView):
 
 class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
     """
-    In case user needs the email to be resend we create this view.
+    In case user needs the email to be resent we create this view.
     """
 
     template_name = 'registration/resend_email.html'
     form_class = forms.ResendEmailForm
     success_message = None
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
 
     def get_user(self, email):
         user = get_user_model().objects.get(email=email)
@@ -170,7 +173,7 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
 
     def generate_token(self, user) -> str:
         """
-        Generates a token for the user to confirm it's email.
+        Generates a token for the user to confirm its email.
 
         Parameters
         ----------
@@ -226,7 +229,7 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
     }
     form_class = forms.PasswordResetForm
     html_email_template_name = 'email_templates/password_reset_email.html'
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
     template_name = 'registration/password_reset.html'
 
     def form_valid(self, form):
@@ -242,7 +245,7 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     """
 
     form_class = forms.SetPasswordForm
-    success_url = reverse_lazy('registration:login')
+    success_url = reverse_lazy('registration:auth:login')
     template_name = 'registration/password_change.html'
 
     def form_valid(self, form):
@@ -260,3 +263,52 @@ class RequestTokenView(LoginRequiredMixin, TemplateView):
         context_data['object'] = token
         context_data['created'] = created
         return context_data
+
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = models.User
+    form_class = forms.UserForm
+    template_name = 'registration/user_update.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        if self.get_object() == request.user:
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden()
+
+    def get_initial(self):
+        initial = super().get_initial()
+        profile = self.request.user.profile
+        initial.update({
+            'bio': profile.bio,
+            'birthday': profile.birthday,
+            'language': profile.language,
+            'web': profile.web,
+        })
+        if profile.image:
+            initial.update({'image': profile.image})
+        return initial
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        profile = self.object.profile
+        if profile.image:
+            src = profile.image.url
+        else:
+            src = f'{settings.STATIC_URL}img/default_user.png'
+        alt_text = _('avatar').capitalize()
+        img_element = layout.HTML(
+            f'<img alt="{alt_text}" class="rounded-circle" src="{src}" width="200" height="200" />'
+        )
+        form.helper.layout[0][1][0].insert(0, img_element)
+        return form
+
+    def get_success_url(self):
+        return resolve_url('registration:user:edit', pk=self.object.pk)
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        msg = cfl(_('user updated successfully!'))
+        messages.success(self.request, msg)
+        return res

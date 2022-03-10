@@ -39,7 +39,7 @@ def generate_breadcrumbs(text):
 @stringfilter
 def capfirstletter(text: str):
     """
-    Same behaviour as `django.template.defaultfilters.capfirst` but only uppercase if is letter.
+    Same behavior as `django.template.defaultfilters.capfirst` but only uppercase if is letter.
     """
 
     first_letter = 0

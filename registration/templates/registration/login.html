@@ -52,10 +52,10 @@
       <div class="col-12 col-xl-6">
         {% crispy form %}
         <div class="row justify-content-around mt-3 mt-md-5 mb-5">
-          <a href="{% url 'registration:password_reset' %}">
+          <a href="{% url 'registration:auth:password_reset' %}">
             {% translate "forgot password?"|capfirstletter %}
           </a>
-          <a href="{% url 'registration:resend_email' %}">
+          <a href="{% url 'registration:auth:resend_email' %}">
             {% translate "resend email"|capfirst %}
           </a>
         </div>
@@ -66,12 +66,12 @@
         <p class="lead text-white mr-sm-3 mb-md-0">
           {% translate "don't have an account?"|capfirstletter %}
         </p>
-        <a class="lead" href="{% url 'registration:register' %}">{% translate "join now!"|capfirstletter %}</a>
+        <a class="lead" href="{% url 'registration:auth:register' %}">{% translate "join now!"|capfirstletter %}</a>
       </div>
 
       <!-- Arrow -->
       <div class="fixed-bottom text-right px-3" id="goto-arrow">
-        <a href="{% url 'registration:login' %}#about-us" class="lead text-white" style="font-size: 2rem">
+        <a href="{% url 'registration:auth:login' %}#about-us" class="lead text-white" style="font-size: 2rem">
           <i class="ic ic-arrow-down"></i>
         </a>
       </div>
