@@ -69,5 +69,12 @@
     </div>
 
     {% include "socialaccount/snippets/login_extra.html" %}
+
+    <div class="row justify-content-around">
+      <button onclick="window.history.back();" class="btn btn-dark">
+        <i class="ic ic-arrow-left"></i>
+        {% translate "go back"|capfirst %}
+      </button>
+    </div>
   </main>
 {% endblock content %}

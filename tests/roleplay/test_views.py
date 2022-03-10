@@ -51,7 +51,7 @@ class TestPlaceCreateView(TestCase):
 
     def test_access_anonymous_ko(self):
         response = self.client.get(self.url)
-        login_url = reverse('registration:login')
+        login_url = reverse('registration:auth:login')
 
         self.assertRedirects(response, f'{login_url}?next={self.url}')
 
@@ -193,7 +193,7 @@ class TestPlaceUpdateView(TestCase):
         os.unlink(self.tmp_file.name)
 
     def test_anonymous_access_ko(self):
-        login_url = reverse('registration:login')
+        login_url = reverse('registration:auth:login')
         response = self.client.get(self.url)
 
         self.assertRedirects(response, f'{login_url}?next={self.url}')
@@ -211,7 +211,7 @@ class TestPlaceUpdateView(TestCase):
         self.assertEqual(200, response.status_code)
 
     def test_anonymous_post_data_ko(self):
-        login_url = reverse('registration:login')
+        login_url = reverse('registration:auth:login')
         response = self.client.post(self.url, data=self.data_ok)
 
         self.assertRedirects(response, f'{login_url}?next={self.url}')
@@ -799,7 +799,7 @@ class TestWorldUpdateView(TestCase):
 
 class TestSessionCreateView(TestCase):
     fake = Faker()
-    login_url = reverse('registration:login')
+    login_url = reverse('registration:auth:login')
     model = models.Session
     resolver = 'roleplay:session:create'
     template = 'roleplay/session/session_create.html'
@@ -856,7 +856,7 @@ class TestSessionJoinView(TestCase):
         cls.session = baker.make(cls.model, world=cls.world)
 
     def setUp(self):
-        self.login_url = reverse('registration:login')
+        self.login_url = reverse('registration:auth:login')
         self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
 
     def test_access_anonymous_user_ko(self):
@@ -896,7 +896,7 @@ class TestSessionDetailView(TestCase):
         cls.session.add_game_masters(cls.game_master)
 
     def setUp(self):
-        self.login_url = reverse('registration:login')
+        self.login_url = reverse('registration:auth:login')
         self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
 
     def test_access_anonymous_user_ko(self):

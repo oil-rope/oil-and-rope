@@ -1,9 +1,12 @@
+import datetime
 import logging
 import re
 from smtplib import SMTPException
 
 from crispy_forms.helper import FormHelper
 from django import forms
+from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -13,10 +16,12 @@ from django.utils.translation import gettext_lazy as _
 
 from bot.exceptions import DiscordApiException
 from bot.models import User
+from common.constants import models
+from common.forms.widgets import DateWidget
 from common.utils.auth import generate_token
 
 from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLayout, SetPasswordFormLayout,
-                     SignUpFormLayout)
+                     SignUpFormLayout, UserFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +40,7 @@ class LoginForm(auth_forms.AuthenticationForm):
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.form_action = 'registration:login'
+        self.helper.form_action = 'registration:auth:login'
         self.helper.include_media = False
         self.helper.field_class = 'form-text-white'
         self.helper.label_class = 'text-white'
@@ -66,7 +71,7 @@ class SignUpForm(auth_forms.UserCreationForm):
 
         self.request = request
         self.helper = FormHelper(self)
-        self.helper.form_action = 'registration:register'
+        self.helper.form_action = 'registration:auth:register'
         self.helper.include_media = False
         self.helper.id = 'registerForm'
         self.helper.layout = SignUpFormLayout()
@@ -160,7 +165,7 @@ class ResendEmailForm(forms.Form):
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.form_action = 'registration:resend_email'
+        self.helper.form_action = 'registration:auth:resend_email'
         self.helper.include_media = False
         self.helper.layout = ResendEmailFormLayout()
 
@@ -204,3 +209,54 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.layout = SetPasswordFormLayout()
+
+
+class UserForm(forms.ModelForm):
+    bio = forms.CharField(required=False, label=_('biography'), widget=forms.Textarea(attrs={'rows': 3}))
+    birthday = forms.DateField(required=False, label=_('birthday'), widget=DateWidget(format='%Y-%m-%d'))
+    language = forms.ChoiceField(
+        choices=settings.LANGUAGES,
+        required=True,
+        initial=settings.LANGUAGE_CODE,
+        label=_('language'),
+    )
+    web = forms.URLField(required=False, label=_('website'))
+    image = forms.ImageField(required=False, label=_('avatar'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.capitalize_labels(['bio', 'birthday', 'language', 'web', 'image'])
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+        self.helper.layout = UserFormLayout()
+
+    def capitalize_labels(self, fields=None):
+        for field in fields:
+            form_field = self.fields[field]
+            form_field.label = form_field.label.capitalize()
+
+    def clean_birthday(self):
+        data = self.cleaned_data.get('birthday')
+        if data and data > datetime.date.today():
+            msg = _('birthday cannot be set after today.')
+            raise ValidationError(msg.capitalize())
+        return data
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        profile = instance.profile
+        profile.bio = self.cleaned_data.get('bio', '')
+        profile.birthday = self.cleaned_data.get('birthday')
+        profile.language = self.cleaned_data['language']
+        profile.web = self.cleaned_data.get('web', '')
+        profile.image = self.cleaned_data.get('image') or None
+        if commit:
+            profile.save()
+        return instance
+
+    class Meta:
+        model = apps.get_model(models.USER_MODEL)
+        fields = (
+            'username', 'email', 'first_name', 'last_name',
+        )

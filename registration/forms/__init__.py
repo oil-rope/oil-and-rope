@@ -1,5 +1,5 @@
-from .forms import LoginForm, PasswordResetForm, ResendEmailForm, SetPasswordForm, SignUpForm
+from .forms import LoginForm, PasswordResetForm, ResendEmailForm, SetPasswordForm, SignUpForm, UserForm
 
 __all__ = [
-    'LoginForm', 'SignUpForm', 'ResendEmailForm', 'PasswordResetForm', 'SetPasswordForm'
+    'LoginForm', 'SignUpForm', 'ResendEmailForm', 'PasswordResetForm', 'SetPasswordForm', 'UserForm'
 ]
