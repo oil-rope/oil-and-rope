@@ -40,10 +40,10 @@
       <!-- Presentation -->
       <div class="col-12 text-center py-3">
         <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color_thin.svg' %}" alt="Oil & Rope Logo">
-        <h1 class="display-3 text-white font-ds-bold">
+        <h1 class="display-3 text-light font-ds-bold">
           Oil &amp; Rope
         </h1>
-        <small class="lead text-white">
+        <small class="lead text-light">
           <em>&laquo;{{ slogan|default:"i'm rollin' it"|capfirstletter }}&raquo;</em>
         </small>
       </div>
@@ -52,26 +52,30 @@
       <div class="col-12 col-xl-6">
         {% crispy form %}
         <div class="row justify-content-around mt-3 mt-md-5 mb-5">
-          <a href="{% url 'registration:auth:password_reset' %}">
-            {% translate "forgot password?"|capfirstletter %}
-          </a>
-          <a href="{% url 'registration:auth:resend_email' %}">
-            {% translate "resend email"|capfirst %}
-          </a>
+          <div class="col text-center">
+            <a href="{% url 'registration:auth:password_reset' %}">
+              {% translate "forgot password?"|capfirstletter %}
+            </a>
+          </div>
+          <div class="col text-center">
+            <a href="{% url 'registration:auth:resend_email' %}">
+              {% translate "resend email"|capfirst %}
+            </a>
+          </div>
         </div>
       </div>
 
       <!-- Join -->
       <div class="col-12 d-flex justify-content-around align-items-md-center justify-content-sm-center py-5 py-md-0 py-lg-3 pt-xl-0 pb-xl-5">
-        <p class="lead text-white mr-sm-3 mb-md-0">
+        <p class="lead text-light me-sm-3 mb-md-0">
           {% translate "don't have an account?"|capfirstletter %}
         </p>
         <a class="lead" href="{% url 'registration:auth:register' %}">{% translate "join now!"|capfirstletter %}</a>
       </div>
 
       <!-- Arrow -->
-      <div class="fixed-bottom text-right px-3" id="goto-arrow">
-        <a href="{% url 'registration:auth:login' %}#about-us" class="lead text-white" style="font-size: 2rem">
+      <div class="fixed-bottom text-end px-3" id="goto-arrow">
+        <a href="{% url 'registration:auth:login' %}#about-us" class="lead text-light" style="font-size: 2rem">
           <i class="ic ic-arrow-down"></i>
         </a>
       </div>

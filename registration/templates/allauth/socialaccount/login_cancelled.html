@@ -11,10 +11,10 @@
       <div class="col-12">
         <p class="text-center">
           {% url 'account_login' as login_url %}
-          {% blocktrans %}
+          {% blocktranslate %}
             You decided to cancel logging in to our site using one of your existing accounts.
             If this was a mistake, please proceed to <a href="{{ login_url }}">sign in</a>.
-          {% endblocktrans %}
+          {% endblocktranslate %}
         </p>
       </div>
     </div>

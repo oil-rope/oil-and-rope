@@ -9,7 +9,7 @@ const element = document.querySelector(elementSelector);
 
 // Random ID so never conflicts
 const loadingId = Math.round(Math.random() * 100);
-const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only">${gettext(
+const loadingElement = `<div id="${loadingId}" class="spinner-border" role="status"><span class="sr-only-focusable visually-hidden-focusable">${gettext(
 	"loading"
 )}...</span></div>`;
 

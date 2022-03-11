@@ -6,7 +6,7 @@
 
 {% block content %}
   <main class="container pb-5">
-    <h1 class="text-center">{% translate "account connections"|title %}</h1>
+    <h1 class="text-center fw-lighter mt-xl-3">{% translate "account connections"|title %}</h1>
     <hr class="mx-5">
 
     <div class="row mb-5">
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <h2 class="text-center">{% translate 'Add a 3rd Party Account' %}</h2>
+    <h2 class="text-center fw-lighter">{% translate 'Add a 3rd Party Account' %}</h2>
     <hr class="mx-5">
 
     <div class="row">
@@ -71,7 +71,7 @@
     {% include "socialaccount/snippets/login_extra.html" %}
 
     <div class="row justify-content-around">
-      <button onclick="window.history.back();" class="btn btn-dark">
+      <button onclick="window.history.back();" class="btn btn-dark col-11 col-md-6 col-xl-4">
         <i class="ic ic-arrow-left"></i>
         {% translate "go back"|capfirst %}
       </button>

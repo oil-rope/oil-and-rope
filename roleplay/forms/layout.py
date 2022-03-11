@@ -40,7 +40,7 @@ class PlaceLayout(layout.Layout):
                 layout.Column(
                     common_layout.SubmitClearLayout(
                         submit_text=submit_text.capitalize(),
-                        submit_css_class='col-5 col-lg-10',
+                        submit_css_class='col-5 col-lg-10 col-xl-5',
                         reset_css_class='col-5 d-lg-none',
                     ),
                 ),

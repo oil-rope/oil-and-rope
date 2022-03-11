@@ -23,7 +23,7 @@
       <li class="nav-item dropdown">
         <a data-menu-referrer="{{ node.pk }}"
             class="nav-link dynamic-menu-track dropdown-toggle text-uppercase{% if actual_url|startswith:node.url %} active{% endif %}"
-            href="javascript:" id="navbarDropdown_{{ node.pk }}" role="button" data-toggle="dropdown"
+            href="javascript:" id="navbarDropdown_{{ node.pk }}" role="button" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
           {{ node.display_menu_name|safe }}
         </a>

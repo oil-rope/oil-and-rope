@@ -6,7 +6,7 @@ const Loader = ({ text }) => (
   <div className="d-flex justify-content-around">
     <div>{`${gettext(text)}...`}</div>
     <Spinner animation="border" role="status">
-      <span className="sr-only">{`${gettext(text)}...`}</span>
+      <span className="sr-only-focusable visually-hidden-focusable">{`${gettext(text)}...`}</span>
     </Spinner>
   </div>
 );

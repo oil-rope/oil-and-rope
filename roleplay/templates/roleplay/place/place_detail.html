@@ -42,14 +42,14 @@
       {{ object.name }}
     </h3>
     <small class="text-center text-muted d-block">
-      {% blocktrans with creator=object.owner.username|default:"Oil &amp; Rope" created=object.entry_created_at %}
+      {% blocktranslate with creator=object.owner.username|default:"Oil &amp; Rope" created=object.entry_created_at %}
         Created by {{ creator }} ({{ created }})
-      {% endblocktrans %}
+      {% endblocktranslate %}
     </small>
     <hr class="mx-2">
 
     <div class="row">
-      <div class="col-12 text-right">
+      <div class="col-12 text-end">
         {% include 'roleplay/world/include/tree_view.html' %}
       </div>
     </div>
@@ -76,67 +76,77 @@
     </div>
 
     <div class="row justify-content-around mt-4">
-      <div class="col-11 col-sm-5 btn-group dropright mt-3 px-0">
+      <div class="col-11 col-sm-5 btn-group dropdown mt-3 px-0">
         <button
-          type="button"
           class="btn btn-primary dropdown-toggle {% if not object.get_children and object.get_root == object %}disabled{% endif %}"
+          type="button"
           id="dropdownPlaceList"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-expanded="false"
           title="{% translate "list of places"|capfirst %}"
         >
           {% translate "go to"|capfirst %}
         </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownPlaceList">
+        <ul
+          class="dropdown-menu"
+          aria-labelledby="dropdownPlaceList"
+        >
           {% if object.get_root != object %}
-            <a
-              href="{% url 'roleplay:place:detail' object.get_root.pk %}"
-              class="dropdown-item"
-              title="{% translate "move to main world"|capfirst %}"
-            >
-              <i class="ic ic-world"></i>
-              {% translate "world"|capfirst %}
-            </a>
-            {% if object.get_root != object.parent_site %}
+            <li>
               <a
-                href="{% url 'roleplay:place:detail' object.parent_site.pk %}"
+                href="{% url 'roleplay:place:detail' object.get_root.pk %}"
                 class="dropdown-item"
-                title="{% translate "go to parent site"|capfirst %}"
+                title="{% translate "move to main world"|capfirst %}"
               >
-                {{ object.parent_site.resolve_icon|safe }}
-                {{ object.parent_site.name }}
+                <i class="ic ic-world"></i>
+                {% translate "world"|capfirst %}
               </a>
+            </li>
+            {% if object.get_root != object.parent_site %}
+              <li>
+                <a
+                  href="{% url 'roleplay:place:detail' object.parent_site.pk %}"
+                  class="dropdown-item"
+                  title="{% translate "go to parent site"|capfirst %}"
+                >
+                  {{ object.parent_site.resolve_icon|safe }}
+                  {{ object.parent_site.name }}
+                </a>
+              </li>
             {% endif %}
             {% if object.get_children %}
               <div class="dropdown-divider"></div>
             {% endif %}
           {% endif %}
           {% for place in object.get_children %}
-            <a
-              href="{% url 'roleplay:place:detail' place.pk %}"
-              class="dropdown-item"
-              title="{% translate "go to parent site"|capfirst %}"
-            >
-              {{ place.resolve_icon|safe }}
-              {{ place.name }}
-            </a>
+            <li>
+              <a
+                href="{% url 'roleplay:place:detail' place.pk %}"
+                class="dropdown-item"
+                title="{% translate "go to parent site"|capfirst %}"
+              >
+                {{ place.resolve_icon|safe }}
+                {{ place.name }}
+              </a>
+            </li>
           {% endfor %}
-        </div>
+        </ul>
       </div>
       <div
-        class="col-11 col-sm-5 btn-group dropright mt-3 px-0"
+        class="col-11 col-sm-5 btn-group dropdown mt-3 px-0"
       >
         <button
           class="btn btn-secondary dropdown-toggle"
           type="button"
           id="dropdownPlaceOptions"
-          data-toggle="dropdown"
+          data-bs-toggle="dropdown"
           aria-expanded="false"
           title="{% translate "list of options"|capfirst %}"
           >
           {% translate "options"|capfirst %}
         </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
+        <ul class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
+        <li>
           <a
             href="#no-url"
             class="dropdown-item disabled"
@@ -144,26 +154,33 @@
             <i class="ic ic-quill"></i>
             {% translate "create campaign"|capfirst %}
           </a>
+        </li>
           {% if object.owner == request.user %}
-            <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
-              <i class="ic ic-map"></i>
-              {% translate "add"|capfirst %} {% translate "geography" %}
-            </a>
+            <li>
+              <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
+                <i class="ic ic-map"></i>
+                {% translate "add"|capfirst %} {% translate "geography" %}
+              </a>
+            </li>
             {% if object.get_root == object %}
               {% url 'roleplay:world:edit' object.pk as place_edit_url %}
             {% else %}
               {% url 'roleplay:place:edit' object.pk as place_edit_url %}
             {% endif %}
-            <a class="dropdown-item" href="{{ place_edit_url }}">
-              <i class="ic ic-edit"></i>
-              {% translate "edit"|capfirst %}
-            </a>
-            <a class="dropdown-item" href="{% url 'roleplay:world:delete' object.pk %}">
-              <i class="ic ic-trash"></i>
-              {% translate "delete"|capfirst %}
-            </a>
+            <li>
+              <a class="dropdown-item" href="{{ place_edit_url }}">
+                <i class="ic ic-edit"></i>
+                {% translate "edit"|capfirst %}
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'roleplay:world:delete' object.pk %}">
+                <i class="ic ic-trash"></i>
+                {% translate "delete"|capfirst %}
+              </a>
+            </li>
           {% endif %}
-        </div>
+        </ul>
       </div>
     </div>
   </main>

@@ -6,14 +6,14 @@
 {% block content %}
   <main class="container pb-5">
     {% if process == "connect" %}
-      <h1 class="text-center">
-        {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
-        <p class="lead text-muted">{% blocktrans with provider.name as provider %}You are about to connect a new third party account from {{ provider }}.{% endblocktrans %}</p>
+      <h1 class="text-center fw-lighter">
+        {% blocktranslate with provider.name as provider %}Connect {{ provider }}{% endblocktranslate %}
+        <p class="lead text-muted">{% blocktranslate with provider.name as provider %}You are about to connect a new third party account from {{ provider }}.{% endblocktranslate %}</p>
       </h1>
     {% else %}
-      <h1 class="text-center">
-        {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
-        <p class="lead text-muted">{% blocktrans with provider.name as provider %}You are about to sign in using a third party account from {{ provider }}.{% endblocktrans %}</p>
+      <h1 class="text-center fw-lighter">
+        {% blocktranslate with provider.name as provider %}Sign In Via {{ provider }}{% endblocktranslate %}
+        <p class="lead text-muted">{% blocktranslate with provider.name as provider %}You are about to sign in using a third party account from {{ provider }}.{% endblocktranslate %}</p>
       </h1>
     {% endif %}
 

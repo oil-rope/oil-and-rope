@@ -19,21 +19,21 @@
   <div class="card-body">
     <div class="container">
       <div class="row">
-        <a href="{% url 'roleplay:place:detail' world.pk %}" class="btn btn-secondary mr-1">
+        <a href="{% url 'roleplay:place:detail' world.pk %}" class="btn btn-secondary col me-1">
           <i class="ic ic-world"></i>
           {% translate "view details"|capfirst %}
         </a>
         {% if world.owner == user %}
-          <a href="{% url 'roleplay:world:edit' world.pk %}" class="btn btn-primary ml-1">
+          <a href="{% url 'roleplay:world:edit' world.pk %}" class="btn btn-primary col ms-1">
             <i class="ic ic-edit"></i>
             {% translate "edit"|capfirst %}
           </a>
         {% endif %}
-        <div class="btn-group dropright align-self-end ml-auto">
+        <div class="btn-group col-1 dropend align-self-end ms-auto">
           <button
             type="button"
             class="btn"
-            data-toggle="dropdown"
+            data-bs-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
           >
@@ -68,7 +68,7 @@
   <div class="card-footer">
     <p class="text-muted text-center">
       {% with sessions=0 %}
-        {% blocktrans count counter=sessions %}Used in {{ sessions }} session{% plural %}Used in {{ sessions }} sessions{% endblocktrans %}
+        {% blocktranslate count counter=sessions %}Used in {{ sessions }} session{% plural %}Used in {{ sessions }} sessions{% endblocktranslate %}
       {% endwith %}
     </p>
   </div>
