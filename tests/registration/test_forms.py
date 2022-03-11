@@ -370,7 +370,7 @@ class TestUserForm(TestCase):
 
     def test_data_birthday_set_after_today(self):
         data_birthday_after_today = self.data_ok.copy()
-        data_birthday_after_today['birthday'] = fake.date_between(start_date='today', end_date='+30d')
+        data_birthday_after_today['birthday'] = fake.date_between(start_date='+1d', end_date='+30d')
         form = self.form_class(data=data_birthday_after_today, files=self.files)
 
         self.assertFalse(form.is_valid())
