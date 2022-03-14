@@ -14,13 +14,13 @@ const Message = ({ message }) => {
   const renderMessage = () => (
     <>
       <p className="mb-0">
-        <small className="text-white font-weight-bold">
+        <small className="text-light font-weight-bold">
           <u>{message.author.username}</u>
         </small>
         <br />
         {message.message}
       </p>
-      <p className="text-right mb-0">
+      <p className="text-end mb-0">
         <small className="text-muted">
           {gettext("Sent at")} {formatDate(message.entry_created_at)}
         </small>

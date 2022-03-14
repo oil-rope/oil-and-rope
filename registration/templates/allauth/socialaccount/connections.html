@@ -4,13 +4,20 @@
 
 {% block head_title %}{% translate "account connections"|title %}{% endblock head_title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='account connections' no_separation=True %}
+{% endblock breadcrumb %}
+
 {% block content %}
-  <main class="container pb-5">
-    <h1 class="text-center">{% translate "account connections"|title %}</h1>
+  <main class="container-fluid pb-5 pt-xl-3">
+    <h1 class="text-center fw-lighter mt-xl-3">{% translate "account connections"|title %}</h1>
     <hr class="mx-5">
 
     <div class="row mb-5">
-      <div class="col-12">
+      <div class="col col-md-3 col-xl-2">
+        {% include 'registration/include/user_context_menu.html' %}
+      </div>
+      <div class="col">
         {% if form.accounts %}
           <p>{% translate "you can sign in to your account using any of the following third party accounts:"|capfirst %}</p>
 
@@ -57,11 +64,11 @@
       </div>
     </div>
 
-    <h2 class="text-center">{% translate 'Add a 3rd Party Account' %}</h2>
+    <h2 class="text-center fw-lighter">{% translate 'Add a 3rd Party Account' %}</h2>
     <hr class="mx-5">
 
-    <div class="row">
-      <div class="col-12">
+    <div class="row justify-content-around">
+      <div class="col-8">
         <ul class="socialaccount_providers">
           {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
         </ul>
@@ -69,12 +76,5 @@
     </div>
 
     {% include "socialaccount/snippets/login_extra.html" %}
-
-    <div class="row justify-content-around">
-      <button onclick="window.history.back();" class="btn btn-dark">
-        <i class="ic ic-arrow-left"></i>
-        {% translate "go back"|capfirst %}
-      </button>
-    </div>
   </main>
 {% endblock content %}

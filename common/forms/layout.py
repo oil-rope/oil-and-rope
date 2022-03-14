@@ -10,7 +10,8 @@ class SubmitClearLayout(layout.Layout):
     Simple layout with :class:`layout.Submit` button and optional `layout.Reset` button.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *fields, **kwargs):
+        super().__init__(*fields)
         self.submit_text = kwargs.pop('submit_text', _('create').title())
         self.reset_button = kwargs.pop('reset_button', True)
         self.reset_text = kwargs.pop('reset_text', _('clear').title())
@@ -33,27 +34,54 @@ class SubmitClearLayout(layout.Layout):
         )
 
 
-class Link(layout.LayoutObject):
-    field_classes = "btn"
-    template = '%s/layout/link.html'
+class Link(layout.Layout):
+    field_classes = 'btn'
+    template = 'common/layout/link.html'
 
-    def __init__(self, content, url, new_tab=False, icon=None, **kwargs):
+    def __init__(self, content, url, new_tab=False, icon=None, *fields, **kwargs):
+        super().__init__(*fields)
         self.content = content
         self.url = url
         self.new_tab = new_tab
         self.icon = icon
-        self.template = kwargs.pop("template", self.template)
+        self.template = kwargs.pop('template', self.template)
 
         # We turn  css_class into class
-        kwargs["class"] = self.field_classes
-        if "css_class" in kwargs:
-            kwargs["class"] += " %s" % kwargs.pop("css_class")
+        kwargs['class'] = self.field_classes
+        if 'css_class' in kwargs:
+            kwargs['class'] += ' %s' % kwargs.pop('css_class')
 
         self.flat_attrs = flatatt(kwargs)
 
     def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
         self.content = Template(str(self.content)).render(context)
         template = self.get_template_name(template_pack)
-        context.update({"link": self})
+        context.update({'link': self})
+
+        return render_to_string(template, context.flatten())
+
+
+class Button(layout.Layout):
+    field_classes = 'btn'
+    template = 'common/layout/button.html'
+
+    def __init__(self, content, action='return;', icon=None, *fields, **kwargs):
+        super().__init__(*fields)
+        self.content = content
+        self.action = action
+        self.icon = icon
+        self.template = kwargs.pop('template', self.template)
+
+        # We turn  css_class into class
+        kwargs['class'] = self.field_classes
+        if 'css_class' in kwargs:
+            kwargs['class'] += ' %s' % kwargs.pop('css_class')
+
+        self.flat_attrs = flatatt(kwargs)
+
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
+        self.content = Template(str(self.content)).render(context)
+        template = self.get_template_name(template_pack)
+        context.update({'button': self})
 
         return render_to_string(template, context.flatten())

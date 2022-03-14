@@ -9,10 +9,10 @@
     <h1 class="text-center">
       {% translate "register"|capfirst %}
       <p class="lead text-muted">
-        {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+        {% blocktranslate with provider_name=account.get_provider.name site_name=site.name %}
           You are about to use your {{ provider_name }} account to login to {{ site_name }}.
           As a final step, please complete the following form:
-        {% endblocktrans %}
+        {% endblocktranslate %}
       </p>
     </h1>
     <hr class="mx-5">

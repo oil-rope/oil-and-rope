@@ -12,23 +12,23 @@ class LoginFormLayout(layout.Layout):
         super().__init__(
             layout.Row(
                 layout.Column(
-                    layout.Field('username', css_class='text-white'),
+                    layout.Field('username', css_class='text-light'),
                     css_class='col-sm-12 col-md-10 col-lg-8 col-xl-10'
                 ),
                 layout.Column(
-                    layout.Field('password', css_class='text-white'),
+                    layout.Field('password', css_class='text-light'),
                     css_class='col-sm-12 col-md-10 col-lg-8 col-xl-10'
                 ),
                 css_class='justify-content-md-around',
             ),
             layout.Row(
-                layout.Submit('login', _('login').capitalize(), css_class='col col-md-9 btn-lg text-white'),
+                layout.Submit('login', _('login').capitalize(), css_class='col col-md-9 btn-lg text-light'),
                 layout.Div(css_class='w-100'),
                 common_layout.Link(
                     content=_('login with %(social_media)s').capitalize() % {'social_media': 'Google'},
                     icon='ic-google',
                     url=reverse('google_login'),
-                    css_class='btn-lg bg-white col col-md-9 mt-2',
+                    css_class='btn-lg bg-light col col-md-9 mt-2',
                 ),
                 css_class='justify-content-md-around mt-md-3',
             )

@@ -1,11 +1,9 @@
 import asyncio
 import logging
-import pathlib
 from smtplib import SMTPAuthenticationError
 
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
@@ -132,11 +130,9 @@ class SessionForm(forms.ModelForm):
         exclude = ('chat', 'game_master', 'next_game', 'players',)
 
     async def send_invitations(self):
-        css_file = pathlib.Path(f'{settings.BASE_DIR}/core/static/core/css/oilandrope-theme.min.css')
         html_msg = render_to_string(
             'email_templates/invitation_email.html',
             context={
-                'style': css_file.read_text(encoding='utf-8'),
                 'protocol': 'https' if self.request.is_secure() else 'http',
                 'domain': self.request.META.get('HTTP_HOST', 'localhost'),
                 'object': self.instance,

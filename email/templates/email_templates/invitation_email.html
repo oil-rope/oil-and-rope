@@ -12,28 +12,28 @@
 {% block content %}
   <main class="container py-5">
     <h1 class="text-center">
-      {% blocktrans with name=object.name %}
+      {% blocktranslate with name=object.name %}
         You've been invited to {{ name }}!
-      {% endblocktrans %}
+      {% endblocktranslate %}
     </h1>
     <hr class="mx-5">
     <div class="row">
       <div class="col-12">
         <p class="lead text-center">
           {% url "roleplay:place:detail" object.world.pk as world_link %}
-          {% blocktrans with gm=object.game_master world_name=object.world.name %}
+          {% blocktranslate with gm=object.game_master world_name=object.world.name %}
             {{ gm }} invites you to join into an epic quest in the world of
             <a class="btn btn-link"
                href="{{ protocol }}://{{ domain }}{{ world_link }}"
             >
               {{ world_name }}
             </a>.
-          {% endblocktrans %}
+          {% endblocktranslate %}
         </p>
         <h4 class="text-center">
-          {% blocktrans with name=object.name %}
+          {% blocktranslate with name=object.name %}
             The adventure of <em>"{{ name }}"</em> awaits for you!
-          {% endblocktrans %}
+          {% endblocktranslate %}
         </h4>
       </div>
     </div>

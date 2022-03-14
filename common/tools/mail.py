@@ -1,4 +1,3 @@
-import pathlib
 import threading
 
 from django.conf import settings
@@ -37,9 +36,7 @@ class HtmlThreadMail(threading.Thread):
         self.subject = subject
         self.from_email = from_email
         self.to = to
-        css_file = pathlib.Path(f'{settings.BASE_DIR}/core/static/core/css/oilandrope-theme.min.css')
         self.context = {
-            'style': css_file.read_text(encoding='utf-8'),
             'protocol': 'https',
             'domain': settings.ALLOWED_HOSTS[0],
         }

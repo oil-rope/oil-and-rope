@@ -11,12 +11,12 @@
 
 {% block body_content %}
   <main class="container pb-5">
-    <h1 class="text-center font-weight-lighter">
+    <h1 class="text-center fw-lighter">
       {% blocktranslate with name=parent_site.name %}
         Add geography to {{ name }}!
       {% endblocktranslate %}
     </h1>
-    <hr class="mx-3 pb-3">
+    <hr class="mx-3" />
     <div class="row px-1">
       <div class="col">
         {% crispy form %}

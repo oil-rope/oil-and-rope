@@ -1,7 +1,7 @@
 <a
   href="{{ link.url }}"
   {{ link.flat_attrs|safe }}
-  class="{% if div.css_class %}{{ div.css_class }}{% else %}btn-link{% endif %}"
+  class="{% if link.css_class %}{{ link.css_class }}{% else %}btn-link{% endif %}"
   {% if link.new_tab %}target="_blank"{% endif %}
 >
   {% if link.icon %}

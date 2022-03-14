@@ -71,7 +71,7 @@ const Chat = () => {
   }, [chat]);
 
   return (
-    <Container fluid className="bg-white pb-4">
+    <Container fluid className="bg-light pb-4">
       <Row>
         <Col>
           <Suspense fallback={<Loader />}>

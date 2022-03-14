@@ -105,7 +105,7 @@ class PlaceDetailView(LoginRequiredMixin, DetailView):
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     enum = enums.SiteTypes
     model = models.Place
-    paginate_by = 9
+    paginate_by = 3
     user_worlds_page_kwarg = 'page_user_worlds'
     queryset = models.Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'

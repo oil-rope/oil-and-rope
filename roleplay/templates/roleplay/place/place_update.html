@@ -11,16 +11,10 @@
 
 {% block body_content %}
   <main class="container pb-5">
-    <h1 class="text-center font-weight-lighter">{% translate "editing"|capfirst %} {{ object.name }}</h1>
-    <hr class="mx-3 pb-3">
+    <h1 class="text-center fw-lighter">{% translate "editing"|capfirst %} {{ object.name }}</h1>
+    <hr class="mx-3" />
     <div class="row justify-content-around px-1">
       {% crispy form %}
-    </div>
-    <div class="row justify-content-around mt-3">
-      <button onclick="window.history.back();" class="btn btn-dark">
-        <i class="ic ic-arrow-left"></i>
-        {% translate "go back"|capfirst %}
-      </button>
     </div>
   </main>
 {% endblock body_content %}

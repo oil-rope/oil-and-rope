@@ -1,28 +1,42 @@
 {% load i18n %}
 {% load static %}
-<div id="worldCarousel_{{ world.pk }}" class="carousel slide" data-ride="carousel">
+<div id="worldCarousel_{{ world.pk }}" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     {% for image in world.images %}
       <div class="carousel-item{% if forloop.first %} active{% endif %}">
-        <div class="d-inline-block w-100 full-background  "
-             style="background-image: url('{{ image.url }}')"></div>
+        <div
+          class="d-inline-block w-100 full-background"
+          style="background-image: url('{{ image.url }}')"
+        ></div>
       </div>
     {% empty %}
       <div class="carousel-item active">
         {% static 'roleplay/img/places/default_image.png' as default_image %}
-        <div class="d-inline-block w-100 full-background"
-             style="background-image: url('{{ default_image }}')"></div>
+        <div
+          class="d-inline-block w-100 full-background"
+          style="background-image: url('{{ default_image }}')"
+        ></div>
       </div>
     {% endfor %}
   </div>
   {% if controls %}
-    <a class="carousel-control-prev" href="#worldCarousel_{{ world.pk }}" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">{% translate "previous"|capfirst %}</span>
-  </a>
-  <a class="carousel-control-next" href="#worldCarousel_{{ world.pk }}" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">{% translate "next"|capfirst %}</span>
-  </a>
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#worldCarousel_{{ world.pk }}"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">{% translate "previous"|capfirst %}</span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#worldCarousel_{{ world.pk }}"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only-focusable visually-hidden-focusable">{% translate "next"|capfirst %}</span>
+    </button>
   {% endif %}
 </div>

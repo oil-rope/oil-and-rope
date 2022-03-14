@@ -5,45 +5,19 @@
 
 {% block title %}{% translate "edit"|capfirst %} {% translate "user"|capfirst %}{% endblock title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='profile' no_separation=True %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
   <main class="container-fluid pb-5 pt-xl-3">
-    <h1 class="text-center font-weight-lighter">
+    <h1 class="text-center fw-lighter">
       {% translate "your profile"|capfirst %}
     </h1>
     <hr class="mx-5">
     <div class="row flex-column flex-md-row">
       <div class="col col-md-3 col-xl-2">
-        <ul class="nav nav-pills flex-column text-uppercase">
-          <li class="nav-item">
-            <a
-              href="{% url 'registration:user:edit' request.user.pk %}"
-              class="nav-link active"
-            >
-              <i class="ic ic-user"></i>
-              {% translate "your profile" %}
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              href="{% url 'registration:token' %}"
-              title="{% translate "a token can be used to make calls to our API!"|capfirstletter %}"
-            >
-              <i class="ic-key"></i>
-              {% translate "get token"|capfirst %}
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              href="{% url 'socialaccount_connections' %}"
-              title="{% translate "connect to your accounts to get full experience!"|capfirstletter %}"
-            >
-              <i class="ic ic-connect"></i>
-              {% translate "connect accounts" %}
-            </a>
-          </li>
-        </ul>
+        {% include 'registration/include/user_context_menu.html' %}
       </div>
       <div class="col">
         {% crispy form %}

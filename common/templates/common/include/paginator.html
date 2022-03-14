@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% with page_kwarg=page_kwarg|default:'page' %}
-  <nav aria-label="{% blocktrans with model=paginator.queryset %}pagination for {{ model }}{% endblocktrans %}">
+  <nav aria-label="{% blocktranslate with model=paginator.queryset %}pagination for {{ model }}{% endblocktranslate %}">
     <ul class="pagination justify-content-{{ align|default:'end' }}">
       <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
         <a class="page-link" href="{{ path }}?{{ page_kwarg }}=1" aria-label="{% translate 'first'|capfirst %}">
@@ -9,33 +9,57 @@
         </a>
       </li>
       {% if page_obj.has_previous %}
-        <li class="page-item disabled">
-          <a href="{{ path }}?{{ page_kwarg }}={{ page_obj.previous_page_number }}" class="page-link" tabindex="-1"
-             aria-disabled="true">{% translate "previous"|capfirst %}</a>
+        <li class="page-item">
+          <a
+            href="{{ path }}?{{ page_kwarg }}={{ page_obj.previous_page_number }}"
+            class="page-link"
+            tabindex="-1"
+            aria-disabled="true"
+          >
+            {% translate "previous"|capfirst %}
+          </a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <a href="{{ path }}?{{ page_kwarg }}=1" class="page-link" tabindex="-1"
-             aria-disabled="true">{% translate "previous"|capfirst %}</a>
+          <a
+            href="#no-url"
+            class="page-link"
+            tabindex="-1"
+            aria-disabled="true"
+          >
+            {% translate "previous"|capfirst %}
+          </a>
         </li>
       {% endif %}
       {% for page in paginator.page_range %}
         <li class="page-item{% if page_obj.number == page %} active{% endif %}">
           <a href="{{ path }}?{{ page_kwarg }}={{ page }}" class="page-link">
             {{ page }}
-            <span class="sr-only">({% translate "current"|capfirst %})</span>
+            {% if page_obj.number == page %}
+              <span class="sr-only-focusable visually-hidden-focusable">
+                ({% translate "current"|capfirst %})
+              </span>
+            {% endif %}
           </a>
         </li>
       {% endfor %}
       {% if page_obj.has_next %}
         <li class="page-item">
-          <a href="{{ path }}?{{ page_kwarg }}={{ page_obj.next_page_number }}"
-             class="page-link">{% translate "next"|capfirst %}
+          <a
+            href="{{ path }}?{{ page_kwarg }}={{ page_obj.next_page_number }}"
+           class="page-link"
+          >
+            {% translate "next"|capfirst %}
           </a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <a href="{{ path }}?{{ page_kwarg }}=1" class="page-link">{% translate "next"|capfirst %}</a>
+          <a
+            href="#no-url"
+            class="page-link"
+          >
+            {% translate "next"|capfirst %}
+          </a>
         </li>
       {% endif %}
       <li class="page-item{% if page_obj.number == paginator.num_pages %} disabled{% endif %}">

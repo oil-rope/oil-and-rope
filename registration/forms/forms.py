@@ -42,8 +42,8 @@ class LoginForm(auth_forms.AuthenticationForm):
         self.helper.form_method = 'POST'
         self.helper.form_action = 'registration:auth:login'
         self.helper.include_media = False
-        self.helper.field_class = 'form-text-white'
-        self.helper.label_class = 'text-white'
+        self.helper.field_class = 'form-text-light'
+        self.helper.label_class = 'text-light'
         self.helper.form_id = 'formLogin'
         self.helper.layout = LoginFormLayout()
 

@@ -608,11 +608,11 @@ msgstr "contribuir"
 #: core/templates/core/includes/about_the_project.html:25
 msgid ""
 "Oil &amp; Rope is an open-source project and can be found on <a href="
-"\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white\">GitHub</"
+"\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light\">GitHub</"
 "a>."
 msgstr ""
 "Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a "
-"href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-white"
+"href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
 "\">GitHub</a>."
 
 #: core/templates/core/includes/about_the_project.html:27
@@ -1910,7 +1910,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"        ¡Has sido invitado/a a %(name)s!\n"
+"        ¡Añadir geografía a %(name)s!\n"
 "      "
 
 #: roleplay/templates/roleplay/place/place_detail.html:33
