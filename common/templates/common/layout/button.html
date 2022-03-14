@@ -1,0 +1,9 @@
+<button
+  {{ button.flat_attrs|safe }}
+  onclick="{{ button.action }}"
+>
+  {% if button.icon %}
+    <i class="ic {{ button.icon }}"></i>
+  {% endif %}
+  {{ button.content }}
+</button>

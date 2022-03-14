@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load string_utils %}
+
+<ul class="nav nav-pills flex-column text-uppercase">
+  <li class="nav-item">
+    {% url 'registration:user:edit' request.user.pk as user_edit_url %}
+    <a
+      href="{{ user_edit_url }}"
+      class="nav-link {% if request.path|startswith:user_edit_url %}active{% endif %}"
+    >
+      <i class="ic ic-user"></i>
+      {% translate "your profile" %}
+    </a>
+  </li>
+  <li class="nav-item">
+    {% url 'registration:token' as token_url %}
+    <a
+      class="nav-link {% if request.path|startswith:token_url %}active{% endif %}"
+      href="{{ token_url }}"
+      title="{% translate "a token can be used to make calls to our API!"|capfirstletter %}"
+    >
+      <i class="ic-key"></i>
+      {% translate "get token"|capfirst %}
+    </a>
+  </li>
+  <li class="nav-item">
+    {% url 'socialaccount_connections' as connect_accounts_url %}
+    <a
+      class="nav-link {% if request.path|startswith:connect_accounts_url %}active{% endif %}"
+      href="{{ connect_accounts_url }}"
+      title="{% translate "connect to your accounts to get full experience!"|capfirstletter %}"
+    >
+      <i class="ic ic-connect"></i>
+      {% translate "connect accounts" %}
+    </a>
+  </li>
+</ul>

@@ -8,9 +8,16 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-  <main class="container py-5">
+  <main class="container-fluid pb-5 pt-xl-3">
+    <h1 class="text-center fw-lighter">
+      {% translate "your token"|capfirst %}
+    </h1>
+    <hr class="mx-5">
     <div class="row justify-content-lg-center">
-      <div class="col-12">
+      <div class="col col-xl-2 mb-3">
+        {% include 'registration/include/user_context_menu.html' %}
+      </div>
+      <div class="col">
         <div class="card">
           <div class="card-header">
             <h5 class="card-title text-center">
@@ -27,22 +34,14 @@
           </div>
         </div>
       </div>
-    </div>
-    <hr class="mx-5">
-    <div class="row">
-      <div class="col-12">
-        <p>
+      <div class="w-100"></div>
+      <div class="col mt-3">
+        <p class="text-center">
           {% blocktranslate with api='<a target="_blank" href="https://github.com/oil-rope/oil-and-rope/wiki/Server-API">API REST</a>' %}
             For more information check our {{ api }}.
           {% endblocktranslate %}
         </p>
       </div>
     </div>
-  <div class="row justify-content-around">
-    <button onclick="window.history.back();" class="btn btn-dark col-11 col-md-6 col-xl-4">
-        <i class="ic ic-arrow-left"></i>
-        {% translate "go back"|capfirst %}
-      </button>
-  </div>
   </main>
 {% endblock body_content %}

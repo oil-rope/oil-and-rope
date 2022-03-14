@@ -1910,7 +1910,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"        ¡Has sido invitado/a a %(name)s!\n"
+"        ¡Añadir geografía a %(name)s!\n"
 "      "
 
 #: roleplay/templates/roleplay/place/place_detail.html:33

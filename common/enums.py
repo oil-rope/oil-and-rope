@@ -1,3 +1,5 @@
+import enum
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -64,3 +66,11 @@ class AvailableIcons(models.TextChoices):
         choices = cls.choices
         choices.insert(0, ('', '-----'))
         return choices
+
+
+class JavaScriptAction(enum.Enum):
+    """
+    List of JavaScript actions declared on `common/js/utils.js` or any other JavaScript file.
+    """
+
+    GO_BACK = 'goBack();'
