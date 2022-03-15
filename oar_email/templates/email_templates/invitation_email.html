@@ -1,34 +1,35 @@
 {% extends 'email_templates/email_layout.html' %}
 {% load i18n %}
+{% load string_utils %}
 
-{% block style %}
-  <style>
-    {{ style }}
-  </style>
-{% endblock style %}
-
-{% block title %}{% translate "you've been invited!"|capfirst %}{% endblock title %}
+{% block title %}{% translate "you've been invited!"|capfirstletter %}{% endblock title %}
 
 {% block content %}
-  <main class="container py-5">
+  <main class="container-fluid pt-1">
     <h1 class="text-center">
       {% blocktranslate with name=object.name %}
         You've been invited to {{ name }}!
       {% endblocktranslate %}
     </h1>
     <hr class="mx-5">
+
     <div class="row">
-      <div class="col-12">
+      <div class="col">
         <p class="lead text-center">
-          {% url "roleplay:place:detail" object.world.pk as world_link %}
           {% blocktranslate with gm=object.game_master world_name=object.world.name %}
-            {{ gm }} invites you to join into an epic quest in the world of
-            <a class="btn btn-link"
-               href="{{ protocol }}://{{ domain }}{{ world_link }}"
-            >
-              {{ world_name }}
-            </a>.
+            {{ gm }} invites you to join into an epic quest in the world of {{ world_name }}.
           {% endblocktranslate %}
+        </p>
+        <p class="text-muted text-center">
+          {% trans "check this world here"|capfirst %}
+          <i class="ic ic-arrow-right"></i>
+          {% url 'roleplay:place:detail' object.world.pk as world_link %}
+          <a
+            href="{{ protocol }}://{{ domain }}{{ world_link }}"
+            target="_blank"
+          >
+            {{ object.world.name }}
+          </a>
         </p>
         <h4 class="text-center">
           {% blocktranslate with name=object.name %}
@@ -37,15 +38,14 @@
         </h4>
       </div>
     </div>
-    <div class="row justify-content-center">
-      <div class="col-5">
-        {% url "roleplay:session:join" object.pk as join_url %}
-        <a href="{{ protocol }}://{{ domain }}{{ join_url }}"
-           class="btn btn-lg btn-primary w-100"
-        >
-          {% translate "join now!"|capfirst %}
-        </a>
-      </div>
+    <div class="row justify-content-around mt-md-4">
+      {% url "roleplay:session:join" object.pk as join_url %}
+      <a
+        href="{{ protocol }}://{{ domain }}{{ join_url }}"
+        class="btn btn-lg btn-primary col-11 col-md-6 col-lg-4 col-xl-2"
+      >
+        {% translate "join now!"|capfirstletter %}
+      </a>
     </div>
   </main>
 {% endblock content %}
