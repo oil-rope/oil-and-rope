@@ -346,7 +346,7 @@ EMAIL_HOST = os.environ['EMAIL_HOST']
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = to_bool(os.getenv('EMAIL_USE_TLS', True))
 
 # CORS System
 # https://github.com/adamchainz/django-cors-headers#configuration

@@ -25,9 +25,6 @@ MIDDLEWARE.extend([
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ])
 
-EMAIL_PORT = os.getenv('EMAIL_PORT', '2525')
-EMAIL_USE_TLS = False
-
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -40,7 +37,7 @@ CHANNEL_LAYERS = {
 SHELL_PLUS_PRINT_SQL = True
 SHELL_PLUS_IMPORTS = [
     'from bot.enums import ChannelTypes, EmbedTypes, HttpMethods, MessageTypes',
-    'from common.enums import AvailableIcons',
+    'from common.enums import AvailableIcons, JavaScriptAction',
     'from dynamic_menu.enums import MenuTypes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
