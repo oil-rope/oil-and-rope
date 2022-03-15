@@ -7,24 +7,31 @@ from model_bakery import baker
 class TestEmailView(TestCase):
     resolver = 'oar_email:template'
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = resolve_url(cls.resolver, mail_template='email_layout.html')
+
     def test_anonymous_access_ko(self):
-        url = resolve_url(self.resolver, mail_template='email_layout.html')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         login_url = resolve_url(settings.LOGIN_URL)
-        expected_url = f'{login_url}?next={url}'
+        expected_url = f'{login_url}?next={self.url}'
 
         self.assertRedirects(response, expected_url)
 
     def test_non_staff_access_ko(self):
         self.client.force_login(baker.make_recipe('registration.user'))
-        url = resolve_url(self.resolver, mail_template='email_layout.html')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
 
         self.assertNotEqual(200, response.status_code)
 
     def test_staff_access_ok(self):
         self.client.force_login(baker.make_recipe('registration.staff_user'))
-        url = resolve_url(self.resolver, mail_template='email_layout.html')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_with_json_ok(self):
+        self.client.force_login(baker.make_recipe('registration.staff_user'))
+        response = self.client.get(self.url, data={'object': '{"name": "Test"}'})
 
         self.assertEqual(200, response.status_code)
