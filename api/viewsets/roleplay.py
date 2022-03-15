@@ -170,8 +170,6 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
 
         subject = _('you\'ve invited to a session!')
         context = {
-            'protocol': 'https' if self.request.is_secure() else 'http',
-            'domain': self.request.META.get('HTTP_HOST', 'localhost'),
             'object': instance,
         }
 
@@ -179,7 +177,7 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
         for email in emails:
             HtmlThreadMail(
                 template_name='email_templates/invitation_email.html', context=context,
-                subject=subject, to=[email],
-            ).run()
+                subject=subject, to=[email], request=self.request,
+            ).send()
 
         return Response(_('users invited!'))
