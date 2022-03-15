@@ -1,56 +1,42 @@
 import threading
 
-from django.conf import settings
-from django.core import mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 
 
-class ThreadMail(threading.Thread):
-
-    def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-                 connection=None, attachments=None, headers=None, cc=None,
-                 reply_to=None):
-        super().__init__()
-        self.fail_silently = False
-        self.mail = mail.EmailMessage(subject, body, from_email, to, bcc,
-                                      connection, attachments, headers, cc, reply_to)
-
-    def run(self):
-        self.mail.send(self.fail_silently)
-
-    def send(self, fail_silently=False):
-        self.fail_silently = fail_silently
-        self.start()
-
-
-class HtmlThreadMail(threading.Thread):
-    """
-    :class:`.HtmlThreadMail` inherits from :class:`django.core.mail.EmailMessage` and :class:`threading.Thread` in order
-    to send emails without having server waiting for task to complete.
-    """
-
-    def __init__(self, template_name, context=None, subject='', from_email=None, to=None):
-        super().__init__()
+class HtmlThreadMail:
+    def __init__(self, template_name, request=None, context=None, subject='', from_email=None, to=None):
         self.template_name = template_name
+        self.request = request
+        self.context = context
         self.subject = subject
         self.from_email = from_email
         self.to = to
-        self.context = {
+        self.thread = None
+
+    def get_email(self):
+        mail = EmailMultiAlternatives(subject=self.subject, from_email=self.from_email, to=self.to)
+        mail.attach_alternative(self.get_body(), 'text/html')
+        return mail
+
+    def get_context_data(self):
+        context = {
             'protocol': 'https',
-            'domain': settings.ALLOWED_HOSTS[0],
+            'domain': 'oilandrope-project.com',
         }
-        if context:
-            self.context.update(context)
-        self.body = self.render_body()
-        self.plain_message = strip_tags(self.body)
+        if self.request:
+            context.update({
+                'protocol': self.request.scheme,
+                'domain': self.request.headers.get('HOST', 'oilandrope-project.com'),
+            })
+        if self.context:
+            context.update(self.context)
+        return context
 
-    def run(self):
-        mail.send_mail(subject=self.subject, message=self.plain_message, from_email=self.from_email,
-                       recipient_list=self.to, html_message=self.body)
+    def get_body(self):
+        return render_to_string(template_name=self.template_name, context=self.get_context_data())
 
-    def send(self):
-        self.start()
-
-    def render_body(self):
-        return render_to_string(self.template_name, self.context)
+    def send(self, fail_silently=False):
+        email = self.get_email()
+        self.thread = threading.Thread(target=email.send, kwargs={'fail_silently': fail_silently})
+        self.thread.start()

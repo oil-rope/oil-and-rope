@@ -1,0 +1,40 @@
+{% extends 'email_templates/email_layout.html' %}
+{% load i18n %}
+{% load string_utils %}
+
+{% block title %}{% translate "confirm email"|capfirst %}{% endblock title %}
+
+{% block content %}
+  <main class="container-fluid pt-1">
+    <h1 class="display-2 text-center">
+      {% translate "welcome to Oil &amp; Rope traveller!"|capfirstletter %}
+    </h1>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col">
+        <p class="text-center">
+          {% translate "before you start, please make sure to activate your account by clicking in the link below."|capfirst %}
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <a
+        href="{{ protocol }}://{{ domain }}{% url 'registration:auth:activate' token object.pk %}"
+        class="btn btn-primary col-11 col-md-6 col-lg-4 col-xl-2"
+      >
+        {% translate "activate account"|capfirst %}
+      </a>
+    </div>
+    <div class="row mt-1 mt-md-3">
+      <div class="col">
+        <small class="d-block text-muted text-center">
+          {% translate "if you can't click on the link here's raw"|capfirst %}
+          <br />
+          <code>
+            {{ protocol }}://{{ domain }}{% url 'registration:auth:activate' token object.pk %}
+          </code>
+        </small>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

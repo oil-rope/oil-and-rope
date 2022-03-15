@@ -48,6 +48,8 @@ urlpatterns += i18n_patterns(
     path('frontend/', include('frontend.urls')),
     # Roleplay
     path('roleplay/', include('roleplay.urls')),
+    # O&R Email
+    path('email/', include('oar_email.urls')),
     prefix_default_language=True,
 )
 

@@ -100,7 +100,9 @@ INSTALLED_APPS = [
     # FrontEnd
     'frontend.apps.FrontendConfig',
     # Roleplay
-    'roleplay.apps.RoleplayConfig'
+    'roleplay.apps.RoleplayConfig',
+    # O&R Email
+    'oar_email.apps.OAREmailConfig',
 ]
 
 
@@ -127,7 +129,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'email/templates/',
+            BASE_DIR / 'oar_email/templates/',
             BASE_DIR / 'common/templates/errors/',
             BASE_DIR / 'registration/templates/allauth/',
         ],
@@ -346,7 +348,7 @@ EMAIL_HOST = os.environ['EMAIL_HOST']
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = to_bool(os.getenv('EMAIL_USE_TLS', True))
 
 # CORS System
 # https://github.com/adamchainz/django-cors-headers#configuration

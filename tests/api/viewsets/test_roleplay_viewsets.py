@@ -1,3 +1,5 @@
+import time
+
 from django.apps import apps
 from django.core import mail
 from django.shortcuts import reverse
@@ -895,7 +897,8 @@ class TestSessionViewSet(APITestCase):
         data = {
             'emails': [self.user.email, self.admin_user.email]
         }
-        with self.settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
-            response = self.client.post(url, data)
-            self.assertEqual(status.HTTP_200_OK, response.status_code)
-            self.assertEqual(2, len(mail.outbox))
+        response = self.client.post(url, data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        # NOTE: Let's wait for the mails to be sent
+        time.sleep(1)
+        self.assertEqual(2, len(mail.outbox))
