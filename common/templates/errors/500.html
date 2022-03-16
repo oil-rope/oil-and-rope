@@ -1,16 +1,20 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load string_utils %}
 
-{% block title %}{% translate "boom!"|capfirst %}{% endblock title %}
+{% block title %}{% translate "boom!"|capfirstletter %}{% endblock title %}
 
 {% block body_content %}
-  <main class="container py-5">
-    <h2 class="display-3 text-center">{% translate "one of our robots have just exploded."|capfirst %}</h2>
-    <small class="lead text-muted">
-      {% translate "but don't panic, it's not like they're gonna reveal against us..."|capfirst %} {% translate "right?"|capfirst %}
-    </small>
+  <main class="container pt-5">
+    <h1 class="display-4 text-center">
+      {% translate "one of our robots have just exploded."|capfirst %}
+      <br />
+      <small class="lead text-muted">
+        {% translate "but don't panic, it's not like they're gonna reveal against us..."|capfirst %} {% translate "right?"|capfirstletter %}
+      </small>
+    </h1>
     <hr class="mx-5">
-    <div class="row pt-5">
+    <div class="row mt-3">
       <div class="col-12">
         <p class="lead text-center">
           {% translate "meanwhile why don't you try to escap... I mean"|capfirst %}

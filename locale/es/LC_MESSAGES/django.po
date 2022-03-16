@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-15 13:08+0000\n"
+"POT-Creation-Date: 2022-03-16 19:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,14 +71,14 @@ msgstr "ya casi estás listo/a para empezar tu aventura"
 msgid "type %(command)s to get your invitation"
 msgstr "escribe %(command)s para obtener tu invitación"
 
-#: chat/models.py:20 chat/models.py:46 common/models.py:33
+#: chat/models.py:23 chat/models.py:59 common/models.py:33
 #: roleplay/models.py:527
 #, fuzzy
 #| msgid "Identifier"
 msgid "identifier"
 msgstr "identificador"
 
-#: chat/models.py:21 common/models.py:34 dynamic_menu/models.py:89
+#: chat/models.py:24 common/models.py:34 dynamic_menu/models.py:89
 #: roleplay/models.py:33 roleplay/models.py:86 roleplay/models.py:356
 #: roleplay/models.py:450
 #, fuzzy
@@ -86,34 +86,40 @@ msgstr "identificador"
 msgid "name"
 msgstr "nombre"
 
-#: chat/models.py:22 common/enums.py:27 roleplay/models.py:372
+#: chat/models.py:25 common/enums.py:27 roleplay/models.py:372
 #, fuzzy
 #| msgid "Users"
 msgid "users"
 msgstr "usuarios"
 
-#: chat/models.py:25 chat/models.py:48 chat/templates/chat/index.html:5
+#: chat/models.py:27 registration/forms/forms.py:57
+#, fuzzy
+#| msgid "Discord Identifier"
+msgid "discord identifier"
+msgstr "identificador de discord"
+
+#: chat/models.py:38 chat/models.py:61 chat/templates/chat/index.html:5
 #: roleplay/models.py:457
 msgid "chat"
 msgstr "chat"
 
-#: chat/models.py:26
+#: chat/models.py:39
 #, fuzzy
 #| msgid "Chats"
 msgid "chats"
 msgstr "chats"
 
-#: chat/models.py:50 chat/models.py:57
+#: chat/models.py:64 chat/models.py:71
 #, fuzzy
 #| msgid "Message"
 msgid "message"
 msgstr "mensaje"
 
-#: chat/models.py:52
+#: chat/models.py:66
 msgid "author"
 msgstr "autor"
 
-#: chat/models.py:58
+#: chat/models.py:72
 #, fuzzy
 #| msgid "Message"
 msgid "messages"
@@ -401,23 +407,23 @@ msgstr "siguiente"
 msgid "last"
 msgstr "último"
 
-#: common/templates/errors/403.html:4
+#: common/templates/errors/403.html:5
 #, fuzzy
 #| msgid "Forbidden"
 msgid "forbidden"
 msgstr "prohibido"
 
-#: common/templates/errors/403.html:8
+#: common/templates/errors/403.html:10
 #, fuzzy
 #| msgid "You shall not pass!"
 msgid "you shall not pass!"
 msgstr "¡no puedes pasar!"
 
-#: common/templates/errors/403.html:9
+#: common/templates/errors/403.html:13
 msgid "'cause page returned 403"
 msgstr "porque la web ha dado error 403"
 
-#: common/templates/errors/403.html:14
+#: common/templates/errors/403.html:19
 #, fuzzy
 #| msgid ""
 #| "It seems you are trying to perform an action for which you are not allowed"
@@ -426,58 +432,58 @@ msgid ""
 msgstr ""
 "parece que estás intentando realizar un acción para la que no tienes permiso"
 
-#: common/templates/errors/403.html:15
+#: common/templates/errors/403.html:20
 #, fuzzy
 #| msgid "Maybe you should"
 msgid "maybe you should"
 msgstr "a lo mejor deberías"
 
-#: common/templates/errors/403.html:15 common/templates/errors/500.html:17
+#: common/templates/errors/403.html:20 common/templates/errors/500.html:21
 #: registration/templates/registration/password_reset.html:22
 #: registration/templates/registration/resend_email.html:20
 #: roleplay/forms/layout.py:51 roleplay/forms/layout.py:96
 msgid "go back"
 msgstr "volver"
 
-#: common/templates/errors/404.html:4
+#: common/templates/errors/404.html:5
 #, fuzzy
 #| msgid "Mistery"
-msgid "mistery"
-msgstr "misterio"
+msgid "mistery!"
+msgstr "¡misterio!"
 
-#: common/templates/errors/404.html:8
+#: common/templates/errors/404.html:10
 #, fuzzy
 #| msgid "Seems like the resource you are looking for is missing"
-msgid "seems like the resource you are looking for is missing"
-msgstr "parece que lo que estás buscando ha desaparecido"
+msgid "seems like the resource you are looking for is missing..."
+msgstr "parece que lo que estás buscando ha desaparecido..."
 
-#: common/templates/errors/404.html:9
+#: common/templates/errors/404.html:13
 #, fuzzy
 #| msgid "Don't worry, our best man is on case"
-msgid "don't worry, our best man is on case"
-msgstr "no te preocupes, nuestro mejor hombre está en el caso"
+msgid "don't worry, our best man is on case."
+msgstr "no te preocupes, nuestro mejor hombre está en el caso."
 
-#: common/templates/errors/404.html:14
+#: common/templates/errors/404.html:20
 #, fuzzy
 #| msgid "Meanwhile what about"
 msgid "meanwhile what about"
 msgstr "mientras tanto qué tal si"
 
-#: common/templates/errors/404.html:14
+#: common/templates/errors/404.html:20
 msgid "going back"
 msgstr "volvemos"
 
-#: common/templates/errors/500.html:4
+#: common/templates/errors/500.html:5
 msgid "boom!"
-msgstr "¡Boom!"
+msgstr "¡boom!"
 
-#: common/templates/errors/500.html:8
+#: common/templates/errors/500.html:10
 #, fuzzy
 #| msgid "One of our robots have just exploded"
 msgid "one of our robots have just exploded."
 msgstr "uno de nuestros robots acaba de explotar."
 
-#: common/templates/errors/500.html:10
+#: common/templates/errors/500.html:13
 #, fuzzy
 #| msgid ""
 #| "But don't panic, it's not like they're gonna reveal against us... Right?"
@@ -485,11 +491,11 @@ msgid "but don't panic, it's not like they're gonna reveal against us..."
 msgstr ""
 "pero no te preocupes, no es como que se vayan a revelar contra nosotros..."
 
-#: common/templates/errors/500.html:10
+#: common/templates/errors/500.html:13
 msgid "right?"
-msgstr "¿Verdad?"
+msgstr "¿verdad?"
 
-#: common/templates/errors/500.html:16
+#: common/templates/errors/500.html:20
 #, fuzzy
 #| msgid "Meanwhile why don't you try to escap... I mean"
 msgid "meanwhile why don't you try to escap... I mean"
@@ -769,7 +775,7 @@ msgstr "activar navegación"
 msgid "worlds"
 msgstr "mundos"
 
-#: core/templates/core/includes/menu.html:64 registration/forms/layout.py:25
+#: core/templates/core/includes/menu.html:64 registration/forms/layout.py:27
 #: registration/templates/allauth/socialaccount/login.html:4
 #: registration/templates/registration/login.html:7
 #, fuzzy
@@ -1088,12 +1094,6 @@ msgstr "sistema de registro"
 msgid "username or email"
 msgstr "nombre de usuario o email"
 
-#: registration/forms/forms.py:57
-#, fuzzy
-#| msgid "Discord Identifier"
-msgid "discord identifier"
-msgstr "identificador de discord"
-
 #: registration/forms/forms.py:60
 #, fuzzy
 #| msgid ""
@@ -1186,16 +1186,16 @@ msgstr "sitio web"
 msgid "birthday cannot be set after today."
 msgstr "la fecha de nacimiento no puede ser después de hoy."
 
-#: registration/forms/layout.py:28
+#: registration/forms/layout.py:32
 #, python-format
 msgid "login with %(social_media)s"
 msgstr "acceder con %(social_media)s"
 
-#: registration/forms/layout.py:54
+#: registration/forms/layout.py:58
 msgid "invite our bot to your server!"
 msgstr "¡invita nuestro bot a tu server!"
 
-#: registration/forms/layout.py:63
+#: registration/forms/layout.py:70
 #: registration/templates/allauth/socialaccount/signup.html:5
 #: registration/templates/allauth/socialaccount/signup.html:10
 #: registration/templates/allauth/socialaccount/signup.html:28
@@ -1204,7 +1204,7 @@ msgstr "¡invita nuestro bot a tu server!"
 msgid "register"
 msgstr "registrarse"
 
-#: registration/forms/layout.py:80
+#: registration/forms/layout.py:88
 #: registration/templates/registration/login.html:62
 #: registration/templates/registration/resend_email.html:13
 #, fuzzy
@@ -1212,19 +1212,19 @@ msgstr "registrarse"
 msgid "resend email"
 msgstr "reenviar email"
 
-#: registration/forms/layout.py:96
+#: registration/forms/layout.py:104
 #, fuzzy
 #| msgid "Resend email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: registration/forms/layout.py:112
+#: registration/forms/layout.py:120
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
 msgstr "cambiar contraseña"
 
-#: registration/forms/layout.py:147 roleplay/views.py:75 roleplay/views.py:199
+#: registration/forms/layout.py:155 roleplay/views.py:75 roleplay/views.py:199
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -1253,7 +1253,7 @@ msgstr "perfiles"
 msgid "account connections"
 msgstr "conexiones de cuenta"
 
-#: registration/templates/allauth/socialaccount/connections.html:22
+#: registration/templates/allauth/socialaccount/connections.html:23
 #, fuzzy
 #| msgid ""
 #| "You can sign in to your account using any of the following third party "
@@ -1265,18 +1265,18 @@ msgstr ""
 "puedes acceder a tu usuario usando cualquiera de las siguientes cuentas de "
 "terceros:"
 
-#: registration/templates/allauth/socialaccount/connections.html:55
+#: registration/templates/allauth/socialaccount/connections.html:58
 #, fuzzy
 #| msgid "Remove"
 msgid "remove"
 msgstr "borrar"
 
-#: registration/templates/allauth/socialaccount/connections.html:62
+#: registration/templates/allauth/socialaccount/connections.html:66
 msgid ""
 "you currently have no social network accounts connected to this account."
 msgstr "actualmente no tienes ninguna red social conectada a esta cuenta."
 
-#: registration/templates/allauth/socialaccount/connections.html:67
+#: registration/templates/allauth/socialaccount/connections.html:72
 msgid "Add a 3rd Party Account"
 msgstr "Añadir cuenta de terceros"
 

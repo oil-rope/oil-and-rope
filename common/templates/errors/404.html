@@ -1,14 +1,20 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load string_utils %}
 
-{% block title %}{% translate "mistery"|capfirst %}!{% endblock title %}
+{% block title %}{% translate "mistery!"|capfirstletter %}{% endblock title %}
 
 {% block body_content %}
-  <main class="container py-5">
-    <h2 class="display-3 text-center">{% translate "seems like the resource you are looking for is missing"|capfirst %}</h2>
-    <small class="lead text-muted">{% translate "don't worry, our best man is on case"|capfirst %}.</small>
+  <main class="container pt-5">
+    <h1 class="display-5 text-center">
+      {% translate "seems like the resource you are looking for is missing..."|capfirst %}
+      <br />
+      <small class="lead text-muted">
+        {% translate "don't worry, our best man is on case."|capfirst %}
+      </small>
+    </h1>
     <hr class="mx-5">
-    <div class="row pt-5">
+    <div class="row mt-3">
       <div class="col-12">
         <p class="lead text-center">
           {% translate "meanwhile what about"|capfirst %} <a href="{% url 'core:home' %}">{% translate "going back" %}?</a>

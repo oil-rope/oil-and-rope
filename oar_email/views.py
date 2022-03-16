@@ -1,16 +1,22 @@
 import json
 
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 
 
-@method_decorator(staff_member_required(login_url='registration:auth:login'), name='dispatch')
-class EmailView(TemplateView):
+class EmailView(LoginRequiredMixin, TemplateView):
     """
     This view is intended to be used only on testing since it will be used to see how emails are being rendered.
     If you want to add context you should pass it as QueryParams.
     """
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        if not request.user.is_staff:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         given_template = self.kwargs['mail_template']

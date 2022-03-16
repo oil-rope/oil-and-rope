@@ -1,14 +1,19 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load string_utils %}
 
 {% block title %}{% translate "forbidden"|capfirst %}{% endblock title %}
 
 {% block body_content %}
-  <main class="container py-5">
-    <h2 class="display-4 text-center font-ds-bold">{% translate "you shall not pass!"|capfirst %}</h2>
-    <small class="d-block text-muted text-center">{% translate "'cause page returned 403" %}...</small>
+  <main class="container pt-5">
+    <h2 class="display-4 text-center font-ds-bold">
+      {% translate "you shall not pass!"|capfirstletter %}
+    </h2>
+    <small class="d-block lead text-muted text-center">
+      {% translate "'cause page returned 403" %}...
+    </small>
     <hr class="mx-5">
-    <div class="row pt-5">
+    <div class="row mt-3">
       <div class="col-12">
         <p class="lead text-center">
           {% translate "it seems you are trying to perform an action for which you are not allowed"|capfirst %}...<br>
