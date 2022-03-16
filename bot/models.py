@@ -20,10 +20,10 @@ class ApiMixin:
             self.response = response
         else:
             self.response = discord_api_get(self.url)
-        self.json_response = self.response.json()
+        self.json = self.response.json()
 
         # Magic attributes
-        for key, value in self.json_response.items():
+        for key, value in self.json.items():
             setattr(self, key, value)
 
         # Turning ID into int again

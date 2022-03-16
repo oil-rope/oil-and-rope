@@ -73,4 +73,4 @@ class JavaScriptAction(enum.Enum):
     List of JavaScript actions declared on `common/js/utils.js` or any other JavaScript file.
     """
 
-    GO_BACK = 'goBack();'
+    GO_BACK = 'window.history.back();'

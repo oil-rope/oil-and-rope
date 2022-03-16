@@ -55,7 +55,7 @@ class TestSendMessageToDiscordUserView(TestCase):
         channel = Channel(response.json()['channel_id'])
         msg = Message(channel, response.json()['id'])
 
-        self.assertEqual(response.json(), msg.json_response)
+        self.assertEqual(response.json(), msg.json)
 
 
 @override_settings(

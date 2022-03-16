@@ -92,7 +92,7 @@ class SendMessageToDiscordUserView(View):
 
         discord_user = self.get_discord_user()
         message = self.send_message(discord_user)
-        data = message.json_response
+        data = message.json
 
         return JsonResponse(data=data, status=HTTP_201_CREATED)
 

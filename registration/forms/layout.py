@@ -22,15 +22,19 @@ class LoginFormLayout(layout.Layout):
                 css_class='justify-content-md-around',
             ),
             layout.Row(
-                layout.Submit('login', _('login').capitalize(), css_class='col col-md-9 btn-lg text-light'),
-                layout.Div(css_class='w-100'),
+                layout.Submit(
+                    name='login',
+                    value=_('login').capitalize(),
+                    css_class='btn-lg col-11 col-md-8 col-lg-6 col-xl-7 text-light',
+                ),
+                layout.Div(css_class='my-2'),
                 common_layout.Link(
                     content=_('login with %(social_media)s').capitalize() % {'social_media': 'Google'},
                     icon='ic-google',
                     url=reverse('google_login'),
-                    css_class='btn-lg bg-light col col-md-9 mt-2',
+                    css_class='btn-lg bg-light col-11 col-md-8 col-lg-6 col-xl-7',
                 ),
-                css_class='justify-content-md-around mt-md-3',
+                css_class='justify-content-around mt-md-3',
             )
         )
 
@@ -49,21 +53,25 @@ class SignUpFormLayout(layout.Layout):
                 css_class='justify-content-xl-between'
             ),
             layout.Row(
-                layout.Column('discord_id', css_class='col-12 col-md-6 col-lg-6 col-xl-5'),
+                layout.Column('discord_id', css_class='col-12 col-lg-6 col-xl-5'),
                 common_layout.Link(
                     content=cfl(_('invite our bot to your server!')),
                     url=settings.BOT_INVITATION,
                     new_tab=True,
-                    css_class='btn-info align-self-center col-12 col-md-6 col-lg-6 col-xl-5',
+                    css_class='btn-info align-self-center col-11 col-lg-6 col-xl-5',
                 ),
-                css_class='justify-content-xl-between mb-5'
+                css_class='justify-content-around justify-content-xl-between'
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('register').title()),
+                    common_layout.SubmitClearLayout(
+                        submit_css_class='col-11',
+                        reset_button=False,
+                        create_text=_('register').title()
+                    ),
                     css_class='col-lg-8 col-xl-6'
                 ),
-                css_class='justify-content-lg-around'
+                css_class='justify-content-lg-around mt-5 mt-md-4'
             )
         )
 

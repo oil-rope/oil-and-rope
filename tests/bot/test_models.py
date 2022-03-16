@@ -157,13 +157,13 @@ class TestChannel(TestCase):
         self.channel = user.create_dm()
 
     def test_loads_ok(self):
-        channel_has_attrs = all([hasattr(self.channel, attr)] for attr in self.channel.json_response.keys())
+        channel_has_attrs = all([hasattr(self.channel, attr)] for attr in self.channel.json.keys())
 
         self.assertTrue(channel_has_attrs)
 
     def test_loads_from_response_ok(self):
         channel = self.api_class(self.id, response=self.channel.response)
-        channel_has_attrs = all([hasattr(channel, attr)] for attr in channel.json_response.keys())
+        channel_has_attrs = all([hasattr(channel, attr)] for attr in channel.json.keys())
 
         self.assertTrue(channel_has_attrs)
 
@@ -200,13 +200,13 @@ class TestMessage(TestCase):
         self.message = self.channel.send_message(self.text)
 
     def test_loads_ok(self):
-        message_has_attrs = all([hasattr(self.message, attr)] for attr in self.message.json_response.keys())
+        message_has_attrs = all([hasattr(self.message, attr)] for attr in self.message.json.keys())
 
         self.assertTrue(message_has_attrs)
 
     def test_loads_from_given_channel_id_ok(self):
         message = self.api_class(self.channel.id, self.message.id)
-        message_has_attrs = all([hasattr(message, attr)] for attr in message.json_response.keys())
+        message_has_attrs = all([hasattr(message, attr)] for attr in message.json.keys())
 
         self.assertTrue(message_has_attrs)
 

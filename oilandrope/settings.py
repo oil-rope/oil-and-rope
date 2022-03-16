@@ -410,7 +410,7 @@ DISCORD_API_URL = 'https://discord.com/api/'
 
 BOT_INVITATION = os.getenv(
     'BOT_INVITATION',
-    'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=37604544&scope=bot'
+    'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=201337920&scope=bot'
 )
 BOT_TOKEN = os.environ['BOT_TOKEN']
 BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
