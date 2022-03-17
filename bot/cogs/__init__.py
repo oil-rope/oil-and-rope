@@ -1,5 +1,5 @@
-from .misc import Miscellaneous
+from .misc import Miscellaneous, Roleplay
 
 __all__ = [
-    'Miscellaneous',
+    'Miscellaneous', 'Roleplay'
 ]
