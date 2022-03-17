@@ -100,5 +100,5 @@ def test_dice_roll_simple_roll_ok():
     roll = 'd20+2'
     result, rolls = roll_dice(roll)
 
-    assert result <= 20 and result >= 3
+    assert result <= 22 and result >= 3
     assert 'd20' in rolls and '+2' in rolls
