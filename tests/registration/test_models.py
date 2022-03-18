@@ -1,28 +1,26 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
-from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import SiteTypes
+from tests import fake
+from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 Place = apps.get_model(constants.PLACE_MODEL)
 Race = apps.get_model(constants.RACE_MODEL)
 Session = apps.get_model(constants.SESSION_MODEL)
 User = apps.get_model(constants.USER_MODEL)
 
-fake = Faker()
-
 
 class TestUser(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = get_user_model()
+    model = get_user_model()
 
-        cls.instance = baker.make(_model=cls.model)
+    def setUp(self):
+        self.instance = baker.make_recipe('registration.user')
 
     def test_owned_races_ok(self):
         iterations = fake.pyint(min_value=1, max_value=10)
@@ -44,6 +42,17 @@ class TestUser(TestCase):
         expected_result = iterations
 
         self.assertEqual(expected_result, result)
+
+    def test_discord_user_none_when_discord_id_not_set_ok(self):
+        self.assertIsNone(self.instance.discord_user)
+
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_discord_user_with_discord_id_ok(self):
+        self.instance.discord_id = USER_WITH_SAME_SERVER
+        self.instance.save(update_fields=['discord_id'])
+        self.instance.refresh_from_db()
+
+        self.assertIsNotNone(self.instance.discord_user)
 
 
 class TestProfileModel(TestCase):

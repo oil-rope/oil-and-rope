@@ -86,7 +86,7 @@ class SignUpForm(auth_forms.UserCreationForm):
                 }
                 raise ValidationError(msg)
             try:
-                data = User(data)
+                User(data)
             except DiscordApiException:
                 msg = _('seems like your user couldn\'t be found, do you have any server in common with our bot?')
                 raise ValidationError(msg.capitalize())
@@ -125,6 +125,7 @@ class SignUpForm(auth_forms.UserCreationForm):
         instance = super().save(commit=False)
         # Set active to False until user activates email
         instance.is_active = False
+        instance.discord_id = self.cleaned_data.get('discord_id', '')
         if commit:
             instance.save()
             try:
@@ -202,7 +203,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
     """
-    Allows the user to change the password.
+    Allows the user to change the password without entering the old password.
     """
 
     def __init__(self, *args, **kwargs):
@@ -258,5 +259,5 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = apps.get_model(models.USER_MODEL)
         fields = (
-            'username', 'email', 'first_name', 'last_name',
+            'username', 'email', 'first_name', 'last_name', 'discord_id',
         )

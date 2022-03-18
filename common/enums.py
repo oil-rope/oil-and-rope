@@ -68,7 +68,7 @@ class AvailableIcons(models.TextChoices):
         return choices
 
 
-class JavaScriptAction(enum.Enum):
+class JavaScriptActions(enum.Enum):
     """
     List of JavaScript actions declared on `common/js/utils.js` or any other JavaScript file.
     """
