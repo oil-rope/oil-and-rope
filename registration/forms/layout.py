@@ -111,14 +111,17 @@ class SetPasswordFormLayout(layout.Layout):
     def __init__(self):
         super().__init__(
             layout.Row(
-                layout.Column('new_password1', css_class='col-12 col-lg-5'),
-                layout.Column('new_password2', css_class='col-12 col-lg-5'),
+                layout.Column('new_password1', css_class='col-12 col-xl-4'),
+                layout.Column('new_password2', css_class='col-12 col-xl-4'),
                 css_class='justify-content-around'
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.SubmitClearLayout(reset_button=False, create_text=_('change password').capitalize()),
-                    css_class='col-12 col-lg-6'
+                    common_layout.SubmitClearLayout(
+                        reset_button=False,
+                        submit_text=_('change password').capitalize(),
+                    ),
+                    css_class='col-11 col-md-7 col-lg-4 col-xl-2',
                 ),
                 css_class='justify-content-around'
             )
@@ -147,6 +150,9 @@ class UserFormLayout(layout.Layout):
                     ),
                     layout.Row(
                         layout.Column('web'),
+                    ),
+                    layout.Row(
+                        layout.Column('discord_id'),
                     ),
                     layout.Row(
                         layout.Column(

@@ -378,7 +378,7 @@ class TestPasswordResetConfirmView(TestCase):
         url = response.url
         response = self.client.get(url)
         self.assertEqual(200, response.status_code, 'User cannot access.')
-        self.assertTemplateUsed(response, 'registration/password_change.html')
+        self.assertTemplateUsed(response, 'registration/password_reset_confirm.html')
 
     @mock.patch('registration.views.messages')
     def test_ok(self, mock_call):
@@ -423,6 +423,85 @@ class TestPasswordResetConfirmView(TestCase):
         )
 
         self.assertTrue(self.user.is_authenticated, 'User cannot login with new password.')
+
+
+class TestPasswordChangeView(TestCase):
+    resolver = 'registration:auth:password_change'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.url = resolve_url(cls.resolver)
+
+    def setUp(self):
+        self.password = fake.password()
+        self.data_ok = {
+            'new_password1': self.password,
+            'new_password2': self.password,
+        }
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        login_url = resolve_url(settings.LOGIN_URL)
+        expected_url = f'{login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, 'registration/password_change.html')
+
+    def test_user_post_data_without_new_password1_ko(self):
+        data_without_new_password1 = self.data_ok.copy()
+        del data_without_new_password1['new_password1']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_new_password1)
+
+        self.assertFormError(response, 'form', 'new_password1', ['This field is required.'])
+
+    def test_user_post_data_without_new_password2_ko(self):
+        data_without_new_password2 = self.data_ok.copy()
+        del data_without_new_password2['new_password2']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_new_password2)
+
+        self.assertFormError(response, 'form', 'new_password2', ['This field is required.'])
+
+    def test_user_post_data_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.data_ok)
+
+        self.assertRedirects(response, resolve_url(self.user))
+
+    @mock.patch('registration.views.messages')
+    def test_success_message_is_launched_ok(self, mocker):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.data_ok)
+
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'Password changed successfully!'
+        )
+
+    def test_user_can_login_with_new_password_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.password)
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.is_authenticated)
 
 
 class TestRequestTokenView(TestCase):

@@ -17,6 +17,7 @@ AUTH_PATTERNS = [
     path('resend_email/', views.ResendConfirmationEmailView.as_view(), name='resend_email'),
     path('reset_password/', views.ResetPasswordView.as_view(), name='password_reset'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
 ]
 
 urlpatterns = [
