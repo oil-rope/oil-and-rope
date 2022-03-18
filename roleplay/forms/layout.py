@@ -1,7 +1,7 @@
 from crispy_forms import bootstrap, layout
 from django.utils.translation import gettext_lazy as _
 
-from common.enums import JavaScriptAction
+from common.enums import JavaScriptActions
 from common.forms import layout as common_layout
 
 
@@ -50,7 +50,7 @@ class PlaceLayout(layout.Layout):
                 common_layout.Button(
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6',
-                    action=JavaScriptAction.GO_BACK.value,
+                    action=JavaScriptActions.GO_BACK.value,
                     icon='ic-arrow-left',
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
@@ -95,7 +95,7 @@ class WorldFormLayout(layout.Layout):
                 common_layout.Button(
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6',
-                    action=JavaScriptAction.GO_BACK.value,
+                    action=JavaScriptActions.GO_BACK.value,
                     icon='ic-arrow-left',
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
