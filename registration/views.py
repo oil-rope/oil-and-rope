@@ -246,12 +246,22 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
     form_class = forms.SetPasswordForm
     success_url = reverse_lazy('registration:auth:login')
-    template_name = 'registration/password_change.html'
+    template_name = 'registration/password_reset_confirm.html'
 
-    def form_valid(self, form):
+    def get_success_url(self):
         msg = cfl(_('password changed successfully!'))
         messages.success(self.request, msg)
-        return super().form_valid(form)
+        return super().get_success_url()
+
+
+class PasswordChangeView(auth_views.PasswordChangeView):
+    form_class = forms.SetPasswordForm
+    template_name = 'registration/password_change.html'
+
+    def get_success_url(self):
+        msg = cfl(_('password changed successfully!'))
+        messages.success(self.request, msg)
+        return resolve_url(self.request.user)
 
 
 class RequestTokenView(LoginRequiredMixin, TemplateView):

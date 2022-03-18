@@ -6,10 +6,12 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.functional import cached_property, keep_lazy
 from django.utils.translation import gettext_lazy as _
 
+from bot.models import User as DiscordUser
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
@@ -19,6 +21,15 @@ from dynamic_menu.enums import MenuTypes
 class User(AbstractUser):
     email = models.EmailField(verbose_name=_('email address'), null=False, blank=False, unique=True)
     is_premium = models.BooleanField(verbose_name=_('premium user'), default=False)
+    discord_id = models.CharField(
+        verbose_name=_('discord identifier'), max_length=100, null=False, blank=True,
+    )
+
+    @property
+    def discord_user(self):
+        if not self.discord_id:
+            return None
+        return DiscordUser(self.discord_id)
 
     @property
     def owned_races(self):
@@ -34,6 +45,9 @@ class User(AbstractUser):
             player_in_session_set__is_game_master=True
         )
         return sessions
+
+    def get_absolute_url(self):
+        return resolve_url('registration:user:edit', pk=self.pk)
 
     class Meta:
         db_table = 'auth_user'

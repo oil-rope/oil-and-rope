@@ -202,7 +202,7 @@ class PasswordResetForm(auth_forms.PasswordResetForm):
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
     """
-    Allows the user to change the password.
+    Allows the user to change the password without entering the old password.
     """
 
     def __init__(self, *args, **kwargs):

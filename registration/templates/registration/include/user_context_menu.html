@@ -13,13 +13,23 @@
     </a>
   </li>
   <li class="nav-item">
+    {% url 'registration:auth:password_change' as password_change_url %}
+    <a
+      href="{{ password_change_url }}"
+      class="nav-link {% if request.path|startswith:password_change_url %}active{% endif %}"
+    >
+      <i class="ic ic-key"></i>
+      {% translate "change password" %}
+    </a>
+  </li>
+  <li class="nav-item">
     {% url 'registration:token' as token_url %}
     <a
       class="nav-link {% if request.path|startswith:token_url %}active{% endif %}"
       href="{{ token_url }}"
       title="{% translate "a token can be used to make calls to our API!"|capfirstletter %}"
     >
-      <i class="ic-key"></i>
+      <i class="ic ic-user-check"></i>
       {% translate "get token"|capfirst %}
     </a>
   </li>
