@@ -70,7 +70,7 @@ class TestSignUpForm(TestCase):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         self.assertTrue(form.is_valid(), 'Form is invalid.')
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
+    @unittest.skip('Now users can be accessed by bots even if they don\'t share server')
     def test_discord_id_does_not_exist_ko(self):
         data = self.data_ok.copy()
         data['discord_id'] = USER_WITH_DIFFERENT_SERVER
