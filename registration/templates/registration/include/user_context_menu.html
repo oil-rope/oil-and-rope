@@ -17,6 +17,7 @@
     <a
       href="{{ password_change_url }}"
       class="nav-link {% if request.path|startswith:password_change_url %}active{% endif %}"
+      title="{% translate "change password"|capfirst %}"
     >
       <i class="ic ic-key"></i>
       {% translate "change password" %}
