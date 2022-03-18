@@ -152,6 +152,9 @@ class UserFormLayout(layout.Layout):
                         layout.Column('web'),
                     ),
                     layout.Row(
+                        layout.Column('discord_id'),
+                    ),
+                    layout.Row(
                         layout.Column(
                             common_layout.SubmitClearLayout(
                                 reset_button=False,
