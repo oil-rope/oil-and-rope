@@ -47,7 +47,7 @@ class TestAPICors(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_get_token_ok(self):
-        url = resolve_url('api:token')
+        url = resolve_url('api:auth:token')
         data = {
             'username': self.user.username,
             'password': self.password,
