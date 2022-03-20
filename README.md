@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/oil-rope/oil-and-rope/branch/master/graph/badge.svg)](https://codecov.io/gh/oil-rope/oil-and-rope)
 
 Oil &amp; Rope is a Python project for managing Roleplay Games.
-The goald of this project is to make online roleplay easier and intuitive.
+The goal of this project is to make online roleplay easier and intuitive.
 
 You can try now at our website [Oil & Rope Web](https://oilandrope-project.com/).
 
@@ -19,11 +19,10 @@ The main goal of *Oil &amp; Rope Project* is combine both real-time web interact
 Since a lot of people often use Discord for roleplay gaming we thought it might be wonderful for everyone to enjoy a
 session either on Discord chat or Web (with its respective features).
 
-The project is based on four fundamental technologies:
+The project is based on three fundamental technologies:
 
 -   [Web with Django](#web)
 -   [ASGI with Channels](#asgi)
--   [WebSocket components with React](#react-components)
 -   [Discord Bot with Discord.py](#discord)
 
 ### Web
@@ -36,11 +35,6 @@ All views are tested CBV with Pytest (compatible with Unittest).
 We use [django-channels](https://channels.readthedocs.io/) to deal with ASGI requests since we need real-time
 interaction with the user for sending and receiving information from Discord API.
 
-### React Components
-
-For dealing with real-time interaction in the frontend in an easy way we use React Components with native ES6
-WebSockets.
-
 ### Discord
 
 The web is directly linked to
@@ -51,7 +45,6 @@ the bot that manages roleplay session that are currently open in [Oil &amp; Rope
 
 -   [Web](#setup-web)
 -   [ASGI](#setup-channels)
--   [React](#setup-react)
 -   [Discord](#setup-bot)
 
 First of all we need to clone this repository `git clone https://github.com/oil-rope/oil-and-rope.git`.  
@@ -84,18 +77,6 @@ We use Docker to simulate a Redis machine that manage ASGI requests.
 
 1. Run `docker run --rm -p 6739:6739 --name redis redis`. This docker machine will manage all ASGI requests if you are
 2. running the web with `dev_settings.py`.
-
-### Setup React
-
-For dealing with React Components we use [Node.js](https://nodejs.org/es/), [npm](https://www.npmjs.com/get-npm) and
-[webpack](https://www.npmjs.com/get-npm).  
-There are two simple runs: `dev` for development and `build` for compiling production JS.
-
-1.  Install dependencies: `npm install`.
-2.  *(Recommended) Run tests: `npm run test`.*
-3.  Compile JS: `npm run dev` for development (with watch) or `npm run build` for production.
-
-JS bundles are stored in `frontend/static/frontend/dist/` and can be called by Django with `{% static %}`.
 
 ### Setup Bot
 
