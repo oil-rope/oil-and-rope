@@ -134,6 +134,11 @@ class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
         return qs
 
     def get_serializer(self, *args, **kwargs):
+        if 'use_serializer' in self.request.query_params:
+            kwargs.update({
+                'map_fields': self.request.query_params.getlist('use_serializer'),
+            })
+
         user = self.current_user
         if user.is_staff:
             return super(SessionViewSet, self).get_serializer(*args, **kwargs)

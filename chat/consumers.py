@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 from django.apps import apps
 from django.contrib.auth.models import AnonymousUser
 
-from api.serializers.chat import ChatMessageSerializer
+from api.serializers.chat import NestedChatMessageSerializer
 from common.constants import models as constants
 from core.consumers import HandlerJsonWebsocketConsumer
 
@@ -41,7 +41,7 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_serialized_message(self, message):
-        serialized_message = ChatMessageSerializer(message, map_fields=['author'])
+        serialized_message = NestedChatMessageSerializer(message)
         data = serialized_message.data
         return data
 
