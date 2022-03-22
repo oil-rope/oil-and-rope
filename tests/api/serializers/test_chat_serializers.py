@@ -1,87 +1,210 @@
-from itertools import cycle
-
 from django.apps import apps
 from django.test import TestCase
-from faker import Faker
 from model_bakery import baker
 
-from api.serializers.chat import ChatMessageSerializer, ChatSerializer
+from api.serializers.chat import (ChatMessageSerializer, ChatSerializer, NestedChatMessageSerializer,
+                                  NestedChatSerializer)
 from common.constants import models
+from tests import fake
 
-fake = Faker()
+Chat = apps.get_model(models.CHAT_MODEL)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
 
 
 class TestChatMessageSerializer(TestCase):
-    model = apps.get_model(models.CHAT_MESSAGE_MODEL)
-    serializer = ChatMessageSerializer
+    model = ChatMessage
+    serializer_class = ChatMessageSerializer
 
-    def test_empty_serializer_ok(self):
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
+    @classmethod
+    def setUpTestData(cls):
+        cls.message = baker.make_recipe('chat.message')
 
-        self.assertListEqual([], serialized_result)
+    def test_id_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_data_ok(self):
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
+        self.assertTrue(isinstance(serialized_data['id'], int))
 
-        self.assertEqual(queryset.count(), len(serialized_result))
+    def test_chat_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_object_ok(self):
-        expected_message = fake.word()
-        obj = baker.make(self.model, message=expected_message)
-        serialized_obj = self.serializer(obj)
-        serialized_result = serialized_obj.data
+        self.assertTrue(isinstance(serialized_data['chat'], int))
 
-        self.assertEqual(expected_message, serialized_result['message'])
+    def test_message_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['message'], str))
+
+    def test_author_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['author'], int))
+
+    def test_entry_created_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_created_at'], str))
+
+    def test_entry_updated_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_updated_at'], str))
+
+
+class TestNestedChatMessageSerializer(TestCase):
+    model = ChatMessage
+    serializer_class = NestedChatMessageSerializer
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.message = baker.make_recipe('chat.message')
+
+    def test_id_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['id'], int))
+
+    def test_chat_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['chat'], int))
+
+    def test_message_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['message'], str))
+
+    def test_author_is_dict_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['author'], dict))
+
+    def test_entry_created_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_created_at'], str))
+
+    def test_entry_updated_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.message)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_updated_at'], str))
 
 
 class TestChatSerializer(TestCase):
+    model = Chat
+    serializer_class = ChatSerializer
+
+    @classmethod
+    def setUpTestData(cls):
+        users = baker.make_recipe('registration.user', _quantity=fake.pyint(min_value=1, max_value=10))
+        messages = baker.make_recipe('chat.message', _quantity=fake.pyint(min_value=1, max_value=10))
+        cls.chat = baker.make_recipe(
+            baker_recipe_name='chat.chat',
+            users=users,
+            chat_message_set=messages,
+        )
+
+    def test_id_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['id'], int))
+
+    def test_name_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['name'], str))
+
+    def test_users_is_list_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['users'], list))
+
+    def test_chat_message_set_is_list_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['chat_message_set'], list))
+
+    def test_entry_created_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_created_at'], str))
+
+    def test_entry_updated_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_updated_at'], str))
+
+
+class TestNestedChatSerializer(TestCase):
     model = apps.get_model(models.CHAT_MODEL)
-    serializer = ChatSerializer
+    serializer_class = NestedChatSerializer
 
-    def test_serializer_empty_ok(self):
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_set = baker.make_recipe('registration.user', _quantity=fake.pyint(min_value=1, max_value=10))
+        cls.chat_without_messages = baker.make_recipe('chat.chat', users=cls.user_set)
+        cls.chat_with_messages = baker.make_recipe('chat.chat', users=cls.user_set)
+        baker.make_recipe(
+            'chat.message',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+            chat=cls.chat_with_messages,
+        )
 
-        self.assertListEqual([], serialized_result)
+    def test_id_is_int_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_data_ok(self):
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
+        self.assertTrue(isinstance(serialized_data['id'], int))
 
-        self.assertEqual(queryset.count(), len(serialized_result))
+    def test_name_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_object_ok(self):
-        expected_name = fake.word()
-        obj = baker.make(self.model, name=expected_name)
-        serialized_obj = self.serializer(obj)
-        serialized_result = serialized_obj.data
+        self.assertTrue(isinstance(serialized_data['name'], str))
 
-        self.assertEqual(expected_name, serialized_result['name'])
+    def test_users_is_list_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_users_ok(self):
-        users = baker.make(_model=models.USER_MODEL, _quantity=fake.pyint(min_value=1, max_value=10))
-        obj = baker.make(_model=self.model, users=users)
-        serialized_obj = self.serializer(obj)
-        serialized_result = serialized_obj.data
-        expected_result = all([user.id in serialized_result['users'] for user in users])
+        self.assertTrue(isinstance(serialized_data['users'], list))
 
-        self.assertTrue(expected_result)
+    def test_chat_message_set_is_list_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
 
-    def test_serializer_with_messages_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=6)
-        expected_messages = [fake.word() for _ in range(0, iterations)]
-        obj = baker.make(self.model)
-        baker.make(_model=models.CHAT_MESSAGE_MODEL, _quantity=iterations, message=cycle(expected_messages), chat=obj)
-        serialized_obj = self.serializer(obj)
-        serialized_result = serialized_obj.data
-        expected_result = all([m['message'] in expected_messages for m in serialized_result['chat_message_set']])
+        self.assertTrue(isinstance(serialized_data['chat_message_set'], list))
 
-        self.assertTrue(expected_result)
+    def test_entry_created_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_created_at'], str))
+
+    def test_entry_updated_at_is_str_ok(self):
+        serialized_obj = self.serializer_class(self.chat_without_messages)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['entry_updated_at'], str))
+
+    def test_nested_chat_message_set_is_dict(self):
+        serialized_obj = self.serializer_class(self.chat_with_messages)
+        serialized_data = serialized_obj.data
+
+        self.assertTrue(isinstance(serialized_data['chat_message_set'][0], dict))

@@ -1,7 +1,8 @@
-from ..viewsets.chat import ChatMessageViewSet, ChatViewSet
-from .routers import OilAndRopeDefaultRouter
+from rest_framework.routers import SimpleRouter
 
-router = OilAndRopeDefaultRouter()
+from ..viewsets.chat import ChatMessageViewSet, ChatViewSet
+
+router = SimpleRouter()
 router.register(prefix=r'chat', viewset=ChatViewSet, basename='chat')
 router.register(prefix=r'message', viewset=ChatMessageViewSet, basename='message')
 
