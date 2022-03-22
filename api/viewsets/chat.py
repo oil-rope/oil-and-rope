@@ -71,7 +71,17 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        if self.request.user.is_staff:
+            return serializer.save()
+        # Regular user should not be able to set other author than themself
+        return serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        if self.request.user.is_staff:
+            return serializer.save()
+        instance = self.get_object()
+        # Regular user should not be able to change chat
+        return serializer.save(chat=instance.chat)
 
     def update(self, request, *args, **kwargs):
         self.serializer_class = ChatMessageSerializer

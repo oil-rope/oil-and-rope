@@ -1,7 +1,5 @@
-import unittest
-
 from django.apps import apps
-from django.shortcuts import resolve_url, reverse
+from django.shortcuts import resolve_url
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -70,6 +68,40 @@ class TestChatViewSet(APITestCase):
         data = response.json()['results']
         expected_data = self.model.objects.filter(
             users__in=[self.user],
+        ).count()
+
+        self.assertEqual(expected_data, len(data))
+
+    def test_authenticated_staff_list_ok(self):
+        url = resolve_url(f'{base_resolver}:chat-list')
+        self.client.credentials(**self.staff_credentials)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_staff_list_length_ok(self):
+        """
+        Checks if staff can only see its own chat.
+        """
+
+        url = resolve_url(f'{base_resolver}:chat-list')
+        self.client.credentials(**self.staff_credentials)
+
+        # Creating data
+        baker.make_recipe(
+            baker_recipe_name='chat.chat',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+        )
+        baker.make_recipe(
+            baker_recipe_name='chat.chat',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+            users=[self.staff_user],
+        )
+        response = self.client.get(url)
+
+        data = response.json()['results']
+        expected_data = self.model.objects.filter(
+            users__in=[self.staff_user],
         ).count()
 
         self.assertEqual(expected_data, len(data))
@@ -195,6 +227,40 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(len(messages), len(response.json()['results']))
 
+    def test_authenticated_staff_list_ok(self):
+        url = resolve_url(f'{base_resolver}:message-list')
+        self.client.credentials(**self.staff_credentials)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_staff_list_length_ok(self):
+        """
+        Checks if staff can only see their own messages.
+        """
+
+        url = resolve_url(f'{base_resolver}:message-list')
+        self.client.credentials(**self.staff_credentials)
+
+        # Creating data
+        baker.make_recipe(
+            baker_recipe_name='chat.message',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+        )
+        baker.make_recipe(
+            baker_recipe_name='chat.message',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+            author=self.staff_user,
+        )
+        response = self.client.get(url)
+
+        data = response.json()['results']
+        expected_data = self.model.objects.filter(
+            author__in=[self.staff_user],
+        ).count()
+
+        self.assertEqual(expected_data, len(data))
+
     def test_authenticated_user_list_all_ko(self):
         url = resolve_url(f'{base_resolver}:message-list-all')
         self.client.credentials(**self.user_credentials)
@@ -248,10 +314,24 @@ class TestChatMessageViewSet(APITestCase):
         # Directly not correct format
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_authenticated_staff_create_with_other_author_id_ok(self):
+        another_user = baker.make('registration.user')
+        url = resolve_url(f'{base_resolver}:message-list')
+        self.client.credentials(**self.staff_credentials)
+        data = {
+            'chat': self.chat_with_user_in_it.pk,
+            'message': fake.sentence(),
+            'author': another_user.pk,
+        }
+        response = self.client.post(url, data=data, format='json')
+
+        # Directly not correct format
+        self.assertEqual(another_user.pk, response.json()['author'])
+
     def test_authenticated_user_author_message_partial_update_correct_data_ok(self):
         message = baker.make_recipe('chat.message', author=self.user)
         self.client.credentials(**self.user_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
         }
@@ -259,10 +339,23 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_authenticated_user_author_partial_update_changes_chat_ko(self):
+        message = baker.make_recipe('chat.message', author=self.user)
+        another_chat = baker.make_recipe('chat.chat')
+        self.client.credentials(**self.user_credentials)
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
+        data = {
+            'message': fake.word(),
+            'chat': another_chat.pk,
+        }
+        response = self.client.patch(path=url, data=data, format='json')
+
+        self.assertEqual(message.chat.pk, response.json()['chat'])
+
     def test_authenticated_user_not_author_message_partial_update_ko(self):
         message = baker.make_recipe('chat.message')
         self.client.credentials(**self.user_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
         }
@@ -274,7 +367,7 @@ class TestChatMessageViewSet(APITestCase):
         author = self.user
         message = baker.make_recipe('chat.message', author=author)
         self.client.credentials(**self.user_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
             'chat': message.chat.pk,
@@ -288,7 +381,7 @@ class TestChatMessageViewSet(APITestCase):
         author = baker.make_recipe('registration.user')
         message = baker.make_recipe('chat.message', author=author)
         self.client.credentials(**self.staff_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
             'chat': message.chat.pk,
@@ -302,7 +395,7 @@ class TestChatMessageViewSet(APITestCase):
         author = baker.make_recipe('registration.user')
         message = baker.make_recipe('chat.message', author=author)
         self.client.credentials(**self.staff_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
             'chat': message.chat.pk,
@@ -317,7 +410,7 @@ class TestChatMessageViewSet(APITestCase):
         diff_author = baker.make_recipe('registration.user')
         message = baker.make_recipe('chat.message', author=author)
         self.client.credentials(**self.staff_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         data = {
             'message': fake.word(),
             'chat': message.chat.pk,
@@ -327,38 +420,41 @@ class TestChatMessageViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    @unittest.skip('Work in progress')
+    def test_authenticated_staff_message_update_with_different_author_updates_author_ok(self):
+        author = baker.make_recipe('registration.user')
+        diff_author = baker.make_recipe('registration.user')
+        message = baker.make_recipe('chat.message', author=author)
+        self.client.credentials(**self.staff_credentials)
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
+        data = {
+            'message': fake.word(),
+            'chat': message.chat.pk,
+            'author': diff_author.pk,
+        }
+        response = self.client.put(path=url, data=data, format='json')
+
+        self.assertEqual(diff_author.pk, response.json()['author'])
+
     def test_authenticated_user_author_message_delete_ok(self):
-        message = baker.make(self.model, author=self.user)
+        message = baker.make_recipe('chat.message', author=self.user)
         self.client.credentials(**self.user_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
-    @unittest.skip('Work in progress')
     def test_authenticated_user_not_author_message_delete_ko(self):
-        message = baker.make(self.model)
+        message = baker.make_recipe('chat.message')
         self.client.credentials(**self.user_credentials)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
-    @unittest.skip('Work in progress')
-    def test_authenticated_staff_author_message_delete_ok(self):
-        message = baker.make(self.model, author=self.admin_user)
-        self.client.force_login(self.admin_user)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
-        response = self.client.delete(url)
-
-        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
-
-    @unittest.skip('Work in progress')
-    def test_authenticated_staff_not_author_message_delete_ok(self):
-        message = baker.make(self.model)
-        self.client.force_login(self.admin_user)
-        url = reverse(f'{base_resolver}:message-detail', kwargs={'pk': message.pk})
+    def test_authenticated_staff_message_delete_ok(self):
+        message = baker.make_recipe('chat.message')
+        self.client.credentials(**self.staff_credentials)
+        url = resolve_url(f'{base_resolver}:message-detail', pk=message.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)

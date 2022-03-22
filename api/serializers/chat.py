@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from common.constants import models
 
-from ..validators.chat import UserInAuthorValidator
 from .registration import SimpleUserSerializer
 
 User = get_user_model()
@@ -15,7 +14,6 @@ Chat = apps.get_model(models.CHAT_MODEL)
 class ChatMessageSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
-        validators=[UserInAuthorValidator],
         default=serializers.CurrentUserDefault(),
     )
 
