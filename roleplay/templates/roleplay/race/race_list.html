@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load string_utils %}
 
-{% block title %}{% translate 'worlds'|capfirst %}{% endblock title %}
+{% block title %}{% translate 'races'|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds' %}
@@ -10,75 +10,11 @@
 
 {% block body_content %}
   <div class="container">
-    <!-- User's worlds -->
-    {% if not user_worlds.exists %}
       <h2 class="display-5 text-center">
-        {% translate "seems like you haven't any world."|capfirst %}<br>
-        {% translate "create one!"|capfirstletter %}
-      </h2>
-      <div class="row justify-content-center py-5">
+        {% translate Races %}
         <a
-          href="{% url 'roleplay:world:create' %}?user"
-         class="btn btn-lg btn-primary col-11 col-md-8 col-xl-4"
-        >
-          {% translate "create world!"|capfirstletter %}
-        </a>
-      </div>
-      <div class="w-100 my-5"></div>
-    {% else %}
-      <h2 class="display-5 text-center">
-        {% blocktranslate count counter=user_worlds_full.count %}Your world{% plural %}Your worlds{% endblocktranslate %}
-        <a
-          title="{% translate 'create new world'|capfirst %}" href="{% url 'roleplay:world:create' %}?user"
-         class="btn btn-lg btn-primary"
-        >
-          <span class="ic-plus"></span>
-        </a>
-      </h2>
-      <div class="w-100 py-2"></div>
-      {% if user_worlds_is_paginated %}
-        {% include 'common/include/paginator.html' with paginator=user_worlds_paginator page_obj=user_worlds_page_obj path=request.path align='center' page_kwarg='page_user_worlds' only %}
-      {% endif %}
-      <div class="row justify-content-around pb-5">
-        {% for world in user_worlds_page_obj %}
-          <div
-            class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4"
-          >
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
-          </div>
-        {% endfor %}
-      </div>
-      <div class="row justify-content-center pb-5">
-        <a
-          href="{% url 'roleplay:world:create' %}?user"
-         class="btn btn-lg btn-primary col-11 col-md-8 col-xl-4"
-        >
-          {% translate "create private world!"|capfirstletter %}
-        </a>
-      </div>
-    {% endif %}
-
-    <!-- Community worlds -->
-    {% if not object_list.exists %}
-      <h2 class="display-5 text-center">
-        {% translate "seems like we don't have comunity worlds"|capfirst %}<br>
-        {% translate "would you like to create one?"|capfirstletter %}
-      </h2>
-      <div class="row justify-content-center py-5">
-        <a
-          href="{% url 'roleplay:world:create' %}"
-          class="btn btn-lg btn-dark col-11 col-md-8 col-xl-4"
-        >
-          {% translate "create world!"|capfirstletter %}
-        </a>
-      </div>
-    {% else %}
-      <h2 class="display-5 text-center">
-        {% blocktranslate count counter=object_list_full.count %}Checkout our community world{% plural %}Checkout our
-          {{ counter }} community worlds{% endblocktranslate %}
-        <a
-          title="{% translate 'create community world'|capfirst %}"
-          href="{% url 'roleplay:world:create' %}"
+          title="{% translate Race %}"
+          href="{% url 'roleplay:race:create' %}"
          class="btn btn-lg btn-dark"
         >
           <span class="ic-plus"></span>
@@ -89,21 +25,12 @@
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
       {% endif %}
       <div class="row justify-content-around pb-5">
-        {% for world in page_obj %}
+        {% for race in page_obj %}
           <div
             class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
+            {% include 'roleplay/include/race_card.html' with race=race user=request.user only %}
           </div>
         {% endfor %}
       </div>
-      <div class="row justify-content-center pb-5">
-        <a
-          href="{% url 'roleplay:world:create' %}"
-          class="btn btn-lg btn-dark col-11 col-md-8 col-xl-4"
-        >
-          {% translate "create public world!"|capfirstletter %}
-        </a>
-      </div>
-    {% endif %}
   </div>
 {% endblock body_content %}

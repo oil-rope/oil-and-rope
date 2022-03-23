@@ -28,6 +28,7 @@ RACE_PATTERNS = [
     path('<int:pk>/', views.RaceDetailView.as_view(), name='detail'),
     path('edit/<int:pk>/', views.RaceUpdateView.as_view(), name='update'),
     path('delete/<int:pk>/', views.RaceDeleteView.as_view(), name='delete'),
+    path('list/', views.RaceListView.as_view(), name='delete'),
 ]
 
 urlpatterns = [
