@@ -191,3 +191,4 @@ class RaceForm(forms.ModelForm):
                 'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
             ) % {'max_size': utils.max_size_file_mb()}
         }
+

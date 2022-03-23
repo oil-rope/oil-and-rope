@@ -4,7 +4,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
@@ -15,6 +15,8 @@ from api.serializers.registration import UserSerializer
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
+
+from common.forms.layout import SubmitClearLayout as Submit
 
 from . import enums, forms, models
 
@@ -314,11 +316,12 @@ class RaceCreateView(CreateView):
     template_name = 'roleplay/race/race_create.html'
 
     def get_success_url(self):
-        return reverse('roleplay:race:detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
+        kwargs['submit_text']: _('create').capitalize()
 
         return kwargs
 
@@ -341,11 +344,34 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView):
     form_class = forms.RaceForm
     template_name = 'roleplay/race/race_update.html'
 
-    def get_success_url(self):
-        return reverse('roleplay:race:detail', kwargs={'pk': self.object.pk})
+    def get_form_kwargs(self, form_class=None):
+        breakpoint()
+        kwargs['submit_text'] = _('update').capitalize()
+        return kwargs
 
+    def get_success_url(self):
+        return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
+
+class RaceListView(LoginRequiredMixin, DeleteView):
+    """
+    this view deletes a race
+    """
+
+    model = models.Race
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_list.html'
+    paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+
+        return context
 
 class RaceDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    this view deletes a race
+    """
+
     model = models.Race
-    success_url = reverse_lazy('roleplay:world:list')
-    template_name = 'roleplay/race/race_delete.html'
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_confirm_delete.html'

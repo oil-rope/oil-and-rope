@@ -1,0 +1,25 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% translate "update"|capfirst %} {% translate "race"|capfirst %}
+{% endblock title %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <h2 class="display-4 text-center">
+      {% translate "update"|capfirst %} {{ object.name }}
+    </h2>
+    <hr class="mx-5">
+    <div class="row">
+      <div class="col">
+        {% crispy form %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+{% endblock javascript %}

@@ -183,8 +183,11 @@ class RaceFormLayout(layout.Layout):
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.SubmitClearLayout(reset_button=False),
-                    css_class='col-md-6'
+                    common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
+                        submit_css_class='col-5 col-lg-6',
+                        reset_css_class='col-5 d-lg-none',
+                    ),
                 ),
                 css_class='justify-content-md-center',
             ),

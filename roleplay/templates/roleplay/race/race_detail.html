@@ -4,22 +4,65 @@
 
 {% block title %}
   {% blocktrans with name=object.name %}
-    Playing {{ name }}
+    {{ name }}
   {% endblocktrans %}
 {% endblock title %}
 
 {% block body_content %}
   <main class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <div id="raceDisplay"></div>
+    <h3 class="font-ds-lighter display-4 text-center">
+      {{ object.name }}
+    </h3>
+    <div class="col-12">
+      <div class="d-flex row justify-content-center ">
+        <picture class="row">
+          <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color.svg' %}" alt="Oil & Rope Logo">
+        </picture>
+      </div>
+      <br>
+      <div class="d-flex row justify-content-around ">
+
+        <div class="col-8">
+          <p class="px-3">
+            {{ object.description }}
+          </p>
+        </div>
+        <div class="col-4 justify-content-end">
+        <div class="d-flex row">
+          <h5 class="justify-content-center">{% translate 'strength'|capfirst %}: {{ object.strength }} </h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'dexterity'|capfirst %}: {{ object.dexterity  }}</h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'constitution'|capfirst %}: {{ object.constitution }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'intelligence'|capfirst %}: {{ object.intelligence }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'wisdom'|capfirst %}: {{ object.wisdom }} </h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'charisma'|capfirst %}: {{ object.charisma }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">
+            {% translate 'Affected by Armor'|capfirst %}: 
+              {% if object.affect_by_armor %}
+                &#10004;
+              {% else %}
+                &times;
+              {% endif %} </h5>
+        </div>
+      </div>
       </div>
     </div>
   </main>
 {% endblock body_content %}
 
 {% block javascript %}
-  <!-- <script src="{% static 'frontend/dist/session.bundle.js' %}"
-          data-user="{{ serialized_user }}"
-  ></script> -->
+<!--   <script src="{% static 'frontend/dist/session.bundle.js' %}"-->  
+<!--           data-user="{{ serialized_user }}"                   -->  
+<!--   ></script>                                                  -->  
 {% endblock javascript %}
