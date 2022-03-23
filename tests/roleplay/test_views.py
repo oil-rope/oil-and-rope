@@ -926,10 +926,6 @@ class TestSessionDetailView(TestCase):
         self.assertEqual(403, response.status_code)
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5de0985 (feat(roleplay view): update of race create view and form)
 class TestRaceCreateView(TestCase):
     fake = Faker()
     login_url = reverse('registration:login')
