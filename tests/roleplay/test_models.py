@@ -21,7 +21,7 @@ from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 Domain = apps.get_model(constants.DOMAIN_MODEL)
 Place = apps.get_model(constants.PLACE_MODEL)
 PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
-Race = apps.get_model(cGonstants.RACE_MODEL)
+Race = apps.get_model(constants.RACE_MODEL)
 RaceUser = apps.get_model(constants.USER_RACE_RELATION)
 Session = apps.get_model(constants.SESSION_MODEL)
 User = apps.get_model(constants.USER_MODEL)

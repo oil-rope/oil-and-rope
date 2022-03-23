@@ -267,8 +267,8 @@ class TestRaceForm(TestCase):
     model = models.Race
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
-        self.faker = Faker()
+        self.user = baker.make_recipe('registration.user')
+        self.faker = fake
         self.data_ok = {
             'name': self.faker.word(),
             'description': self.faker.paragraph(),

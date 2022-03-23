@@ -928,7 +928,7 @@ class TestSessionDetailView(TestCase):
 
 class TestRaceCreateView(TestCase):
     fake = Faker()
-    login_url = reverse('registration:login')
+    login_url = reverse('registration:auth:login')
     model = models.Race
     resolver = 'roleplay:race:create'
     template = 'roleplay/race/race_create.html'
