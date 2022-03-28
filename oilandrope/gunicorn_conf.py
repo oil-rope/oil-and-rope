@@ -19,7 +19,7 @@ wsgi_app = f'{wsgi_module}:application'
 
 daemon = bool(to_bool(os.environ['GUNICORN_DAEMON']))
 reload = True
-debug = bool(to_bool(os.environ['DEBUG'], 'False'))
+debug = bool(to_bool(os.environ['DEBUG']))
 
 if 'GUNICORN_WORKERS' in os.environ:
     workers = int(os.environ['GUNICORN_WORKERS'])
