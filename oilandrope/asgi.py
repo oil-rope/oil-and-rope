@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from django.core.asgi import get_asgi_application
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
+from django.core.asgi import get_asgi_application
 from django.urls import re_path
 
 from common.utils.env import load_env_file
