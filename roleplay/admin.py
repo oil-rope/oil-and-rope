@@ -24,11 +24,19 @@ class PlaceAdmin(DraggableMPTTAdmin):
     search_fields = ['name__icontains']
 
 
+class PlayersInSessionInline(admin.TabularInline):
+    model = models.PlayerInSession
+    extra = 1
+
+
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
-    fields = (('name', 'system'), 'next_game')
-    list_display = ('__str__', 'system', 'next_game', 'entry_created_at')
-    list_display_links = ('__str__', )
+    inlines = (PlayersInSessionInline, )
+    fields = (('name', 'system'), 'plot', 'next_game', 'chat', 'world')
+    filter_horizontal = ('players', )
+    list_display = ('__str__', 'id', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
+    list_display_links = ('__str__', 'id')
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
+    search_fields = ['name__icontains', 'world__name__icontains']

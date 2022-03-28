@@ -3,7 +3,6 @@ from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -431,31 +430,32 @@ class Session(TracingMixin):
 
     Parameters
     ----------
-    name : str
+    name: :class:`str`
         Name of the session.
-    players : List[:class:`~registration.models.User`]
+    plot: :class:`str`
+        Plot of the session.
+    players: List[:class:`~registration.models.User`]
         Players in session.
-    chat : Optional[:class:`~chat.model.Chat`]
+    chat: :class:`~chat.model.Chat`
         Chat used for this session.
-    next_game : :class:`datetime.datetime`
+    next_game: :class:`datetime.datetime`
         Next session's date.
-    system : int
+    system: :class:`int`
         System used.
-    game_master : :class:`~registration.models.User`
-        The GM of the session.
-    world : :class:`~roleplay.models.Place`
+    world: :class:`~roleplay.models.Place`
         The world where this session is played.
     """
 
+    id = models.AutoField(verbose_name=_('identifier'), primary_key=True, blank=False, null=False, db_index=True)
     name = models.CharField(verbose_name=_('name'), max_length=100)
-    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    plot = models.TextField(verbose_name=_('plot'), null=False, blank=True)
     players = models.ManyToManyField(
         to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session',
         through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
     )
-    chat = models.ForeignKey(
+    chat = models.OneToOneField(
         to=constants.CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE,
-        related_name='session_set', related_query_name='session', db_index=True, blank=True
+        related_name='session', related_query_name='session', db_index=True, blank=False, null=False,
     )
     next_game = models.DateTimeField(
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True
@@ -493,30 +493,16 @@ class Session(TracingMixin):
         try:
             world = self.world
         except Session.world.RelatedObjectDoesNotExist:
-            msg = _('session hasn\'t any world')
-            raise ValidationError({'world': f'{msg}.'})
+            msg = _('session hasn\'t any world.').capitalize()
+            raise ValidationError({'world': msg})
         if world:
             if world.site_type != SiteTypes.WORLD:
-                msg = _('world must be a world')
-                raise ValidationError({'world': f'{msg}.'})
+                msg = _('world must be a world.').capitalize()
+                raise ValidationError({'world': msg})
 
     def save(self, *args, **kwargs):
         self.full_clean()
-
-        try:
-            self.chat
-        except Session.chat.RelatedObjectDoesNotExist:
-            formatted_date = timezone.now().strftime('%Y%m%d_%H%M%S')
-            chat_name = f'{self.name}_{formatted_date}'
-
-            Chat = apps.get_model(constants.CHAT_MODEL)
-            self.chat = Chat.objects.create(
-                name=chat_name[:Chat.name.field.max_length]
-            )
-        finally:
-            super().save(*args, **kwargs)
-            # We add all players
-            self.chat.users.add(*self.players.all())
+        super().save(*args, **kwargs)
 
     def __str__(self):
         system = RoleplaySystems(self.system)
@@ -537,7 +523,7 @@ class PlayerInSession(TracingMixin):
 
     class Meta:
         verbose_name = _('player in session')
-        verbose_name_plural = _('players in sessions')
+        verbose_name_plural = _('players in session')
         unique_together = [
             ['session', 'player']
         ]

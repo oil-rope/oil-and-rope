@@ -9,14 +9,14 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.shortcuts import reverse
+from django.shortcuts import resolve_url
 from django.test import TestCase
-from faker import Faker
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
+from tests import fake
 
 Domain = apps.get_model(constants.DOMAIN_MODEL)
 Place = apps.get_model(constants.PLACE_MODEL)
@@ -27,8 +27,6 @@ Session = apps.get_model(constants.SESSION_MODEL)
 User = apps.get_model(constants.USER_MODEL)
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
-
-fake = Faker()
 
 
 class TestDomain(TestCase):
@@ -443,13 +441,13 @@ class TestRaceUser(TestCase):
 
 
 class TestSession(TestCase):
+    model = Session
+
     @classmethod
     def setUpTestData(cls):
-        cls.model = Session
-
-        cls.user = baker.make(constants.USER_MODEL)
-        cls.chat = baker.make(constants.CHAT_MODEL)
-        cls.world = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.WORLD)
+        cls.user = baker.make_recipe('registration.user')
+        cls.chat = baker.make_recipe('chat.chat')
+        cls.world = baker.make_recipe('roleplay.world')
 
     def test_str_ok(self):
         name = fake.word()
@@ -464,39 +462,28 @@ class TestSession(TestCase):
 
         self.assertEqual(expected, str(instance))
 
-    def test_save_without_chat_ok(self):
-        instance = self.model.objects.create(
-            name=fake.word(),
-            system=RoleplaySystems.PATHFINDER,
-            world=self.world,
-        )
-        instance.save()
-
-        self.assertIsNotNone(instance.chat)
-        self.assertIn(instance.name, instance.chat.name)
-
     def test_clean_non_world_ko(self):
         place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
         session = self.model(
             name=fake.word(),
-            description=fake.paragraph(),
+            plot=fake.paragraph(),
             next_game=datetime.now(),
             system=RoleplaySystems.PATHFINDER,
             world=place,
         )
 
-        with self.assertRaisesRegex(ValidationError, 'world must be a world'):
+        with self.assertRaisesRegex(ValidationError, 'World must be a world'):
             session.clean()
 
     def test_clean_no_world_given_ko(self):
         session = self.model(
             name=fake.word(),
-            description=fake.paragraph(),
+            plot=fake.paragraph(),
             next_game=datetime.now(),
             system=RoleplaySystems.PATHFINDER,
         )
 
-        with self.assertRaisesRegex(ValidationError, 'session hasn\'t any world'):
+        with self.assertRaisesRegex(ValidationError, 'Session hasn\'t any world'):
             session.clean()
 
     def test_add_game_masters_ok(self):
@@ -531,7 +518,7 @@ class TestSession(TestCase):
 
     def test_get_absolute_url(self):
         instance = baker.make(self.model, world=self.world)
-        expected_url = reverse('roleplay:session:detail', kwargs={'pk': instance.pk})
+        expected_url = resolve_url(instance)
         url = instance.get_absolute_url()
 
         self.assertEqual(expected_url, url)
