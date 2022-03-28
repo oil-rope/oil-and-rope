@@ -458,7 +458,7 @@ class Session(TracingMixin):
         related_name='session', related_query_name='session', db_index=True, blank=False, null=False,
     )
     next_game = models.DateTimeField(
-        verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True
+        verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True,
     )
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     world = models.ForeignKey(
