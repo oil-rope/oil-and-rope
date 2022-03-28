@@ -97,8 +97,6 @@ INSTALLED_APPS = [
     'registration.apps.RegistrationConfig',
     # Chat
     'chat.apps.ChatConfig',
-    # FrontEnd
-    'frontend.apps.FrontendConfig',
     # Roleplay
     'roleplay.apps.RoleplayConfig',
     # O&R Email

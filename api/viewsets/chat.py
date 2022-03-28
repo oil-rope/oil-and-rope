@@ -1,99 +1,92 @@
 from django.apps import apps
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
-from rest_framework.settings import api_settings
 
 from common.constants import models
 
-from ..serializers.chat import ChatMessageSerializer, ChatSerializer
+from ..serializers.chat import ChatMessageSerializer, ChatSerializer, NestedChatMessageSerializer, NestedChatSerializer
 
 Chat = apps.get_model(models.CHAT_MODEL)
 ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 
 class ChatViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    ViewSet for :class:`Chat`.
+    ViewSet for :class:`~chat.models.Chat`.
     """
 
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
-    queryset = Chat.objects.all()
+    queryset = None
     serializer_class = ChatSerializer
-
-    def get_serializer(self, *args, **kwargs):
-        map_fields = self.request.GET.getlist('use_map')
-        kwargs.update({
-            "map_fields": map_fields
-        })
-        return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated and user.is_staff:
-            qs = super().get_queryset()
-        else:
-            qs = super().get_queryset().filter(
-                users__in=[user],
-            )
-        return qs
+        qs = Chat.objects.filter(
+            users__in=[user],
+        )
+        if not user.is_staff:
+            return qs
+        if self.action == 'list':
+            return qs
+        return Chat.objects.all()
+
+    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
+    def list_all(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    @action(methods=['get'], detail=True, url_name='detail-nested', url_path='nested')
+    def nested_retrieve(self, request, *args, **kwargs):
+        self.serializer_class = NestedChatSerializer
+        return self.retrieve(request, *args, **kwargs)
 
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for :class:`ChatMessage`.
+    ViewSet for :class:`~chat.models.ChatMessage`.
     """
 
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
-    queryset = ChatMessage.objects.all()
-    serializer_class = ChatMessageSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated and user.is_staff:
-            qs = super().get_queryset()
-        else:
-            qs = super().get_queryset().filter(
-                author_id=user.pk,
-            )
-        return qs
+    queryset = None
+    serializer_class = NestedChatMessageSerializer
 
     def get_permissions(self):
-        if self.action == 'update':  # Only admin users has permission to change an entire entry
+        if self.action == 'update':
             self.permission_classes = [IsAdminUser]
         return super().get_permissions()
 
-    def perform_create(self, serializer):
-        self._check_user_in_chat(serializer.validated_data)
-        super().perform_create(serializer)
-
-    def _check_user_in_chat(self, data):
-        user = data['author']
-        chat = data['chat']
-
-        if user not in chat.users.all():
-            msg = _('user not in chat')
-            raise ValidationError({'author': f'{msg.capitalize()}.'})
-
-    def get_serializer(self, *args, **kwargs):
-        if 'data' not in kwargs:
-            return super().get_serializer(*args, **kwargs)
-
+    def get_queryset(self):
         user = self.request.user
-        data = kwargs['data'].copy()
+        qs = ChatMessage.objects.filter(
+            author=user,
+        )
+        if not user.is_staff:
+            return qs
+        if self.action == 'list':
+            return qs
+        return ChatMessage.objects.all()
 
-        if self.action == 'partial_update':
-            # Only message if allowed to be changed by patch
-            if 'message' in data:
-                data = {
-                    'message': data['message']
-                }
+    def create(self, request, *args, **kwargs):
+        self.serializer_class = ChatMessageSerializer
+        return super().create(request, *args, **kwargs)
 
-        # If user is not admin we assume author is same as user
-        if self.action == 'create' and not user.is_staff:
-            data['author'] = user.pk
+    def perform_create(self, serializer):
+        if self.request.user.is_staff:
+            return serializer.save()
+        # Regular user should not be able to set other author than themself
+        return serializer.save(author=self.request.user)
 
-        kwargs['data'] = data
-        return super().get_serializer(*args, **kwargs)
+    def perform_update(self, serializer):
+        if self.request.user.is_staff:
+            return serializer.save()
+        instance = self.get_object()
+        # Regular user should not be able to change chat
+        return serializer.save(chat=instance.chat)
+
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = ChatMessageSerializer
+        return super().update(request, *args, **kwargs)
+
+    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
+    def list_all(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-16 19:36+0000\n"
+"POT-Creation-Date: 2022-03-22 14:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,17 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: api/viewsets/chat.py:77
-#, fuzzy
-#| msgid "User not found."
-msgid "user not in chat"
-msgstr "usuario no encontrado en el chat"
-
-#: api/viewsets/roleplay.py:171
+#: api/viewsets/roleplay.py:176
 msgid "you've invited to a session!"
 msgstr "¡has sido invitado a una partida!"
 
-#: api/viewsets/roleplay.py:183
+#: api/viewsets/roleplay.py:188
 msgid "users invited!"
 msgstr "¡usuarios invitados!"
 
@@ -92,7 +86,7 @@ msgstr "nombre"
 msgid "users"
 msgstr "usuarios"
 
-#: chat/models.py:27 registration/forms/forms.py:57
+#: chat/models.py:27 registration/forms/forms.py:57 registration/models.py:25
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
@@ -198,7 +192,7 @@ msgstr "dado"
 msgid "user check"
 msgstr "comprobación de usuario"
 
-#: common/enums.py:26 registration/models.py:70
+#: common/enums.py:26 registration/models.py:84
 #: registration/templates/registration/user_update.html:6 roleplay/models.py:99
 #: roleplay/models.py:415
 msgid "user"
@@ -790,8 +784,8 @@ msgstr "acceder"
 msgid "create your account"
 msgstr "crea tu cuenta"
 
-#: core/templates/core/includes/menu.html:92 registration/forms/forms.py:224
-#: registration/models.py:86 registration/views.py:300
+#: core/templates/core/includes/menu.html:92 registration/forms/forms.py:225
+#: registration/models.py:100 registration/views.py:310
 #, fuzzy
 #| msgid "Avatar"
 msgid "avatar"
@@ -965,10 +959,6 @@ msgstr "menús dinámicos"
 msgid "menu created!"
 msgstr "¡usuario creado!"
 
-#: frontend/apps.py:7
-msgid "frontend"
-msgstr "frontend"
-
 #: oar_email/apps.py:7
 #, fuzzy
 #| msgid "Send email"
@@ -1072,13 +1062,13 @@ msgstr ""
 msgid "to accomplish the requested task please click on link below."
 msgstr "para realizar dicha tarea has click en el link de debajo."
 
-#: oilandrope/settings.py:233
+#: oilandrope/settings.py:231
 #, fuzzy
 #| msgid "English"
 msgid "english"
 msgstr "inglés"
 
-#: oilandrope/settings.py:234
+#: oilandrope/settings.py:232
 #, fuzzy
 #| msgid "Spanish"
 msgid "spanish"
@@ -1127,62 +1117,62 @@ msgstr ""
 msgid "welcome to %(title)s!"
 msgstr "¡bienvenido a %(title)s!"
 
-#: registration/forms/forms.py:144
+#: registration/forms/forms.py:145
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: registration/forms/forms.py:154 registration/models.py:20
+#: registration/forms/forms.py:155 registration/models.py:22
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: registration/forms/forms.py:155
+#: registration/forms/forms.py:156
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación."
 
-#: registration/forms/forms.py:175 registration/forms/forms.py:198
+#: registration/forms/forms.py:176 registration/forms/forms.py:199
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: registration/forms/forms.py:187
+#: registration/forms/forms.py:188
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:215 registration/models.py:72
+#: registration/forms/forms.py:216 registration/models.py:86
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:216 registration/models.py:73
+#: registration/forms/forms.py:217 registration/models.py:87
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:221 registration/models.py:82
+#: registration/forms/forms.py:222 registration/models.py:96
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:223 registration/models.py:84
+#: registration/forms/forms.py:224 registration/models.py:98
 #, fuzzy
 #| msgid "Website"
 msgid "website"
 msgstr "sitio web"
 
-#: registration/forms/forms.py:242
+#: registration/forms/forms.py:243
 msgid "birthday cannot be set after today."
 msgstr "la fecha de nacimiento no puede ser después de hoy."
 
@@ -1218,31 +1208,35 @@ msgstr "reenviar email"
 msgid "send email"
 msgstr "reenviar email"
 
-#: registration/forms/layout.py:120
+#: registration/forms/layout.py:122
+#: registration/templates/registration/include/user_context_menu.html:20
+#: registration/templates/registration/include/user_context_menu.html:23
+#: registration/templates/registration/password_change.html:5
+#: registration/templates/registration/password_change.html:10
 #, fuzzy
 #| msgid "Change password"
 msgid "change password"
 msgstr "cambiar contraseña"
 
-#: registration/forms/layout.py:155 roleplay/views.py:75 roleplay/views.py:199
+#: registration/forms/layout.py:161 roleplay/views.py:75 roleplay/views.py:199
 #, fuzzy
 #| msgid "Update"
 msgid "update"
 msgstr "actualizar"
 
-#: registration/models.py:21
+#: registration/models.py:23
 #, fuzzy
 #| msgid "Premium"
 msgid "premium user"
 msgstr "usuario premium"
 
-#: registration/models.py:136
+#: registration/models.py:150
 #, fuzzy
 #| msgid "Profile"
 msgid "profile"
 msgstr "perfil"
 
-#: registration/models.py:137
+#: registration/models.py:151
 #, fuzzy
 #| msgid "Profiles"
 msgid "profiles"
@@ -1357,12 +1351,16 @@ msgstr "tu token"
 msgid "you can always look it up by comming back here"
 msgstr "siempre lo puedes volver a ver viniendo aquí"
 
-#: registration/templates/api/request_token.html:40
-#, python-format
+#: registration/templates/api/request_token.html:37
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "            For more information check our %(api)s.\n"
+#| "          "
 msgid ""
 "\n"
-"            For more information check our %(api)s.\n"
-"          "
+"                For more information check our %(api)s.\n"
+"              "
 msgstr ""
 "\n"
 "            Para más información comprueba nuestra %(api)s.\n"
@@ -1375,21 +1373,21 @@ msgstr ""
 msgid "your profile"
 msgstr "tu perfil"
 
-#: registration/templates/registration/include/user_context_menu.html:20
+#: registration/templates/registration/include/user_context_menu.html:31
 #, fuzzy
 #| msgid "a token can be used to make calls to our api!"
 msgid "a token can be used to make calls to our API!"
 msgstr "¡un token puede ser usado para hacer llamadas a nuestra API!"
 
-#: registration/templates/registration/include/user_context_menu.html:23
+#: registration/templates/registration/include/user_context_menu.html:34
 msgid "get token"
 msgstr "obtener token"
 
-#: registration/templates/registration/include/user_context_menu.html:31
+#: registration/templates/registration/include/user_context_menu.html:42
 msgid "connect to your accounts to get full experience!"
 msgstr "¡conecta tus redes sociales para obtener una experiencia completa!"
 
-#: registration/templates/registration/include/user_context_menu.html:34
+#: registration/templates/registration/include/user_context_menu.html:45
 #, fuzzy
 #| msgid "Create your account"
 msgid "connect accounts"
@@ -1407,13 +1405,13 @@ msgstr "¿olvidaste la contraseña?"
 msgid "don't have an account?"
 msgstr "¿no tienes una cuenta?"
 
-#: registration/templates/registration/password_change.html:6
+#: registration/templates/registration/password_reset_confirm.html:6
 #, fuzzy
 #| msgid "New password"
 msgid "new password"
 msgstr "nueva contraseña"
 
-#: registration/templates/registration/password_change.html:9
+#: registration/templates/registration/password_reset_confirm.html:9
 #, fuzzy
 #| msgid "New password"
 msgid "set new password"
@@ -1506,13 +1504,13 @@ msgstr "restaurar contraseña"
 msgid "email for password reset request sent!"
 msgstr "¡se ha enviado un email con la petición de restauración de contraseña!"
 
-#: registration/views.py:252
+#: registration/views.py:252 registration/views.py:262
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "password changed successfully!"
 msgstr "¡contraseña cambiada correctamente!"
 
-#: registration/views.py:312
+#: registration/views.py:322
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "user updated successfully!"
@@ -2117,6 +2115,14 @@ msgstr "¡crear mundo público!"
 #| msgid "you've invited to a session!"
 msgid "you are not part of this session!"
 msgstr "¡has sido invitado a una partida!"
+
+#, fuzzy
+#~| msgid "User not found."
+#~ msgid "user not in chat"
+#~ msgstr "usuario no encontrado en el chat"
+
+#~ msgid "frontend"
+#~ msgstr "frontend"
 
 #, fuzzy
 #~| msgid "Reset password"

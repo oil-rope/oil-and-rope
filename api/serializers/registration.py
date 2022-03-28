@@ -1,5 +1,6 @@
 from django.apps import apps
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from common.constants import models
 
@@ -27,12 +28,21 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     profile = ProfileSerializer()
+    token = serializers.SerializerMethodField()
+
+    def get_token(self, obj):
+        try:
+            token_obj = Token.objects.get(user=obj)
+        except Token.DoesNotExist:
+            token_obj = Token.objects.create(user=obj)
+        finally:
+            return token_obj.key
 
     class Meta:
         model = User
         fields = (
             'id', 'last_login', 'username', 'first_name', 'last_name', 'is_active', 'date_joined', 'email',
-            'is_premium', 'profile',
+            'is_premium', 'profile', 'token',
         )
 
 

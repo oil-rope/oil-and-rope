@@ -741,7 +741,7 @@ class TestUserUpdateView(TestCase):
     def test_form_birthday_set_after_today(self):
         self.client.force_login(self.user)
         data_birthday_after_today = self.data_ok.copy()
-        data_birthday_after_today['birthday'] = fake.date_between(start_date='today', end_date='+30d')
+        data_birthday_after_today['birthday'] = fake.date_between(start_date='+1d', end_date='+30d')
         response = self.client.post(self.url, data_birthday_after_today)
 
         self.assertFormError(response, 'form', 'birthday', ['Birthday cannot be set after today.'])
