@@ -1,10 +1,12 @@
 import os
 import random
 import tempfile
+import time
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -233,7 +235,7 @@ class TestPlaceDetailView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.owner = baker.make(get_user_model())
+        cls.owner = baker.make_recipe('registration.user')
 
         cls.private_world = models.Place.objects.create(
             name=fake.country(),
@@ -280,7 +282,7 @@ class TestPlaceDetailView(TestCase):
         self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
 
     def test_access_community_world_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         self.client.force_login(another_user)
         world = baker.make(self.model, name=fake.country(), owner=self.owner)
         url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
@@ -307,7 +309,7 @@ class TestWorldListView(TestCase):
 
     def setUp(self):
         self.pagination = self.view.paginate_by
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -335,7 +337,7 @@ class TestWorldListView(TestCase):
             self.assertIn(str(entry), str(response.content))
 
     def test_cannot_see_other_users_places_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
@@ -352,7 +354,7 @@ class TestWorldListView(TestCase):
             self.assertNotIn(str(entry), str(response.content))
 
     def test_user_can_see_its_worlds_but_no_other_users_worlds_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
@@ -384,7 +386,7 @@ class TestWorldListView(TestCase):
     def test_user_can_see_community_worlds_and_its_world_but_not_other_users_worlds_ok(self):
         # To avoid repetition, we use different fakers
 
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
@@ -536,7 +538,7 @@ class TestWorldCreateView(TestCase):
         cls.url = reverse('roleplay:world:create')
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
 
         self.tmp_image = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.png', delete=False)
         image_file = self.tmp_image.name
@@ -624,7 +626,7 @@ class TestWorldDeleteView(TestCase):
         cls.model = models.Place
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
         self.world = self.model.objects.create(
             name=fake.city(),
             owner=self.user
@@ -659,7 +661,7 @@ class TestWorldDeleteView(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_non_owner_access_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.get(self.url)
 
@@ -673,7 +675,7 @@ class TestWorldDeleteView(TestCase):
             self.model.objects.get(pk=self.world.pk)
 
     def test_non_owner_delete_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.delete(self.url)
 
@@ -691,7 +693,7 @@ class TestWorldUpdateView(TestCase):
         with open(self.image_file, 'rb') as image:
             self.image = SimpleUploadedFile(name=self.image_file, content=image.read(), content_type='image/png')
 
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
         self.world = self.model.objects.create(name=fake.city(), user=self.user, owner=self.user)
         self.community_world = self.model.objects.create(name=fake.city(), owner=self.user)
         self.url = reverse('roleplay:world:edit', kwargs={'pk': self.world.pk})
@@ -726,7 +728,7 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_non_owner_access_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.get(self.url)
 
@@ -797,7 +799,7 @@ class TestWorldUpdateView(TestCase):
 
 
 class TestSessionCreateView(TestCase):
-    login_url = reverse('registration:auth:login')
+    login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
     resolver = 'roleplay:session:create'
     template = 'roleplay/session/session_create.html'
@@ -805,18 +807,18 @@ class TestSessionCreateView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make(get_user_model())
-        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = baker.make_recipe('roleplay.world')
 
     def setUp(self):
-        self.url = reverse(self.resolver)
+        self.url = resolve_url(self.resolver)
         self.data_ok = {
             'name': fake.word(),
-            'description': fake.paragraph(),
-            'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
-            'next_game_time': timezone.now().time(),
+            'plot': fake.paragraph(),
+            'next_game': timezone.now() + timezone.timedelta(days=1),
             'system': enums.RoleplaySystems.PATHFINDER,
-            'world': [self.world.pk],
+            'world': self.world.pk,
+            'email_invitations': '\n'.join([fake.safe_email() for _ in range(3)])
         }
 
     def test_access_anonymous_ko(self):
@@ -830,12 +832,100 @@ class TestSessionCreateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
+
+    def test_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
         self.assertTemplateUsed(response, self.template)
 
-    def test_creates_session_ok(self):
+    def test_session_is_created_with_correct_data_ok(self):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.data_ok)
-        instance = self.model.objects.first()
 
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.data_ok['description'], instance.description)
+        session = self.model.objects.last()
+        self.assertEqual(self.data_ok['name'], session.name)
+        self.assertEqual(self.data_ok['plot'], session.plot)
+        self.assertEqual(self.data_ok['next_game'], session.next_game)
+        self.assertEqual(self.data_ok['system'], session.system)
+        self.assertEqual(self.data_ok['world'], session.world.pk)
+
+    def test_session_is_created_with_current_user_as_game_master_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+
+        session = self.model.objects.last()
+        self.assertIn(self.user, session.game_masters)
+
+    def test_session_is_created_and_emails_are_sent_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+
+        time.sleep(1)
+        self.assertEqual(1, len(mail.outbox))
+
+    def test_post_data_without_name_ko(self):
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_name)
+
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
+
+    def test_post_data_without_next_game_ko(self):
+        data_without_next_game = self.data_ok.copy()
+        del data_without_next_game['next_game']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_next_game)
+
+        self.assertFormError(response, 'form', 'next_game', 'This field is required.')
+
+    def test_post_data_without_system_ko(self):
+        data_without_system = self.data_ok.copy()
+        del data_without_system['system']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_system)
+
+        self.assertFormError(response, 'form', 'system', 'This field is required.')
+
+    def test_post_data_without_world_ko(self):
+        data_without_world = self.data_ok.copy()
+        del data_without_world['world']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_world)
+
+        self.assertFormError(response, 'form', 'world', 'This field is required.')
+
+    def test_post_data_next_game_in_the_past_ko(self):
+        data_with_past_next_game = self.data_ok.copy()
+        data_with_past_next_game['next_game'] = fake.past_datetime()
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_with_past_next_game)
+
+        self.assertFormError(response, 'form', 'next_game', 'Next game date must be in the future.')
+
+    def test_post_data_without_email_invitations_ok(self):
+        data_without_email_invitations = self.data_ok.copy()
+        del data_without_email_invitations['email_invitations']
+
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data_without_email_invitations)
+
+        time.sleep(1)
+        self.assertEqual(0, len(mail.outbox))
+
+    def test_post_data_without_plot_ok(self):
+        data_without_plot = self.data_ok.copy()
+        del data_without_plot['plot']
+
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data_without_plot)
+
+        session = self.model.objects.last()
+        # NOTE: Field is not nullable, so it's empty string
+        self.assertEqual('', session.plot)

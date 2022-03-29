@@ -223,7 +223,7 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
 
         qs = models.Place.objects.community_places()
         qs |= models.Place.objects.user_places(user=self.request.user)
-        return qs.filter(site_type=enums.SiteTypes.WORLD)
+        return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)

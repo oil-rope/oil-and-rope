@@ -124,12 +124,13 @@ class SessionForm(forms.ModelForm):
 
     def _send_invitations(self):
         email_invitations = self.cleaned_data.get('email_invitations')
-        HtmlThreadMail(
-            template_name='email_templates/invitation_email.html',
-            subject=cfl(_('a quest request for you!')),
-            to=email_invitations.splitlines(),
-            context={'object': self.instance},
-        ).send()
+        if email_invitations:
+            HtmlThreadMail(
+                template_name='email_templates/invitation_email.html',
+                subject=cfl(_('a quest request for you!')),
+                to=email_invitations.splitlines(),
+                context={'object': self.instance},
+            ).send()
 
     def save(self, commit=True):
         self.instance = super().save(False)

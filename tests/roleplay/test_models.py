@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.shortcuts import resolve_url
 from django.test import TestCase
 from freezegun import freeze_time
 from model_bakery import baker
@@ -515,13 +514,6 @@ class TestSession(TestCase):
         result = instace.game_masters.count()
 
         self.assertEqual(expected, result)
-
-    def test_get_absolute_url(self):
-        instance = baker.make(self.model, world=self.world)
-        expected_url = resolve_url(instance)
-        url = instance.get_absolute_url()
-
-        self.assertEqual(expected_url, url)
 
 
 class TestPlayerInSession(TestCase):

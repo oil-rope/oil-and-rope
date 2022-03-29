@@ -444,6 +444,11 @@ class Session(TracingMixin):
         System used.
     world: :class:`~roleplay.models.Place`
         The world where this session is played.
+
+    Attributes
+    ----------
+    game_masters: List[:class:`~registration.models.User`]
+        Game masters of this session.
     """
 
     id = models.AutoField(verbose_name=_('identifier'), primary_key=True, blank=False, null=False, db_index=True)
@@ -484,9 +489,6 @@ class Session(TracingMixin):
             player_in_session_set__is_game_master=True
         )
         return gms
-
-    def get_absolute_url(self):
-        return reverse('roleplay:session:detail', kwargs={'pk': self.pk})
 
     def clean(self):
         # Don't allow non Worlds to be world
