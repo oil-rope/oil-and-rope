@@ -40,7 +40,7 @@
             <i class="ic ic-dots-horizontal-triple"></i>
           </button>
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
-            <a href="#" class="dropdown-item disabled">
+            <a href="{% url 'roleplay:session:create' %}" class="dropdown-item">
               <span class="ic-quill"></span>
               {% translate "create campaign"|capfirst %}
             </a>

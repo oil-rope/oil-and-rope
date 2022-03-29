@@ -1,4 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
+from rest_framework.decorators import action
 
 
 class UserListMixin:
@@ -28,5 +29,6 @@ class UserListMixin:
             return self.get_reverse_relation().all()
         return super().get_queryset()
 
+    @action(methods=['get'], detail=False, url_path='@me', url_name='user-list')
     def user_list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)

@@ -5,7 +5,6 @@ from django.apps import apps
 from django.utils import timezone as tz
 from model_bakery.recipe import Recipe, foreign_key, related
 
-from chat.baker_recipes import chat
 from common.constants import models
 from common.utils import create_faker
 from registration.baker_recipes import user
@@ -52,7 +51,6 @@ session = Recipe(
     name=fake.sentence,
     plot=fake.paragraph,
     players=related(user),
-    chat=foreign_key(chat),
     next_game=random_date_after_today,
     system=random_roleplay_system,
     world=foreign_key(world),

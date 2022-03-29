@@ -1,16 +1,12 @@
 from django.apps import apps
-from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, viewsets
-from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.settings import api_settings
 
 from common.constants import models
-from common.tools.mail import HtmlThreadMail
 
 from ..permissions import common
-from ..permissions.roleplay import IsInGameMastersOrStaff, IsInPlayersOrStaff, IsPublicOrStaff
+from ..permissions.roleplay import IsGameMasterOrAdmin, IsPlayerOrAdmin, IsPublicOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import UserListMixin
 
@@ -112,72 +108,26 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
 class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
     related_name = 'gm_sessions'
     queryset = Session.objects.all()
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsInPlayersOrStaff]
+    permission_classes = [IsAuthenticated & IsPlayerOrAdmin]
     serializer_class = SessionSerializer
-    current_user = None
-
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
-        self.current_user = request.user
-        return request
 
     def get_queryset(self):
-        qs = super(SessionViewSet, self).get_queryset()
+        qs = super().get_queryset().filter(
+            players__in=[self.request.user]
+        )
 
-        if self.action == 'user_list':
-            return qs
-
-        user = self.current_user
-        if not user.is_staff:
-            qs = user.session_set.all()
+        # Staff can access all sessions unless it's a list or user_list action
+        if self.request.user.is_staff and self.action not in ('list', 'user_list'):
+            qs = super().get_queryset()
 
         return qs
 
-    def get_serializer(self, *args, **kwargs):
-        user = self.current_user
-        if user.is_staff:
-            return super(SessionViewSet, self).get_serializer(*args, **kwargs)
-
-        if self.action in ('list', 'user_list', 'retrieve', 'create'):
-            return super(SessionViewSet, self).get_serializer(*args, **kwargs)
-
-        data = kwargs['data'].copy()
-
-        if 'chat' in data:
-            del data['chat']
-
-        kwargs['data'] = data
-
-        return super(SessionViewSet, self).get_serializer(*args, **kwargs)
-
     def get_permissions(self):
-        if self.action in ('partial_update', 'update'):
-            self.permission_classes = [IsInGameMastersOrStaff]
+        if self.action in ('partial_update', 'update', 'destroy'):
+            self.permission_classes = [IsGameMasterOrAdmin]
         return super(SessionViewSet, self).get_permissions()
 
     def perform_create(self, serializer):
         obj = serializer.save()
-        user = self.current_user
-        obj.add_game_masters(user)
+        obj.add_game_masters(self.request.user)
         return obj
-
-    def invite_players_to_session(self, request, *args, **kwargs):
-        instance = self.get_object()
-        data = request.data
-        if 'emails' not in data:
-            raise ValidationError()
-        emails = data.getlist('emails')
-
-        subject = _('you\'ve invited to a session!')
-        context = {
-            'object': instance,
-        }
-
-        # TODO: For some reason Mailing is not working with threads
-        for email in emails:
-            HtmlThreadMail(
-                template_name='email_templates/invitation_email.html', context=context,
-                subject=subject, to=[email], request=self.request,
-            ).send()
-
-        return Response(_('users invited!'))
