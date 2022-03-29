@@ -7,8 +7,12 @@
   {% translate "create"|capfirst %} {% translate "session"|capfirst %}
 {% endblock title %}
 
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,sessions,create' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
-  <main class="container py-5">
+  <main class="container pb-5">
     <h2 class="display-4 text-center">
       {% translate "create"|capfirst %} {% translate "session"|capfirst %}
     </h2>
@@ -20,7 +24,3 @@
     </div>
   </main>
 {% endblock body_content %}
-
-{% block javascript %}
-  <script src="{% static 'roleplay/js/session/addPlayers.js' %}"></script>
-{% endblock javascript %}

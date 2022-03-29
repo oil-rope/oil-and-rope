@@ -40,3 +40,7 @@ class SessionAdmin(admin.ModelAdmin):
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
     search_fields = ['name__icontains', 'world__name__icontains']
+
+    def delete_model(self, request, obj):
+        obj.chat.delete()
+        obj.delete()

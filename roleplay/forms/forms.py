@@ -95,13 +95,16 @@ class SessionForm(forms.ModelForm):
         widget=DateTimeWidget,
     )
     email_invitations = forms.CharField(
-        label=_('email invitations'),
+        label='',
         widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
         required=False,
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['email_invitations'].label = _('email invitations').capitalize()
+
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
         self.helper.layout = SessionFormLayout()
@@ -124,7 +127,8 @@ class SessionForm(forms.ModelForm):
         HtmlThreadMail(
             template_name='email_templates/invitation_email.html',
             subject=cfl(_('a quest request for you!')),
-            bcc=email_invitations.splitlines(),
+            to=email_invitations.splitlines(),
+            context={'object': self.instance},
         ).send()
 
     def save(self, commit=True):
