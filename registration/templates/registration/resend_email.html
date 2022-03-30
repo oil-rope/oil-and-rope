@@ -5,6 +5,9 @@
 {% block title %}{% translate "resend confirmation email"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "resend email" as breadcrumb_translation %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='login=registration:auth:login,resend email' %}
 {% endblock breadcrumb %}
 

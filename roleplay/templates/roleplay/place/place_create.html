@@ -5,7 +5,9 @@
 {% block title %}{% translate "add"|capfirst %} {% translate "place"|capfirst %}{% endblock title %}
 
 {% block breadcrumb %}
-  {% translate "create world" as create_world_page %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "add geography" as breadcrumb_translation %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,add geography' %}
 {% endblock breadcrumb %}
 
