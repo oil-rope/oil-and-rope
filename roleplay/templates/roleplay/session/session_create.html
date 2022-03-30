@@ -8,7 +8,10 @@
 {% endblock title %}
 
 {% block breadcrumb %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,sessions,create' %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "create session" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,create session' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}

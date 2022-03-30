@@ -1,9 +1,7 @@
 import os
 import random
 import tempfile
-import time
 
-from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from model_bakery import baker
@@ -251,12 +249,3 @@ class TestSessionForm(TestCase):
         form = self.form_class(data=data_before_today)
 
         self.assertFalse(form.is_valid())
-
-    def test_invitations_are_sent_ok(self):
-        data_with_email_invitations = self.data_ok.copy()
-        data_with_email_invitations['email_invitations'] = [fake.safe_email()]
-        form = self.form_class(data=data_with_email_invitations)
-        form.save()
-
-        time.sleep(1)
-        self.assertEqual(1, len(mail.outbox))

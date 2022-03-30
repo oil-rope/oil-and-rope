@@ -10,6 +10,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
+from common.templatetags.string_utils import capfirstletter as cfl
+from common.tools.mail import HtmlThreadMail
 from common.views import MultiplePaginatorListView
 
 from . import enums, forms
@@ -238,7 +240,23 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         form.fields['world'].queryset = self.get_available_worlds()
         return form
 
+    def send_emails(self, form):
+        """
+        Sends emails to all players given in `email_invitations`.
+        """
+
+        emails = form.cleaned_data.get('email_invitations')
+        if emails:
+            HtmlThreadMail(
+                template_name='email_templates/invitation_email.html',
+                subject=cfl(_('a quest for you!')),
+                to=emails.splitlines(),
+                request=self.request,
+                context={'object': self.object, 'user': self.request.user},
+            ).send()
+
     def form_valid(self, form):
         response = super().form_valid(form)
         self.object.add_game_masters(self.request.user)
+        self.send_emails(form)
         return response

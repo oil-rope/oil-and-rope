@@ -44,3 +44,8 @@ class SessionAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         obj.chat.delete()
         obj.delete()
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.chat.delete()
+        queryset.delete()

@@ -11,8 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from common.constants import models as constants
 from common.files import utils
 from common.forms.widgets import DateTimeWidget
-from common.templatetags.string_utils import capfirstletter as cfl
-from common.tools.mail import HtmlThreadMail
 
 from .. import enums, models
 from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
@@ -117,16 +115,6 @@ class SessionForm(forms.ModelForm):
                 raise forms.ValidationError(_('next game date must be in the future.').capitalize())
         return next_game
 
-    def _send_invitations(self):
-        email_invitations = self.cleaned_data.get('email_invitations')
-        if email_invitations:
-            HtmlThreadMail(
-                template_name='email_templates/invitation_email.html',
-                subject=cfl(_('a quest request for you!')),
-                to=email_invitations.splitlines(),
-                context={'object': self.instance},
-            ).send()
-
     def save(self, commit=True):
         self.instance = super().save(False)
         if commit:
@@ -134,5 +122,4 @@ class SessionForm(forms.ModelForm):
                 name=f'{self.instance.name} chat',
             )
             self.instance.chat = chat
-            self._send_invitations()
         return super().save(commit)

@@ -146,15 +146,17 @@
           {% translate "options"|capfirst %}
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
-        <li>
-          <a
-            href="#no-url"
-            class="dropdown-item disabled"
-          >
-            <i class="ic ic-quill"></i>
-            {% translate "create campaign"|capfirst %}
-          </a>
-        </li>
+          {% if object.is_world %}
+            <li>
+              <a
+                href="{% url 'roleplay:session:create' object.pk %}"
+                class="dropdown-item"
+              >
+                <i class="ic ic-quill"></i>
+                {% translate "create campaign"|capfirst %}
+              </a>
+            </li>
+          {% endif %}
           {% if object.owner == request.user %}
             <li>
               <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
