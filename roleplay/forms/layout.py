@@ -105,7 +105,7 @@ class WorldFormLayout(layout.Layout):
 
 
 class SessionFormLayout(layout.Layout):
-    def __init__(self):
+    def __init__(self, submit_text=_('create')):
         super().__init__(
             bootstrap.TabHolder(
                 bootstrap.Tab(
@@ -147,6 +147,7 @@ class SessionFormLayout(layout.Layout):
             layout.Row(
                 layout.Column(
                     common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
                         reset_button=False,
                         submit_css_class='col-5 col-lg-6 col-xl-3',
                     ),

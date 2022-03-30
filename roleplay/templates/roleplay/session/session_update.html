@@ -1,0 +1,24 @@
+{% extends 'core/layout.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "edit"|capfirst %} {{ object.name }}{% endblock %}
+
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "edit session" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,edit session' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-5">
+    <h1 class="text-center fw-lighter">{% translate "editing"|capfirst %} {{ object.name }}</h1>
+    <hr class="mx-3" />
+    <div class="row justify-content-around px-1">
+      {% crispy form %}
+    </div>
+  </main>
+{% endblock body_content %}

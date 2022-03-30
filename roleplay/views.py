@@ -2,6 +2,7 @@ import logging
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -14,6 +15,7 @@ from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools.mail import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from roleplay.forms.layout import SessionFormLayout
 
 from . import enums, forms
 
@@ -288,8 +290,38 @@ class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         """
-        Checks that user is in players.
+        Checks that user is game master.
         """
 
         session = self.get_object()
         return self.request.user in session.game_masters
+
+    def get_success_url(self):
+        msg = _('session deleted.').capitalize()
+        messages.success(self.request, msg)
+        return super().get_success_url()
+
+
+class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = forms.SessionForm
+    model = Session
+    template_name = 'roleplay/session/session_update.html'
+
+    def test_func(self):
+        """
+        Checks that user is game master.
+        """
+
+        session = self.get_object()
+        return self.request.user in session.game_masters
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.layout = SessionFormLayout(_('update').capitalize())
+        form.helper.layout[0].pop(2)
+        return form
+
+    def get_success_url(self):
+        msg = cfl(_('session updated!'))
+        messages.success(self.request, msg)
+        return reverse_lazy('roleplay:session:detail', kwargs={'pk': self.object.pk})

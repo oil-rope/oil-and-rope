@@ -47,9 +47,8 @@
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownSessionSettings">
                 <a
-                  class="dropdown-item disabled"
-                  href="#no-url"
-                  {% comment %} href="{% url 'roleplay:session:edit' object.pk %}" {% endcomment %}
+                  class="dropdown-item"
+                  href="{% url 'roleplay:session:edit' object.pk %}"
                 >
                   <i class="ic ic-edit"></i>
                   {% translate "edit"|capfirst %}

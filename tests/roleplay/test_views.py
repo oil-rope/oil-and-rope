@@ -2,6 +2,7 @@ import os
 import random
 import tempfile
 import time
+from unittest import mock
 
 from django.conf import settings
 from django.core import mail
@@ -1033,3 +1034,92 @@ class TestSessionDeleteView(TestCase):
 
         with self.assertRaises(self.model.DoesNotExist):
             self.model.objects.get(pk=self.session.pk)
+
+    def test_access_game_master_session_deleted_redirect_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, resolve_url('roleplay:world:list'))
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_game_master_session_deleted_message_ok(self, mock_messages):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'Session deleted.',
+        )
+
+
+class TestSessionUpdateView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:edit'
+    template = 'roleplay/session/session_update.html'
+    view = views.SessionUpdateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_in_game_masters = baker.make_recipe('registration.user')
+        cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_non_game_master_ko(self):
+        self.client.force_login(self.user_not_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_game_master_session_updated_ok(self):
+        name = fake.sentence()
+        data = {
+            'name': name,
+            'plot': fake.text(),
+            'system': self.session.system,
+            'next_game': self.session.next_game,
+            'world': self.session.world.pk,
+        }
+        self.client.force_login(self.user_in_game_masters)
+        self.client.post(self.url, data)
+        self.session.refresh_from_db()
+
+        self.assertEqual(name, self.session.name)
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_game_master_session_updated_message_ok(self, mock_messages):
+        data = {
+            'name': fake.sentence(),
+            'plot': fake.text(),
+            'system': self.session.system,
+            'next_game': self.session.next_game,
+            'world': self.session.world.pk,
+        }
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url, data)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'Session updated!'
+        )
