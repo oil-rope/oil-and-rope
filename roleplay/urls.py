@@ -20,6 +20,7 @@ WORLD_PATTERNS = [
 SESSION_PATTERNS = [
     path('<int:pk>/', views.SessionDetailView.as_view(), name='detail'),
     path('create/<int:pk>/', views.SessionCreateView.as_view(), name='create'),
+    path('delete/<int:pk>/', views.SessionDeleteView.as_view(), name='delete'),
 ]
 
 urlpatterns = [

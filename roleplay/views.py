@@ -1,6 +1,7 @@
 import logging
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -273,3 +274,22 @@ class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
         session = self.get_object()
         return self.request.user in session.players.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['TABLETOP_URL'] = settings.TABLETOP_URL
+        return context
+
+
+class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Session
+    success_url = reverse_lazy('roleplay:world:list')
+    template_name = 'roleplay/session/session_confirm_delete.html'
+
+    def test_func(self):
+        """
+        Checks that user is in players.
+        """
+
+        session = self.get_object()
+        return self.request.user in session.game_masters

@@ -985,3 +985,51 @@ class TestSessionDetailView(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
+
+
+class TestSessionDeleteView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:delete'
+    template = 'roleplay/session/session_confirm_delete.html'
+    view = views.SessionDeleteView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_in_game_masters = baker.make_recipe('registration.user')
+        cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_non_game_master_ko(self):
+        self.client.force_login(self.user_not_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_game_master_session_deleted_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        self.client.post(self.url)
+
+        with self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(pk=self.session.pk)

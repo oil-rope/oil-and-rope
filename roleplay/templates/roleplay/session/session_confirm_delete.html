@@ -1,0 +1,62 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% block title %}{% translate "delete"|capfirst %} {{ object.name }}{% endblock title %}
+{% load string_utils %}
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "session delete" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,session delete' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row">
+      <div class="col-12">
+        <div class="card p-md-5">
+          <div class="card-body">
+            <p class="text-end">
+              <button class="btn" onclick="goBack();">
+                <i class="ic ic-cross-thin text-danger"></i>
+              </button>
+            </p>
+            <h4 class="card-title text-center">
+              <i class="display-4 ic ic-circle-cross-thin text-danger"></i><br>
+              {% translate "are you sure?"|capfirstletter %}
+            </h4>
+            <p class="card-text text-center">
+              {% translate "you and your players will no longer be able to play in this session."|capfirst %}<br>
+              {% translate "this action cannot be undone."|capfirst %}
+            </p>
+          </div>
+          <div class="card-body mt-xl-5">
+            <form
+              class="d-flex justify-content-around"
+              action="{% url 'roleplay:session:delete' object.pk %}"
+              method="post"
+            >
+              {% csrf_token %}
+              <button
+                type="button"
+                onclick="goBack();"
+                class="col-5 col-xl-4 btn btn-dark"
+              >
+                {% translate 'cancel'|capfirst %}
+              </button>
+              <input type="submit" value="{% translate 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+{% endblock javascript %}

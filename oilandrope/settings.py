@@ -429,3 +429,6 @@ SLOGANS = (
     'Just Roll It',
     'Where\'s the Oil?',
 )
+
+# Tabletop
+TABLETOP_URL = os.getenv('TABLETOP_URL', 'https://play.oilandrope-project.com')
