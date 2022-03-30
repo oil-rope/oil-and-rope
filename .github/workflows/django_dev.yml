@@ -1,4 +1,4 @@
-name: (Django) Feature Checker
+name: (Dev) Django Checker
 
 on:
   push:
@@ -62,3 +62,12 @@ jobs:
         run: |
           python manage.py migrate --settings oilandrope.dev_settings
           python manage.py check --settings oilandrope.dev_settings
+
+      - name: Updating Codecov (coverage)
+        if: ${{ success() && matrix.python-version==3.9 }}
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          file: ./coverage.xml
+          verbose: true
