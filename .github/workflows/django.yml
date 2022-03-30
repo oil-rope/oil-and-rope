@@ -1,4 +1,4 @@
-name: [Prod] Django Checker
+name: (Prod) Django Checker
 
 on:
   push:

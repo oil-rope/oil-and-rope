@@ -1,4 +1,4 @@
-name: [Dev] Django Checker
+name: (Dev) Django Checker
 
 on:
   push:
