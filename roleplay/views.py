@@ -45,17 +45,9 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'parent_site_queryset': self.model.objects.filter(pk=self.get_parent_site().pk),
+            'parent_site_queryset': self.get_parent_site().get_descendants(include_self=True),
         })
         return kwargs
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # NOTE: We make 'parent_site' hidden since user is not supposed to edit it
-        # Label shouldn't be shown since field is hidden
-        form.helper['parent_site'].update_attributes(hidden=True)
-        form.fields['parent_site'].label = ''
-        return form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

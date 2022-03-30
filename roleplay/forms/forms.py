@@ -5,11 +5,11 @@ from smtplib import SMTPAuthenticationError
 from crispy_forms.helper import FormHelper
 from django import forms
 from django.core.mail import send_mail
+from django.db.models import QuerySet
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from mptt.forms import TreeNodeChoiceField
 
 from common.files import utils
 from common.forms.widgets import DateWidget, TimeWidget
@@ -21,18 +21,18 @@ LOGGER = logging.getLogger(__name__)
 
 
 class PlaceForm(forms.ModelForm):
-    parent_site = TreeNodeChoiceField(
-        queryset=models.Place.objects.none(),
-        label=_('this place belongs to...').capitalize(),
-        required=True,
-    )
-
     def __init__(self, parent_site_queryset=None, submit_text=_('create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not parent_site_queryset:
-            self.fields['parent_site'].queryset = models.Place.objects.all()
-        else:
+
+        self.fields['parent_site'].label = _('this place belongs to...').capitalize()
+        self.fields['parent_site'].required = True
+        if parent_site_queryset and isinstance(parent_site_queryset, QuerySet):
             self.fields['parent_site'].queryset = parent_site_queryset
+
+        # NOTE: Using Meta options `help_texts` does not translate the help text.
+        self.fields['image'].help_text = _('A picture is worth a thousand words. Max size file %(max_size)s MiB.') % {
+            'max_size': utils.max_size_file_mb()
+        }
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
@@ -41,11 +41,6 @@ class PlaceForm(forms.ModelForm):
 
     class Meta:
         exclude = ('owner', 'user')
-        help_texts = {
-            'image': _(
-                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
-            ) % {'max_size': utils.max_size_file_mb()}
-        }
         model = models.Place
 
     def save(self, commit=True):
@@ -62,9 +57,14 @@ class WorldForm(forms.ModelForm):
         self.user = user
         self.owner = owner
 
+        # NOTE: Using Meta options `help_texts` does not translate the help text.
+        self.fields['image'].help_text = _('A picture is worth a thousand words. Max size file %(max_size)s MiB.') % {
+            'max_size': utils.max_size_file_mb()
+        }
+
         self.helper = FormHelper(self)
         self.helper.form_action = resolve_url('roleplay:world:create')
-        # NOTE: Since user is gotten from '?user? QueryParam, `form_action` must replicate this behaviour
+        # NOTE: Since user is gotten from '?user? QueryParam, `form_action` must replicate this behavior
         if self.user:
             self.helper.form_action = f'{self.helper.form_action}?user'
         self.helper.form_method = 'POST'
@@ -74,11 +74,6 @@ class WorldForm(forms.ModelForm):
     class Meta:
         exclude = ('user', 'parent_site', 'site_type', 'owner')
         model = models.Place
-        help_texts = {
-            'image': _(
-                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
-            ) % {'max_size': utils.max_size_file_mb()}
-        }
 
     def save(self, commit=True):
         if self.user:
