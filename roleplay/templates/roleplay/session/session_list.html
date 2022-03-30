@@ -1,5 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load static %}
+
 {% block title %}{% translate "sessions"|capfirst %} {% endblock title %}
 
 {% block breadcrumb %}
@@ -14,7 +16,105 @@
     <div class="row">
       <div class="col">
         {% for session in object_list %}
-          {{ session }}
+          <div class="row flex-row flex-wordwrap">
+            <div class="col-12 col-md-6 col-xl-4 text-center">
+              {% if session.image %}
+                <img
+                  class="img-fluid"
+                  src="{{ session.image.url }}"
+                  alt="{% translate "session cover"|capfirst %}"
+                >
+              {% else %}
+                <img
+                  class="img-fluid"
+                  src="{% static 'roleplay/img/places/default_image.png' %}"
+                  alt="{% translate "session cover"|capfirst %}"
+                >
+              {% endif %}
+            </div>
+            <div class="col mt-3">
+              <div class="row">
+                <div class="col">
+                  <a
+                    href="{% url 'roleplay:session:detail' session.pk %}"
+                    title="{% translate "go to session"|capfirst %}"
+                    class="text-decoration-none"
+                  >
+                    <h3 class="text-center text-md-start">
+                      <i class="ic ic-quill"></i>
+                      {{ session.name }}
+                    </h3>
+                  </a>
+                  <div class="my-2 my-md-4"></div>
+                  <a
+                    href="{{ TABLETOP_URL }}/session/{{ session.pk }}"
+                    title="{% translate "go to tabletop"|capfirst %}"
+                    class="text-decoration-none text-info"
+                    target="_blank"
+                  >
+                    <h4 class="text-center text-md-start">
+                      <i class="ic ic-dice"></i>
+                      {% translate "start game"|capfirst %}
+                    </h4>
+                  </a>
+                </div>
+                <div class="d-lg-none w-100 my-2"></div>
+                <div class="col">
+                  <div class="row">
+                    {% for player in session.players.all %}
+                      <div class="col">
+                        {% if player.profile.image %}
+                          <img
+                            src="{{ player.profile.image.url }}"
+                            alt="{% translate "avatar"|capfirst %}"
+                            class="rounded-circle"
+                            width="75"
+                            height="75"
+                          >
+                        {% else %}
+                          <img
+                          src="{% static 'img/default_user.png' %}"
+                          alt="{% translate "avatar"|capfirst %}"
+                          class="rounded-circle"
+                          width="75"
+                          height="75"
+                          >
+                        {% endif %}
+                        <p>
+                          {{ player.username }}
+                        </p>
+                      </div>
+                    {% empty %}
+                      <div class="col">
+                        <p>
+                          {% translate "no players"|capfirst %}
+                        </p>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if forloop.counter < session_list.count %}
+            <hr>
+          {% endif %}
+        {% empty %}
+          <div class="row justify-content-around">
+            <p class="lead text-center">
+              {% translate "seems like you don't have any session."|capfirst %}
+              <br />
+              {% translate "you can create one epic quest but first you need to select your world."|capfirst %}
+            </p>
+            <a
+              href="{% url 'roleplay:world:list' %}"
+              class="btn btn-primary col-11 col-md-6 col-lg-4 col-xl-3"
+              title="{% translate "go to world selection"|capfirst %}"
+            >
+              <i class="ic ic-world"></i>
+              {% translate "go to world selection"|capfirst %}
+            </a>
+          </div>
         {% endfor %}
       </div>
     </div>

@@ -471,6 +471,9 @@ class Session(TracingMixin):
         related_name='session_set', related_query_name='session', db_index=True,
         limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
+    image = models.ImageField(
+        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
+    )
 
     class Meta:
         verbose_name = _('session')

@@ -33,7 +33,7 @@ class PlayersInSessionInline(admin.TabularInline):
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     inlines = (PlayersInSessionInline, )
-    fields = (('name', 'system'), 'plot', 'next_game', 'chat', 'world')
+    fields = (('name', 'system'), 'plot', 'next_game', 'chat', 'world', 'image')
     filter_horizontal = ('players', )
     list_display = ('__str__', 'id', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
     list_display_links = ('__str__', 'id')
