@@ -26,21 +26,12 @@ fake = create_faker()
 base_resolver = 'api:roleplay'
 
 
-class TestRoleplayAPIRoot(APITestCase):
-
-    def test_anonymous_list_urls_ok(self):
-        url = reverse(f'{base_resolver}:api-root')
-        response = self.client.get(url)
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-
-
 class TestDomainViewSet(APITestCase):
+    list_url = reverse(f'{base_resolver}:domain-list')
+    model = Domain
 
     @classmethod
     def setUpTestData(cls):
-        cls.list_url = reverse(f'{base_resolver}:domain-list')
-        cls.model = Domain
-
         cls.user = baker.make_recipe('registration.user')
         cls.admin_user = baker.make_recipe('registration.staff_user')
         cls.domain_recipe = recipes.domain
@@ -710,6 +701,37 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(len(session_instances), len(response.json()['results']))
 
+    def test_anonymous_session_retrieve_ko(self):
+        session = baker.make_recipe('roleplay.session')
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_user_in_players_retrieve_ok(self):
+        session = baker.make_recipe('roleplay.session', players=[self.user])
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
+        self.client.credentials(**self.user_credentials)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_user_not_in_players_retrieve_ko(self):
+        session = baker.make_recipe('roleplay.session')
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
+        self.client.credentials(**self.user_credentials)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_authenticated_staff_retrieve_ok(self):
+        session = baker.make_recipe('roleplay.session')
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
+        self.client.credentials(**self.staff_user_credentials)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
     def test_anonymous_session_create_ko(self):
         response = self.client.post(self.list_url, self.data_ok, format='json')
 
@@ -737,7 +759,7 @@ class TestSessionViewSet(APITestCase):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session')
         session.add_game_masters(self.user)
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
         }
@@ -748,7 +770,7 @@ class TestSessionViewSet(APITestCase):
     def test_authenticated_user_not_game_master_session_partial_update_ko(self):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session', players=[self.user])
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
         }
@@ -759,7 +781,7 @@ class TestSessionViewSet(APITestCase):
     def test_authenticated_staff_not_game_master_session_partial_update_ok(self):
         self.client.credentials(**self.staff_user_credentials)
         session = baker.make_recipe('roleplay.session')
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
         }
@@ -767,11 +789,11 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_user_game_master_update_ok(self):
+    def test_authenticated_user_game_master_session_update_ok(self):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session')
         session.add_game_masters(self.user)
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
             'plot': fake.paragraph(),
@@ -782,10 +804,10 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_user_not_game_master_update_ko(self):
+    def test_authenticated_user_not_game_master_session_update_ko(self):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session', players=[self.user])
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
             'plot': fake.paragraph(),
@@ -796,10 +818,10 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_authenticated_staff_update_ok(self):
+    def test_authenticated_staff_session_update_ok(self):
         self.client.credentials(**self.staff_user_credentials)
         session = baker.make_recipe('roleplay.session')
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         data = {
             'name': fake.sentence(),
             'plot': fake.paragraph(),
@@ -810,27 +832,54 @@ class TestSessionViewSet(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_authenticated_user_game_master_delete_ok(self):
+    def test_authenticated_user_game_master_session_delete_ok(self):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session')
         session.add_game_masters(self.user)
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
-    def test_authenticated_user_not_game_master_delete_ko(self):
+    def test_authenticated_user_not_game_master_session_delete_ko(self):
         self.client.credentials(**self.user_credentials)
         session = baker.make_recipe('roleplay.session', players=[self.user])
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_authenticated_staff_delete_ok(self):
+    def test_authenticated_staff_session_delete_ok(self):
         self.client.credentials(**self.staff_user_credentials)
         session = baker.make_recipe('roleplay.session')
-        url = reverse(f'{base_resolver}:session-detail', kwargs={'pk': session.pk})
+        url = resolve_url(f'{base_resolver}:session-detail', pk=session.pk)
         response = self.client.delete(url)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+    def test_anonymous_session_list_all_ko(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_user_session_list_all_ko(self):
+        self.client.credentials(**self.user_credentials)
+        url = reverse(f'{base_resolver}:session-list-all')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_staff_session_list_all_ok(self):
+        self.client.credentials(**self.staff_user_credentials)
+        url = reverse(f'{base_resolver}:session-list-all')
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_staff_session_list_all_correct_length_ok(self):
+        self.client.credentials(**self.staff_user_credentials)
+        baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
+        url = reverse(f'{base_resolver}:session-list-all')
+        response = self.client.get(url)
+
+        self.assertEqual(Session.objects.count(), len(response.json()['results']))

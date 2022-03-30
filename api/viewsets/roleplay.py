@@ -8,7 +8,7 @@ from common.constants import models
 from ..permissions import common
 from ..permissions.roleplay import IsGameMasterOrAdmin, IsPlayerOrAdmin, IsPublicOrStaff
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
-from .mixins import UserListMixin
+from .mixins import StaffListAllMixin, UserListMixin
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
@@ -105,22 +105,20 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
         return qs
 
 
-class SessionViewSet(UserListMixin, viewsets.ModelViewSet):
+class SessionViewSet(StaffListAllMixin, UserListMixin, viewsets.ModelViewSet):
     related_name = 'gm_sessions'
     queryset = Session.objects.all()
     permission_classes = [IsAuthenticated & IsPlayerOrAdmin]
     serializer_class = SessionSerializer
 
     def get_queryset(self):
-        qs = super().get_queryset().filter(
+        qs = super().get_queryset()
+        # NOTE: Staff user needs to have access to all sessions that are not specific user lists
+        if self.request.user.is_staff and self.action not in ('user_list', 'list'):
+            return qs
+        return qs.filter(
             players__in=[self.request.user]
         )
-
-        # Staff can access all sessions unless it's a list or user_list action
-        if self.request.user.is_staff and self.action not in ('list', 'user_list'):
-            qs = super().get_queryset()
-
-        return qs
 
     def get_permissions(self):
         if self.action in ('partial_update', 'update', 'destroy'):
