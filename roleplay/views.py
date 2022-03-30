@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -260,3 +260,16 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         self.object.add_game_masters(self.request.user)
         self.send_emails(form)
         return response
+
+
+class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Session
+    template_name = 'roleplay/session/session_detail.html'
+
+    def test_func(self):
+        """
+        Checks that user is in players.
+        """
+
+        session = self.get_object()
+        return self.request.user in session.players.all()

@@ -8,18 +8,18 @@
   {% endblocktranslate %}
 {% endblock title %}
 
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "session detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,session detail' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
   <main class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <div id="sessionDisplay"></div>
       </div>
     </div>
   </main>
 {% endblock body_content %}
-
-{% block javascript %}
-  <script src="{% static 'frontend/dist/session.bundle.js' %}"
-          data-user="{{ serialized_user }}"
-  ></script>
-{% endblock javascript %}

@@ -945,3 +945,43 @@ class TestSessionCreateView(TestCase):
         session = self.model.objects.last()
         # NOTE: Field is not nullable, so it's empty string
         self.assertEqual('', session.plot)
+
+
+class TestSessionDetailView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:detail'
+    template = 'roleplay/session/session_detail.html'
+    view = views.SessionDetailView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_in_players = baker.make_recipe('registration.user')
+        cls.user_not_in_players = baker.make_recipe('registration.user')
+
+        cls.session = baker.make_recipe('roleplay.session', players=[cls.user_in_players])
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_non_player_ko(self):
+        self.client.force_login(self.user_not_in_players)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_with_player_ok(self):
+        self.client.force_login(self.user_in_players)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_players)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
