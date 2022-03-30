@@ -39,6 +39,15 @@ world = Recipe(
     owner=foreign_key(user),
 )
 
+private_world = Recipe(
+    Place,
+    name=fake.country,
+    description=fake.paragraph,
+    site_type=SiteTypes.WORLD,
+    owner=foreign_key(user),
+    user=foreign_key(user),
+)
+
 domain = Recipe(
     Domain,
     name=fake.word,

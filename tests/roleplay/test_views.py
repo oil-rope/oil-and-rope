@@ -811,7 +811,7 @@ class TestSessionCreateView(TestCase):
         cls.world = baker.make_recipe('roleplay.world')
 
     def setUp(self):
-        self.url = resolve_url(self.resolver)
+        self.url = resolve_url(self.resolver, pk=self.world.pk)
         self.data_ok = {
             'name': fake.word(),
             'plot': fake.paragraph(),
@@ -838,6 +838,22 @@ class TestSessionCreateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
+
+    def test_access_with_non_existing_world_ko(self):
+        self.client.force_login(self.user)
+        non_existent_pk = self.world.pk + 1
+        url = resolve_url(self.resolver, pk=non_existent_pk)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_with_private_world_ko(self):
+        world = baker.make_recipe('roleplay.private_world')
+        url = resolve_url(self.resolver, pk=world.pk)
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
 
     def test_session_is_created_with_correct_data_ok(self):
         self.client.force_login(self.user)

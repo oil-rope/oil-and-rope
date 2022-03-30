@@ -1,23 +1,28 @@
 import logging
 
+from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
+from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.views import MultiplePaginatorListView
 
-from . import enums, forms, models
+from . import enums, forms
 
 LOGGER = logging.getLogger(__name__)
+
+Place = apps.get_model(models.PLACE_MODEL)
+Session = apps.get_model(models.SESSION_MODEL)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     form_class = forms.PlaceForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_create.html'
 
     def get_parent_site(self):
@@ -59,7 +64,7 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
 
 class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.PlaceForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
@@ -72,7 +77,7 @@ class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
 
 class PlaceDetailView(LoginRequiredMixin, DetailView):
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_detail.html'
 
     def get(self, request, *args, **kwargs):
@@ -98,10 +103,10 @@ class PlaceDetailView(LoginRequiredMixin, DetailView):
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     enum = enums.SiteTypes
-    model = models.Place
+    model = Place
     paginate_by = 3
     user_worlds_page_kwarg = 'page_user_worlds'
-    queryset = models.Place.objects.filter(site_type=enums.SiteTypes.WORLD)
+    queryset = Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'
 
     def get_user_worlds(self):
@@ -165,7 +170,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 
 class WorldCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.WorldForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/world/world_create.html'
 
     def get_form_kwargs(self):
@@ -183,7 +188,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
@@ -197,37 +202,48 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
 
 class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
-    model = models.Place
+    model = Place
     success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/world/world_confirm_delete.html'
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.SessionForm
-    model = models.Session
+    model = Session
     template_name = 'roleplay/session/session_create.html'
     success_url = reverse_lazy('roleplay:world:list')
+
+    def get_world(self):
+        """
+        Checks that given world exists and is not private.
+        """
+
+        world = self.get_available_worlds().filter(pk=self.kwargs['pk'])
+        if world:
+            return world.get()
+        raise Http404()
 
     def get_initial(self):
         initial = super().get_initial()
         next_week = timezone.now() + timezone.timedelta(days=7)
         initial.update({
+            'world': self.get_world(),
             'next_game': next_week.strftime('%Y-%m-%dT%H:%M'),
         })
         return initial
 
-    def get_worlds(self):
+    def get_available_worlds(self):
         """
-        Gets either community maps or user's private maps.
+        Gets community maps and user's private maps.
         """
 
-        qs = models.Place.objects.community_places()
-        qs |= models.Place.objects.user_places(user=self.request.user)
+        qs = Place.objects.community_places()
+        qs |= Place.objects.user_places(user=self.request.user)
         return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
-        form.fields['world'].queryset = self.get_worlds()
+        form.fields['world'].queryset = self.get_available_worlds()
         return form
 
     def form_valid(self, form):

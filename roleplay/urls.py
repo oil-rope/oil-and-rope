@@ -18,7 +18,7 @@ WORLD_PATTERNS = [
 ]
 
 SESSION_PATTERNS = [
-    path('create/', views.SessionCreateView.as_view(), name='create'),
+    path('create/<int:pk>/', views.SessionCreateView.as_view(), name='create'),
 ]
 
 urlpatterns = [
