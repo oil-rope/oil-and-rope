@@ -2,7 +2,7 @@ from ckeditor.fields import RichTextField
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
-from django.urls import reverse
+from django.shortcuts import resolve_url
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -117,7 +117,7 @@ class Place(MPTTModel, TracingMixin):
         return '<i class="{}"></i>'.format(self.ICON_RESOLVERS.get(self.site_type, ''))
 
     def get_absolute_url(self):
-        return reverse('roleplay:place:detail', kwargs={'pk': self.pk})
+        return resolve_url('roleplay:place:detail', pk=self.pk)
 
     def get_houses(self):
         houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
@@ -505,6 +505,9 @@ class Session(TracingMixin):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return resolve_url('roleplay:session:detail', pk=self.pk)
 
     def __str__(self):
         system = RoleplaySystems(self.system)

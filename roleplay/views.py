@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
@@ -285,7 +285,7 @@ class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Session
-    success_url = reverse_lazy('roleplay:world:list')
+    success_url = reverse_lazy('roleplay:session:list')
     template_name = 'roleplay/session/session_confirm_delete.html'
 
     def test_func(self):
@@ -325,3 +325,12 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         msg = cfl(_('session updated!'))
         messages.success(self.request, msg)
         return reverse_lazy('roleplay:session:detail', kwargs={'pk': self.object.pk})
+
+
+class SessionListView(LoginRequiredMixin, ListView):
+    model = Session
+    template_name = 'roleplay/session/session_list.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(players__in=[self.request.user])

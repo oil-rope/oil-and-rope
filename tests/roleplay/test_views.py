@@ -1039,7 +1039,7 @@ class TestSessionDeleteView(TestCase):
         self.client.force_login(self.user_in_game_masters)
         response = self.client.post(self.url)
 
-        self.assertRedirects(response, resolve_url('roleplay:world:list'))
+        self.assertRedirects(response, resolve_url('roleplay:session:list'))
 
     @mock.patch('roleplay.views.messages')
     def test_access_game_master_session_deleted_message_ok(self, mock_messages):
@@ -1123,3 +1123,48 @@ class TestSessionUpdateView(TestCase):
             response.wsgi_request,
             'Session updated!'
         )
+
+
+class TestSessionListView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:list'
+    template = 'roleplay/session/session_list.html'
+    view = views.SessionListView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.session = baker.make_recipe('roleplay.session', players=[cls.user])
+        cls.url = resolve_url(cls.resolver)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_session_list_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
+
+    def test_access_session_list_only_where_user_is_player_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
+
+        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())

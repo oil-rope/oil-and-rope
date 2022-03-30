@@ -45,7 +45,18 @@
               {% if actual_path|startswith:world_list %}aria-current="page"{% endif %}
             >
               <i class="ic-world"></i>
-              {% translate "worlds"|capfirst %}
+              {% translate "worlds" %}
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'roleplay:session:list' as session_list %}
+            <a
+              href="{{ session_list }}"
+              class="nav-link text-uppercase {% if actual_path|startswith:session_list %} active{% endif %}"
+              {% if actual_path|startswith:session_list %}aria-current="page"{% endif %}
+            >
+              <i class="ic-dice"></i>
+              {% translate "sessions" %}
             </a>
           </li>
         </ul>

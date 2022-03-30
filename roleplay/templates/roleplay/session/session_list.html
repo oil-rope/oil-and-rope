@@ -1,0 +1,22 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% block title %}{% translate "sessions"|capfirst %} {% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='sessions' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-3">
+    <h1 class="display-5 text-center">
+      {% translate "your list of sessions"|capfirst %}
+    </h1>
+    <div class="row">
+      <div class="col">
+        {% for session in object_list %}
+          {{ session }}
+        {% endfor %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
