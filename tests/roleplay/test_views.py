@@ -981,6 +981,26 @@ class TestSessionDetailView(TestCase):
 
         self.assertEqual(200, response.status_code)
 
+    def test_access_with_player_with_profile_pic_ok(self):
+        user = baker.make_recipe('roleplay.user')
+        profile = user.profile
+        profile.image = SimpleUploadedFile('test_image.jpg', b'file_content', content_type='image/jpeg')
+        profile.save()
+        self.session.players.add(user)
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        session = baker.make_recipe('roleplay.session')
+        session.add_game_masters(self.user_in_players)
+        self.client.force_login(self.user_in_players)
+        url = resolve_url(self.resolver, pk=session.pk)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
     def test_access_templated_used_is_correct_ok(self):
         self.client.force_login(self.user_in_players)
         response = self.client.get(self.url)
@@ -1135,7 +1155,15 @@ class TestSessionListView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
-        cls.session = baker.make_recipe('roleplay.session', players=[cls.user])
+        cls.another_user = baker.make_recipe('registration.user')
+        another_user_profile = cls.another_user.profile
+        another_user_profile.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
+        another_user_profile.save()
+        baker.make_recipe(
+            baker_recipe_name='roleplay.session',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+            players=[cls.user, cls.another_user],
+        )
         cls.url = resolve_url(cls.resolver)
 
     def test_anonymous_access_ko(self):
@@ -1161,6 +1189,15 @@ class TestSessionListView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
+
+    def test_access_session_with_image_ok(self):
+        session = baker.make_recipe('roleplay.session', players=[self.user])
+        session.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
+        session.save()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
 
     def test_access_session_list_only_where_user_is_player_ok(self):
         self.client.force_login(self.user)
