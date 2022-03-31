@@ -142,6 +142,7 @@ TEMPLATES = [
                 'core.context_processors.language',
                 'dynamic_menu.context_processors.menus',
             ],
+            'debug': bool(to_bool(os.getenv('DEBUG_TEMPLATE', 'False'))),
         },
     },
 ]

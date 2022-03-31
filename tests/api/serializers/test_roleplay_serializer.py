@@ -72,6 +72,16 @@ class TestPlaceSerializer(TestCase):
 
         self.assertEqual(expected_name, serialized_result['name'])
 
+    def test_serializer_with_children_ok(self):
+        obj = baker.make_recipe('roleplay.place')
+        children_obj = baker.make_recipe(
+            'roleplay.place', _quantity=fake.pyint(min_value=1, max_value=10), parent_site=obj,
+        )
+        serialized_qs = self.serializer(obj)
+        serialized_result = serialized_qs.data
+
+        self.assertEqual(len(children_obj), len(serialized_result['children']))
+
 
 class TestRaceSerializer(TestCase):
     @classmethod

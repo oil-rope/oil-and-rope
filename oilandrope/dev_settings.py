@@ -6,6 +6,12 @@ SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
 DEBUG = True
 ALLOWED_HOSTS = []
 
+# NOTE: Needed for `debug_toolbar`
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -21,9 +27,7 @@ INSTALLED_APPS.extend([
     'debug_toolbar',
 ])
 
-MIDDLEWARE.extend([
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-])
+MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 CHANNEL_LAYERS = {
     'default': {
@@ -41,3 +45,8 @@ SHELL_PLUS_IMPORTS = [
     'from dynamic_menu.enums import MenuTypes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
+
+# Debug Toolbar configuration
+# https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
+
+SHOW_COLLAPSED = True

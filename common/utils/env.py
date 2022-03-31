@@ -39,4 +39,4 @@ def load_env_file(env_file: pathlib.Path or str):
         raise ImportError(f'File \'{env_file}\' couldn\'t be found')
 
     check_env_file(env_file)
-    return load_dotenv(env_file, override=True, verbose=True, encoding='utf-8')
+    return load_dotenv(env_file, override=False, verbose=True, encoding='utf-8')

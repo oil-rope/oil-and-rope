@@ -16,12 +16,17 @@ jobs:
     name: Python with PostgreSQL & Redis
     runs-on: ubuntu-latest
     env:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      # NOTE: This is needed for coverage on HTML
+      DEBUG_TEMPLATE: True
+      DJANGO_SETTINGS_MODULE: oilandrope.settings
+      DB_NAME: oilandrope
+      DB_USER: postgres
+      DB_PASSWORD: p4ssw0rd@
 
     # Set up Postgres and Redis
     services:
       postgres:
-        image: postgres:13.3
+        image: postgres:14
         env:
           POSTGRES_PASSWORD: p4ssw0rd@
           POSTGRES_USER: postgres
@@ -73,13 +78,13 @@ jobs:
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test --settings oilandrope.settings
+          coverage run manage.py test
           coverage xml
 
       - name: Django Check
         run: |
-          python manage.py migrate --settings oilandrope.settings
-          python manage.py check --settings oilandrope.settings
+          python manage.py migrate
+          python manage.py check
 
       - name: Updating Codecov (coverage)
         if: ${{ success() && matrix.python-version==3.9 }}
