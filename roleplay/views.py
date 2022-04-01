@@ -213,7 +213,6 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.SessionForm
     model = Session
     template_name = 'roleplay/session/session_create.html'
-    success_url = reverse_lazy('roleplay:world:list')
 
     def get_world(self):
         """
@@ -254,6 +253,9 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         emails = form.cleaned_data.get('email_invitations', '').splitlines()
         send_session_invitations(self.object, self.request, emails)
         return response
+
+    def get_success_url(self):
+        return resolve_url(self.object)
 
 
 class SessionJoinView(SingleObjectMixin, RedirectView):
