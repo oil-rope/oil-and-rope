@@ -20,6 +20,7 @@ WORLD_PATTERNS = [
 SESSION_PATTERNS = [
     path('', views.SessionListView.as_view(), name='list'),
     path('<int:pk>/', views.SessionDetailView.as_view(), name='detail'),
+    path('<int:pk>/<str:token>/', views.SessionJoinView.as_view(), name='join'),
     path('create/<int:pk>/', views.SessionCreateView.as_view(), name='create'),
     path('edit/<int:pk>/', views.SessionUpdateView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.SessionDeleteView.as_view(), name='delete'),

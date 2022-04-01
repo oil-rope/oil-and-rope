@@ -3,17 +3,21 @@ import logging
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.signing import BadSignature, TimestampSigner
 from django.http import Http404, HttpResponseForbidden
+from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
-from common.tools.mail import HtmlThreadMail
+from common.tools import HtmlThreadMail, get_token
 from common.views import MultiplePaginatorListView
 from roleplay.forms.layout import SessionFormLayout
 
@@ -21,6 +25,7 @@ from . import enums, forms
 
 LOGGER = logging.getLogger(__name__)
 
+User = get_user_model()
 Place = apps.get_model(models.PLACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
 
@@ -248,21 +253,53 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         Sends emails to all players given in `email_invitations`.
         """
 
-        emails = form.cleaned_data.get('email_invitations')
+        emails = form.cleaned_data.get('email_invitations', '').splitlines()
         if emails:
-            HtmlThreadMail(
-                template_name='email_templates/invitation_email.html',
-                subject=cfl(_('a quest for you!')),
-                to=emails.splitlines(),
-                request=self.request,
-                context={'object': self.object, 'user': self.request.user},
-            ).send()
+            for email in emails:
+                HtmlThreadMail(
+                    template_name='email_templates/invitation_email.html',
+                    subject=cfl(_('a quest for you!')),
+                    to=[email],
+                    request=self.request,
+                    context={
+                        'object': self.object,
+                        'user': self.request.user,
+                        'token': get_token(email, TimestampSigner()),
+                    },
+                ).send()
 
     def form_valid(self, form):
         response = super().form_valid(form)
         self.object.add_game_masters(self.request.user)
         self.send_emails(form)
         return response
+
+
+class SessionJoinView(SingleObjectMixin, RedirectView):
+    signer_class = TimestampSigner
+    model = Session
+
+    def get_signer_instace(self):
+        return self.signer_class()
+
+    def get_email_associated(self):
+        try:
+            signer = self.get_signer_instace()
+            return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
+        except BadSignature:
+            raise Http404()
+
+    def get_user(self):
+        try:
+            return User.objects.get(email=self.get_email_associated())
+        except User.DoesNotExist:
+            raise Http404()
+
+    def get_redirect_url(self, *args, **kwargs):
+        session = self.get_object()
+        session.players.add(self.get_user())
+        messages.success(self.request, _('you have joined the session.').capitalize())
+        return resolve_url(session)
 
 
 class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):

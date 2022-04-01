@@ -7,6 +7,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.signing import TimestampSigner
 from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.urls import reverse
@@ -14,6 +15,7 @@ from django.utils import timezone
 from model_bakery import baker
 from PIL import Image
 
+from common import tools
 from roleplay import enums, models, views
 from tests import fake
 
@@ -877,9 +879,10 @@ class TestSessionCreateView(TestCase):
     def test_session_is_created_and_emails_are_sent_ok(self):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.data_ok)
+        emails = self.data_ok['email_invitations'].split('\n')
 
         time.sleep(1)
-        self.assertEqual(1, len(mail.outbox))
+        self.assertEqual(len(emails), len(mail.outbox))
 
     def test_post_data_without_name_ko(self):
         data_without_name = self.data_ok.copy()
@@ -946,6 +949,47 @@ class TestSessionCreateView(TestCase):
         session = self.model.objects.last()
         # NOTE: Field is not nullable, so it's empty string
         self.assertEqual('', session.plot)
+
+
+class TestSessionJoinView(TestCase):
+    model = models.Session
+    resolver = 'roleplay:session:join'
+    view = views.SessionJoinView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.signer = TimestampSigner()
+
+    def test_access_with_correct_token_and_existing_user_ok(self):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(self.session), target_status_code=302)
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_existing_user_messages_ok(self, mock_messages):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        mock_messages.success.assert_called_once_with(response.wsgi_request, 'You have joined the session.')
+
+    def test_access_with_correct_token_and_non_existing_user_ko(self):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_with_incorrect_token_ko(self):
+        token = f'{fake.email()}:{fake.password()}'
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
 
 
 class TestSessionDetailView(TestCase):
