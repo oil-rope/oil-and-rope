@@ -27,14 +27,14 @@
         <div class="row justify-content-xl-around mt-3 mx-1">
           <a
             href="{{ TABLETOP_URL }}/session/{{ object.pk }}"
-            class="btn btn-primary col col-xl-4"
+            class="btn btn-info col col-xl-3"
             target="_blank"
           >
             <i class="ic ic-dice"></i>
             {% translate "go to tabletop"|capfirst %}
           </a>
           {% if user in object.game_masters %}
-            <div class="dropdown col col-xl-4">
+            <div class="dropdown col col-xl-3">
               <button
                 class="btn btn-secondary dropdown-toggle w-100"
                 type="button"
@@ -46,20 +46,27 @@
                 {% translate "settings"|capfirst %}
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownSessionSettings">
-                <a
-                  class="dropdown-item"
-                  href="{% url 'roleplay:session:edit' object.pk %}"
-                >
-                  <i class="ic ic-edit"></i>
-                  {% translate "edit"|capfirst %}
-                </a>
-                <a
-                  class="dropdown-item"
-                  href="{% url 'roleplay:session:delete' object.pk %}"
-                >
-                  <i class="ic ic-trash"></i>
-                  {% translate "delete"|capfirst %}
-                </a>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'roleplay:session:edit' object.pk %}"
+                  >
+                    <i class="ic ic-edit"></i>
+                    {% translate "edit"|capfirst %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'roleplay:session:delete' object.pk %}"
+                  >
+                    <i class="ic ic-trash"></i>
+                    {% translate "delete"|capfirst %}
+                  </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
               </div>
             </div>
           {% endif %}
@@ -145,6 +152,13 @@
               </p>
             </div>
           {% endfor %}
+          <p>
+            {% if request.user in object.game_masters %}
+              <small class="text-muted">
+                {% translate "To invite more players got to 'Edit' and then 'Invite players'." %}
+              </small>
+            {% endif %}
+          </p>
         </div>
       </div>
     </div>

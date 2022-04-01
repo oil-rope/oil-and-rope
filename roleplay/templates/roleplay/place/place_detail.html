@@ -76,7 +76,7 @@
     </div>
 
     <div class="row justify-content-around mt-4">
-      <div class="col-11 col-sm-5 btn-group dropdown mt-3 px-0">
+      <div class="col-11 col-sm-5 col-xl-3 btn-group dropdown mt-3 px-0">
         <button
           class="btn btn-primary dropdown-toggle {% if not object.get_children and object.get_root == object %}disabled{% endif %}"
           type="button"
@@ -133,7 +133,7 @@
         </ul>
       </div>
       <div
-        class="col-11 col-sm-5 btn-group dropdown mt-3 px-0"
+        class="col-11 col-sm-5 col-xl-3 btn-group dropdown mt-3 px-0"
       >
         <button
           class="btn btn-secondary dropdown-toggle"
@@ -176,7 +176,7 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item" href="{% url 'roleplay:world:delete' object.pk %}">
+              <a class="dropdown-item" href="{% url 'roleplay:place:delete' object.pk %}">
                 <i class="ic ic-trash"></i>
                 {% translate "delete"|capfirst %}
               </a>

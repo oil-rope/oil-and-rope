@@ -87,7 +87,7 @@ class WorldFormLayout(layout.Layout):
                 layout.Column(
                     common_layout.SubmitClearLayout(
                         submit_text=submit_text.capitalize(),
-                        submit_css_class='col-5 col-lg-6',
+                        submit_css_class='col-5 col-lg-6 col-xl-3',
                         reset_css_class='col-5 d-lg-none',
                     ),
                 ),
@@ -95,7 +95,7 @@ class WorldFormLayout(layout.Layout):
             layout.Row(
                 common_layout.Button(
                     content=_('go back').capitalize(),
-                    css_class='btn-dark col-11 col-md-7 col-lg-6',
+                    css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
                     icon='ic-arrow-left',
                 ),

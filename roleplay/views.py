@@ -17,11 +17,11 @@ from django.views.generic.detail import SingleObjectMixin
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
-from common.tools import HtmlThreadMail, get_token
 from common.views import MultiplePaginatorListView
 from roleplay.forms.layout import SessionFormLayout
 
 from . import enums, forms
+from .utils.invitations import send_session_invitations
 
 LOGGER = logging.getLogger(__name__)
 
@@ -203,10 +203,10 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         return kwargs
 
 
-class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Place
     success_url = reverse_lazy('roleplay:world:list')
-    template_name = 'roleplay/world/world_confirm_delete.html'
+    template_name = 'roleplay/place/place_confirm_delete.html'
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):
@@ -248,30 +248,11 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         form.fields['world'].queryset = self.get_available_worlds()
         return form
 
-    def send_emails(self, form):
-        """
-        Sends emails to all players given in `email_invitations`.
-        """
-
-        emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        if emails:
-            for email in emails:
-                HtmlThreadMail(
-                    template_name='email_templates/invitation_email.html',
-                    subject=cfl(_('a quest for you!')),
-                    to=[email],
-                    request=self.request,
-                    context={
-                        'object': self.object,
-                        'user': self.request.user,
-                        'token': get_token(email, TimestampSigner()),
-                    },
-                ).send()
-
     def form_valid(self, form):
         response = super().form_valid(form)
         self.object.add_game_masters(self.request.user)
-        self.send_emails(form)
+        emails = form.cleaned_data.get('email_invitations', '').splitlines()
+        send_session_invitations(self.object, self.request, emails)
         return response
 
 
@@ -291,12 +272,19 @@ class SessionJoinView(SingleObjectMixin, RedirectView):
 
     def get_user(self):
         try:
+            # If user is already logged in, use it
+            if self.request.user.is_authenticated:
+                return self.request.user
             return User.objects.get(email=self.get_email_associated())
         except User.DoesNotExist:
-            raise Http404()
+            return None
 
     def get_redirect_url(self, *args, **kwargs):
         session = self.get_object()
+        user = self.get_user()
+        if not user:
+            messages.warning(self.request, _('you need an account to join this session.').capitalize())
+            return resolve_url(settings.LOGIN_URL)
         session.players.add(self.get_user())
         messages.success(self.request, _('you have joined the session.').capitalize())
         return resolve_url(session)
@@ -355,8 +343,13 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.helper.layout = SessionFormLayout(_('update').capitalize())
-        form.helper.layout[0].pop(2)
         return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        emails = form.cleaned_data.get('email_invitations', '').splitlines()
+        send_session_invitations(self.object, self.request, emails)
+        return response
 
     def get_success_url(self):
         msg = cfl(_('session updated!'))

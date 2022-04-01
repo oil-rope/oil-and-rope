@@ -8,13 +8,13 @@ PLACE_PATTERNS = [
     path('<int:pk>/', views.PlaceDetailView.as_view(), name='detail'),
     path('create/<int:pk>/', views.PlaceCreateView.as_view(), name='create'),
     path('edit/<int:pk>/', views.PlaceUpdateView.as_view(), name='edit'),
+    path('delete/<int:pk>/', views.PlaceDeleteView.as_view(), name='delete'),
 ]
 
 WORLD_PATTERNS = [
     path('', views.WorldListView.as_view(), name='list'),
     path('create/', views.WorldCreateView.as_view(), name='create'),
     path('edit/<int:pk>/', views.WorldUpdateView.as_view(), name='edit'),
-    path('delete/<int:pk>/', views.WorldDeleteView.as_view(), name='delete'),
 ]
 
 SESSION_PATTERNS = [

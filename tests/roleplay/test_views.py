@@ -623,7 +623,7 @@ class TestWorldCreateView(TestCase):
         self.assertIsNotNone(entry.image)
 
 
-class TestWorldDeleteView(TestCase):
+class TestPlaceDeleteView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = models.Place
@@ -639,15 +639,15 @@ class TestWorldDeleteView(TestCase):
             owner=self.user,
             user=self.user
         )
-        self.url = reverse('roleplay:world:delete', kwargs={'pk': self.world.pk})
-        self.private_world_url = reverse('roleplay:world:delete', kwargs={'pk': self.private_world.pk})
+        self.url = reverse('roleplay:place:delete', kwargs={'pk': self.world.pk})
+        self.private_world_url = reverse('roleplay:place:delete', kwargs={'pk': self.private_world.pk})
 
     def test_access_ok(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world/world_confirm_delete.html')
+        self.assertTemplateUsed(response, 'roleplay/place/place_confirm_delete.html')
 
     def test_access_anonymous_user_ko(self):
         response = self.client.get(self.url)
@@ -658,7 +658,7 @@ class TestWorldDeleteView(TestCase):
     def test_non_existent_world_ko(self):
         self.client.force_login(self.user)
         non_existent_pk = self.model.objects.last().pk + 1
-        url = reverse('roleplay:world:delete', kwargs={'pk': non_existent_pk})
+        url = reverse('roleplay:place:delete', kwargs={'pk': non_existent_pk})
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
@@ -977,12 +977,39 @@ class TestSessionJoinView(TestCase):
 
         mock_messages.success.assert_called_once_with(response.wsgi_request, 'You have joined the session.')
 
-    def test_access_with_correct_token_and_non_existing_user_ko(self):
+    def test_access_with_correct_token_and_non_existing_user_redirects_to_login_ko(self):
         token = tools.get_token(fake.email(), self.signer)
         url = resolve_url(self.resolver, pk=self.session.pk, token=token)
         response = self.client.get(url)
 
-        self.assertEqual(404, response.status_code)
+        self.assertRedirects(response, resolve_url(settings.LOGIN_URL))
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_non_existing_user_messages_ko(self, mock_messages):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        mock_messages.warning.assert_called_once_with(
+            response.wsgi_request,
+            'You need an account to join this session.'
+        )
+
+    def test_access_with_logged_user_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(self.session))
+
+    def test_access_with_logged_user_adds_user_to_players_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        self.client.get(url)
+
+        self.assertIn(self.user, self.session.players.all())
 
     def test_access_with_incorrect_token_ko(self):
         token = f'{fake.email()}:{fake.password()}'
