@@ -12,7 +12,9 @@ jobs:
     name: Python Build
     runs-on: ubuntu-latest
     env:
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      # NOTE: This is needed for coverage on HTML
+      DEBUG_TEMPLATE: True
+      DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
 
     # Redis
     services:

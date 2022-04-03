@@ -1,6 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load static %}
 {% load i18n %}
+{% load string_utils %}
 
 {% block title %}
   {% blocktranslate with name=object.name %}
@@ -8,18 +9,155 @@
   {% endblocktranslate %}
 {% endblock title %}
 
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "session detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='sessions=roleplay:session:list,session detail' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
-  <main class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <div id="sessionDisplay"></div>
+  <main class="container pb-3">
+    <h1 class="text-center fw-light">
+      {{ object.name }}
+    </h1>
+    <hr>
+    <div class="row flex-column-reverse flex-lg-row">
+      <div class="col">
+        <div class="row justify-content-xl-around mt-3 mx-1">
+          <a
+            href="{{ TABLETOP_URL }}/session/{{ object.pk }}"
+            class="btn btn-info col col-xl-3"
+            target="_blank"
+          >
+            <i class="ic ic-dice"></i>
+            {% translate "go to tabletop"|capfirst %}
+          </a>
+          {% if user in object.game_masters %}
+            <div class="dropdown col col-xl-3">
+              <button
+                class="btn btn-secondary dropdown-toggle w-100"
+                type="button"
+                id="dropdownSessionSettings"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="ic ic-cogs"></i>
+                {% translate "settings"|capfirst %}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownSessionSettings">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'roleplay:session:edit' object.pk %}"
+                  >
+                    <i class="ic ic-edit"></i>
+                    {% translate "edit"|capfirst %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'roleplay:session:delete' object.pk %}"
+                  >
+                    <i class="ic ic-trash"></i>
+                    {% translate "delete"|capfirst %}
+                  </a>
+                </li>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        <div class="row mt-3 mx-1">
+          <div class="col bg-light bg-opacity-50">
+            <p>
+              {% blocktranslate with date=object.next_game|date:"l, j F Y" time=object.next_game|date:"fA" %}
+                <span class="fw-bold">Next session will be on</span><br />
+                {{ date }} at {{ time }}
+              {% endblocktranslate %}
+            </p>
+          </div>
+          <div class="w-100"></div>
+          <div class="col mt-3">
+            <h4 class="text-center">
+              {% translate "what will happen?"|capfirstletter %}
+            </h4>
+            <hr>
+            <p>
+              {{ object.plot|linebreaksbr }}
+            </p>
+          </div>
+          <div class="col-12 mt-3">
+            <h4 class="text-center">
+              {% translate "about the world..."|capfirst %}
+            </h4>
+            <hr>
+            <h5 class="text-center fw-lighter">
+              {{ object.world.name }}
+            </h5>
+            <p>
+              {{ object.world.description|safe|truncatechars_html:250 }}
+              <br />
+              <a
+                href="{% url 'roleplay:place:detail' object.world.pk %}"
+                title="{% translate "go to world"|capfirst %}"
+              >
+                {% translate "learn more"|capfirst %}
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col col-lg-4 col-xl-3">
+        <div
+          class="row justify-content-around rounded bg-dark bg-opacity-10 mx-1 py-2"
+        >
+          <h2 class="text-center">
+            {% blocktranslate count player_count=object.players.count %}
+              {{ player_count }} player
+            {% plural %}
+              {{ player_count }} players
+            {% endblocktranslate %}
+          </h2>
+          {% for player in object.players.all %}
+            <div class="col">
+              {% if player.profile.image %}
+                <img
+                  src="{{ player.profile.image.url }}"
+                  alt="{% translate "avatar"|capfirst %}"
+                  class="rounded-circle"
+                  width="75"
+                  height="75"
+                >
+              {% else %}
+                <img
+                src="{% static 'img/default_user.png' %}"
+                alt="{% translate "avatar"|capfirst %}"
+                class="rounded-circle"
+                width="75"
+                height="75"
+                >
+              {% endif %}
+              <p>
+                {{ player.username }}
+              </p>
+            </div>
+          {% empty %}
+            <div class="col">
+              <p>
+                {% translate "no players"|capfirst %}
+              </p>
+            </div>
+          {% endfor %}
+          <p>
+            {% if request.user in object.game_masters %}
+              <small class="text-muted">
+                {% translate "To invite more players got to 'Edit' and then 'Invite players'." %}
+              </small>
+            {% endif %}
+          </p>
+        </div>
       </div>
     </div>
   </main>
 {% endblock body_content %}
-
-{% block javascript %}
-  <script src="{% static 'frontend/dist/session.bundle.js' %}"
-          data-user="{{ serialized_user }}"
-  ></script>
-{% endblock javascript %}

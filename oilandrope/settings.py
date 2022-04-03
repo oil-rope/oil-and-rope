@@ -14,6 +14,7 @@ import os
 from distutils.util import strtobool as to_bool
 from pathlib import Path
 
+from django.contrib.messages import constants as message_constants
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -115,6 +116,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Changing messages tags to Bootstrap
+# (https://docs.djangoproject.com/en/4.0/ref/settings/#message-tags)
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',
+}
 
 # SITE_ID = 1 is for declaring page ID
 # (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/#enabling-the-sites-framework)
@@ -430,3 +442,6 @@ SLOGANS = (
     'Just Roll It',
     'Where\'s the Oil?',
 )
+
+# Tabletop
+TABLETOP_URL = os.getenv('TABLETOP_URL', 'https://play.oilandrope-project.com')

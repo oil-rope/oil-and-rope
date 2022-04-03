@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from common.enums import JavaScriptActions
 from common.forms import layout as common_layout
+from common.templatetags.string_utils import capfirstletter as cfl
 
 
 class PlaceLayout(layout.Layout):
@@ -86,7 +87,7 @@ class WorldFormLayout(layout.Layout):
                 layout.Column(
                     common_layout.SubmitClearLayout(
                         submit_text=submit_text.capitalize(),
-                        submit_css_class='col-5 col-lg-6',
+                        submit_css_class='col-5 col-lg-6 col-xl-3',
                         reset_css_class='col-5 d-lg-none',
                     ),
                 ),
@@ -94,7 +95,7 @@ class WorldFormLayout(layout.Layout):
             layout.Row(
                 common_layout.Button(
                     content=_('go back').capitalize(),
-                    css_class='btn-dark col-11 col-md-7 col-lg-6',
+                    css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
                     icon='ic-arrow-left',
                 ),
@@ -104,7 +105,7 @@ class WorldFormLayout(layout.Layout):
 
 
 class SessionFormLayout(layout.Layout):
-    def __init__(self):
+    def __init__(self, submit_text=_('create')):
         super().__init__(
             bootstrap.TabHolder(
                 bootstrap.Tab(
@@ -115,35 +116,50 @@ class SessionFormLayout(layout.Layout):
                         layout.Column('world'),
                     ),
                     layout.Row(
-                        layout.Column('description'),
+                        layout.Column(
+                            layout.Field(
+                                'plot',
+                                placeholder=cfl(_('what will happen in this session?')),
+                                style='resize: none'
+                            ),
+                        ),
                     ),
                 ),
                 bootstrap.Tab(
                     _('next session').title(),
                     layout.Row(
-                        layout.Column('next_game_date', css_class='col-6'),
-                        layout.Column('next_game_time', css_class='col-6'),
+                        layout.Column('next_game'),
                     )
                 ),
                 bootstrap.Tab(
                     _('invite players').title(),
                     layout.Row(
-                        layout.Column(layout.Field('invited_players', id='playersInvitedContainer')),
                         layout.Column(
-                            layout.Field('invite_player_input', id='invitePlayerInput'), css_class='align-self-end'
-                        ),
-                        bootstrap.StrictButton(
-                            content=_('add').capitalize(),
-                            css_class='btn-info col align-self-center', css_id='playerAddButton'
+                            layout.Field(
+                                'email_invitations',
+                                placeholder='worldo@oar.com\ndungeon@fog.com\ndude@tabern.com',
+                                style='resize: none',
+                            ),
                         ),
                     ),
                 ),
             ),
             layout.Row(
                 layout.Column(
-                    common_layout.SubmitClearLayout(reset_button=False),
-                    css_class='col-md-6'
+                    common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
+                        reset_button=False,
+                        submit_css_class='col-5 col-lg-6 col-xl-3',
+                    ),
                 ),
-                css_class='justify-content-md-center',
+            ),
+            layout.Row(
+                common_layout.Button(
+                    content=_('go back').capitalize(),
+                    css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
+                    action=JavaScriptActions.GO_BACK.value,
+                    icon='ic-arrow-left',
+                ),
+                css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
         )
