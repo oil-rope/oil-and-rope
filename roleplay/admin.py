@@ -33,6 +33,11 @@ class SessionAdmin(admin.ModelAdmin):
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
 
+
+class RaceInline(admin.TabularInline):
+    model = models.RaceUser 
+
+
 @admin.register(models.Race)
 class RaceAdmin(admin.ModelAdmin):
     list_display = (
@@ -50,6 +55,11 @@ class RaceAdmin(admin.ModelAdmin):
         'affected_by_armor',
         'image',
     )
+
+    inlines = [
+        RaceInline
+    ]
+
     list_filter = (
         'entry_created_at',
         'entry_updated_at',

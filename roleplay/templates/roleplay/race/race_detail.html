@@ -15,13 +15,16 @@
     </h3>
     <div class="col-12">
       <div class="d-flex row justify-content-center ">
-        <picture class="row">
+        <picture class="d-flex justify-content-center"> 
+          {% if object.image %}
+          <img height="250px" load="lazy" src="{{ object.image.url }}" alt="Race image">
+          {% else %}
           <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color.svg' %}" alt="Oil & Rope Logo">
+          {% endif %}
         </picture>
       </div>
       <br>
       <div class="d-flex row justify-content-around ">
-
         <div class="col-8">
           <p class="px-3">
             {{ object.description }}

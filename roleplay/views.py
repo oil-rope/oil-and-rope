@@ -345,13 +345,13 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'roleplay/race/race_update.html'
 
     def get_form_kwargs(self, form_class=None):
-        breakpoint()
         kwargs = super().get_form_kwargs()
         kwargs['submit_text'] = _('update').capitalize()
         return kwargs
 
     def get_success_url(self):
         return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
+
 
 class RaceListView(LoginRequiredMixin, MultiplePaginatorListView):
     """
@@ -381,6 +381,8 @@ class RaceListView(LoginRequiredMixin, MultiplePaginatorListView):
 
         races = self.get_races()
         context['races'] = races
+        user = self.request.user
+        context['user'] = user
 
         if not page_size:  # pragma: no cover
             return context

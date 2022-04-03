@@ -1,9 +1,5 @@
-from .forms import PlaceForm, SessionForm, WorldForm
+from .forms import PlaceForm, SessionForm, WorldForm, RaceForm
 
 __all__ = [
-<<<<<<< HEAD
-    'PlaceForm', 'SessionForm', 'WorldForm', 'RaceForm'
-=======
     'WorldForm', 'SessionForm', 'RaceForm', 'PlaceForm'
->>>>>>> ac37904 (Merge)
 ]
