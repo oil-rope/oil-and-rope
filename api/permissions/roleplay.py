@@ -1,8 +1,13 @@
 from rest_framework import permissions
 
 
-class IsInPlayersOrStaff(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj) -> bool:
+class IsPlayerOrAdmin(permissions.BasePermission):
+    """
+    Since :class:`~rest_framework.permissions.IsAdminUser` does not have a method :method:`has_object_permission`,
+    we have to declare it here manually.
+    """
+
+    def has_object_permission(self, request, view, obj):
         """
         Checks if user is staff or user in players.
         """
@@ -15,9 +20,13 @@ class IsInPlayersOrStaff(permissions.BasePermission):
         return user in obj.players.all()
 
 
-class IsInGameMastersOrStaff(permissions.BasePermission):
+class IsGameMasterOrAdmin(permissions.BasePermission):
+    """
+    Since :class:`~rest_framework.permissions.IsAdminUser` does not have a method :method:`has_object_permission`,
+    we have to declare it here manually.
+    """
 
-    def has_object_permission(self, request, view, obj) -> bool:
+    def has_object_permission(self, request, view, obj):
         """
         Checks if user is staff or user in game masters.
         """

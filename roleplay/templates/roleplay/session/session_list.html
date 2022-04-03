@@ -1,0 +1,38 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% translate "sessions"|capfirst %} {% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='sessions' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-3">
+    <h1 class="display-5 text-center">
+      {% translate "your list of sessions"|capfirst %}
+    </h1>
+    <div class="row row-cols-1 row-cols-lg-2 g-4 justify-content-around">
+      {% for session in object_list %}
+        {% include 'roleplay/session/include/session_list_item.html' with session=session %}
+      {% empty %}
+        <div class="row justify-content-around">
+          <p class="lead text-center">
+            {% translate "seems like you don't have any session."|capfirst %}
+            <br />
+            {% translate "you can create one epic quest but first you need to select your world."|capfirst %}
+          </p>
+          <a
+            href="{% url 'roleplay:world:list' %}"
+            class="btn btn-primary col-11 col-md-6 col-lg-4 col-xl-3"
+            title="{% translate "go to world selection"|capfirst %}"
+          >
+            <i class="ic ic-world"></i>
+            {% translate "go to world selection"|capfirst %}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+{% endblock body_content %}

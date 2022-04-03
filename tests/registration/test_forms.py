@@ -15,8 +15,7 @@ from PIL import Image
 from common.utils import create_faker
 from registration import forms
 
-from ..bot.helpers.constants import (ANOTHER_BOT_TOKEN, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
-                                     USER_WITH_SAME_SERVER)
+from ..bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 from ..utils import check_litecord_connection
 
 fake = create_faker()
@@ -69,15 +68,6 @@ class TestSignUpForm(TestCase):
     def test_form_ok(self):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         self.assertTrue(form.is_valid(), 'Form is invalid.')
-
-    @unittest.skip('Now users can be accessed by bots even if they don\'t share server')
-    def test_discord_id_does_not_exist_ko(self):
-        data = self.data_ok.copy()
-        data['discord_id'] = USER_WITH_DIFFERENT_SERVER
-
-        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=ANOTHER_BOT_TOKEN):
-            form = forms.SignUpForm(self.request, data=data)
-            self.assertFalse(form.is_valid())
 
     @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
     def test_discord_id_exists_ok(self):

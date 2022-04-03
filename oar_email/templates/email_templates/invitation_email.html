@@ -16,8 +16,8 @@
     <div class="row">
       <div class="col">
         <p class="lead text-center">
-          {% blocktranslate with gm=object.game_master world_name=object.world.name %}
-            {{ gm }} invites you to join into an epic quest in the world of {{ world_name }}.
+          {% blocktranslate with game_master=user.username world_name=object.world.name %}
+            {{ game_master }} invites you to join into an epic quest in the world of {{ world_name }}.
           {% endblocktranslate %}
         </p>
         <p class="text-muted text-center">
@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="row justify-content-around mt-md-4">
-      {% url "roleplay:session:join" object.pk as join_url %}
+      {% url "roleplay:session:join" pk=object.pk token=token as join_url %}
       <a
         href="{{ protocol }}://{{ domain }}{{ join_url }}"
         class="btn btn-lg btn-primary col-11 col-md-6 col-lg-4 col-xl-2"

@@ -1,0 +1,85 @@
+{% load i18n %}
+{% load static %}
+
+<div class="d-flex col col-md-10 col-lg-8 col-xl-7">
+  <div class="card mb-3">
+    <div class="h-100 row flex-column flex-md-row g-0">
+      <div class="col">
+        {% if session.image %}
+          <img
+            class="card-img-top"
+            src="{{ session.image.url }}"
+            alt="{% translate "session cover"|capfirst %}"
+          >
+        {% else %}
+          <img
+            class="img-fluid"
+            src="{% static 'roleplay/img/places/default_image.png' %}"
+            alt="{% translate "session cover"|capfirst %}"
+          >
+        {% endif %}
+      </div>
+      {% comment %} 'd-flex' and 'flex-column' is needed in order to maintain footer at bottom {% endcomment %}
+      <div class="col d-flex flex-column">
+        <div class="card-body">
+          <div class="card-title text-center">
+            <h4>
+              {% comment %} NOTE: Applying styles on `small` does not work for link {% endcomment %}
+              <a
+                class="text-decoration-none"
+                href="{% url 'roleplay:session:detail' session.pk %}"
+              >
+                <i class="ic ic-quill"></i>
+                {{ session.name }}
+              </a>
+              <div class="my-2"></div>
+              <a
+                class="small link-info text-decoration-none"
+                href="{{ TABLETOP_URL }}/session/{{ session.pk }}"
+                target="_blank"
+              >
+                <i class="ic ic-dice"></i>
+                {% translate "start game"|title %}
+              </a>
+            </h4>
+            <small class="text-muted">
+              [{{ session.get_system_display }}]
+            </small>
+          </div>
+          <hr>
+          <p class="card-text">
+            {{ session.plot|truncatechars:200 }}
+          </p>
+        </div>
+        <div class="card-footer">
+          <div class="row">
+            {% for player in session.players.all %}
+              <div class="col text-center">
+                {% if player.profile.image %}
+                  <img
+                    src="{{ player.profile.image.url }}"
+                    alt="{% translate "avatar"|capfirst %}"
+                    class="rounded-circle"
+                    width="75"
+                    height="75"
+                  >
+                {% else %}
+                  <img
+                    src="{% static 'img/default_user.png' %}"
+                    alt="{% translate "avatar"|capfirst %}"
+                    class="rounded-circle"
+                    width="75"
+                    height="75"
+                  >
+                {% endif %}
+                <p>
+                  {{ player.username }}
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

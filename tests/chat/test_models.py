@@ -1,29 +1,35 @@
+import unittest
+
 from django.test import TestCase, override_settings
 from model_bakery import baker
 
 from chat import models
-from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from tests.utils import check_litecord_connection
+
+from ..bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 
 class TestChat(TestCase):
     model = models.Chat
 
-    def setUp(self):
-        self.instance = baker.make(self.model)
+    @classmethod
+    def setUpTestData(cls):
+        cls.instance = baker.make_recipe('chat.chat')
 
     def test_str_ok(self):
         expected = f'{self.instance.name} ({self.instance.pk})'
 
         self.assertEqual(expected, str(self.instance))
 
-    def test_discord_chat_without_discord_id(self):
+    def test_discord_chat_is_not_reached_when_no_discord_id(self):
         self.assertIsNone(self.instance.discord_chat)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
-    def test_discord_chat_with_discord_id(self):
-        self.instance.discord_id = CHANNEL
+    def test_discord_chat_is_returned_when_discord_id_given_ok(self):
+        instance = baker.make_recipe('chat.chat', discord_id=CHANNEL)
 
-        self.assertIsNotNone(self.instance.discord_chat)
+        self.assertIsNotNone(instance.discord_chat)
 
 
 class TestChatMessage(TestCase):

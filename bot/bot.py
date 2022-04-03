@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 class OilAndRopeBot(commands.Bot):
     """
-    Custom class to control the behaviour of the bot by environment variables.
+    Custom class to control the behavior of the bot by environment variables.
     """
 
     def __init__(self, **options):
@@ -83,5 +83,5 @@ class OilAndRopeBot(commands.Bot):
             LOGGER.info(log_message)
         await super().on_message(message)
 
-    def run(self, *args, **kwargs):
+    def run(self, *args, **kwargs):  # pragma: no cover
         super().run(self.token, *args, **kwargs)
