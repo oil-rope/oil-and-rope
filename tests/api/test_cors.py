@@ -1,6 +1,6 @@
 import requests
-from django.apps import apps
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url
 from django.test import LiveServerTestCase
 from model_bakery import baker
@@ -8,12 +8,11 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from common.constants import models
 from common.utils import create_faker
 
 fake = create_faker()
 
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 
 class TestAPICors(APITestCase):

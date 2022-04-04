@@ -5,7 +5,6 @@ from smtplib import SMTPException
 
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
@@ -16,7 +15,6 @@ from django.utils.translation import gettext_lazy as _
 
 from bot.exceptions import DiscordApiException
 from bot.models import User
-from common.constants import models
 from common.forms.widgets import DateWidget
 from common.utils.auth import generate_token
 
@@ -257,7 +255,7 @@ class UserForm(forms.ModelForm):
         return instance
 
     class Meta:
-        model = apps.get_model(models.USER_MODEL)
+        model = get_user_model()
         fields = (
             'username', 'email', 'first_name', 'last_name', 'discord_id',
         )

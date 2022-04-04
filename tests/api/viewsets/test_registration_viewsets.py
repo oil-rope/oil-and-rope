@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from faker import Faker
 from model_bakery import baker
@@ -9,7 +10,7 @@ from common.constants import models
 
 fake = Faker()
 
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 Profile = apps.get_model(models.PROFILE_MODEL)
 
 base_resolver = 'api:registration'

@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from faker import Faker
 from model_bakery import baker
@@ -8,7 +9,7 @@ from rest_framework.test import APITestCase
 from common.constants import models
 
 DynamicMenu = apps.get_model(models.DYNAMIC_MENU)
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 fake = Faker()
 
