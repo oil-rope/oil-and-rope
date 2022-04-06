@@ -27,13 +27,11 @@ class TypedConsumerMixin:
 
     serializer_class = None
 
-    def get_serializer(self, data, serializer_class=None):
+    def get_serializer(self, data):
         """
         Returns the serializer instance.
         """
 
-        if serializer_class:
-            return serializer_class(data=data)
         if not self.serializer_class:
             raise NotImplementedError('You must either define `serializer_class` or override `get_serializer`.')
         return self.serializer_class(data=data)
@@ -57,11 +55,8 @@ class TypedConsumerMixin:
                         'message': _('invalid data').capitalize(),
                     },
                 })
-                await super().close(code=WebSocketCloseCodes.INVALID_FRAME_PAYLOAD_DATA.value)
-            else:
-                await super().receive(text_data, bytes_data, **kwargs)
-        else:
-            await super().receive(text_data, bytes_data, **kwargs)
+                return await super().close(code=WebSocketCloseCodes.INVALID_FRAME_PAYLOAD_DATA.value)
+        return await super().receive(text_data, bytes_data, **kwargs)
 
 
 class HandlerJsonWebsocketConsumer(TypedConsumerMixin, AsyncJsonWebsocketConsumer):
