@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.settings import api_settings
@@ -14,7 +15,7 @@ Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 
 class DomainViewSet(viewsets.ModelViewSet):
