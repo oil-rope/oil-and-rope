@@ -1,39 +1,40 @@
-import faker
 import pytest
-from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
-from django.urls import path
 
+from api.serializers.common import WebSocketMessageSerializer
 from core.consumers import HandlerJsonWebsocketConsumer
+from tests import fake
 
-application = URLRouter([
-    path('testws/', WebsocketCommunicator),
-])
 
-fake = faker.Faker()
+@pytest.fixture(scope='function')
+def consumer():
+    class ConsumerClass(HandlerJsonWebsocketConsumer):
+        serializer_class = WebSocketMessageSerializer
+    return ConsumerClass
 
 
 @pytest.mark.asyncio
-async def test_websocket_sends_error():
-    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer.as_asgi(), 'testws/')
+async def test_websocket_sends_error(consumer):
+    communicator = WebsocketCommunicator(consumer.as_asgi(), 'testws/')
     data = {
         'dump': fake.word()
     }
     await communicator.send_json_to(data)
 
     error_response = {
-        'error': 'No type given.'
+        'type': 'error',
+        'content': {'message': 'Invalid data'},
     }
     response = await communicator.receive_json_from()
-    assert response == error_response, 'Incorrect response.'
+    assert response == error_response
 
     # Disconnect WebSocket to avoid pending tasks
     await communicator.disconnect()
 
 
 @pytest.mark.asyncio
-async def test_websocket_handler_non_existent_function():
-    communicator = WebsocketCommunicator(HandlerJsonWebsocketConsumer.as_asgi(), 'testws/')
+async def test_websocket_handler_non_existent_function(consumer):
+    communicator = WebsocketCommunicator(consumer.as_asgi(), 'testws/')
     data = {
         'type': fake.word()
     }
@@ -41,9 +42,10 @@ async def test_websocket_handler_non_existent_function():
     response = await communicator.receive_json_from()
 
     error_response = {
-        'error': 'Non existent type.'
+        'type': 'error',
+        'content': {'message': 'Given type does not exist.'},
     }
-    assert response == error_response, 'Incorrect response.'
+    assert response == error_response
 
     # Disconnect WebSocket to avoid pending tasks
     await communicator.disconnect()

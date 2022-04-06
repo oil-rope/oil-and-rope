@@ -75,7 +75,8 @@ class HandlerJsonWebsocketConsumer(TypedConsumerMixin, AsyncJsonWebsocketConsume
         func = content['type']
         if not hasattr(self, func):
             content = {
-                'error': _('given type does not exist.').capitalize()
+                'type': 'error',
+                'content': {'message': _('given type does not exist.').capitalize()},
             }
             await super().send_json(content)
             await super().close(code=WebSocketCloseCodes.INVALID_FRAME_PAYLOAD_DATA.value)
