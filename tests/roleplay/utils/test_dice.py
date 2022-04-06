@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 
 from core.exceptions import OilAndRopeException
 from roleplay.utils.dice import is_dice_roll, roll_dice
@@ -80,6 +81,15 @@ def test_is_dice_roll_incorrect_syntax_ko():
     roll = '1d20+'
 
     assert not is_dice_roll(roll), 'Incorrect dice roll syntax is taken as correct'
+
+
+def test_roll_dice_with_bot_command_prefix_ok():
+    roll = f'{settings.BOT_COMMAND_PREFIX}roll 1d20+2'
+
+    result, rolls = roll_dice(roll)
+
+    assert isinstance(result, int)
+    assert isinstance(rolls, dict)
 
 
 def test_dice_roll_incorrect_syntax_ko():

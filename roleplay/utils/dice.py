@@ -2,6 +2,7 @@ import random
 import re
 from collections import defaultdict
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from core.exceptions import OilAndRopeException
@@ -46,12 +47,17 @@ def roll_dice_logic(d_roll: str) -> list:
 def roll_dice(roll: str) -> tuple[int, defaultdict]:
     """
     This function separates and executes the rolling, addition and subtraction needed.
+    It also checks if roll comes with `settings.BOT_COMMAND_PREFIX` and if so, it will
+    remove it and strip the message to avoid dangling whitespaces.
 
     Parameters
     ----------
     roll: :class:`str`
         Given dice roll pattern.
     """
+
+    if roll.startswith(f'{settings.BOT_COMMAND_PREFIX}roll'):
+        roll = roll.replace(f'{settings.BOT_COMMAND_PREFIX}roll', '').strip()
 
     if not is_dice_roll(roll):
         msg = _('dice roll `%(roll)s` syntax is incorrect.') % {
