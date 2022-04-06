@@ -1,6 +1,7 @@
 import random
 
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url, reverse
 from model_bakery import baker
 from rest_framework import status
@@ -19,7 +20,7 @@ Place = apps.get_model(models.PLACE_MODEL)
 PlayerInSession = apps.get_model(models.ROLEPLAY_PLAYER_IN_SESSION)
 Race = apps.get_model(models.RACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 fake = create_faker()
 

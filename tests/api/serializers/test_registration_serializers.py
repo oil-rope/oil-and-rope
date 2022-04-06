@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from faker import Faker
 from model_bakery import baker
@@ -8,20 +9,13 @@ from common.constants import models
 
 fake = Faker()
 
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 Profile = apps.get_model(models.PROFILE_MODEL)
 
 
 class TestUserSerializer(TestCase):
     model = User
     serializer = UserSerializer
-
-    def test_empty_data_ok(self):
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
-
-        self.assertListEqual([], serialized_result)
 
     def test_serializer_with_data_ok(self):
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))

@@ -6,7 +6,7 @@ from discord.ext import commands
 from django.conf import settings
 from django.utils.translation import gettext as _
 
-from .cogs import Miscellaneous
+from .cogs import Miscellaneous, Roleplay
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class OilAndRopeBot(commands.Bot):
         print('\nLoading commands ', end='')
 
         # List of categories
-        cogs = [Miscellaneous, ]
+        cogs = [Miscellaneous, Roleplay]
         new_commands = []
 
         for cog in cogs:

@@ -1,11 +1,12 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from common.constants import models
 
 Profile = apps.get_model(models.PROFILE_MODEL)
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 
 class ProfileSerializer(serializers.ModelSerializer):

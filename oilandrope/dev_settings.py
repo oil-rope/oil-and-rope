@@ -29,19 +29,20 @@ INSTALLED_APPS.extend([
 
 MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
+
+# In Memory Channel Layer for testing
+# https://channels.readthedocs.io/en/stable/topics/channel_layers.html#in-memory-channel-layer
+
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
 SHELL_PLUS_PRINT_SQL = True
 SHELL_PLUS_IMPORTS = [
     'from bot.enums import ChannelTypes, EmbedTypes, HttpMethods, MessageTypes',
-    'from common.enums import AvailableIcons, JavaScriptActions',
+    'from common.enums import AvailableIcons, JavaScriptActions, WebSocketCloseCodes',
     'from dynamic_menu.enums import MenuTypes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
