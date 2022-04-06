@@ -1,4 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
 
 
 class UserListMixin:
@@ -28,5 +30,21 @@ class UserListMixin:
             return self.get_reverse_relation().all()
         return super().get_queryset()
 
+    @action(methods=['get'], detail=False, url_path='@me', url_name='user-list')
     def user_list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
+class StaffListAllMixin:
+    """
+    If user is staff is a allowed to see all the objects.
+    """
+
+    def get_queryset(self):
+        if self.action == 'list_all':
+            return super().get_queryset().model.objects.all()
+        return super().get_queryset()
+
+    @action(methods=['get'], detail=False, url_path='all', url_name='list-all', permission_classes=[IsAdminUser])
+    def list_all(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)

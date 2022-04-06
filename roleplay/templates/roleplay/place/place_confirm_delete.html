@@ -31,7 +31,7 @@
             </p>
           </div>
           <div class="card-body mt-xl-5">
-            <form class="d-flex justify-content-around" action="{% url 'roleplay:world:delete' object.pk %}"
+            <form class="d-flex justify-content-around" action="{% url 'roleplay:place:delete' object.pk %}"
                   method="post">
               {% csrf_token %}
               <input type="button" onclick="goBack();" value="{% translate 'cancel'|capfirst %}"

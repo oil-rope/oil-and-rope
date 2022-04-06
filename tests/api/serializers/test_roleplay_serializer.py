@@ -1,19 +1,16 @@
 from django.apps import apps
 from django.test import TestCase
-from faker import Faker
 from model_bakery import baker
 
 from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from common.constants import models
-from roleplay.enums import SiteTypes
+from tests import fake
 
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
 User = apps.get_model(models.USER_MODEL)
-
-fake = Faker()
 
 
 class TestDomainSerializer(TestCase):
@@ -75,6 +72,16 @@ class TestPlaceSerializer(TestCase):
 
         self.assertEqual(expected_name, serialized_result['name'])
 
+    def test_serializer_with_children_ok(self):
+        obj = baker.make_recipe('roleplay.place')
+        children_obj = baker.make_recipe(
+            'roleplay.place', _quantity=fake.pyint(min_value=1, max_value=10), parent_site=obj,
+        )
+        serialized_qs = self.serializer(obj)
+        serialized_result = serialized_qs.data
+
+        self.assertEqual(len(children_obj), len(serialized_result['children']))
+
 
 class TestRaceSerializer(TestCase):
     @classmethod
@@ -126,12 +133,12 @@ class TestRaceSerializer(TestCase):
 
 
 class TestSessionSerializer(TestCase):
+    model = Session
+    serializer = SessionSerializer
+
     @classmethod
     def setUpTestData(cls):
-        cls.model = Session
-        cls.serializer = SessionSerializer
-
-        cls.world = baker.make(Place, site_type=SiteTypes.WORLD)
+        cls.world = baker.make_recipe('roleplay.world')
 
     def test_empty_data_ok(self):
         qs = self.model.objects.all()
@@ -142,6 +149,7 @@ class TestSessionSerializer(TestCase):
 
     def test_serializer_with_data_ok(self):
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), world=self.world)
+        baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
         qs = self.model.objects.all()
         serialized_qs = self.serializer(qs, many=True)
         serialized_result = serialized_qs.data

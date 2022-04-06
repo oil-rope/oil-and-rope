@@ -3,8 +3,7 @@ import random
 import tempfile
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import RequestFactory, TestCase
-from django.utils import timezone
+from django.test import TestCase
 from model_bakery import baker
 from PIL import Image
 
@@ -196,57 +195,58 @@ class TestSessionForm(TestCase):
         cls.user = baker.make_recipe('registration.user')
 
     def setUp(self):
-        self.rq = RequestFactory().get('/')
-        self.rq.user = self.user
         self.data_ok = {
-            'name': fake.word(),
-            'description': fake.paragraph(),
-            'world': baker.make(models.Place, site_type=enums.SiteTypes.WORLD),
+            'name': fake.sentence(),
+            'plot': fake.paragraph(),
+            'world': baker.make_recipe('roleplay.world'),
             'system': enums.RoleplaySystems.PATHFINDER,
-            'next_game_date': timezone.now().date(),
-            'next_game_time': timezone.now().time(),
+            'next_game': fake.future_datetime(),
         }
 
     def test_data_ok(self):
-        form = self.form_class(self.rq, data=self.data_ok)
+        form = self.form_class(data=self.data_ok)
 
         self.assertTrue(form.is_valid(), f'Errors: {form.errors.values()}')
 
-    def test_missing_non_required_data_ok(self):
-        data_without_description = self.data_ok.copy()
-        del data_without_description['description']
-        form = self.form_class(self.rq, data=data_without_description)
+    def test_data_without_plot_ok(self):
+        data_without_plot = self.data_ok.copy()
+        del data_without_plot['plot']
+        form = self.form_class(data=data_without_plot)
 
         self.assertTrue(form.is_valid())
 
-    def test_missing_required_data_ko(self):
+    def test_without_name_ko(self):
         data_without_name = self.data_ok.copy()
         del data_without_name['name']
-        form = self.form_class(self.rq, data_without_name)
+        form = self.form_class(data_without_name)
 
         self.assertFalse(form.is_valid())
 
+    def test_without_world_ko(self):
         data_without_world = self.data_ok.copy()
         del data_without_world['world']
-        form = self.form_class(self.rq, data=data_without_world)
+        form = self.form_class(data=data_without_world)
 
         self.assertFalse(form.is_valid())
 
+    def test_without_system_ko(self):
         data_without_system = self.data_ok.copy()
         del data_without_system['system']
-        form = self.form_class(self.rq, data=data_without_system)
+        form = self.form_class(data=data_without_system)
 
         self.assertFalse(form.is_valid())
 
-        data_without_next_game_date = self.data_ok.copy()
-        del data_without_next_game_date['next_game_date']
-        form = self.form_class(self.rq, data=data_without_next_game_date)
+    def test_without_next_game_ko(self):
+        data_without_next_game = self.data_ok.copy()
+        del data_without_next_game['next_game']
+        form = self.form_class(data=data_without_next_game)
 
         self.assertFalse(form.is_valid())
 
-        data_without_next_game_time = self.data_ok.copy()
-        del data_without_next_game_time['next_game_time']
-        form = self.form_class(self.rq, data=data_without_next_game_time)
+    def test_next_game_before_today_ko(self):
+        data_before_today = self.data_ok.copy()
+        data_before_today['next_game'] = fake.past_datetime()
+        form = self.form_class(data=data_before_today)
 
         self.assertFalse(form.is_valid())
 

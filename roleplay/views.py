@@ -1,31 +1,39 @@
-import json
 import logging
 
+from django.apps import apps
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.signing import BadSignature, TimestampSigner
+from django.http import Http404, HttpResponseForbidden
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, RedirectView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from rest_framework.authtoken.models import Token
 
-from api.serializers.registration import UserSerializer
+from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
+from roleplay.forms.layout import SessionFormLayout
 
 from common.forms.layout import SubmitClearLayout as Submit
-
 from . import enums, forms, models
+from .utils.invitations import send_session_invitations
 
 LOGGER = logging.getLogger(__name__)
+
+User = get_user_model()
+Place = apps.get_model(models.PLACE_MODEL)
+Session = apps.get_model(models.SESSION_MODEL)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
     form_class = forms.PlaceForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_create.html'
 
     def get_parent_site(self):
@@ -59,7 +67,7 @@ class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
 
 class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.PlaceForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
@@ -72,7 +80,7 @@ class PlaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
 
 class PlaceDetailView(LoginRequiredMixin, DetailView):
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_detail.html'
 
     def get(self, request, *args, **kwargs):
@@ -98,10 +106,10 @@ class PlaceDetailView(LoginRequiredMixin, DetailView):
 
 class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     enum = enums.SiteTypes
-    model = models.Place
+    model = Place
     paginate_by = 3
     user_worlds_page_kwarg = 'page_user_worlds'
-    queryset = models.Place.objects.filter(site_type=enums.SiteTypes.WORLD)
+    queryset = Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'
 
     def get_user_worlds(self):
@@ -165,7 +173,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 
 class WorldCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.WorldForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/world/world_create.html'
 
     def get_form_kwargs(self):
@@ -183,7 +191,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
 
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
-    model = models.Place
+    model = Place
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
@@ -196,113 +204,173 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         return kwargs
 
 
-class WorldDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
-    model = models.Place
+class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+    model = Place
     success_url = reverse_lazy('roleplay:world:list')
-    template_name = 'roleplay/world/world_confirm_delete.html'
+    template_name = 'roleplay/place/place_confirm_delete.html'
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.SessionForm
-    model = models.Session
+    model = Session
     template_name = 'roleplay/session/session_create.html'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'request': self.request,
-        })
-        return kwargs
+    def get_world(self):
+        """
+        Checks that given world exists and is not private.
+        """
+
+        world = self.get_available_worlds().filter(pk=self.kwargs['pk'])
+        if world:
+            return world.get()
+        raise Http404()
 
     def get_initial(self):
         initial = super().get_initial()
+        next_week = timezone.now() + timezone.timedelta(days=7)
         initial.update({
-            'next_game_date': timezone.now().strftime('%Y-%m-%d'),
-            'next_game_time': timezone.now().strftime('%H:%M'),
+            'world': self.get_world(),
+            'next_game': next_week.strftime('%Y-%m-%dT%H:%M'),
         })
         return initial
 
-    def get_worlds(self):
+    def get_available_worlds(self):
         """
-        Gets either community maps or user's private maps.
+        Gets community maps and user's private maps.
         """
 
-        qs = models.Place.objects.community_places()
-        qs.union(models.Place.objects.user_places(self.request.user))
-        return qs
+        qs = Place.objects.community_places()
+        qs |= Place.objects.user_places(user=self.request.user)
+        return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
-        form.fields['world'].queryset = self.get_worlds()
-
-        if self.request.method == 'POST':
-            invited_users = self.request.POST.getlist('invited_players')
-            if not invited_users:
-                return form
-            # Little hack to avoid empty choices validation
-            form.fields['invited_players'].choices = ((email, email) for email in invited_users)
-
+        form.fields['world'].queryset = self.get_available_worlds()
         return form
 
-
-class SessionJoinView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
-    """
-    Adds the player to the session.
-    """
-
-    model = models.Session
-    pattern_name = 'roleplay:session:detail'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        user = request.user
-        self.object.players.add(user)
-        response = super().get(request, *args, **kwargs)
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.object.add_game_masters(self.request.user)
+        emails = form.cleaned_data.get('email_invitations', '').splitlines()
+        send_session_invitations(self.object, self.request, emails)
         return response
 
+    def get_success_url(self):
+        return resolve_url(self.object)
 
-class SessionDetailView(LoginRequiredMixin, DetailView):
-    """
-    This view controls active session for user.
-    """
 
-    model = models.Session
+class SessionJoinView(SingleObjectMixin, RedirectView):
+    signer_class = TimestampSigner
+    model = Session
+
+    def get_signer_instace(self):
+        return self.signer_class()
+
+    def get_email_associated(self):
+        try:
+            signer = self.get_signer_instace()
+            return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
+        except BadSignature:
+            raise Http404()
+
+    def get_user(self):
+        try:
+            # If user is already logged in, use it
+            if self.request.user.is_authenticated:
+                return self.request.user
+            return User.objects.get(email=self.get_email_associated())
+        except User.DoesNotExist:
+            return None
+
+    def get_redirect_url(self, *args, **kwargs):
+        session = self.get_object()
+        user = self.get_user()
+        if not user:
+            messages.warning(self.request, _('you need an account to join this session.').capitalize())
+            return resolve_url(settings.LOGIN_URL)
+        session.players.add(self.get_user())
+        messages.success(self.request, _('you have joined the session.').capitalize())
+        return resolve_url(session)
+
+
+class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Session
     template_name = 'roleplay/session/session_detail.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
+    def test_func(self):
+        """
+        Checks that user is in players.
+        """
 
-        if not user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-
-        self.object = self.get_object()
-        players = self.object.players.all()
-
-        if user not in players:
-            msg = cfl(_('you are not part of this session!'))
-            messages.error(request, msg)
-            return HttpResponseForbidden(content=msg)
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        self.add_user_to_chat()
-        return super().get(request, *args, **kwargs)
-
-    def get_chat(self):
-        return self.object.chat
-
-    def add_user_to_chat(self):
-        chat = self.get_chat()
-        chat.users.add(self.request.user)
-
-    def _check_user_has_token(self):
-        Token.objects.get_or_create(user=self.request.user)
+        session = self.get_object()
+        return self.request.user in session.players.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self._check_user_has_token()
-        context['serialized_user'] = json.dumps(UserSerializer(self.request.user).data)
+        context['TABLETOP_URL'] = settings.TABLETOP_URL
+        return context
+
+
+class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Session
+    success_url = reverse_lazy('roleplay:session:list')
+    template_name = 'roleplay/session/session_confirm_delete.html'
+
+    def test_func(self):
+        """
+        Checks that user is game master.
+        """
+
+        session = self.get_object()
+        return self.request.user in session.game_masters
+
+    def get_success_url(self):
+        msg = _('session deleted.').capitalize()
+        messages.success(self.request, msg)
+        return super().get_success_url()
+
+
+class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = forms.SessionForm
+    model = Session
+    template_name = 'roleplay/session/session_update.html'
+
+    def test_func(self):
+        """
+        Checks that user is game master.
+        """
+
+        session = self.get_object()
+        return self.request.user in session.game_masters
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.layout = SessionFormLayout(_('update').capitalize())
+        return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        emails = form.cleaned_data.get('email_invitations', '').splitlines()
+        send_session_invitations(self.object, self.request, emails)
+        return response
+
+    def get_success_url(self):
+        msg = cfl(_('session updated!'))
+        messages.success(self.request, msg)
+        return reverse_lazy('roleplay:session:detail', kwargs={'pk': self.object.pk})
+
+
+class SessionListView(LoginRequiredMixin, ListView):
+    model = Session
+    template_name = 'roleplay/session/session_list.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(players__in=[self.request.user])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['TABLETOP_URL'] = settings.TABLETOP_URL
         return context
 
 

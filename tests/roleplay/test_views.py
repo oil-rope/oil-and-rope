@@ -1,17 +1,21 @@
 import os
 import random
 import tempfile
+import time
+from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.signing import TimestampSigner
+from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from faker import Faker
 from model_bakery import baker
 from PIL import Image
 
+from common import tools
 from roleplay import enums, models, views
 from tests import fake
 
@@ -234,7 +238,7 @@ class TestPlaceDetailView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.owner = baker.make(get_user_model())
+        cls.owner = baker.make_recipe('registration.user')
 
         cls.private_world = models.Place.objects.create(
             name=fake.country(),
@@ -281,7 +285,7 @@ class TestPlaceDetailView(TestCase):
         self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
 
     def test_access_community_world_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         self.client.force_login(another_user)
         world = baker.make(self.model, name=fake.country(), owner=self.owner)
         url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
@@ -308,7 +312,7 @@ class TestWorldListView(TestCase):
 
     def setUp(self):
         self.pagination = self.view.paginate_by
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
 
     def test_access_ok(self):
         self.client.force_login(self.user)
@@ -336,7 +340,7 @@ class TestWorldListView(TestCase):
             self.assertIn(str(entry), str(response.content))
 
     def test_cannot_see_other_users_places_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, 10):
             another_user_entries.append(
@@ -353,7 +357,7 @@ class TestWorldListView(TestCase):
             self.assertNotIn(str(entry), str(response.content))
 
     def test_user_can_see_its_worlds_but_no_other_users_worlds_ok(self):
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
@@ -385,7 +389,7 @@ class TestWorldListView(TestCase):
     def test_user_can_see_community_worlds_and_its_world_but_not_other_users_worlds_ok(self):
         # To avoid repetition, we use different fakers
 
-        another_user = baker.make(get_user_model())
+        another_user = baker.make_recipe('registration.user')
         another_user_entries = []
         for _ in range(0, self.pagination):
             another_user_entries.append(
@@ -537,7 +541,7 @@ class TestWorldCreateView(TestCase):
         cls.url = reverse('roleplay:world:create')
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
 
         self.tmp_image = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.png', delete=False)
         image_file = self.tmp_image.name
@@ -619,13 +623,13 @@ class TestWorldCreateView(TestCase):
         self.assertIsNotNone(entry.image)
 
 
-class TestWorldDeleteView(TestCase):
+class TestPlaceDeleteView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = models.Place
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
         self.world = self.model.objects.create(
             name=fake.city(),
             owner=self.user
@@ -635,15 +639,15 @@ class TestWorldDeleteView(TestCase):
             owner=self.user,
             user=self.user
         )
-        self.url = reverse('roleplay:world:delete', kwargs={'pk': self.world.pk})
-        self.private_world_url = reverse('roleplay:world:delete', kwargs={'pk': self.private_world.pk})
+        self.url = reverse('roleplay:place:delete', kwargs={'pk': self.world.pk})
+        self.private_world_url = reverse('roleplay:place:delete', kwargs={'pk': self.private_world.pk})
 
     def test_access_ok(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, 'roleplay/world/world_confirm_delete.html')
+        self.assertTemplateUsed(response, 'roleplay/place/place_confirm_delete.html')
 
     def test_access_anonymous_user_ko(self):
         response = self.client.get(self.url)
@@ -654,13 +658,13 @@ class TestWorldDeleteView(TestCase):
     def test_non_existent_world_ko(self):
         self.client.force_login(self.user)
         non_existent_pk = self.model.objects.last().pk + 1
-        url = reverse('roleplay:world:delete', kwargs={'pk': non_existent_pk})
+        url = reverse('roleplay:place:delete', kwargs={'pk': non_existent_pk})
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
 
     def test_non_owner_access_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.get(self.url)
 
@@ -674,7 +678,7 @@ class TestWorldDeleteView(TestCase):
             self.model.objects.get(pk=self.world.pk)
 
     def test_non_owner_delete_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.delete(self.url)
 
@@ -692,7 +696,7 @@ class TestWorldUpdateView(TestCase):
         with open(self.image_file, 'rb') as image:
             self.image = SimpleUploadedFile(name=self.image_file, content=image.read(), content_type='image/png')
 
-        self.user = baker.make(get_user_model())
+        self.user = baker.make_recipe('registration.user')
         self.world = self.model.objects.create(name=fake.city(), user=self.user, owner=self.user)
         self.community_world = self.model.objects.create(name=fake.city(), owner=self.user)
         self.url = reverse('roleplay:world:edit', kwargs={'pk': self.world.pk})
@@ -727,7 +731,7 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_non_owner_access_ko(self):
-        foreign_user = baker.make(get_user_model())
+        foreign_user = baker.make_recipe('registration.user')
         self.client.force_login(foreign_user)
         response = self.client.get(self.url)
 
@@ -798,8 +802,7 @@ class TestWorldUpdateView(TestCase):
 
 
 class TestSessionCreateView(TestCase):
-    fake = Faker()
-    login_url = reverse('registration:auth:login')
+    login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
     resolver = 'roleplay:session:create'
     template = 'roleplay/session/session_create.html'
@@ -807,18 +810,18 @@ class TestSessionCreateView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make(get_user_model())
-        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = baker.make_recipe('roleplay.world')
 
     def setUp(self):
-        self.url = reverse(self.resolver)
+        self.url = resolve_url(self.resolver, pk=self.world.pk)
         self.data_ok = {
             'name': fake.word(),
-            'description': fake.paragraph(),
-            'next_game_date': timezone.now().date() + timezone.timedelta(days=1),
-            'next_game_time': timezone.now().time(),
+            'plot': fake.paragraph(),
+            'next_game': timezone.now() + timezone.timedelta(days=1),
             'system': enums.RoleplaySystems.PATHFINDER,
-            'world': [self.world.pk],
+            'world': self.world.pk,
+            'email_invitations': '\n'.join([fake.safe_email() for _ in range(3)])
         }
 
     def test_access_anonymous_ko(self):
@@ -832,15 +835,120 @@ class TestSessionCreateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
+
+    def test_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
         self.assertTemplateUsed(response, self.template)
 
-    def test_creates_session_ok(self):
+    def test_access_with_non_existing_world_ko(self):
+        self.client.force_login(self.user)
+        non_existent_pk = self.world.pk + 1
+        url = resolve_url(self.resolver, pk=non_existent_pk)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_with_private_world_ko(self):
+        world = baker.make_recipe('roleplay.private_world')
+        url = resolve_url(self.resolver, pk=world.pk)
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_session_is_created_with_correct_data_ok(self):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.data_ok)
-        instance = self.model.objects.first()
 
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.data_ok['description'], instance.description)
+        session = self.model.objects.last()
+        self.assertEqual(self.data_ok['name'], session.name)
+        self.assertEqual(self.data_ok['plot'], session.plot)
+        self.assertEqual(self.data_ok['next_game'], session.next_game)
+        self.assertEqual(self.data_ok['system'], session.system)
+        self.assertEqual(self.data_ok['world'], session.world.pk)
+
+    def test_session_is_created_with_current_user_as_game_master_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+
+        session = self.model.objects.last()
+        self.assertIn(self.user, session.game_masters)
+
+    def test_session_is_created_and_emails_are_sent_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+        emails = self.data_ok['email_invitations'].split('\n')
+
+        time.sleep(1)
+        self.assertEqual(len(emails), len(mail.outbox))
+
+    def test_post_data_without_name_ko(self):
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_name)
+
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
+
+    def test_post_data_without_next_game_ko(self):
+        data_without_next_game = self.data_ok.copy()
+        del data_without_next_game['next_game']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_next_game)
+
+        self.assertFormError(response, 'form', 'next_game', 'This field is required.')
+
+    def test_post_data_without_system_ko(self):
+        data_without_system = self.data_ok.copy()
+        del data_without_system['system']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_system)
+
+        self.assertFormError(response, 'form', 'system', 'This field is required.')
+
+    def test_post_data_without_world_ko(self):
+        data_without_world = self.data_ok.copy()
+        del data_without_world['world']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_without_world)
+
+        self.assertFormError(response, 'form', 'world', 'This field is required.')
+
+    def test_post_data_next_game_in_the_past_ko(self):
+        data_with_past_next_game = self.data_ok.copy()
+        data_with_past_next_game['next_game'] = fake.past_datetime()
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data_with_past_next_game)
+
+        self.assertFormError(response, 'form', 'next_game', 'Next game date must be in the future.')
+
+    def test_post_data_without_email_invitations_ok(self):
+        data_without_email_invitations = self.data_ok.copy()
+        del data_without_email_invitations['email_invitations']
+
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data_without_email_invitations)
+
+        time.sleep(1)
+        self.assertEqual(0, len(mail.outbox))
+
+    def test_post_data_without_plot_ok(self):
+        data_without_plot = self.data_ok.copy()
+        del data_without_plot['plot']
+
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data_without_plot)
+
+        session = self.model.objects.last()
+        # NOTE: Field is not nullable, so it's empty string
+        self.assertEqual('', session.plot)
 
 
 class TestSessionJoinView(TestCase):
@@ -850,36 +958,69 @@ class TestSessionJoinView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make(get_user_model())
-        cls.game_master = baker.make(get_user_model())
-        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
-        cls.session = baker.make(cls.model, world=cls.world)
+        cls.user = baker.make_recipe('registration.user')
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.signer = TimestampSigner()
 
-    def setUp(self):
-        self.login_url = reverse('registration:auth:login')
-        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+    def test_access_with_correct_token_and_existing_user_ok(self):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
 
-    def test_access_anonymous_user_ko(self):
-        response = self.client.get(self.url)
-        expected_url = f'{self.login_url}?next={self.url}'
+        self.assertRedirects(response, resolve_url(self.session), target_status_code=302)
 
-        self.assertRedirects(response, expected_url)
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_existing_user_messages_ok(self, mock_messages):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
 
-    def test_access_logged_user_ok(self):
+        mock_messages.success.assert_called_once_with(response.wsgi_request, 'You have joined the session.')
+
+    def test_access_with_correct_token_and_non_existing_user_redirects_to_login_ko(self):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(settings.LOGIN_URL))
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_non_existing_user_messages_ko(self, mock_messages):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        mock_messages.warning.assert_called_once_with(
+            response.wsgi_request,
+            'You need an account to join this session.'
+        )
+
+    def test_access_with_logged_user_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        expected_url = reverse('roleplay:session:detail', kwargs={'pk': self.session.pk})
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
 
-        self.assertRedirects(response, expected_url)
+        self.assertRedirects(response, resolve_url(self.session))
 
-    def test_user_is_added_to_players_ok(self):
+    def test_access_with_logged_user_adds_user_to_players_ok(self):
         self.client.force_login(self.user)
-        self.client.get(self.url)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        self.client.get(url)
 
         self.assertIn(self.user, self.session.players.all())
 
+    def test_access_with_incorrect_token_ko(self):
+        token = f'{fake.email()}:{fake.password()}'
+        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
 
 class TestSessionDetailView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
     resolver = 'roleplay:session:detail'
     template = 'roleplay/session/session_detail.html'
@@ -887,44 +1028,255 @@ class TestSessionDetailView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make(get_user_model())
-        cls.game_master = baker.make(get_user_model())
-        cls.player = baker.make(get_user_model())
-        cls.world = baker.make(models.Place, site_type=enums.SiteTypes.WORLD)
-        cls.session = baker.make(cls.model, world=cls.world)
-        cls.session.players.add(cls.player)
-        cls.session.add_game_masters(cls.game_master)
+        cls.user_in_players = baker.make_recipe('registration.user')
+        cls.user_not_in_players = baker.make_recipe('registration.user')
 
-    def setUp(self):
-        self.login_url = reverse('registration:auth:login')
-        self.url = reverse(self.resolver, kwargs={'pk': self.session.pk})
+        cls.session = baker.make_recipe('roleplay.session', players=[cls.user_in_players])
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
 
-    def test_access_anonymous_user_ko(self):
+    def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
         expected_url = f'{self.login_url}?next={self.url}'
 
         self.assertRedirects(response, expected_url)
 
-    def test_access_game_master_ok(self):
-        self.client.force_login(self.game_master)
-        response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, self.template)
-
-    def test_access_player_ok(self):
-        self.client.force_login(self.player)
-        response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, self.template)
-
-    def test_access_non_player_ko(self):
-        self.client.force_login(self.user)
+    def test_access_with_non_player_ko(self):
+        self.client.force_login(self.user_not_in_players)
         response = self.client.get(self.url)
 
         self.assertEqual(403, response.status_code)
 
+
+    def test_access_with_player_ok(self):
+        self.client.force_login(self.user_in_players)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_with_player_with_profile_pic_ok(self):
+        user = baker.make_recipe('roleplay.user')
+        profile = user.profile
+        profile.image = SimpleUploadedFile('test_image.jpg', b'file_content', content_type='image/jpeg')
+        profile.save()
+        self.session.players.add(user)
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        session = baker.make_recipe('roleplay.session')
+        session.add_game_masters(self.user_in_players)
+        self.client.force_login(self.user_in_players)
+        url = resolve_url(self.resolver, pk=session.pk)
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_players)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+
+class TestSessionDeleteView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:delete'
+    template = 'roleplay/session/session_confirm_delete.html'
+    view = views.SessionDeleteView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_in_game_masters = baker.make_recipe('registration.user')
+        cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_non_game_master_ko(self):
+        self.client.force_login(self.user_not_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_game_master_session_deleted_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        self.client.post(self.url)
+
+        with self.assertRaises(self.model.DoesNotExist):
+            self.model.objects.get(pk=self.session.pk)
+
+    def test_access_game_master_session_deleted_redirect_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, resolve_url('roleplay:session:list'))
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_game_master_session_deleted_message_ok(self, mock_messages):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'Session deleted.',
+        )
+
+
+class TestSessionUpdateView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:edit'
+    template = 'roleplay/session/session_update.html'
+    view = views.SessionUpdateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_in_game_masters = baker.make_recipe('registration.user')
+        cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+
+        cls.session = baker.make_recipe('roleplay.session')
+        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_non_game_master_ko(self):
+        self.client.force_login(self.user_not_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_with_game_master_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_game_master_session_updated_ok(self):
+        name = fake.sentence()
+        data = {
+            'name': name,
+            'plot': fake.text(),
+            'system': self.session.system,
+            'next_game': self.session.next_game,
+            'world': self.session.world.pk,
+        }
+        self.client.force_login(self.user_in_game_masters)
+        self.client.post(self.url, data)
+        self.session.refresh_from_db()
+
+        self.assertEqual(name, self.session.name)
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_game_master_session_updated_message_ok(self, mock_messages):
+        data = {
+            'name': fake.sentence(),
+            'plot': fake.text(),
+            'system': self.session.system,
+            'next_game': self.session.next_game,
+            'world': self.session.world.pk,
+        }
+        self.client.force_login(self.user_in_game_masters)
+        response = self.client.post(self.url, data)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'Session updated!'
+        )
+
+
+class TestSessionListView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Session
+    resolver = 'roleplay:session:list'
+    template = 'roleplay/session/session_list.html'
+    view = views.SessionListView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.another_user = baker.make_recipe('registration.user')
+        another_user_profile = cls.another_user.profile
+        another_user_profile.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
+        another_user_profile.save()
+        baker.make_recipe(
+            baker_recipe_name='roleplay.session',
+            _quantity=fake.pyint(min_value=1, max_value=10),
+            players=[cls.user, cls.another_user],
+        )
+        cls.url = resolve_url(cls.resolver)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_session_list_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
+
+    def test_access_session_with_image_ok(self):
+        session = baker.make_recipe('roleplay.session', players=[self.user])
+        session.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
+        session.save()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_session_list_only_where_user_is_player_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
+
+        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
 
 class TestRaceCreateView(TestCase):
     fake = Faker()
@@ -957,10 +1309,6 @@ class TestRaceCreateView(TestCase):
         }
 
     def test_access_logged_user_ok(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, self.template)
 
     def test_creates_race_ok(self):

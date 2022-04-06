@@ -76,7 +76,7 @@
     </div>
 
     <div class="row justify-content-around mt-4">
-      <div class="col-11 col-sm-5 btn-group dropdown mt-3 px-0">
+      <div class="col-11 col-sm-5 col-xl-3 btn-group dropdown mt-3 px-0">
         <button
           class="btn btn-primary dropdown-toggle {% if not object.get_children and object.get_root == object %}disabled{% endif %}"
           type="button"
@@ -123,7 +123,7 @@
               <a
                 href="{% url 'roleplay:place:detail' place.pk %}"
                 class="dropdown-item"
-                title="{% translate "go to parent site"|capfirst %}"
+                title="{% translate "go to site"|capfirst %}"
               >
                 {{ place.resolve_icon|safe }}
                 {{ place.name }}
@@ -133,7 +133,7 @@
         </ul>
       </div>
       <div
-        class="col-11 col-sm-5 btn-group dropdown mt-3 px-0"
+        class="col-11 col-sm-5 col-xl-3 btn-group dropdown mt-3 px-0"
       >
         <button
           class="btn btn-secondary dropdown-toggle"
@@ -146,15 +146,17 @@
           {% translate "options"|capfirst %}
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownPlaceOptions">
-        <li>
-          <a
-            href="#no-url"
-            class="dropdown-item disabled"
-          >
-            <i class="ic ic-quill"></i>
-            {% translate "create campaign"|capfirst %}
-          </a>
-        </li>
+          {% if object.is_world %}
+            <li>
+              <a
+                href="{% url 'roleplay:session:create' object.pk %}"
+                class="dropdown-item"
+              >
+                <i class="ic ic-quill"></i>
+                {% translate "create campaign"|capfirst %}
+              </a>
+            </li>
+          {% endif %}
           {% if object.owner == request.user %}
             <li>
               <a class="dropdown-item" href="{% url 'roleplay:place:create' object.pk %}">
@@ -174,7 +176,7 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item" href="{% url 'roleplay:world:delete' object.pk %}">
+              <a class="dropdown-item" href="{% url 'roleplay:place:delete' object.pk %}">
                 <i class="ic ic-trash"></i>
                 {% translate "delete"|capfirst %}
               </a>

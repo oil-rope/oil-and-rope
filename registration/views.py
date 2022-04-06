@@ -92,7 +92,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
                 _('seems like we are experimenting issues with our mail automatization.').capitalize(),
                 _('please try later.').capitalize(),
             )
-            messages.error(self.request, msg, extra_tags='danger')
+            messages.error(self.request, msg)
             # NOTE: We return response as is form has failed so user doesn't have to write everything again
             response = super().form_invalid(form)
         finally:

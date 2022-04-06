@@ -21,7 +21,7 @@ class Chat(TracingMixin):
     """
 
     id = models.BigAutoField(primary_key=True, verbose_name=_('identifier'))
-    name = models.CharField(verbose_name=_('name'), max_length=50)
+    name = models.CharField(verbose_name=_('name'), max_length=254)
     users = models.ManyToManyField(to=USER_MODEL, verbose_name=_('users'), related_name='chat_set')
     discord_id = models.CharField(
         verbose_name=_('discord identifier'), max_length=100, null=False, blank=True, db_index=True,

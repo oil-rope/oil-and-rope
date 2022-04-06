@@ -191,7 +191,6 @@ class TestSignUpView(TestCase):
             mock_call.error.assert_called_with(
                 response.wsgi_request,
                 error_message,
-                extra_tags='danger',
             )
 
     def test_wrong_confirm_password(self):
