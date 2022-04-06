@@ -37,6 +37,7 @@ xlrd = "^2.0"
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6"
 coverage = "^6.3"
+django-coverage-plugin = "^2.0"
 django-debug-toolbar = "^3.2"
 django-extensions = "^3.1"
 dpytest = "^0.5"
@@ -54,7 +55,7 @@ pytest-mock = "^3.7"
 pytest-xdist = "^2.5"
 Sphinx = "^4.4"
 sphinx-rtd-theme = "^1.0"
-werkzeug = "^2.0"
+werkzeug = "~2.0"
 selenium = "^4.1"
 
 [build-system]

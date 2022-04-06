@@ -29,7 +29,7 @@
             {% translate "edit"|capfirst %}
           </a>
         {% endif %}
-        <div class="btn-group col-1 dropend align-self-end ms-auto">
+        <div class="btn-group col-1 col-md-2 dropend align-self-end ms-auto">
           <button
             type="button"
             class="btn"
@@ -40,7 +40,7 @@
             <i class="ic ic-dots-horizontal-triple"></i>
           </button>
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
-            <a href="#" class="dropdown-item disabled">
+            <a href="{% url 'roleplay:session:create' world.pk %}" class="dropdown-item">
               <span class="ic-quill"></span>
               {% translate "create campaign"|capfirst %}
             </a>
@@ -54,7 +54,7 @@
                 {% translate "settings"|capfirst %}
               </a>
               <div class="dropdown-divider"></div>
-              <a href="{% url 'roleplay:world:delete' world.pk %}" class="dropdown-item">
+              <a href="{% url 'roleplay:place:delete' world.pk %}" class="dropdown-item">
                 <span class="ic-trash text-danger"></span>
                 {% translate "delete"|capfirst %} {% translate "world" %}
               </a>

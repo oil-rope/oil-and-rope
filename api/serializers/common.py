@@ -33,6 +33,6 @@ class MappedSerializerMixin:
         return mapped_fields
 
     def get_fields(self):
-        fields = super(MappedSerializerMixin, self).get_fields()
+        fields = super().get_fields()
         fields = self.override_fields(fields)
         return fields

@@ -4,7 +4,9 @@
 {% load string_utils %}
 
 {% block breadcrumb %}
-  {% translate "world delete" as world_delete_page %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "world delete" as breadcrumb_translation %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,world delete' %}
 {% endblock breadcrumb %}
 
@@ -29,7 +31,7 @@
             </p>
           </div>
           <div class="card-body mt-xl-5">
-            <form class="d-flex justify-content-around" action="{% url 'roleplay:world:delete' object.pk %}"
+            <form class="d-flex justify-content-around" action="{% url 'roleplay:place:delete' object.pk %}"
                   method="post">
               {% csrf_token %}
               <input type="button" onclick="goBack();" value="{% translate 'cancel'|capfirst %}"

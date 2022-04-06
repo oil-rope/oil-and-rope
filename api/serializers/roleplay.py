@@ -3,9 +3,7 @@ from rest_framework import serializers
 
 from common.constants import models
 
-from .chat import ChatSerializer
-from .common import MappedSerializerMixin
-
+Chat = apps.get_model(models.CHAT_MODEL)
 Domain = apps.get_model(models.DOMAIN_MODEL)
 Place = apps.get_model(models.PLACE_MODEL)
 Race = apps.get_model(models.RACE_MODEL)
@@ -55,19 +53,22 @@ class RaceSerializer(serializers.ModelSerializer):
         )
 
 
-class SessionSerializer(MappedSerializerMixin, serializers.ModelSerializer):
-    serializers_map = {
-        'chat': ChatSerializer(many=False, read_only=True)
-    }
+class SessionSerializer(serializers.ModelSerializer):
+    game_masters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
-    game_masters = serializers.SerializerMethodField(method_name='get_game_masters')
-
-    def get_game_masters(self, obj):
-        gms_pk = obj.game_masters.values_list('pk', flat=True)
-        return list(gms_pk)
+    def save(self, **kwargs):
+        # NOTE: We create the chat on the go
+        chat = Chat.objects.create(
+            name=self.validated_data.get('name') + ' chat',
+        )
+        kwargs['chat'] = chat
+        return super().save(**kwargs)
 
     class Meta:
         model = Session
         fields = (
-            'id', 'name', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters',
+            'id', 'name', 'plot', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters',
         )
+        extra_kwargs = {
+            'chat': {'required': False},
+        }

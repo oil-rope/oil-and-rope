@@ -5,17 +5,18 @@ from django.template.loader import render_to_string
 
 
 class HtmlThreadMail:
-    def __init__(self, template_name, request=None, context=None, subject='', from_email=None, to=None):
+    def __init__(self, template_name, request=None, context=None, subject='', from_email=None, to=None, bcc=None):
         self.template_name = template_name
         self.request = request
         self.context = context
         self.subject = subject
         self.from_email = from_email
         self.to = to
+        self.bcc = bcc
         self.thread = None
 
     def get_email(self):
-        mail = EmailMultiAlternatives(subject=self.subject, from_email=self.from_email, to=self.to)
+        mail = EmailMultiAlternatives(subject=self.subject, from_email=self.from_email, to=self.to, bcc=self.bcc)
         mail.attach_alternative(self.get_body(), 'text/html')
         return mail
 

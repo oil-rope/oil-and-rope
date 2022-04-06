@@ -1,4 +1,4 @@
-from django.shortcuts import reverse
+from django.shortcuts import resolve_url, reverse
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -45,16 +45,16 @@ class TestURLResolverViewSet(APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_with_params_ok(self):
-        session = baker.make_recipe('roleplay.session', players=[self.user])
+        place = baker.make_recipe('roleplay.place')
         data = {
-            'resolver': 'roleplay:session:detail',
-            'pk': session.pk,
+            'resolver': 'roleplay:place:detail',
+            'pk': place.pk,
         }
         response = self.client.post(self.url, data)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-        expected_url = reverse('roleplay:session:detail', kwargs={'pk': session.pk})
+        expected_url = resolve_url(place)
         url = response.json()['url']
 
         self.assertEqual(expected_url, url)

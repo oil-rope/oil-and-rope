@@ -39,6 +39,15 @@ world = Recipe(
     owner=foreign_key(user),
 )
 
+private_world = Recipe(
+    Place,
+    name=fake.country,
+    description=fake.paragraph,
+    site_type=SiteTypes.WORLD,
+    owner=foreign_key(user),
+    user=foreign_key(user),
+)
+
 domain = Recipe(
     Domain,
     name=fake.word,
@@ -49,7 +58,7 @@ domain = Recipe(
 session = Recipe(
     Session,
     name=fake.sentence,
-    description=fake.paragraph,
+    plot=fake.paragraph,
     players=related(user),
     next_game=random_date_after_today,
     system=random_roleplay_system,
