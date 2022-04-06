@@ -1,3 +1,6 @@
+from rest_framework import serializers
+
+
 class MappedSerializerMixin:
     """
     This serializer allows to have more than one representation for an specific field.
@@ -36,3 +39,17 @@ class MappedSerializerMixin:
         fields = super().get_fields()
         fields = self.override_fields(fields)
         return fields
+
+
+class WebSocketMessageSerializer(serializers.Serializer):
+    """
+    This serializer is used to send messages to the client.
+
+    Parameters
+    ----------
+    type: :class:`str`
+        Type of execution.
+    """
+
+    type = serializers.CharField(max_length=255, required=True)
+    content = serializers.DictField(required=False)
