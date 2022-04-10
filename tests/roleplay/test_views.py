@@ -1278,8 +1278,8 @@ class TestSessionListView(TestCase):
 
         self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
 
+
 class TestRaceCreateView(TestCase):
-    fake = Faker()
     login_url = reverse('registration:auth:login')
     model = models.Race
     resolver = 'roleplay:race:create'
@@ -1288,11 +1288,11 @@ class TestRaceCreateView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make(get_user_model())
+        cls.user = baker.make_recipe('registration.user')
         cls.race = baker.make(models.Race)
 
     def setUp(self):
-        self.user = baker.make(get_user_model())
+        self.users = baker.make('registration.user')
         self.url = reverse(self.resolver)
         self.data_ok = {
             'name': fake.word(),
@@ -1308,7 +1308,10 @@ class TestRaceCreateView(TestCase):
             'users': [self.user.pk]
         }
 
-    def test_access_logged_user_ok(self):
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
         self.assertTemplateUsed(response, self.template)
 
     def test_creates_race_ok(self):
@@ -1318,3 +1321,89 @@ class TestRaceCreateView(TestCase):
 
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(self.data_ok['description'], instance.description)
+
+
+class TestRaceUpdateView(TestCase):
+    model = models.Race
+    resolver = 'roleplay:place:edit'
+    template = 'roleplay/race/race_update.html'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.users = baker.make_recipe('registration.user')
+
+        cls.race = cls.model.objectPermissionDenieds.create(
+            name = fake.word(),
+            description = fake.paragraph(),
+            strength = fake.random_int(min=-5, max=5),
+            dexterity = fake.random_int(min=-5, max=5),
+            charisma = fake.random_int(min=-5, max=5),
+            constitution = fake.random_int(min=-5, max=5),
+            intelligence = fake.random_int(min=-5, max=5),
+            affected_by_armor = fake.boolean(),
+            wisdom = fake.random_int(min=-5, max=5),
+            image = fake.image_url(),
+        )
+        cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.url = reverse('roleplay:race:edit', kwargs={'pk': cls.race.pk})
+
+    def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        with open(self.tmp_file.name, 'rb') as img_content:
+            image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
+
+        self.data_ok = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'strength': fake.random_int(min=-5, max=5),
+            'dexterity': fake.random_int(min=-5, max=5),
+            'charisma': fake.random_int(min=-5, max=5),
+            'constitution': fake.random_int(min=-5, max=5),
+            'intelligence': fake.random_int(min=-5, max=5),
+            'affected_by_armor': fake.boolean(),
+            'wisdom': fake.random_int(min=-5, max=5),
+            'image': image,
+            'users': [self.users.pk]
+        }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_anonymous_access_ko(self):
+        login_url = reverse('registration:auth:login')
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_access_not_owner_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_owner_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_anonymous_post_data_ko(self):
+        login_url = reverse('registration:auth:login')
+        response = self.client.post(self.url, data=self.data_ok)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_post_data_ok(self):
+        self.client.force_login(self.owner)
+        current_name = self.race.name
+        new_name = self.data_ok['name']
+        response = self.client.post(self.url, data=self.data_ok)
+        self.race.refresh_from_db()
+
+        self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
+        self.assertNotEqual(current_name, new_name)
+        self.assertEqual(self.race.name, new_name)

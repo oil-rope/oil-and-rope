@@ -7,6 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import resolve_url
 from django.utils import timezone
@@ -21,7 +22,7 @@ from common.views import MultiplePaginatorListView
 from roleplay.forms.layout import SessionFormLayout
 
 from common.forms.layout import SubmitClearLayout as Submit
-from . import enums, forms, models
+from . import enums, forms
 from .utils.invitations import send_session_invitations
 
 LOGGER = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ LOGGER = logging.getLogger(__name__)
 User = get_user_model()
 Place = apps.get_model(models.PLACE_MODEL)
 Session = apps.get_model(models.SESSION_MODEL)
+Race = apps.get_model(models.RACE_MODEL)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -374,13 +376,13 @@ class SessionListView(LoginRequiredMixin, ListView):
         return context
 
 
-class RaceCreateView(CreateView):
+class RaceCreateView(LoginRequiredMixin, CreateView):
     """
     This view creates a race
     """
 
     form_class = forms.RaceForm
-    model = models.Race
+    model = Race
     template_name = 'roleplay/race/race_create.html'
 
     def get_success_url(self):
@@ -399,7 +401,7 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
     This view shows the details of a race
     """
 
-    model = models.Race
+    model = Race
     template_name = 'roleplay/race/race_detail.html'
 
 
@@ -408,12 +410,21 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView):
     This view updates a race
     """
 
-    model = models.Race
+    model = Race
     form_class = forms.RaceForm
     template_name = 'roleplay/race/race_update.html'
 
     def get_form_kwargs(self, form_class=None):
         kwargs = super().get_form_kwargs()
+
+        is_user = False
+        for user in kwargs['instance'].users.all():
+            if user == self.request.user:
+                is_user = True
+
+        if is_user == False:
+            raise PermissionDenied
+
         kwargs['submit_text'] = _('update').capitalize()
         return kwargs
 
@@ -426,12 +437,12 @@ class RaceListView(LoginRequiredMixin, MultiplePaginatorListView):
     this view deletes a race
     """
 
-    model = models.Race
+    model = Race
     success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_list.html'
     paginate_by = 10
     race_page_kwarg = 'page_races'
-    queryset = models.Race.objects.all()
+    queryset = Race.objects.all()
 
     def get_races(self):
         return self.model.objects.all()
@@ -473,6 +484,6 @@ class RaceDeleteView(LoginRequiredMixin, DeleteView):
     this view deletes a race
     """
 
-    model = models.Race
+    model = Race
     success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_confirm_delete.html'
