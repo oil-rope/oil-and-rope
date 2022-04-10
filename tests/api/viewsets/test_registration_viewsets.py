@@ -175,6 +175,5 @@ class TestBotViewSet(TestCase):
     def test_authenticated_access_bot_description_ok(self):
         self.client.force_login(self.bot)
         response = self.client.get(self.url)
-        breakpoint()
 
         self.assertEqual(settings.BOT_DESCRIPTION, response.data['description'])
