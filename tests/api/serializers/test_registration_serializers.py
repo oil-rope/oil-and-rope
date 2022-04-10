@@ -1,13 +1,12 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from faker import Faker
 from model_bakery import baker
 
-from api.serializers.registration import ProfileSerializer, UserSerializer
+from api.serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
 from common.constants import models
-
-fake = Faker()
+from tests import fake
 
 User = get_user_model()
 Profile = apps.get_model(models.PROFILE_MODEL)
@@ -64,3 +63,23 @@ class TestProfileSerializer(TestCase):
         serialized_result = serialized_obj.data
 
         self.assertEqual(expected_bio, serialized_result['bio'])
+
+
+class TestBotSerializer(TestCase):
+    serializer_class = BotSerializer
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
+
+    def test_command_prefix_ok(self):
+        serialized_obj = self.serializer_class(self.bot)
+        serialized_result = serialized_obj.data
+
+        self.assertEqual(settings.BOT_COMMAND_PREFIX, serialized_result['command_prefix'])
+
+    def test_description_ok(self):
+        serialized_obj = self.serializer_class(self.bot)
+        serialized_result = serialized_obj.data
+
+        self.assertEqual(settings.BOT_DESCRIPTION, serialized_result['description'])

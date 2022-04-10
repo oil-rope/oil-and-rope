@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -56,4 +57,26 @@ class SimpleUserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'username', 'first_name', 'last_name', 'email',
+        )
+
+
+class BotSerializer(serializers.ModelSerializer):
+    """
+    API serializer for Oil & Rope bot.
+    This serializer is quite simple and just includes: `id`, `username`, `email`, `command_prefix` and `description`.
+    """
+
+    command_prefix = serializers.SerializerMethodField(method_name='get_command_prefix')
+    description = serializers.SerializerMethodField(method_name='get_description')
+
+    def get_command_prefix(self, obj):
+        return settings.BOT_COMMAND_PREFIX
+
+    def get_description(self, obj):
+        return settings.BOT_DESCRIPTION
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'email', 'command_prefix', 'description',
         )
