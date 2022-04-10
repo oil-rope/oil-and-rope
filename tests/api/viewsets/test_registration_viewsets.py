@@ -1,14 +1,13 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.shortcuts import reverse
-from faker import Faker
+from django.shortcuts import resolve_url, reverse
+from django.test import TestCase
 from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.constants import models
-
-fake = Faker()
 
 User = get_user_model()
 Profile = apps.get_model(models.PROFILE_MODEL)
@@ -148,3 +147,34 @@ class TestProfileViewSet(TestRegistrationViewSet):
         response = self.client.get(url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+
+class TestBotViewSet(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
+        cls.url = resolve_url(f'{base_resolver}:bot-list')
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_authenticated_access_ok(self):
+        self.client.force_login(self.bot)
+        response = self.client.get(self.url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_authenticated_access_command_prefix_ok(self):
+        self.client.force_login(self.bot)
+        response = self.client.get(self.url)
+
+        self.assertEqual(settings.BOT_COMMAND_PREFIX, response.data['command_prefix'])
+
+    def test_authenticated_access_bot_description_ok(self):
+        self.client.force_login(self.bot)
+        response = self.client.get(self.url)
+        breakpoint()
+
+        self.assertEqual(settings.BOT_DESCRIPTION, response.data['description'])
