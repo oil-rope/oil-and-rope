@@ -52,7 +52,7 @@ class SessionAdmin(admin.ModelAdmin):
 
 
 class RaceInline(admin.TabularInline):
-    model = models.RaceUser 
+    model = models.RaceUser
 
 
 @admin.register(models.Race)

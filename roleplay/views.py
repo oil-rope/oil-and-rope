@@ -3,11 +3,11 @@ import logging
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import resolve_url
 from django.utils import timezone
@@ -21,7 +21,6 @@ from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
 from roleplay.forms.layout import SessionFormLayout
 
-from common.forms.layout import SubmitClearLayout as Submit
 from . import enums, forms
 from .utils.invitations import send_session_invitations
 
@@ -390,8 +389,10 @@ class RaceCreateView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        kwargs['submit_text']: _('create').capitalize()
+        kwargs.update({
+            'user': self.request.user,
+            'submit_text': _('create').capitalize()
+        })
 
         return kwargs
 
@@ -422,7 +423,7 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView):
             if user == self.request.user:
                 is_user = True
 
-        if is_user == False:
+        if is_user is False:
             raise PermissionDenied
 
         kwargs['submit_text'] = _('update').capitalize()

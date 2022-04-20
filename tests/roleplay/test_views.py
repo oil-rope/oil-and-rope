@@ -1046,7 +1046,6 @@ class TestSessionDetailView(TestCase):
 
         self.assertEqual(403, response.status_code)
 
-
     def test_access_with_player_ok(self):
         self.client.force_login(self.user_in_players)
         response = self.client.get(self.url)
@@ -1333,16 +1332,16 @@ class TestRaceUpdateView(TestCase):
         cls.users = baker.make_recipe('registration.user')
 
         cls.race = cls.model.objects.create(
-            name = fake.word(),
-            description = fake.paragraph(),
-            strength = fake.random_int(min=-5, max=5),
-            dexterity = fake.random_int(min=-5, max=5),
-            charisma = fake.random_int(min=-5, max=5),
-            constitution = fake.random_int(min=-5, max=5),
-            intelligence = fake.random_int(min=-5, max=5),
-            affected_by_armor = fake.boolean(),
-            wisdom = fake.random_int(min=-5, max=5),
-            image = fake.image_url(),
+            name=fake.word(),
+            description=fake.paragraph(),
+            strength=fake.random_int(min=-5, max=5),
+            dexterity=fake.random_int(min=-5, max=5),
+            charisma=fake.random_int(min=-5, max=5),
+            constitution=fake.random_int(min=-5, max=5),
+            intelligence=fake.random_int(min=-5, max=5),
+            affected_by_armor=fake.boolean(),
+            wisdom=fake.random_int(min=-5, max=5),
+            image=fake.image_url(),
         )
         cls.race.users.add(cls.users)
         cls.owner = cls.users
@@ -1407,7 +1406,3 @@ class TestRaceUpdateView(TestCase):
         self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
         self.assertNotEqual(current_name, new_name)
         self.assertEqual(self.race.name, new_name)
-
-
-#  self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
-# self.assertRedirects(response, f'{login_url}?next={self.url}')
