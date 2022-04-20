@@ -1332,7 +1332,7 @@ class TestRaceUpdateView(TestCase):
     def setUpTestData(cls) -> None:
         cls.users = baker.make_recipe('registration.user')
 
-        cls.race = cls.model.objectPermissionDenieds.create(
+        cls.race = cls.model.objects.create(
             name = fake.word(),
             description = fake.paragraph(),
             strength = fake.random_int(min=-5, max=5),
@@ -1407,3 +1407,7 @@ class TestRaceUpdateView(TestCase):
         self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
         self.assertNotEqual(current_name, new_name)
         self.assertEqual(self.race.name, new_name)
+
+
+#  self.assertTemplateUsed(response, 'roleplay/place/place_detail.html')
+# self.assertRedirects(response, f'{login_url}?next={self.url}')

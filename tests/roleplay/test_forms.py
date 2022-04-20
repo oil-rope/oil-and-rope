@@ -250,17 +250,6 @@ class TestSessionForm(TestCase):
 
         self.assertFalse(form.is_valid())
 
-    def test_next_game_is_correct_ok(self):
-        form = self.form_class(self.rq, data=self.data_ok)
-        expected_date = timezone.datetime.combine(
-            date=self.data_ok['next_game_date'],
-            time=self.data_ok['next_game_time'],
-            tzinfo=timezone.get_current_timezone(),
-        )
-        instance = form.save()
-
-        self.assertEqual(expected_date, instance.next_game)
-
 
 class TestRaceForm(TestCase):
     form_class = forms.RaceForm
