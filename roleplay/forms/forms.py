@@ -13,7 +13,7 @@ from common.files import utils
 from common.forms.widgets import DateTimeWidget
 
 from .. import enums, models
-from .layout import SessionFormLayout, WorldFormLayout, RaceFormLayout, PlaceLayout
+from .layout import PlaceLayout, RaceFormLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 

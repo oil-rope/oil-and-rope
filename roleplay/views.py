@@ -3,13 +3,13 @@ import logging
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.signing import BadSignature, TimestampSigner
 from django.core.exceptions import PermissionDenied
+from django.core.signing import BadSignature, TimestampSigner
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import resolve_url
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView

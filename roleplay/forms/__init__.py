@@ -1,4 +1,4 @@
-from .forms import PlaceForm, SessionForm, WorldForm, RaceForm
+from .forms import PlaceForm, RaceForm, SessionForm, WorldForm
 
 __all__ = [
     'WorldForm', 'SessionForm', 'RaceForm', 'PlaceForm'
