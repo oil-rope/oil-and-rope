@@ -1406,3 +1406,87 @@ class TestRaceUpdateView(TestCase):
         self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
         self.assertNotEqual(current_name, new_name)
         self.assertEqual(self.race.name, new_name)
+
+
+class TestRaceListView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Race
+    resolver = 'roleplay:Race:list'
+    template = 'roleplay/race/race_list.html'
+    view = views.RaceListView
+
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.users = baker.make_recipe('registration.user')
+
+        cls.race = cls.model.objects.create(
+            name=fake.word(),
+            description=fake.paragraph(),
+            strength=fake.random_int(min=-5, max=5),
+            dexterity=fake.random_int(min=-5, max=5),
+            charisma=fake.random_int(min=-5, max=5),
+            constitution=fake.random_int(min=-5, max=5),
+            intelligence=fake.random_int(min=-5, max=5),
+            affected_by_armor=fake.boolean(),
+            wisdom=fake.random_int(min=-5, max=5),
+            image=fake.image_url(),
+        )
+        cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.url = reverse('roleplay:race:list')
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_with_user_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+
+class TestRaceDeleteView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = models.Race
+    resolver = 'roleplay:Race:delete'
+    template = 'roleplay/race/race_confirm_delete.html'
+    view = views.RaceDeleteView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.users = baker.make_recipe('registration.user')
+        cls.race = baker.make_recipe('roleplay.race')
+
+        cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.url = reverse('roleplay:race:delete', kwargs={'pk': cls.race.pk})
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_redirect_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, resolve_url('roleplay:race:list'))
