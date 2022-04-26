@@ -17,7 +17,7 @@ from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
-Chat = apps.get_model(constants.CHAT_MODEL)
+Chat = apps.get_model(constants.CHAT)
 
 
 class PlaceForm(forms.ModelForm):

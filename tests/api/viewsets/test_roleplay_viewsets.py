@@ -14,12 +14,12 @@ from roleplay import baker_recipes as recipes
 from roleplay.enums import RoleplaySystems
 from tests.api.viewsets.utils import bake_places
 
-Chat = apps.get_model(models.CHAT_MODEL)
-Domain = apps.get_model(models.DOMAIN_MODEL)
-Place = apps.get_model(models.PLACE_MODEL)
+Chat = apps.get_model(models.CHAT)
+Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
 PlayerInSession = apps.get_model(models.ROLEPLAY_PLAYER_IN_SESSION)
-Race = apps.get_model(models.RACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
+Race = apps.get_model(models.ROLEPLAY_RACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 User = get_user_model()
 
 fake = create_faker()

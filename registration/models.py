@@ -83,7 +83,7 @@ class Profile(TracingMixin):
     """
 
     user = models.OneToOneField(
-        to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='profile', verbose_name=_('user')
+        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='profile', verbose_name=_('user')
     )
     bio = models.TextField(verbose_name=_('biography'), null=False, blank=True)
     birthday = models.DateField(verbose_name=_('birthday'), null=True, blank=True)

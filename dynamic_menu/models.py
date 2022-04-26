@@ -16,8 +16,8 @@ from core.models import TracingMixin
 from . import managers
 from .enums import MenuTypes
 
-PERMISSION_CLASS = constants.PERMISSION_MODEL
-MODEL_MANAGER_CLASS = constants.CONTENT_TYPE_MODEL
+PERMISSION_CLASS = constants.AUTH_PERMISSION
+MODEL_MANAGER_CLASS = constants.CONTENT_TYPE
 
 
 def dynamic_menu_path(instance: models.Model, filename: str) -> str:
@@ -177,7 +177,7 @@ class DynamicMenu(MPTTModel, TracingMixin):
         Takes a list of perms either :class:`str` (`app_label.codename`) or :class:`auth.Permission` instance.
         """
 
-        Permission = apps.get_model(constants.PERMISSION_MODEL)
+        Permission = apps.get_model(constants.AUTH_PERMISSION)
         parsed_objs = []
 
         for obj in objs:

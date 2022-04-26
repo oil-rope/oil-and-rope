@@ -1,15 +1,15 @@
 from django.conf import settings
 
 # Auth
-GROUP_MODEL = 'auth.Group'
-PERMISSION_MODEL = 'auth.Permission'
+AUTH_GROUP = 'auth.Group'
+AUTH_PERMISSION = 'auth.Permission'
 
 # Registration
-USER_MODEL = settings.AUTH_USER_MODEL
-PROFILE_MODEL = 'registration.Profile'
+REGISTRATION_USER = settings.AUTH_USER_MODEL
+REGISTRATION_PROFILE = 'registration.Profile'
 
 # Common
-TRACK_MODEL = 'common.Track'
+COMMON_TRACK = 'common.Track'
 
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'
@@ -17,19 +17,19 @@ DISCORD_SERVER_MODEL = 'bot.DiscordServer'
 DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
 
 # Content Types
-CONTENT_TYPE_MODEL = 'contenttypes.ContentType'
+CONTENT_TYPE = 'contenttypes.ContentType'
 
 # Dynamic Menu
 DYNAMIC_MENU = 'dynamic_menu.DynamicMenu'
 
 # Roleplay
-DOMAIN_MODEL = 'roleplay.Domain'
-PLACE_MODEL = 'roleplay.Place'
-RACE_MODEL = 'roleplay.Race'
-USER_RACE_RELATION = 'roleplay.RaceUser'
-SESSION_MODEL = 'roleplay.Session'
+ROLEPLAY_DOMAIN = 'roleplay.Domain'
+ROLEPLAY_PLACE = 'roleplay.Place'
+ROLEPLAY_RACE = 'roleplay.Race'
+ROLEPLAY_RACE_USER = 'roleplay.RaceUser'
+ROLEPLAY_SESSION = 'roleplay.Session'
 ROLEPLAY_PLAYER_IN_SESSION = 'roleplay.PlayerInSession'
 
 # Chat
-CHAT_MODEL = 'chat.Chat'
-CHAT_MESSAGE_MODEL = 'chat.ChatMessage'
+CHAT = 'chat.Chat'
+CHAT_MESSAGE = 'chat.ChatMessage'

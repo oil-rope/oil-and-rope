@@ -8,8 +8,8 @@ from .common import WebSocketMessageSerializer
 from .registration import SimpleUserSerializer
 
 User = get_user_model()
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
-Chat = apps.get_model(models.CHAT_MODEL)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
+Chat = apps.get_model(models.CHAT)
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):

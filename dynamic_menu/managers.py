@@ -10,7 +10,7 @@ class DynamicMenuManager(models.Manager):
     """
 
     def from_user(self, user):
-        Permission = apps.get_model(constants.PERMISSION_MODEL)
+        Permission = apps.get_model(constants.AUTH_PERMISSION)
 
         if user.is_superuser:
             user_perms_menus = Permission.objects.values_list('menus', flat=True)

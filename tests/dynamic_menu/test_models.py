@@ -7,8 +7,8 @@ from model_bakery import baker
 from common.constants import models as constants
 from dynamic_menu.models import DynamicMenu, dynamic_menu_path
 
-Permission = apps.get_model(constants.PERMISSION_MODEL)
-ContentType = apps.get_model(constants.CONTENT_TYPE_MODEL)
+Permission = apps.get_model(constants.AUTH_PERMISSION)
+ContentType = apps.get_model(constants.CONTENT_TYPE)
 
 
 class TestDynamicMenuModel(TestCase):

@@ -9,8 +9,8 @@ class TestStaffRequiredMixin(TestCase):
     view = StaffRequiredMixin
 
     def setUp(self):
-        self.user = baker.make(models.USER_MODEL)
-        self.staff = baker.make(models.USER_MODEL, is_staff=True)
+        self.user = baker.make(models.REGISTRATION_USER)
+        self.staff = baker.make(models.REGISTRATION_USER, is_staff=True)
 
     def test_access_user_ko(self):
         self.client.force_login(self.user)

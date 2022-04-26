@@ -8,7 +8,7 @@ from tests import fake
 
 
 def create_bot_user(apps, schema_editor):
-    User = apps.get_model(constants.USER_MODEL)
+    User = apps.get_model(constants.REGISTRATION_USER)
     if not User.objects.filter(email=settings.DEFAULT_FROM_EMAIL).exists():
         User.objects.create_user(
             username='Oil & Rope Bot',
@@ -19,7 +19,7 @@ def create_bot_user(apps, schema_editor):
 
 
 def delete_bot_user(apps, schema_editor):
-    User = apps.get_model(constants.USER_MODEL)
+    User = apps.get_model(constants.REGISTRATION_USER)
     User.objects.filter(email=settings.DEFAULT_FROM_EMAIL).delete()
 
 

@@ -10,8 +10,8 @@ from api.serializers.registration import SimpleUserSerializer
 from common.constants import models
 from tests import fake
 
-Chat = apps.get_model(models.CHAT_MODEL)
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
+Chat = apps.get_model(models.CHAT)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
 User = get_user_model()
 
 base_resolver = 'api:chat'

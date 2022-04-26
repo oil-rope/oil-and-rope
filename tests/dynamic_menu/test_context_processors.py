@@ -8,7 +8,7 @@ from common.constants import models as constants
 from dynamic_menu import context_processors
 from dynamic_menu.enums import MenuTypes
 
-Permission = apps.get_model(constants.PERMISSION_MODEL)
+Permission = apps.get_model(constants.AUTH_PERMISSION)
 DynamicMenu = apps.get_model(constants.DYNAMIC_MENU)
 
 
@@ -16,7 +16,7 @@ class TestMenuContextProcessor(TestCase):
 
     def setUp(self):
         self.faker = Faker()
-        self.user = baker.make(constants.USER_MODEL)
+        self.user = baker.make(constants.REGISTRATION_USER)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.perms = Permission.objects.filter(
@@ -74,7 +74,7 @@ class TestMenuContextProcessor(TestCase):
 
     def test_user_without_permissions_lists_all_menus_ko(self):
         # Random user
-        user = baker.make(constants.USER_MODEL)
+        user = baker.make(constants.REGISTRATION_USER)
         user.user_permissions.add(
             Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
@@ -107,7 +107,7 @@ class TestMenuContextProcessor(TestCase):
                 menu_type=MenuTypes.MAIN_MENU
             )
             menu.add_permissions(*self.perms)
-        user = baker.make(constants.USER_MODEL)
+        user = baker.make(constants.REGISTRATION_USER)
         user.user_permissions.add(
             Permission.objects.get(content_type__app_label='registration', codename='view_user')
         )
@@ -154,10 +154,10 @@ class TestFilterMenus(TestCase):
         self.auth_permssions = Permission.objects.filter(
             content_type__app_label='registration', codename__in=self.auth_permssions
         )
-        self.user = baker.make(constants.USER_MODEL)
-        self.staff_user = baker.make(constants.USER_MODEL, is_staff=True)
-        self.superuser = baker.make(constants.USER_MODEL, is_superuser=True)
-        self.user_with_perms = baker.make(constants.USER_MODEL)
+        self.user = baker.make(constants.REGISTRATION_USER)
+        self.staff_user = baker.make(constants.REGISTRATION_USER, is_staff=True)
+        self.superuser = baker.make(constants.REGISTRATION_USER, is_superuser=True)
+        self.user_with_perms = baker.make(constants.REGISTRATION_USER)
         self.user_with_perms.user_permissions.add(*self.auth_permssions)
 
         self.menu_without_perms = DynamicMenu.objects.create(name=self.faker.word())

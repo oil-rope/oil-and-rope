@@ -11,7 +11,7 @@ from common.constants import models
 from ..permissions.registration import IsUserOrAdmin, IsUserProfileOrAdmin
 from ..serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
 
-Profile = apps.get_model(models.PROFILE_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 User = get_user_model()
 
 

@@ -10,10 +10,10 @@ from roleplay.enums import SiteTypes
 from tests import fake
 from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
-Place = apps.get_model(constants.PLACE_MODEL)
-Race = apps.get_model(constants.RACE_MODEL)
-Session = apps.get_model(constants.SESSION_MODEL)
-User = apps.get_model(constants.USER_MODEL)
+Place = apps.get_model(constants.ROLEPLAY_PLACE)
+Race = apps.get_model(constants.ROLEPLAY_RACE)
+Session = apps.get_model(constants.ROLEPLAY_SESSION)
+User = apps.get_model(constants.REGISTRATION_USER)
 
 
 class TestUser(TestCase):

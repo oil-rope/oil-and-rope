@@ -26,8 +26,8 @@ from .utils.invitations import send_session_invitations
 LOGGER = logging.getLogger(__name__)
 
 User = get_user_model()
-Place = apps.get_model(models.PLACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):

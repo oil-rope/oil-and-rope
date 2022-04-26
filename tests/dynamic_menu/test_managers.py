@@ -9,8 +9,8 @@ class TestDynamicMenuManager(TestCase):
     model = apps.get_model(models.DYNAMIC_MENU)
 
     def setUp(self):
-        self.user = baker.make(models.USER_MODEL, is_staff=False, is_superuser=False)
-        self.superuser = baker.make(models.USER_MODEL, is_staff=False, is_superuser=True)
+        self.user = baker.make(models.REGISTRATION_USER, is_staff=False, is_superuser=False)
+        self.superuser = baker.make(models.REGISTRATION_USER, is_staff=False, is_superuser=True)
         self.menu_with_perms = baker.make(self.model)
         perms = ['registration.view_user', 'registration.add_user']
         self.menu_with_perms.add_permissions(*perms)

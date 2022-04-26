@@ -12,8 +12,8 @@ class TestDynamicMenuCreateView(TestCase):
     view = views.DynamicMenuCreateView
 
     def setUp(self):
-        self.user = baker.make(constants.USER_MODEL)
-        self.staff_user = baker.make(constants.USER_MODEL, is_staff=True)
+        self.user = baker.make(constants.REGISTRATION_USER)
+        self.staff_user = baker.make(constants.REGISTRATION_USER, is_staff=True)
         self.url = reverse('dynamic_menu:dynamic_menu:create')
 
     def test_access_anonymous_user_ko(self):
