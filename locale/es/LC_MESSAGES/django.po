@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-01 14:04+0000\n"
+"POT-Creation-Date: 2022-04-26 07:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: api/views.py:63
+msgid "'roll' field is required."
+msgstr "el campo 'roll' es requerido."
 
 #: bot/bot.py:65
 msgid "hello!"
@@ -57,6 +61,12 @@ msgstr "ya casi estás listo/a para empezar tu aventura"
 msgid "type %(command)s to get your invitation"
 msgstr "escribe %(command)s para obtener tu invitación"
 
+#: chat/consumers.py:33
+#, fuzzy
+#| msgid "User not found."
+msgid "user not authenticated."
+msgstr "usuario no autenticado."
+
 #: chat/models.py:23 chat/models.py:59 common/models.py:33
 #: roleplay/models.py:454 roleplay/models.py:521
 #, fuzzy
@@ -64,22 +74,21 @@ msgstr "escribe %(command)s para obtener tu invitación"
 msgid "identifier"
 msgstr "identificador"
 
-#: chat/models.py:24 common/models.py:34 dynamic_menu/models.py:89
-#: roleplay/models.py:32 roleplay/models.py:85 roleplay/models.py:355
-#: roleplay/models.py:455
+#: chat/models.py:24 common/models.py:34 roleplay/models.py:32
+#: roleplay/models.py:85 roleplay/models.py:355 roleplay/models.py:455
 #, fuzzy
 #| msgid "Chat name"
 msgid "name"
 msgstr "nombre"
 
-#: chat/models.py:25 common/enums.py:27 registration/models.py:55
+#: chat/models.py:25 common/enums.py:27 registration/models.py:53
 #: roleplay/models.py:371
 #, fuzzy
 #| msgid "Users"
 msgid "users"
 msgstr "usuarios"
 
-#: chat/models.py:27 registration/forms/forms.py:57 registration/models.py:25
+#: chat/models.py:27 registration/forms/forms.py:55 registration/models.py:23
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
@@ -168,9 +177,7 @@ msgstr "correo"
 msgid "share"
 msgstr "compartir"
 
-#: common/enums.py:23 core/templates/core/includes/menu.html:156
-#: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:6
-#: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:16
+#: common/enums.py:23
 #, fuzzy
 #| msgid "Menu Type"
 msgid "menu"
@@ -184,7 +191,7 @@ msgstr "dado"
 msgid "user check"
 msgstr "comprobación de usuario"
 
-#: common/enums.py:26 registration/models.py:54 registration/models.py:86
+#: common/enums.py:26 registration/models.py:52 registration/models.py:84
 #: registration/templates/registration/user_update.html:6 roleplay/models.py:98
 #: roleplay/models.py:414
 msgid "user"
@@ -310,11 +317,9 @@ msgstr "círculo cruzado fino"
 msgid "cross thin"
 msgstr "equis fina"
 
-#: common/forms/layout.py:15 core/templates/core/includes/menu.html:156
-#: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:6
-#: dynamic_menu/templates/dynamic_menu/dynamic_menu/create.html:16
-#: roleplay/forms/forms.py:24 roleplay/forms/forms.py:55
-#: roleplay/forms/layout.py:10 roleplay/forms/layout.py:108
+#: common/forms/layout.py:15 roleplay/forms/forms.py:24
+#: roleplay/forms/forms.py:55 roleplay/forms/layout.py:10
+#: roleplay/forms/layout.py:108
 #: roleplay/templates/roleplay/session/session_create.html:7
 #: roleplay/templates/roleplay/session/session_create.html:20
 #: roleplay/templates/roleplay/world/world_create.html:6
@@ -329,8 +334,8 @@ msgstr "crear"
 msgid "clear"
 msgstr "limpiar"
 
-#: common/models.py:35 dynamic_menu/models.py:90 roleplay/models.py:33
-#: roleplay/models.py:86 roleplay/models.py:356
+#: common/models.py:35 roleplay/models.py:33 roleplay/models.py:86
+#: roleplay/models.py:356
 #, fuzzy
 #| msgid "Description"
 msgid "description"
@@ -530,17 +535,15 @@ msgstr "página inválida (%(page_number)s): %(message)s"
 msgid "Oil & Rope core"
 msgstr "Núcleo de Oil & Rope"
 
-#: core/consumers.py:16
-#, fuzzy
-#| msgid "Non existent type"
-msgid "non existent type"
-msgstr "tipo inexistente"
+#: core/consumers.py:55
+msgid "invalid data"
+msgstr "datos no válidos"
 
-#: core/consumers.py:27
+#: core/consumers.py:74
 #, fuzzy
-#| msgid "No type given"
-msgid "no type given"
-msgstr "no se ha indicado el tipo"
+#| msgid "Env file does not exist"
+msgid "given type does not exist."
+msgstr "el tipo indicado no existe."
 
 #: core/models.py:17
 #, fuzzy
@@ -784,10 +787,10 @@ msgstr "acceder"
 msgid "create your account"
 msgstr "crea tu cuenta"
 
-#: core/templates/core/includes/menu.html:103 registration/forms/forms.py:225
-#: registration/models.py:102 registration/views.py:310
-#: roleplay/templates/roleplay/session/include/session_list_item.html:62
-#: roleplay/templates/roleplay/session/include/session_list_item.html:70
+#: core/templates/core/includes/menu.html:103 registration/forms/forms.py:223
+#: registration/models.py:94 registration/views.py:310
+#: roleplay/templates/roleplay/session/include/session_list_item.html:63
+#: roleplay/templates/roleplay/session/include/session_list_item.html:71
 #: roleplay/templates/roleplay/session/session_detail.html:127
 #: roleplay/templates/roleplay/session/session_detail.html:135
 #, fuzzy
@@ -813,11 +816,11 @@ msgstr "configuración"
 msgid "admin panel"
 msgstr "panel de admin"
 
-#: core/templates/core/includes/menu.html:163
+#: core/templates/core/includes/menu.html:156
 msgid "see you soon!"
 msgstr "¡nos vemos!"
 
-#: core/templates/core/includes/menu.html:189
+#: core/templates/core/includes/menu.html:182
 #, fuzzy
 #| msgid "Logout"
 msgid "logout"
@@ -833,136 +836,6 @@ msgstr "cerrar"
 msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
 msgstr ""
 "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
-
-#: dynamic_menu/apps.py:7 dynamic_menu/models.py:196
-#, fuzzy
-#| msgid "Dynamic Menu"
-msgid "dynamic menu"
-msgstr "menú dinámico"
-
-#: dynamic_menu/enums.py:6
-#, fuzzy
-#| msgid "Standard menu"
-msgid "standard menu"
-msgstr "menú estándar"
-
-#: dynamic_menu/enums.py:7
-#, fuzzy
-#| msgid "Context menu"
-msgid "context menu"
-msgstr "menú contextual"
-
-#: dynamic_menu/forms/forms.py:19 dynamic_menu/models.py:98
-#, fuzzy
-#| msgid "Parent Menu"
-msgid "parent menu"
-msgstr "menú padre"
-
-#: dynamic_menu/forms/forms.py:25
-#, fuzzy
-#| msgid "Prepended Text"
-msgid "prepended icon"
-msgstr "texto antepuesto"
-
-#: dynamic_menu/forms/forms.py:31
-#, fuzzy
-#| msgid "Appended Text"
-msgid "appended icon"
-msgstr "texto pospuesto"
-
-#: dynamic_menu/forms/forms.py:38
-msgid ""
-"permissions must be separated by ',' (auth.view_user, roleplay."
-"delete_world, ...)"
-msgstr ""
-"los permisos deben estar separados por ',' (auth.view_user, roleplay."
-"delete_world, ...)"
-
-#: dynamic_menu/forms/forms.py:45
-msgid ""
-"models must be separated by ',' (registration.User, roleplay.World, auth."
-"Group, ...)"
-msgstr ""
-"los modelos deben estar separados por ',' (registration.User, roleplay."
-"World, auth.Group, ...)"
-
-#: dynamic_menu/forms/layout.py:27
-#, fuzzy
-#| msgid "Description"
-msgid "direction"
-msgstr "dirección"
-
-#: dynamic_menu/forms/layout.py:39
-#, fuzzy
-#| msgid "Permissions required"
-msgid "permissions"
-msgstr "permisos"
-
-#: dynamic_menu/forms/layout.py:49
-#, fuzzy
-#| msgid "Resend confirmation email"
-msgid "submenu configuration"
-msgstr "configuración de submenu"
-
-#: dynamic_menu/models.py:92
-#, fuzzy
-#| msgid "Prepended Text"
-msgid "prepended text"
-msgstr "texto antepuesto"
-
-#: dynamic_menu/models.py:95
-#, fuzzy
-#| msgid "Appended Text"
-msgid "appended text"
-msgstr "texto pospuesto"
-
-#: dynamic_menu/models.py:101
-#, fuzzy
-#| msgid "URL Resolver"
-msgid "resolver"
-msgstr "resolutor de URL"
-
-#: dynamic_menu/models.py:103
-#, fuzzy
-#| msgid "Extra URL Parameters"
-msgid "extra parameters"
-msgstr "parámetros extra de URL"
-
-#: dynamic_menu/models.py:105
-#, fuzzy
-#| msgid "Order"
-msgid "order"
-msgstr "orden"
-
-#: dynamic_menu/models.py:107
-#, fuzzy
-#| msgid "Permissions required"
-msgid "permissions required"
-msgstr "permisos necesarios"
-
-#: dynamic_menu/models.py:109
-#, fuzzy
-#| msgid "Staff Required"
-msgid "staff required"
-msgstr "permiso de administrador"
-
-#: dynamic_menu/models.py:111
-#, fuzzy
-#| msgid "Menu Type"
-msgid "menu type"
-msgstr "tipo de menú"
-
-#: dynamic_menu/models.py:197
-#, fuzzy
-#| msgid "Dynamic Menus"
-msgid "dynamic menus"
-msgstr "menús dinámicos"
-
-#: dynamic_menu/views.py:18
-#, fuzzy
-#| msgid "User created"
-msgid "menu created!"
-msgstr "¡usuario creado!"
 
 #: oar_email/apps.py:7
 #, fuzzy
@@ -1072,13 +945,13 @@ msgstr ""
 msgid "to accomplish the requested task please click on link below."
 msgstr "para realizar dicha tarea has click en el link de debajo."
 
-#: oilandrope/settings.py:244
+#: oilandrope/settings.py:241
 #, fuzzy
 #| msgid "English"
 msgid "english"
 msgstr "inglés"
 
-#: oilandrope/settings.py:245
+#: oilandrope/settings.py:242
 #, fuzzy
 #| msgid "Spanish"
 msgid "spanish"
@@ -1088,13 +961,13 @@ msgstr "español"
 msgid "registration system"
 msgstr "sistema de registro"
 
-#: registration/forms/forms.py:38
+#: registration/forms/forms.py:36
 #, fuzzy
 #| msgid "username"
 msgid "username or email"
 msgstr "nombre de usuario o email"
 
-#: registration/forms/forms.py:60
+#: registration/forms/forms.py:58
 #, fuzzy
 #| msgid ""
 #| "If you have a Discord Account you want to link with just give us your ID!"
@@ -1104,16 +977,16 @@ msgstr ""
 "si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo "
 "danos el ID!"
 
-#: registration/forms/forms.py:83
+#: registration/forms/forms.py:81
 msgid "seems like that's your discord discriminator not your identifier."
 msgstr "parece que ese es tu discriminador de discord y no tu identificador."
 
-#: registration/forms/forms.py:84
+#: registration/forms/forms.py:82
 #, python-format
 msgid "right click on your user and then click on %(popup_msg)s."
 msgstr "click derecho sobre tu usuario y luego click sobre %(popup_msg)s."
 
-#: registration/forms/forms.py:91
+#: registration/forms/forms.py:89
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1121,68 +994,68 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: registration/forms/forms.py:109 registration/views.py:206
+#: registration/forms/forms.py:107 registration/views.py:206
 #, fuzzy, python-format
 #| msgid "Welcome to Oil & Rope!"
 msgid "welcome to %(title)s!"
 msgstr "¡bienvenido a %(title)s!"
 
-#: registration/forms/forms.py:145
+#: registration/forms/forms.py:143
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: registration/forms/forms.py:155 registration/models.py:22
+#: registration/forms/forms.py:153 registration/models.py:20
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: registration/forms/forms.py:156
+#: registration/forms/forms.py:154
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviareos el email de confirmación."
 
-#: registration/forms/forms.py:176 registration/forms/forms.py:199
+#: registration/forms/forms.py:174 registration/forms/forms.py:197
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: registration/forms/forms.py:188
+#: registration/forms/forms.py:186
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:216 registration/models.py:88
+#: registration/forms/forms.py:214 registration/models.py:86
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:217 registration/models.py:89
+#: registration/forms/forms.py:215 registration/models.py:87
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:222 registration/models.py:98
+#: registration/forms/forms.py:220 registration/models.py:90
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:224 registration/models.py:100
+#: registration/forms/forms.py:222 registration/models.py:92
 #, fuzzy
 #| msgid "Website"
 msgid "website"
 msgstr "sitio web"
 
-#: registration/forms/forms.py:243
+#: registration/forms/forms.py:241
 msgid "birthday cannot be set after today."
 msgstr "la fecha de nacimiento no puede ser después de hoy."
 
@@ -1234,19 +1107,19 @@ msgstr "cambiar contraseña"
 msgid "update"
 msgstr "actualizar"
 
-#: registration/models.py:23
+#: registration/models.py:21
 #, fuzzy
 #| msgid "Premium"
 msgid "premium user"
 msgstr "usuario premium"
 
-#: registration/models.py:152
+#: registration/models.py:104
 #, fuzzy
 #| msgid "Profile"
 msgid "profile"
 msgstr "perfil"
 
-#: registration/models.py:153
+#: registration/models.py:105
 #, fuzzy
 #| msgid "Profiles"
 msgid "profiles"
@@ -2004,7 +1877,7 @@ msgstr "editando"
 msgid "session cover"
 msgstr "portada de la sesión"
 
-#: roleplay/templates/roleplay/session/include/session_list_item.html:43
+#: roleplay/templates/roleplay/session/include/session_list_item.html:44
 msgid "start game"
 msgstr "empezar partida"
 
@@ -2243,6 +2116,11 @@ msgstr "crear mundo comunitario"
 msgid "create public world!"
 msgstr "¡crear mundo público!"
 
+#: roleplay/utils/dice.py:63
+#, python-format
+msgid "dice roll `%(roll)s` syntax is incorrect."
+msgstr "la sintaxis de la tirada `%(roll)s` es incorrecta."
+
 #: roleplay/utils/invitations.py:27
 msgid "a quest for you!"
 msgstr "¡una misión para ti!"
@@ -2270,498 +2148,3 @@ msgstr "sesión borrada."
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
-
-#, fuzzy
-#~| msgid "Welcome to Oil &amp; Rope traveller!"
-#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
-#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
-
-#, fuzzy
-#~| msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
-#~ msgid "Oil &amp;amp; Rope is a Django project for managing Roleplay Games"
-#~ msgstr ""
-#~ "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
-
-#~ msgid "login cancelled"
-#~ msgstr "inicio de sesión cancelado"
-
-#, fuzzy
-#~| msgid ""
-#~| "Oil &amp; Rope was born from the problem that some websites for managing "
-#~| "roleplay games are quite <i>rough</i>."
-#~ msgid ""
-#~ "Oil &amp;amp; Rope was born from the problem that some websites for "
-#~ "managing roleplay games are quite &lt;i>rough&lt;/i>."
-#~ msgstr ""
-#~ "Oil &amp; Rope nació como solución a un problema: la gestión <i>tosca</i> "
-#~ "de juegos de mesa en línea."
-
-#, fuzzy
-#~| msgid ""
-#~| "Oil &amp; Rope is an open-source project and can be found on <a href="
-#~| "\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
-#~| "\">GitHub</a>."
-#~ msgid ""
-#~ "Oil &amp;amp; Rope is an open-source project and can be found on &lt;a "
-#~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
-#~ "\">GitHub&lt;/a>."
-#~ msgstr ""
-#~ "Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a "
-#~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
-#~ "\">GitHub</a>."
-
-#, fuzzy
-#~| msgid ""
-#~| "We are a group of people with different professional profiles "
-#~| "(developers, designers, composers, …) and one thought in common,<br><i "
-#~| "class=\"font-weight-bold\">\"make an incredible experience for "
-#~| "roleplaying online!\"</i>."
-#~ msgid ""
-#~ "We are a group of people with different professional profiles "
-#~ "(developers, designers, composers, &#8230;) and one thought in common,&lt;"
-#~ "br>&lt;i class=\"font-weight-bold\">\"make an incredible experience for "
-#~ "roleplaying online!\"&lt;/i>."
-#~ msgstr ""
-#~ "Somos un grupo de personas con diferentes perfiles profesionales "
-#~ "(desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i "
-#~ "class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
-
-#~ msgid "users invited!"
-#~ msgstr "¡usuarios invitados!"
-
-#~ msgid ""
-#~ "\n"
-#~ "            You decided to cancel logging in to our site using one of "
-#~ "your existing accounts.\n"
-#~ "            If this was a mistake, please proceed to <a href="
-#~ "\"%(login_url)s\">sign in</a>.\n"
-#~ "          "
-#~ msgstr ""
-#~ "\n"
-#~ "            Has decidido cancelar el inicio de sesión en nuestra web "
-#~ "usando una de tus cuentas existentes.\n"
-#~ "            Si esto ha sido un error, por favor procede a <a href="
-#~ "\"%(login_url)s\">iniciar sesión</a>.\n"
-#~ "          "
-
-#~ msgid ""
-#~ "\n"
-#~ "          You are about to use your %(provider_name)s account to login to "
-#~ "%(site_name)s.\n"
-#~ "          As a final step, please complete the following form:\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "          Estás a punto de usar tu cuenta de %(provider_name)s para "
-#~ "inicia sesión en %(site_name)s.\n"
-#~ "          Como paso final, por favor completa el siguiente formulario:\n"
-#~ "        "
-
-#~ msgid "listed players will be notified"
-#~ msgstr "los jugadores listados serán notificados"
-
-#, fuzzy
-#~| msgid "Send email"
-#~ msgid "type an email"
-#~ msgstr "escribir un email"
-
-#, fuzzy
-#~| msgid "users invited!"
-#~ msgid "you've been invited to %(world)s!"
-#~ msgstr "¡has sido invitado/a a %(world)s!"
-
-#, fuzzy
-#~| msgid "User not found."
-#~ msgid "user not in chat"
-#~ msgstr "usuario no encontrado en el chat"
-
-#~ msgid "frontend"
-#~ msgstr "frontend"
-
-#~ msgid ""
-#~ "\n"
-#~ "            %(gm)s invites you to join into an epic quest in the world "
-#~ "of\n"
-#~ "            <a class=\"btn btn-link\"\n"
-#~ "               href=\"%(protocol)s://%(domain)s%(world_link)s\"\n"
-#~ "            >\n"
-#~ "              %(world_name)s\n"
-#~ "            </a>.\n"
-#~ "          "
-#~ msgstr ""
-#~ "\n"
-#~ "            %(gm)s te invita a una aventura épica en el mundo de\n"
-#~ "            <a class=\"btn btn-link\"\n"
-#~ "               href=\"%(protocol)s://%(domain)s%(world_link)s\"\n"
-#~ "            >\n"
-#~ "              %(world_name)s\n"
-#~ "            </a>.\n"
-#~ "          "
-
-#, fuzzy
-#~| msgid "your token"
-#~ msgid "your user"
-#~ msgstr "tu usuario"
-
-#, fuzzy
-#~| msgid "Alias"
-#~ msgid "alias"
-#~ msgstr "alias"
-
-#, fuzzy
-#~| msgid "Chat Message"
-#~ msgid "chat message"
-#~ msgstr "mensaje de chat"
-
-#, fuzzy
-#~| msgid "Chat Messages"
-#~ msgid "chat messages"
-#~ msgstr "mensajes de chat"
-
-#, fuzzy
-#~| msgid "Create city"
-#~ msgid "create city"
-#~ msgstr "crear ciudad"
-
-#, fuzzy
-#~| msgid "View details"
-#~ msgid "world detail"
-#~ msgstr "detalles del mundo"
-
-#, fuzzy
-#~| msgid "Clean"
-#~ msgid "clean"
-#~ msgstr "limpiar"
-
-#, fuzzy
-#~| msgid "Max size file"
-#~ msgid "max size file"
-#~ msgstr "tamaño máximo del archivo"
-
-#~ msgid "game"
-#~ msgstr "partida"
-
-#, fuzzy
-#~| msgid "This email doesn't belong to a user"
-#~ msgid "this email doesn't belong to a user"
-#~ msgstr "este email no pertenece a ningún usuario"
-
-#~ msgid "restore password"
-#~ msgstr "reestablecer contraseña"
-
-#, fuzzy
-#~| msgid "Seems like this user is inactive"
-#~ msgid "seems like this user is inactive"
-#~ msgstr "parece que este usuario está inactivo"
-
-#, fuzzy
-#~| msgid "Welcome to Oil & Rope!"
-#~ msgid "welcome to Oil & Rope!"
-#~ msgstr "¡bienvenido a Oil & Rope!"
-
-#~ msgid "naming"
-#~ msgstr "nombre"
-
-#~ msgid "Password changed successfully!"
-#~ msgstr "¡Contraseña cambiada correctamente!"
-
-#~ msgid "Email for password reset request sent!"
-#~ msgstr ""
-#~ "Se ha enviado un email con la petición de restauración de contraseña"
-
-#~ msgid "User created!"
-#~ msgstr "¡Usuario creado!"
-
-#~ msgid "User created"
-#~ msgstr "Usuario creado"
-
-#~ msgid "Edit"
-#~ msgstr "Editar"
-
-#~ msgid "Worlds"
-#~ msgstr "Mundos"
-
-#~ msgid "World"
-#~ msgstr "Mundo"
-
-#~ msgid "Delete"
-#~ msgstr "Borrar"
-
-#~ msgid "Show"
-#~ msgstr "Ver"
-
-#~ msgid "Hide"
-#~ msgstr "Ocultar"
-
-#~ msgid "Previous"
-#~ msgstr "Anterior"
-
-#~ msgid "Next"
-#~ msgstr "Siguiente"
-
-#~ msgid "Clean"
-#~ msgstr "Limpiar"
-
-#~ msgid "Go back"
-#~ msgstr "Volver"
-
-#~ msgid "Create your account"
-#~ msgstr "Crea tu cuenta"
-
-#~ msgid "Login"
-#~ msgstr "Acceder"
-
-#~ msgid "Send email"
-#~ msgstr "Enviar email"
-
-#~ msgid "Resend email"
-#~ msgstr "Reenviar email"
-
-#~ msgid "Email address"
-#~ msgstr "Dirección de Email"
-
-#, fuzzy
-#~| msgid "Join now"
-#~ msgid "Join now!"
-#~ msgstr "¡Únete ahora!"
-
-#~ msgid "Create"
-#~ msgstr "Crear"
-
-#, fuzzy
-#~| msgid "Menu Type"
-#~ msgid "Menu"
-#~ msgstr "Tipo de Menú"
-
-#, fuzzy
-#~| msgid "Parent Menu"
-#~ msgid "Parent menu"
-#~ msgstr "Menú padre"
-
-#~ msgid "Logo"
-#~ msgstr "Logo"
-
-#~ msgid "How?"
-#~ msgstr "¿Cómo?"
-
-#~ msgid "Share"
-#~ msgstr "Compartir"
-
-#~ msgid "Boom"
-#~ msgstr "Boom"
-
-#~ msgid "Last"
-#~ msgstr "Último"
-
-#~ msgid "Home"
-#~ msgstr "Inicio"
-
-#, fuzzy
-#~| msgid "Discord User"
-#~ msgid "Discord"
-#~ msgstr "Usuario de Discord"
-
-#, fuzzy
-#~| msgid "Join now"
-#~ msgid "Join"
-#~ msgstr "¡Únete ahora!"
-
-#, fuzzy
-#~| msgid "connect"
-#~ msgid "Connect"
-#~ msgstr "conectar"
-
-#~ msgid "User"
-#~ msgstr "Usuario"
-
-#~ msgid "Users"
-#~ msgstr "Usuarios"
-
-#~ msgid "Town"
-#~ msgstr "Pueblo"
-
-#~ msgid "City"
-#~ msgstr "Ciudad"
-
-#~ msgid "Chat"
-#~ msgstr "Chat"
-
-#, fuzzy
-#~| msgid "Hide"
-#~ msgid "id"
-#~ msgstr "id"
-
-#~ msgid "Env file does not exist"
-#~ msgstr "El archivo Env no existe"
-
-#~ msgid "Incorrect format"
-#~ msgstr "Formato incorrecto"
-
-#~ msgid "Hello traveller! To confirm your account please type %(token)s"
-#~ msgstr ""
-#~ "¡Buenas viajero! Para confirmar su cuenta por favor escriba %(token)s"
-
-#~ msgid "Token has timed out!"
-#~ msgstr "¡El token ha expirado!"
-
-#~ msgid "Your user has been confirmed"
-#~ msgstr "Tu usuario ha sido confirmado"
-
-#~ msgid "The roll must follow the correct pattern"
-#~ msgstr "La tirada debe tener el formato adecuado"
-
-#~ msgid "%(user)s rolled"
-#~ msgstr "%(user)s ha sacado"
-
-#~ msgid "Miscellaneous"
-#~ msgstr "Misceláneo"
-
-#~ msgid "You are part of the full experience already"
-#~ msgstr "Ya eres parte de la experiencia completa"
-
-#~ msgid "Invalid option. Supported options are %(options)s"
-#~ msgstr "Opción inválida. Las opciones soportadas son %(options)s"
-
-#~ msgid ""
-#~ "Seems like you are not registered. You can do it in 5 minutes %(url)s"
-#~ msgstr ""
-#~ "Parece que no estás registrado. Puedes registrarte en 5 minutos %(url)s"
-
-#~ msgid "Sorry, you took so long to reply"
-#~ msgstr "Lo siento, has tardado demasiado en responder"
-
-#~ msgid "Which world would you like to delete?"
-#~ msgstr "¿Qué mundo te gustaría borrar?"
-
-#~ msgid "You can perform this action via web: %(url)s"
-#~ msgstr "Puedes realizar esta acción via web: %(url)s"
-
-#~ msgid "Remember you can perform this action via web: %(url)s"
-#~ msgstr "Recuerda que puedes realizar esta acción via web: %(url)s"
-
-#~ msgid "Check it out here: %(url)s"
-#~ msgstr "Míralo aquí: %(url)s"
-
-#~ msgid "You didn't send an image"
-#~ msgstr "No has enviado una imagen"
-
-#~ msgid "Image too big"
-#~ msgstr "La imagen es muy grande"
-
-#~ msgid "Here's a list of your worlds: %(worlds)s"
-#~ msgstr "Aquí tienes una lista de tus mundos: %(worlds)s"
-
-#~ msgid "Seems like there isn't any world yet"
-#~ msgstr "Parece que no hay ningún mundo aún"
-
-#~ msgid "Are you sure you want to delete %(place)s?"
-#~ msgstr "¿Estás seguro de que quieres borrar %(place)s?"
-
-#~ msgid "no"
-#~ msgstr "no"
-
-#~ msgid "%(place)s deleted"
-#~ msgstr "%(place)s borrado"
-
-#~ msgid "Okay!"
-#~ msgstr "¡Listo!"
-
-#~ msgid "First we need a name"
-#~ msgstr "Primero necesitamos un nombre"
-
-#~ msgid ""
-#~ "Now tell us about your world, a description (You can avoid this by "
-#~ "writting 'no')"
-#~ msgstr "Ahora descríbenos tu mundo (Puedes evitar esto escribiendo 'no')"
-
-#~ msgid "Maybe an image? (You can avoid this by writting 'no')"
-#~ msgstr "¿A lo mejor una imagen?"
-
-#~ msgid "Congrats! Your world have been created!"
-#~ msgstr "¡Felicidades! ¡Tu mundo ha sido creado!"
-
-#~ msgid "List"
-#~ msgstr "Listado"
-
-#~ msgid "Nick"
-#~ msgstr "Nick"
-
-#~ msgid "Code"
-#~ msgstr "Código"
-
-#~ msgid "Avatar URL"
-#~ msgstr "Avatar URL"
-
-#~ msgid "Locale"
-#~ msgstr "Locale"
-
-#~ msgid "Created at"
-#~ msgstr "Creado el"
-
-#~ msgid "Discord Users"
-#~ msgstr "Usuarios de Discord"
-
-#~ msgid "Name"
-#~ msgstr "Nombre"
-
-#~ msgid "Region"
-#~ msgstr "Región"
-
-#~ msgid "Icon URL"
-#~ msgstr "URL del Icono"
-
-#~ msgid "Member count"
-#~ msgstr "Número de miembros"
-
-#~ msgid "Discord Server"
-#~ msgstr "Servidor de Discord"
-
-#~ msgid "Discord Servers"
-#~ msgstr "Servidores de Discord"
-
-#~ msgid "NSFW"
-#~ msgstr "NSFW"
-
-#~ msgid "Topic"
-#~ msgstr "Tema"
-
-#~ msgid "News"
-#~ msgstr "Noticias"
-
-#~ msgid "Discord Text Channel"
-#~ msgstr "Canal de Texto de Discord"
-
-#~ msgid "Discord Text Channels"
-#~ msgstr "Canales de Texto de Discord"
-
-#~ msgid "Bitrate"
-#~ msgstr "Bitrate"
-
-#~ msgid "Discord Voice Channel"
-#~ msgstr "Canal de Voz de Discord"
-
-#~ msgid "Discord Voice Channels"
-#~ msgstr "Canales de Voz de Discord"
-
-#~ msgid "SuperUser Required"
-#~ msgstr "Permiso de SuperUsuario"
-
-#~ msgid "Icon"
-#~ msgstr "Icono"
-
-#~ msgid "Related Model"
-#~ msgstr "Modelo Relacionado"
-
-#~ msgid "This email is already in use"
-#~ msgstr "Este email ya está en uso"
-
-#~ msgid "Have you requested invitation?"
-#~ msgstr "¿Has solicitado una invitación?"
-
-#~ msgid "Multiple users with same email, please contact our developers"
-#~ msgstr ""
-#~ "Múltiples usuarios tienen el mismo email, por favor contacta con nuestro "
-#~ "equipo"
-
-#~ msgid "Race"
-#~ msgstr "Raza"
