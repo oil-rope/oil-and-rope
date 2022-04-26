@@ -23,7 +23,7 @@ def language(request):
     if not user.is_authenticated:
         return content
 
-    # Optimizacion of language selector
+    # Optimization of language selector
     language = Profile.objects.filter(user_id=user.id).values_list('language', flat=True).first()
     request.session['session_language'] = language
     content['lan'] = language

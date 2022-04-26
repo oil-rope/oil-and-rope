@@ -19,9 +19,6 @@ DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
 # Content Types
 CONTENT_TYPE = 'contenttypes.ContentType'
 
-# Dynamic Menu
-DYNAMIC_MENU = 'dynamic_menu.DynamicMenu'
-
 # Roleplay
 ROLEPLAY_DOMAIN = 'roleplay.Domain'
 ROLEPLAY_PLACE = 'roleplay.Place'
