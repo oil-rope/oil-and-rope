@@ -20,6 +20,8 @@ DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
 CONTENT_TYPE = 'contenttypes.ContentType'
 
 # Roleplay
+ROLEPLAY_CAMPAIGN = 'roleplay.Campaign'
+ROLEPLAY_PLAYER_IN_CAMPAIGN = 'roleplay.PlayerInCampaign'
 ROLEPLAY_DOMAIN = 'roleplay.Domain'
 ROLEPLAY_PLACE = 'roleplay.Place'
 ROLEPLAY_RACE = 'roleplay.Race'

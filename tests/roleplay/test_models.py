@@ -9,14 +9,18 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 from tests import fake
+from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from tests.utils import generate_place
 
+Campaign = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
+PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
 Domain = apps.get_model(constants.ROLEPLAY_DOMAIN)
 Place = apps.get_model(constants.ROLEPLAY_PLACE)
 PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
@@ -435,6 +439,54 @@ class TestRaceUser(TestCase):
     def test_str_ok(self):
         instance = self.model.objects.create(user=self.user, race=self.race)
         expected = f'{instance.user.username} <-> {instance.race.name}'
+
+        self.assertEqual(expected, str(instance))
+
+
+class TestCampaign(TestCase):
+    model = Campaign
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.world = generate_place(site_type=SiteTypes.WORLD)
+
+    def test_str_ok(self):
+        name = fake.sentence()
+        instance = self.model.objects.create(name=name, place=self.world)
+        expected = f'{name} [{instance.pk}]'
+
+        self.assertEqual(expected, str(instance))
+
+    def test_add_game_masters(self):
+        game_masters = baker.make(constants.REGISTRATION_USER, 3)
+        instance = self.model.objects.create(name=fake.sentence(), place=self.world)
+        instance.add_game_masters(*game_masters)
+
+        self.assertEqual(instance.game_masters.count(), len(game_masters))
+
+    def test_discord_channel_empty_is_none(self):
+        instance = self.model.objects.create(name=fake.sentence(), place=self.world)
+
+        self.assertIsNone(instance.discord_channel)
+
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_discord_channel_ok(self):
+        instance = self.model.objects.create(name=fake.sentence(), place=self.world, discord_channel_id=CHANNEL)
+
+        self.assertIsNotNone(instance.discord_channel)
+
+
+class TestPlayerInCampaign(TestCase):
+    model = PlayerInCampaign
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.campaign = baker.make(constants.ROLEPLAY_CAMPAIGN)
+        cls.user = baker.make(constants.REGISTRATION_USER)
+
+    def test_str_ok(self):
+        instance = self.model.objects.create(campaign=self.campaign, user=self.user)
+        expected = f'{instance.user.username} in campaign {instance.campaign.name} (Game Master: False)'
 
         self.assertEqual(expected, str(instance))
 

@@ -7,6 +7,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from bot.models import Channel
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from common.validators import validate_file_size
@@ -422,6 +423,144 @@ class RaceUser(TracingMixin):
 
     def __str__(self):
         return f'{self.user.username} <-> {self.race.name}'
+
+
+# TODO: When Character Model is set we should add PCs and NPCs as part of campaign
+class Campaign(TracingMixin):
+    """
+    This model manages campaign for roleplay sessions.
+    A campaign is a set up for a game. This will have sessions related which will be the sessions themeselves.
+
+    Parameters
+    ----------
+    id: :class:`int`
+        Identifier of the object.
+    name: :class:`str`
+        Name of the campaign.
+    description: Optional[:class:`str`]
+        Description of the campaign.
+    resume: Optional[:class:`str`]
+        A one line description of the campaign.
+    cover_image: :class:`str`
+        Path to the cover image of the campaign.
+    is_public: :class:`bool`
+        Declares if the campaign is public or not.
+    players: List[:class:`~registration.models.User`]
+        List of players that are part of the campaign.
+    world: :class:`~roleplay.models.World`
+        World where the campaign is happening.
+    start_date: Optional[:class:`datetime.date`]
+        Date when the campaign starts.
+    end_date: Optional[:class:`datetime.date`]
+        Date when the campaign ends.
+    discord_channel_id: Optional[:class:`str`]
+        The discord channel ID where the campaign is happening.
+        This will be used to send messages to the discord channel.
+
+    Attributes:
+    -----------
+    game_masters: List[:class:`~registration.models.User`]
+        List of players that are game masters.
+    discord_channel: :class:`~bot.models.Channel`
+        The discord channel where the campaign is happening.
+    """
+
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True, null=False, blank=False)
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    resume = models.CharField(verbose_name=_('resume'), max_length=254, null=False, blank=True)
+    cover_image = models.ImageField(
+        verbose_name=_('cover image'), upload_to=default_upload_to, validators=[validate_file_size], null=False,
+        blank=True,
+    )
+    is_public = models.BooleanField(verbose_name=_('public'), default=False)
+    users = models.ManyToManyField(
+        to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='campaign_set',
+        through=constants.ROLEPLAY_PLAYER_IN_CAMPAIGN, through_fields=('campaign', 'user'),
+    )
+    place = models.ForeignKey(
+        verbose_name=_('world'), to=constants.ROLEPLAY_PLACE, related_name='campaign_set', on_delete=models.CASCADE,
+        db_index=True, null=False, blank=False, limit_choices_to={'site_type': SiteTypes.WORLD},
+    )
+    start_date = models.DateField(verbose_name=_('start date'), null=True, blank=True)
+    end_date = models.DateField(verbose_name=_('end date'), null=True, blank=True)
+    discord_channel_id = models.CharField(
+        verbose_name=_('identifier for discord channel'), max_length=254, null=False, blank=True,
+    )
+
+    @property
+    def game_masters(self):
+        gms = self.users.filter(
+            player_in_campaign_set__is_game_master=True,
+        )
+        return gms
+
+    @property
+    def discord_channel(self):
+        if self.discord_channel_id:
+            return Channel(id=self.discord_channel_id)
+        return None
+
+    class Meta:
+        verbose_name = _('campaign')
+        verbose_name_plural = _('campaigns')
+        ordering = ['-entry_created_at', 'name']
+
+    def add_game_masters(self, *users):
+        """
+        Adds given users as game masters.
+        """
+
+        PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
+        objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
+        return objs
+
+    def get_absolute_url(self):
+        return resolve_url('roleplay:campaign:detail', pk=self.campaign.pk)
+
+    def __str__(self):
+        return f'{self.name} [{self.pk}]'
+
+
+class PlayerInCampaign(TracingMixin):
+    """
+    This models manages the 'M2M through' for :class:`~roleplay.models.Campaign`.
+
+    Paramaters
+    ---------
+    id: :class:`int`
+        The identifier of the object.
+    campaign: :class:`~roleplay.models.Campaign`
+        The related campaign.
+    user: :class:`~registration.models.User`
+        The related user.
+    """
+
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, null=False, blank=False, db_index=True)
+    user = models.ForeignKey(
+        verbose_name=_('user'), to=constants.REGISTRATION_USER, on_delete=models.CASCADE, to_field='id',
+        related_name='player_in_campaign_set', db_index=True, null=False, blank=False,
+    )
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, on_delete=models.CASCADE, to_field='id',
+        related_name='player_in_campaign_set', db_index=True, null=False, blank=False,
+    )
+    is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
+
+    class Meta:
+        verbose_name = _('player in campaign')
+        verbose_name_plural = _('players in campaign')
+        ordering = ['-entry_created_at', 'user__username']
+        unique_together = [
+            ('user', 'campaign'),
+        ]
+
+    def __str__(self):
+        str_model = _('%(player)s in campaign %(campaign)s (Game Master: %(is_game_master)s)') % {
+            'player': self.user.username, 'campaign': self.campaign.name, 'is_game_master': self.is_game_master,
+        }
+        return str_model
 
 
 class Session(TracingMixin):
