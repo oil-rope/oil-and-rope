@@ -24,6 +24,21 @@ class PlaceAdmin(DraggableMPTTAdmin):
     search_fields = ['name__icontains']
 
 
+class PlayerInCampaignInline(admin.TabularInline):
+    model = models.PlayerInCampaign
+    extra = 1
+
+
+@admin.register(models.Campaign)
+class CampaignAdmin(admin.ModelAdmin):
+    date_hierarchy = 'entry_created_at'
+    inlines = [PlayerInCampaignInline]
+    list_display = ('__str__', 'entry_created_at', 'entry_updated_at')
+    list_display_links = ('__str__',)
+    readonly_fields = ('entry_created_at', 'entry_updated_at')
+    search_fields = ['name__icontains']
+
+
 class PlayersInSessionInline(admin.TabularInline):
     model = models.PlayerInSession
     extra = 1

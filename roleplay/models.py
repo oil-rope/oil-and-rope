@@ -441,6 +441,8 @@ class Campaign(TracingMixin):
         Description of the campaign.
     resume: Optional[:class:`str`]
         A one line description of the campaign.
+    system: :class:`int`
+        System used.
     cover_image: :class:`str`
         Path to the cover image of the campaign.
     is_public: :class:`bool`
@@ -456,6 +458,8 @@ class Campaign(TracingMixin):
     discord_channel_id: Optional[:class:`str`]
         The discord channel ID where the campaign is happening.
         This will be used to send messages to the discord channel.
+    chat: :class:`~chat.models.Chat`
+        Chat used by the campaign.
 
     Attributes:
     -----------
@@ -469,6 +473,7 @@ class Campaign(TracingMixin):
     name = models.CharField(verbose_name=_('name'), max_length=50)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     resume = models.CharField(verbose_name=_('resume'), max_length=254, null=False, blank=True)
+    system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     cover_image = models.ImageField(
         verbose_name=_('cover image'), upload_to=default_upload_to, validators=[validate_file_size], null=False,
         blank=True,
@@ -486,6 +491,10 @@ class Campaign(TracingMixin):
     end_date = models.DateField(verbose_name=_('end date'), null=True, blank=True)
     discord_channel_id = models.CharField(
         verbose_name=_('identifier for discord channel'), max_length=254, null=False, blank=True,
+    )
+    chat = models.OneToOneField(
+        to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
+        related_name='campaign_set', db_index=True, blank=False, null=False,
     )
 
     @property

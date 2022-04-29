@@ -1,5 +1,6 @@
 import os
 import pathlib
+import random
 import tempfile
 import unittest
 from datetime import datetime
@@ -448,32 +449,34 @@ class TestCampaign(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.chat = baker.make_recipe('chat.chat')
         cls.world = generate_place(site_type=SiteTypes.WORLD)
 
-    def test_str_ok(self):
-        name = fake.sentence()
-        instance = self.model.objects.create(name=name, place=self.world)
-        expected = f'{name} [{instance.pk}]'
+    def setUp(self):
+        self.name = fake.sentence()
+        self.instance = self.model.objects.create(
+            name=self.name, chat=self.chat, system=random.choice(RoleplaySystems.values), place=self.world,
+        )
 
-        self.assertEqual(expected, str(instance))
+    def test_str_ok(self):
+        expected = f'{self.name} [{self.instance.pk}]'
+
+        self.assertEqual(expected, str(self.instance))
 
     def test_add_game_masters(self):
         game_masters = baker.make(constants.REGISTRATION_USER, 3)
-        instance = self.model.objects.create(name=fake.sentence(), place=self.world)
-        instance.add_game_masters(*game_masters)
+        self.instance.add_game_masters(*game_masters)
 
-        self.assertEqual(instance.game_masters.count(), len(game_masters))
+        self.assertEqual(self.instance.game_masters.count(), len(game_masters))
 
     def test_discord_channel_empty_is_none(self):
-        instance = self.model.objects.create(name=fake.sentence(), place=self.world)
-
-        self.assertIsNone(instance.discord_channel)
+        self.assertIsNone(self.instance.discord_channel)
 
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_discord_channel_ok(self):
-        instance = self.model.objects.create(name=fake.sentence(), place=self.world, discord_channel_id=CHANNEL)
-
-        self.assertIsNotNone(instance.discord_channel)
+        self.instance.discord_channel_id = CHANNEL
+        self.instance.save()
+        self.assertIsNotNone(self.instance.discord_channel)
 
 
 class TestPlayerInCampaign(TestCase):
