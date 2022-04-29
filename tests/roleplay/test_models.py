@@ -453,7 +453,7 @@ class TestSession(TestCase):
         instance = self.model.objects.create(
             name=name,
             chat=self.chat,
-            system=RoleplaySystems.PATHFINDER,
+            system=RoleplaySystems.PATHFINDER_1,
             world=self.world,
         )
         system = RoleplaySystems(instance.system)
@@ -467,7 +467,7 @@ class TestSession(TestCase):
             name=fake.word(),
             plot=fake.paragraph(),
             next_game=datetime.now(),
-            system=RoleplaySystems.PATHFINDER,
+            system=RoleplaySystems.PATHFINDER_1,
             world=place,
         )
 
@@ -479,7 +479,7 @@ class TestSession(TestCase):
             name=fake.word(),
             plot=fake.paragraph(),
             next_game=datetime.now(),
-            system=RoleplaySystems.PATHFINDER,
+            system=RoleplaySystems.PATHFINDER_1,
         )
 
         with self.assertRaisesRegex(ValidationError, 'Session hasn\'t any world'):

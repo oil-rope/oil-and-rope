@@ -199,7 +199,7 @@ class TestSessionForm(TestCase):
             'name': fake.sentence(),
             'plot': fake.paragraph(),
             'world': baker.make_recipe('roleplay.world'),
-            'system': enums.RoleplaySystems.PATHFINDER,
+            'system': enums.RoleplaySystems.PATHFINDER_1,
             'next_game': fake.future_datetime(),
         }
 

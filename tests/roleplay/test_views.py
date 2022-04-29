@@ -819,7 +819,7 @@ class TestSessionCreateView(TestCase):
             'name': fake.word(),
             'plot': fake.paragraph(),
             'next_game': timezone.now() + timezone.timedelta(days=1),
-            'system': enums.RoleplaySystems.PATHFINDER,
+            'system': enums.RoleplaySystems.PATHFINDER_1,
             'world': self.world.pk,
             'email_invitations': '\n'.join([fake.safe_email() for _ in range(3)])
         }
