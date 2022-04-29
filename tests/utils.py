@@ -34,14 +34,21 @@ def check_litecord_connection() -> bool:
         return False
 
 
-def generate_place(_quantity=1, **kwargs) -> List[roleplay.models.Place]:
+def generate_place(_quantity=1, with_user=False, **kwargs) -> List[roleplay.models.Place]:
     """
     Generates a list of Place objects with given kwargs.
+
+    Parameters
+    ----------
+    _quantity: Optional[:class:`int`]
+        Number of places to generate.
+    with_user: Optional[:class:`bool`]
+        If True, the generated places will have a user and owner.
     """
 
     places = []
     for _ in range(0, _quantity):
-        user = baker.make_recipe('registration.user')
+        user = baker.make_recipe('registration.user') if with_user else None
         params = {
             'name': fake.country(),
             'description': fake.text(),

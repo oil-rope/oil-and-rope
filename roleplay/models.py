@@ -517,7 +517,7 @@ class Campaign(TracingMixin):
         return objs
 
     def get_absolute_url(self):
-        return resolve_url('roleplay:campaign:detail', pk=self.campaign.pk)
+        return resolve_url('roleplay:campaign:detail', pk=self.pk)
 
     def __str__(self):
         return f'{self.name} [{self.pk}]'

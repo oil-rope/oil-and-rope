@@ -1,0 +1,20 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{{ object.name }}{% endblock title %}
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "campaign detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns,campaign detail' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-3">
+    <h1 class="text-center fw-light">
+      {{ object.name }}
+    </h1>
+    <hr>
+  </main>
+{% endblock body_content %}

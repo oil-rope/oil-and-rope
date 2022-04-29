@@ -17,6 +17,10 @@ WORLD_PATTERNS = [
     path('edit/<int:pk>/', views.WorldUpdateView.as_view(), name='edit'),
 ]
 
+CAMPAIGN_PATTERNS = [
+    path('<int:pk>/', views.CampaignDetailView.as_view(), name='detail'),
+]
+
 SESSION_PATTERNS = [
     path('', views.SessionListView.as_view(), name='list'),
     path('<int:pk>/', views.SessionDetailView.as_view(), name='detail'),
@@ -29,5 +33,6 @@ SESSION_PATTERNS = [
 urlpatterns = [
     path('place/', include((PLACE_PATTERNS, 'place'))),
     path('world/', include((WORLD_PATTERNS, 'world'))),
+    path('campaign/', include((CAMPAIGN_PATTERNS, 'campaign'))),
     path('session/', include((SESSION_PATTERNS, 'session'))),
 ]

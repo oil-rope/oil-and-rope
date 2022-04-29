@@ -25,9 +25,10 @@ from .utils.invitations import send_session_invitations
 
 LOGGER = logging.getLogger(__name__)
 
-User = get_user_model()
+Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
+User = get_user_model()
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -207,6 +208,18 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Place
     success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/place/place_confirm_delete.html'
+
+
+class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def test_func(self):
+        """
+        Checks if user is in players otherwise they have no access.
+        """
+
+        return self.request.user in self.get_object().users.all()
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):

@@ -17,7 +17,9 @@ from PIL import Image
 
 from common import tools
 from roleplay import enums, models, views
-from tests import fake
+
+from .. import fake
+from ..utils import generate_place
 
 
 class TestPlaceCreateView(TestCase):
@@ -799,6 +801,47 @@ class TestWorldUpdateView(TestCase):
         self.assertEqual(data['description'], self.community_world.description)
         self.assertEqual(self.user, self.community_world.owner)
         self.assertIsNone(self.community_world.user)
+
+
+class TestCampaignDetailView(TestCase):
+    model = models.Campaign
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:detail'
+    template = 'roleplay/campaign/campaign_detail.html'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = generate_place(site_type=enums.SiteTypes.WORLD)
+
+    def setUp(self):
+        self.instance = self.model.objects.create(name=fake.city(), place=self.world)
+        self.instance.users.add(self.user)
+        self.url = resolve_url(self.instance)
+
+    def test_access_anonymous_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_not_in_players_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_user_in_players_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
 
 
 class TestSessionCreateView(TestCase):
