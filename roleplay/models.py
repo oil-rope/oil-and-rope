@@ -95,11 +95,11 @@ class Place(MPTTModel, TracingMixin):
         related_name='children_sites', db_index=True
     )
     user = models.ForeignKey(
-        to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='places', verbose_name=_('user'), blank=True,
-        null=True, db_index=True
+        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='places', verbose_name=_('user'),
+        blank=True, null=True, db_index=True
     )
     owner = models.ForeignKey(
-        to=constants.USER_MODEL, on_delete=models.SET_NULL, related_name='places_owned', verbose_name=_('owner'),
+        to=constants.REGISTRATION_USER, on_delete=models.SET_NULL, related_name='places_owned', verbose_name=_('owner'),
         blank=True, null=True, db_index=True
     )
 
@@ -368,8 +368,8 @@ class Race(TracingMixin):
         verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True
     )
     users = models.ManyToManyField(
-        verbose_name=_('users'), to=constants.USER_MODEL, related_name='race_set', db_index=True,
-        through=constants.USER_RACE_RELATION,
+        verbose_name=_('users'), to=constants.REGISTRATION_USER, related_name='race_set', db_index=True,
+        through=constants.ROLEPLAY_RACE_USER,
     )
 
     def get_owners(self):
@@ -380,7 +380,7 @@ class Race(TracingMixin):
 
     def add_owners(self, *users):
         # Getting RaceUser model
-        model = apps.get_model(constants.USER_RACE_RELATION)
+        model = apps.get_model(constants.ROLEPLAY_RACE_USER)
         new_entries = []
         for user in users:
             entry = model(user=user, race=self, is_owner=True)
@@ -411,11 +411,11 @@ class RaceUser(TracingMixin):
     """
 
     user = models.ForeignKey(
-        verbose_name=_('user'), to=constants.USER_MODEL, related_name='m2m_race_set', on_delete=models.CASCADE,
+        verbose_name=_('user'), to=constants.REGISTRATION_USER, related_name='m2m_race_set', on_delete=models.CASCADE,
         db_index=True
     )
     race = models.ForeignKey(
-        verbose_name=_('race'), to=constants.RACE_MODEL, related_name='m2m_race_set', on_delete=models.CASCADE,
+        verbose_name=_('race'), to=constants.ROLEPLAY_RACE, related_name='m2m_race_set', on_delete=models.CASCADE,
         db_index=True
     )
     is_owner = models.BooleanField(verbose_name=_('ownership'), default=False)
@@ -455,11 +455,11 @@ class Session(TracingMixin):
     name = models.CharField(verbose_name=_('name'), max_length=100)
     plot = models.TextField(verbose_name=_('plot'), null=False, blank=True)
     players = models.ManyToManyField(
-        to=constants.USER_MODEL, verbose_name=_('players'), related_name='session_set', related_query_name='session',
-        through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
+        to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='session_set',
+        related_query_name='session', through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
     )
     chat = models.OneToOneField(
-        to=constants.CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE,
+        to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
         related_name='session', related_query_name='session', db_index=True, blank=False, null=False,
     )
     next_game = models.DateTimeField(
@@ -467,7 +467,7 @@ class Session(TracingMixin):
     )
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     world = models.ForeignKey(
-        to=constants.PLACE_MODEL, verbose_name=_('world'), on_delete=models.CASCADE,
+        to=constants.ROLEPLAY_PLACE, verbose_name=_('world'), on_delete=models.CASCADE,
         related_name='session_set', related_query_name='session', db_index=True,
         limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
@@ -520,11 +520,11 @@ class Session(TracingMixin):
 class PlayerInSession(TracingMixin):
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
     session = models.ForeignKey(
-        to=constants.SESSION_MODEL, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
+        to=constants.ROLEPLAY_SESSION, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
         db_index=True, verbose_name=_('session'),
     )
     player = models.ForeignKey(
-        to=constants.USER_MODEL, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
+        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
         db_index=True, verbose_name=_('player')
     )
     is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)

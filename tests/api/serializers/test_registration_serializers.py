@@ -1,27 +1,20 @@
 from django.apps import apps
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import TestCase
-from faker import Faker
 from model_bakery import baker
 
-from api.serializers.registration import ProfileSerializer, UserSerializer
+from api.serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
 from common.constants import models
+from tests import fake
 
-fake = Faker()
-
-User = apps.get_model(models.USER_MODEL)
-Profile = apps.get_model(models.PROFILE_MODEL)
+User = get_user_model()
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 
 
 class TestUserSerializer(TestCase):
     model = User
     serializer = UserSerializer
-
-    def test_empty_data_ok(self):
-        queryset = self.model.objects.all()
-        serialized_qs = self.serializer(queryset, many=True)
-        serialized_result = serialized_qs.data
-
-        self.assertListEqual([], serialized_result)
 
     def test_serializer_with_data_ok(self):
         baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10))
@@ -70,3 +63,23 @@ class TestProfileSerializer(TestCase):
         serialized_result = serialized_obj.data
 
         self.assertEqual(expected_bio, serialized_result['bio'])
+
+
+class TestBotSerializer(TestCase):
+    serializer_class = BotSerializer
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
+
+    def test_command_prefix_ok(self):
+        serialized_obj = self.serializer_class(self.bot)
+        serialized_result = serialized_obj.data
+
+        self.assertEqual(settings.BOT_COMMAND_PREFIX, serialized_result['command_prefix'])
+
+    def test_description_ok(self):
+        serialized_obj = self.serializer_class(self.bot)
+        serialized_result = serialized_obj.data
+
+        self.assertEqual(settings.BOT_DESCRIPTION, serialized_result['description'])

@@ -1,13 +1,12 @@
-from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from model_bakery import baker
 from rest_framework.test import APITestCase
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from api.viewsets.mixins import UserListMixin
-from common.constants import models
 
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 
 class TestUserListMixin(APITestCase):

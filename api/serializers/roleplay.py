@@ -3,11 +3,11 @@ from rest_framework import serializers
 
 from common.constants import models
 
-Chat = apps.get_model(models.CHAT_MODEL)
-Domain = apps.get_model(models.DOMAIN_MODEL)
-Place = apps.get_model(models.PLACE_MODEL)
-Race = apps.get_model(models.RACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
+Chat = apps.get_model(models.CHAT)
+Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Race = apps.get_model(models.ROLEPLAY_RACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 
 
 class DomainSerializer(serializers.ModelSerializer):

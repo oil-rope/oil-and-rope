@@ -41,8 +41,6 @@ urlpatterns += i18n_patterns(
     path('oauth/', include('allauth.urls')),
     # Bot
     path('bot/', include('bot.urls')),
-    # Dynamic Menu
-    path('dynamic_menu/', include('dynamic_menu.urls')),
     # Roleplay
     path('roleplay/', include('roleplay.urls')),
     # O&R Email

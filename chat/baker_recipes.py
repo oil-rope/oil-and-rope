@@ -7,8 +7,8 @@ from registration.baker_recipes import user
 
 fake = create_faker()
 
-Chat = apps.get_model(models.CHAT_MODEL)
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
+Chat = apps.get_model(models.CHAT)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
 
 chat = Recipe(
     Chat,

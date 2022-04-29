@@ -1,15 +1,18 @@
 from django.apps import apps
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from common.constants import models
 
 from ..permissions.registration import IsUserOrAdmin, IsUserProfileOrAdmin
-from ..serializers.registration import ProfileSerializer, UserSerializer
+from ..serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
 
-Profile = apps.get_model(models.PROFILE_MODEL)
-User = apps.get_model(models.USER_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
+User = get_user_model()
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -50,3 +53,17 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         if self.kwargs[self.lookup_url_kwarg or self.lookup_field] == '@me':
             return self.request.user.profile
         return super().get_object()
+
+
+class BotViewSet(viewsets.ViewSet):
+    """
+    ViewSet for Oil & Rope Bot.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = BotSerializer
+
+    def list(self, request):
+        bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
+        serializer = BotSerializer(bot)
+        return Response(data=serializer.data)

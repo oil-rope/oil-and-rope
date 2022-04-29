@@ -1766,7 +1766,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "ea8fe374bf8020b4245e2844e7c57641cf26e6593f95fad44bce3ad6140eb86e"
+content-hash = "b12af36a851aab26ccbfb9d2472acb413990d161f91854e57d5cb6b415c06f99"
 
 [metadata.files]
 aiohttp = [

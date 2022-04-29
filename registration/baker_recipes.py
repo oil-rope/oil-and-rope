@@ -1,10 +1,9 @@
-from django.apps import apps
+from django.contrib.auth import get_user_model
 from model_bakery.recipe import Recipe
 
-from common.constants import models
 from common.utils import create_faker
 
-User = apps.get_model(models.USER_MODEL)
+User = get_user_model()
 
 fake = create_faker()
 

@@ -17,13 +17,13 @@ from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 from tests import fake
 
-Domain = apps.get_model(constants.DOMAIN_MODEL)
-Place = apps.get_model(constants.PLACE_MODEL)
+Domain = apps.get_model(constants.ROLEPLAY_DOMAIN)
+Place = apps.get_model(constants.ROLEPLAY_PLACE)
 PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
-Race = apps.get_model(constants.RACE_MODEL)
-RaceUser = apps.get_model(constants.USER_RACE_RELATION)
-Session = apps.get_model(constants.SESSION_MODEL)
-User = apps.get_model(constants.USER_MODEL)
+Race = apps.get_model(constants.ROLEPLAY_RACE)
+RaceUser = apps.get_model(constants.ROLEPLAY_RACE_USER)
+Session = apps.get_model(constants.ROLEPLAY_SESSION)
+User = apps.get_model(constants.REGISTRATION_USER)
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -409,7 +409,7 @@ class TestRace(TestCase):
 
     def test_create_with_owner_ok(self):
         instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        users = baker.make(constants.USER_MODEL, 3)
+        users = baker.make(constants.REGISTRATION_USER, 3)
         instance.add_owners(*users)
 
         owners = instance.owners
@@ -429,8 +429,8 @@ class TestRaceUser(TestCase):
         cls.model = RaceUser
 
     def setUp(self):
-        self.user = baker.make(constants.USER_MODEL)
-        self.race = baker.make(constants.RACE_MODEL)
+        self.user = baker.make(constants.REGISTRATION_USER)
+        self.race = baker.make(constants.ROLEPLAY_RACE)
 
     def test_str_ok(self):
         instance = self.model.objects.create(user=self.user, race=self.race)
@@ -462,7 +462,7 @@ class TestSession(TestCase):
         self.assertEqual(expected, str(instance))
 
     def test_clean_non_world_ko(self):
-        place = baker.make(constants.PLACE_MODEL, site_type=SiteTypes.CITY)
+        place = baker.make(constants.ROLEPLAY_PLACE, site_type=SiteTypes.CITY)
         session = self.model(
             name=fake.word(),
             plot=fake.paragraph(),

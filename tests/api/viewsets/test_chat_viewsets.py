@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.shortcuts import resolve_url
 from model_bakery import baker
 from rest_framework import status
@@ -9,9 +10,9 @@ from api.serializers.registration import SimpleUserSerializer
 from common.constants import models
 from tests import fake
 
-Chat = apps.get_model(models.CHAT_MODEL)
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
-User = apps.get_model(models.USER_MODEL)
+Chat = apps.get_model(models.CHAT)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
+User = get_user_model()
 
 base_resolver = 'api:chat'
 

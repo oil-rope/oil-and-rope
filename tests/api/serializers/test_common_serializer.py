@@ -7,7 +7,7 @@ from api.serializers.common import MappedSerializerMixin
 from api.serializers.registration import UserSerializer
 from common.constants import models
 
-Profile = apps.get_model(models.PROFILE_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 
 
 class TestMappedSerializerMixin(TestCase):

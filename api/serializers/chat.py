@@ -4,11 +4,12 @@ from rest_framework import serializers
 
 from common.constants import models
 
+from .common import WebSocketMessageSerializer
 from .registration import SimpleUserSerializer
 
 User = get_user_model()
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
-Chat = apps.get_model(models.CHAT_MODEL)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
+Chat = apps.get_model(models.CHAT)
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
@@ -42,3 +43,12 @@ class ChatSerializer(serializers.ModelSerializer):
 
 class NestedChatSerializer(ChatSerializer):
     chat_message_set = NestedChatMessageSerializer(many=True, read_only=True)
+
+
+class WebSocketChatSerializer(WebSocketMessageSerializer):
+    chat = serializers.PrimaryKeyRelatedField(
+        queryset=Chat.objects.all(),
+        required=True,
+    )
+    message = serializers.CharField(max_length=255, required=False)
+    content = NestedChatMessageSerializer(many=False, read_only=True)

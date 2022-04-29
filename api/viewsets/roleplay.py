@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.settings import api_settings
@@ -10,11 +11,11 @@ from ..permissions.roleplay import IsGameMasterOrAdmin, IsPlayerOrAdmin, IsPubli
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import StaffListAllMixin, UserListMixin
 
-Domain = apps.get_model(models.DOMAIN_MODEL)
-Place = apps.get_model(models.PLACE_MODEL)
-Race = apps.get_model(models.RACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
-User = apps.get_model(models.USER_MODEL)
+Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Race = apps.get_model(models.ROLEPLAY_RACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
+User = get_user_model()
 
 
 class DomainViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from bot.models import Channel
-from common.constants.models import CHAT_MODEL, USER_MODEL
+from common.constants.models import CHAT, REGISTRATION_USER
 from core.models import TracingMixin
 
 
@@ -22,7 +22,7 @@ class Chat(TracingMixin):
 
     id = models.BigAutoField(primary_key=True, verbose_name=_('identifier'))
     name = models.CharField(verbose_name=_('name'), max_length=254)
-    users = models.ManyToManyField(to=USER_MODEL, verbose_name=_('users'), related_name='chat_set')
+    users = models.ManyToManyField(to=REGISTRATION_USER, verbose_name=_('users'), related_name='chat_set')
     discord_id = models.CharField(
         verbose_name=_('discord identifier'), max_length=100, null=False, blank=True, db_index=True,
     )
@@ -58,12 +58,12 @@ class ChatMessage(TracingMixin):
 
     id = models.BigAutoField(primary_key=True, verbose_name=_('identifier'))
     chat = models.ForeignKey(
-        to=CHAT_MODEL, verbose_name=_('chat'), on_delete=models.CASCADE, related_name='chat_message_set',
+        to=CHAT, verbose_name=_('chat'), on_delete=models.CASCADE, related_name='chat_message_set',
         db_index=True,
     )
     message = models.CharField(verbose_name=_('message'), max_length=150, null=False, blank=False)
     author = models.ForeignKey(
-        to=USER_MODEL, verbose_name=_('author'), on_delete=models.CASCADE, related_name='chat_message_set',
+        to=REGISTRATION_USER, verbose_name=_('author'), on_delete=models.CASCADE, related_name='chat_message_set',
         db_index=True,
     )
 

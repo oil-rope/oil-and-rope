@@ -90,8 +90,6 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     # Common
     'common.apps.CommonConfig',
-    # Dynamic Menu
-    'dynamic_menu.apps.DynamicMenuConfig',
     # Bot
     'bot.apps.BotConfig',
     # Registration System
@@ -152,7 +150,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.utils.requests_utils',
                 'core.context_processors.language',
-                'dynamic_menu.context_processors.menus',
             ],
             'debug': bool(to_bool(os.getenv('DEBUG_TEMPLATE', 'False'))),
         },
