@@ -815,7 +815,13 @@ class TestCampaignDetailView(TestCase):
         cls.world = generate_place(site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.instance = self.model.objects.create(name=fake.city(), place=self.world)
+        self.chat = baker.make_recipe('chat.chat')
+        self.instance = self.model.objects.create(
+            name=fake.city(),
+            system=random.choice(enums.RoleplaySystems.values),
+            place=self.world,
+            chat=self.chat,
+        )
         self.instance.users.add(self.user)
         self.url = resolve_url(self.instance)
 
