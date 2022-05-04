@@ -188,6 +188,14 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
             })
         return kwargs
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:world:create')
+        # NOTE: Since user is gotten from '?user' QueryParam, `form_action` must replicate this behavior
+        if form.user:
+            form.helper.form_action = f'{form.helper.form_action}?user'
+        return form
+
 
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     form_class = forms.WorldForm
