@@ -1,0 +1,80 @@
+{% load i18n %}
+<li class="nav-item dropdown">
+  <a
+    class="nav-link dropdown-toggle text-uppercase {% if 'roleplay/campaign' in request.path or 'roleplay/session' in request.path %}active{% endif %}"
+    href="#"
+    id="sessionsDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <i class="ic-dice"></i>
+    {% translate "roleplay" %}
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="sessionsDropdown">
+    <li>
+      <h6 class="dropdown-header text-uppercase">
+        {% translate "recent campaigns" %}
+      </h6>
+    </li>
+    {% for campaign in request.user.campaign_set.all|slice:3|dictsortreversed:"entry_updated_at" %}
+      <li>
+        {% url 'roleplay:campaign:detail' campaign.pk as campaign_detail_url %}
+        <a
+          href="{{ campaign_detail_url }}"
+          class="dropdown-item {% if request.path == campaign_detail_url %}active{% endif %}"
+        >
+          {{ campaign.name|truncatechars:20 }}
+        </a>
+      </li>
+    {% empty %}
+      <li class="px-3">
+        <p class="text-muted">
+          {% translate "you don't have any campaign."|capfirst %}
+        </p>
+      </li>
+    {% endfor %}
+
+    <li>
+      <hr class="dropdown-divider" />
+    </li>
+    <li>
+      <h6 class="dropdown-header text-uppercase">
+        {% translate "recent sessions" %}
+      </h6>
+    </li>
+    {% for session in request.user.session_set.all|slice:3|dictsortreversed:"entry_updated_at" %}
+      <li>
+        {% url 'roleplay:session:detail' session.pk as session_detail_url %}
+        <a
+          href="{{ session_detail_url }}"
+          class="dropdown-item {% if request.path == session_detail_url %}active{% endif %}"
+        >
+          {{ session.name|truncatechars:20 }}
+        </a>
+      </li>
+    {% empty %}
+      <li class="px-3">
+        <p class="text-muted">
+          {% translate "you don't have any session."|capfirst %}
+        </p>
+      </li>
+    {% endfor %}
+
+    <li><hr class="dropdown-divider" /></li>
+    <li>
+      <a href="#no-url" class="dropdown-item">
+        {% translate "all campaigns"|title %}
+      </a>
+    </li>
+    <li>
+      {% url 'roleplay:session:list' as session_list_url %}
+      <a
+        href="{{ session_list_url }}"
+        class="dropdown-item {% if request.path == session_list_url %}active{% endif %}"
+      >
+        {% translate "all sessions"|title %}
+      </a>
+    </li>
+  </ul>
+</li>

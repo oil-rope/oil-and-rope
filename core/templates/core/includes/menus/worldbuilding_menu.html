@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load string_utils %}
+{% url 'roleplay:world:list' as world_list %}
+<li class="nav-item dropdown">
+  <a
+    href="#"
+    class="nav-link dropdown-toggle text-uppercase {% if 'place' in request.path or 'world' in request.path %}active{% endif %}"
+    id="worldbuildingDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <i class="ic ic-hammer"></i>
+    {% translate "world building" %}
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="worldbuildingDropdown">
+    <li>
+      <a
+        href="{{ world_list }}"
+        class="dropdown-item {% if actual_path|startswith:world_list %} active{% endif %}"
+        {% if actual_path|startswith:world_list %} aria-current="true"{% endif %}
+      >
+        <i class="ic ic-world"></i>
+        {% translate "worlds"|title %}
+      </a>
+    </li>
+    <li>
+      <a
+        href="#no-urls"
+        class="dropdown-item disabled"
+      >
+        <i class="ic ic-users"></i>
+        {% trans "characters"|title %}
+      </a>
+    </li>
+  </ul>
+</li>
