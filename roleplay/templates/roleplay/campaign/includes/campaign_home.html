@@ -1,0 +1,53 @@
+{% load i18n %}
+<section class="p-3">
+  <h3 class="text-center">
+    {% translate "about the campaign"|title %}
+  </h3>
+  <p>
+    {{ object.description }}
+  </p>
+</section>
+<section class="p-3">
+  <h3 class="text-center">
+    {% translate "about the world"|title %}
+    <button
+      type="button"
+      class="btn btn-sm btn-dark fw-bold"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="{% translate "this is not the entire world to take a deep look go to 'see more'"|capfirst %}"
+    >
+      ?
+    </button>
+    <br>
+    <small class="lead fs-6">
+      {% url 'roleplay:place:detail' object.place.pk as world_detail_url %}
+      <a href="{{ world_detail_url }}">
+        {% translate "see more"|capfirst %}
+      </a>
+    </small>
+  </h3>
+  {% for place in object.place.get_family|slice:3 %}
+    <article class="pt-3">
+      {% if place.level == 0 %}
+        <h3 class="text-center fw-lighter">
+          {{ place.name }} ({{ place.get_site_type_display }})
+        </h3>
+      {% elif place.level == 1 %}
+        <h4 class="text-center fw-lighter">
+          {{ place.name }} ({{ place.get_site_type_display }})
+        </h4>
+      {% else %}
+        <h5 class="text-center fw-lighter">
+          {{ place.name }} ({{ place.get_site_type_display }})
+        </h5>
+      {% endif %}
+      <p>
+        {{ place.description|safe }}
+      </p>
+    </article>
+  {% endfor %}
+  <a href="{{ world_detail_url }}" class="btn btn-link mt-4">
+    {% translate "see more"|capfirst %}
+  </a>
+</section>

@@ -14,7 +14,94 @@
   <main class="container pb-3">
     <h1 class="text-center fw-light">
       {{ object.name }}
+      <br>
+      <small class="lead text-muted">
+        {{ object.resume }}
+      </small>
     </h1>
     <hr>
+    <nav class="mt-5">
+      <div class="nav nav-tabs" id="campaignNavbar" roel="tablist">
+        <button
+          class="nav-link text-uppercase active"
+          id="nav-home-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-home"
+          type="button"
+          role="tab"
+          aria-controls="nav-home"
+          aria-selected="true"
+        >
+          {% translate "home" context "menu" %}
+        </button>
+        <button
+          class="nav-link disabled text-uppercase"
+          id="nav-pcs-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-pcs"
+          type="button"
+          role="tab"
+          aria-controls="nav-pcs"
+          aria-selected="true"
+        >
+          {% translate "protagonists (PC)" context "menu" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link disabled text-uppercase"
+          id="nav-npcs-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-npcs"
+          type="button"
+          role="tab"
+          aria-controls="nav-npcs"
+          aria-selected="true"
+        >
+          {% translate "characters (NPC)" context "menu" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link text-uppercase"
+          id="nav-sessions-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-sessions"
+          type="button"
+          role="tab"
+          aria-controls="nav-sessions"
+          aria-selected="true"
+        >
+          {% translate "sessions" context "menu" %}
+        </button>
+      </div>
+      <div class="tab-content" id="campaignNavContent">
+        <div
+          class="tab-pane fade show active"
+          id="nav-home"
+          role="tabpanel"
+          aria-labelledby="nav-home-tab"
+        >
+          {% include 'roleplay/campaign/includes/campaign_home.html' %}
+        </div>
+        <div
+          class="tab-pane"
+          id="nav-sessions"
+          role="tabpanel"
+          aria-labelledby="nav-sessions-tab"
+        >
+          {% include 'roleplay/campaign/includes/campaign_sessions.html' %}
+        </div>
+      </div>
+    </nav>
   </main>
 {% endblock body_content %}
+
+{% block javascript %}
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
+{% endblock javascript %}

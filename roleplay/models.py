@@ -449,7 +449,7 @@ class Campaign(TracingMixin):
         Declares if the campaign is public or not.
     players: List[:class:`~registration.models.User`]
         List of players that are part of the campaign.
-    world: :class:`~roleplay.models.World`
+    place: :class:`~roleplay.models.Place`
         World where the campaign is happening.
     start_date: Optional[:class:`datetime.date`]
         Date when the campaign starts.
