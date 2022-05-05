@@ -861,6 +861,7 @@ class TestSessionCreateView(TestCase):
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
         cls.world = baker.make_recipe('roleplay.world')
+        cls.campaign = baker.make_recipe('roleplay.public_campaign')
 
     def setUp(self):
         self.url = resolve_url(self.resolver, pk=self.world.pk)
@@ -870,6 +871,7 @@ class TestSessionCreateView(TestCase):
             'next_game': timezone.now() + timezone.timedelta(days=1),
             'system': enums.RoleplaySystems.PATHFINDER_1,
             'world': self.world.pk,
+            'campaign': self.campaign.pk,
             'email_invitations': '\n'.join([fake.safe_email() for _ in range(3)])
         }
 
@@ -1240,6 +1242,7 @@ class TestSessionUpdateView(TestCase):
             'system': self.session.system,
             'next_game': self.session.next_game,
             'world': self.session.world.pk,
+            'campaign': self.session.campaign.pk,
         }
         self.client.force_login(self.user_in_game_masters)
         self.client.post(self.url, data)
@@ -1255,6 +1258,7 @@ class TestSessionUpdateView(TestCase):
             'system': self.session.system,
             'next_game': self.session.next_game,
             'world': self.session.world.pk,
+            'campaign': self.session.campaign.pk,
         }
         self.client.force_login(self.user_in_game_masters)
         response = self.client.post(self.url, data)

@@ -656,6 +656,7 @@ class TestSessionViewSet(APITestCase):
         }
 
         cls.world = baker.make_recipe('roleplay.world')
+        cls.campaign = baker.make_recipe('roleplay.public_campaign', place=cls.world)
 
     def setUp(self):
         self.data_ok = {
@@ -663,6 +664,7 @@ class TestSessionViewSet(APITestCase):
             'plot': fake.paragraph(),
             'world': self.world.pk,
             'system': random.choice(RoleplaySystems.values),
+            'campaign': self.campaign.pk,
         }
 
     def test_anonymous_session_list_ko(self):
@@ -800,6 +802,7 @@ class TestSessionViewSet(APITestCase):
             'plot': fake.paragraph(),
             'world': self.world.pk,
             'system': random.choice(RoleplaySystems.values),
+            'campaign': self.campaign.pk,
         }
         response = self.client.put(url, data, format='json')
 
@@ -828,6 +831,7 @@ class TestSessionViewSet(APITestCase):
             'plot': fake.paragraph(),
             'world': self.world.pk,
             'system': random.choice(RoleplaySystems.values),
+            'campaign': self.campaign.pk,
         }
         response = self.client.put(url, data, format='json')
 

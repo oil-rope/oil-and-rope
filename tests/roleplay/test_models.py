@@ -502,6 +502,7 @@ class TestSession(TestCase):
         cls.user = baker.make_recipe('registration.user')
         cls.chat = baker.make_recipe('chat.chat')
         cls.world = baker.make_recipe('roleplay.world')
+        cls.campaign = baker.make_recipe('roleplay.public_campaign')
 
     def test_str_ok(self):
         name = fake.word()
@@ -510,6 +511,7 @@ class TestSession(TestCase):
             chat=self.chat,
             system=RoleplaySystems.PATHFINDER_1,
             world=self.world,
+            campaign=self.campaign,
         )
         system = RoleplaySystems(instance.system)
         expected = f'{name} [{system.label.title()}]'

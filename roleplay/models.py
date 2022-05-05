@@ -443,7 +443,7 @@ class Campaign(TracingMixin):
         A one line description of the campaign.
     system: :class:`int`
         System used.
-    cover_image: :class:`str`
+    cover_image: Optional[:class:`str`]
         Path to the cover image of the campaign.
     is_public: :class:`bool`
         Declares if the campaign is public or not.
@@ -578,20 +578,26 @@ class Session(TracingMixin):
 
     Parameters
     ----------
+    campaign: :class:`~roleplay.models.Campaign`
+        The related campaign.
     name: :class:`str`
         Name of the session.
+    description: Optional[:class:`str`]
+        Description of the session.
     plot: :class:`str`
         Plot of the session.
     players: List[:class:`~registration.models.User`]
         Players in session.
-    chat: :class:`~chat.model.Chat`
+    chat: :class:`~chat.models.Chat`
         Chat used for this session.
-    next_game: :class:`datetime.datetime`
+    next_game: Optional[:class:`datetime.datetime`]
         Next session's date.
     system: :class:`int`
         System used.
     world: :class:`~roleplay.models.Place`
         The world where this session is played.
+    image: Optional[:class:`str`]
+        Cover image for this session.
 
     Attributes
     ----------
@@ -600,8 +606,13 @@ class Session(TracingMixin):
     """
 
     id = models.AutoField(verbose_name=_('identifier'), primary_key=True, blank=False, null=False, db_index=True)
-    name = models.CharField(verbose_name=_('name'), max_length=100)
-    plot = models.TextField(verbose_name=_('plot'), null=False, blank=True)
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, on_delete=models.CASCADE, to_field='id',
+        related_name='session_set', db_index=True, null=False, blank=False,
+    )
+    name = models.CharField(verbose_name=_('title'), max_length=100, null=False, blank=False)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    plot = models.TextField(verbose_name=_('plot'), help_text=_('one line resume'), null=False, blank=True)
     players = models.ManyToManyField(
         to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='session_set',
         related_query_name='session', through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
@@ -620,7 +631,7 @@ class Session(TracingMixin):
         limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
     )
     image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
+        verbose_name=_('cover'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
     )
 
     class Meta:

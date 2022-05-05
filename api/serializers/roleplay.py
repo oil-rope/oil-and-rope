@@ -67,7 +67,7 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = (
-            'id', 'name', 'plot', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters',
+            'id', 'name', 'plot', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters', 'campaign',
         )
         extra_kwargs = {
             'chat': {'required': False},

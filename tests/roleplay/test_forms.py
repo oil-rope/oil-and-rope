@@ -199,6 +199,7 @@ class TestSessionForm(TestCase):
             'name': fake.sentence(),
             'plot': fake.paragraph(),
             'world': baker.make_recipe('roleplay.world'),
+            'campaign': baker.make_recipe('roleplay.public_campaign'),
             'system': enums.RoleplaySystems.PATHFINDER_1,
             'next_game': fake.future_datetime(),
         }
@@ -206,7 +207,7 @@ class TestSessionForm(TestCase):
     def test_data_ok(self):
         form = self.form_class(data=self.data_ok)
 
-        self.assertTrue(form.is_valid(), f'Errors: {form.errors.values()}')
+        self.assertTrue(form.is_valid(), f'Errors: {form.errors}')
 
     def test_data_without_plot_ok(self):
         data_without_plot = self.data_ok.copy()

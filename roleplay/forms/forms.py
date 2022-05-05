@@ -100,7 +100,7 @@ class SessionForm(forms.ModelForm):
     class Meta:
         model = models.Session
         fields = (
-            'name', 'plot', 'next_game', 'system', 'world',
+            'name', 'plot', 'next_game', 'system', 'world', 'campaign',
         )
 
     def clean_next_game(self):

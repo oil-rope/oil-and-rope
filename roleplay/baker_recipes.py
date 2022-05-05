@@ -19,6 +19,7 @@ random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
 random_site_type = functools.partial(random.choice, SiteTypes.values)
 
+Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
@@ -53,6 +54,13 @@ domain = Recipe(
     name=fake.word,
     description=fake.paragraph,
     domain_type=random_domain_type,
+)
+
+public_campaign = Recipe(
+    Campaign,
+    name=fake.sentence,
+    system=random_roleplay_system,
+    is_public=True,
 )
 
 session = Recipe(
