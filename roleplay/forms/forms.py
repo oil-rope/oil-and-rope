@@ -100,7 +100,7 @@ class SessionForm(forms.ModelForm):
     class Meta:
         model = models.Session
         fields = (
-            'name', 'plot', 'next_game', 'system', 'world', 'campaign',
+            'name', 'plot', 'next_game', 'system', 'campaign',
         )
 
     def clean_next_game(self):
@@ -112,9 +112,4 @@ class SessionForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance = super().save(False)
-        if commit:
-            chat = Chat.objects.create(
-                name=f'{self.instance.name} chat',
-            )
-            self.instance.chat = chat
         return super().save(commit)

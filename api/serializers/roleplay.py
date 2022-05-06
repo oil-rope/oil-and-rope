@@ -51,24 +51,3 @@ class RaceSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma',
             'affected_by_armor', 'image', 'users', 'owners',
         )
-
-
-class SessionSerializer(serializers.ModelSerializer):
-    game_masters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-    def save(self, **kwargs):
-        # NOTE: We create the chat on the go
-        chat = Chat.objects.create(
-            name=self.validated_data.get('name') + ' chat',
-        )
-        kwargs['chat'] = chat
-        return super().save(**kwargs)
-
-    class Meta:
-        model = Session
-        fields = (
-            'id', 'name', 'plot', 'players', 'chat', 'next_game', 'system', 'world', 'game_masters', 'campaign',
-        )
-        extra_kwargs = {
-            'chat': {'required': False},
-        }

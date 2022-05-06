@@ -586,10 +586,6 @@ class Session(TracingMixin):
         Description of the session.
     plot: :class:`str`
         Plot of the session.
-    players: List[:class:`~registration.models.User`]
-        Players in session.
-    chat: :class:`~chat.models.Chat`
-        Chat used for this session.
     next_game: Optional[:class:`datetime.datetime`]
         Next session's date.
     system: :class:`int`
@@ -613,23 +609,10 @@ class Session(TracingMixin):
     name = models.CharField(verbose_name=_('title'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     plot = models.TextField(verbose_name=_('plot'), help_text=_('one line resume'), null=False, blank=True)
-    players = models.ManyToManyField(
-        to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='session_set',
-        related_query_name='session', through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
-    )
-    chat = models.OneToOneField(
-        to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
-        related_name='session', related_query_name='session', db_index=True, blank=False, null=False,
-    )
     next_game = models.DateTimeField(
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True,
     )
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
-    world = models.ForeignKey(
-        to=constants.ROLEPLAY_PLACE, verbose_name=_('world'), on_delete=models.CASCADE,
-        related_name='session_set', related_query_name='session', db_index=True,
-        limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
-    )
     image = models.ImageField(
         verbose_name=_('cover'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
     )
@@ -639,34 +622,25 @@ class Session(TracingMixin):
         verbose_name_plural = _('sessions')
         ordering = ['-entry_created_at', 'name']
 
-    def add_game_masters(self, *users):
-        PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
-        entries_to_create = [PlayerInSession(player=user, session=self, is_game_master=True) for user in users]
-        objs = PlayerInSession.objects.bulk_create(entries_to_create)
-        return objs
+    @property
+    def chat(self):
+        return self.campaign.chat
+
+    @property
+    def world(self):
+        return self.campaign.world
+
+    @property
+    def players(self):
+        players = self.campaign.users.all()
+        return players
 
     @property
     def game_masters(self):
         gms = self.players.filter(
-            player_in_session_set__is_game_master=True
+            player_in_campaign_set__is_game_master=True
         )
         return gms
-
-    def clean(self):
-        # Don't allow non Worlds to be world
-        try:
-            world = self.world
-        except Session.world.RelatedObjectDoesNotExist:
-            msg = _('session hasn\'t any world.').capitalize()
-            raise ValidationError({'world': msg})
-        if world:
-            if world.site_type != SiteTypes.WORLD:
-                msg = _('world must be a world.').capitalize()
-                raise ValidationError({'world': msg})
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return resolve_url('roleplay:session:detail', pk=self.pk)
@@ -674,29 +648,3 @@ class Session(TracingMixin):
     def __str__(self):
         system = RoleplaySystems(self.system)
         return f'{self.name} [{system.label.title()}]'
-
-
-class PlayerInSession(TracingMixin):
-    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
-    session = models.ForeignKey(
-        to=constants.ROLEPLAY_SESSION, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
-        db_index=True, verbose_name=_('session'),
-    )
-    player = models.ForeignKey(
-        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
-        db_index=True, verbose_name=_('player')
-    )
-    is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
-
-    class Meta:
-        verbose_name = _('player in session')
-        verbose_name_plural = _('players in session')
-        unique_together = [
-            ['session', 'player']
-        ]
-
-    def __str__(self):
-        str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s)') % {
-            'player': self.player, 'session': self.session, 'is_game_master': self.is_game_master
-        }
-        return str_model

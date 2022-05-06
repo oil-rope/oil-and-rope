@@ -7,7 +7,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone
-from django.utils.functional import keep_lazy
 from django.utils.translation import gettext_lazy as _
 
 from bot.models import User as DiscordUser
@@ -35,14 +34,6 @@ class User(AbstractUser):
             m2m_race_set__is_owner=True
         )
         return races
-
-    @property
-    @keep_lazy(models.QuerySet)
-    def gm_sessions(self):
-        sessions = self.session_set.filter(
-            player_in_session_set__is_game_master=True
-        )
-        return sessions
 
     def get_absolute_url(self):
         return resolve_url('registration:user:edit', pk=self.pk)

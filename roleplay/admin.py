@@ -39,28 +39,12 @@ class CampaignAdmin(admin.ModelAdmin):
     search_fields = ['name__icontains']
 
 
-class PlayersInSessionInline(admin.TabularInline):
-    model = models.PlayerInSession
-    extra = 1
-
-
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
-    inlines = (PlayersInSessionInline, )
-    fields = (('name', 'system'), 'plot', 'next_game', 'chat', 'world', 'image')
-    filter_horizontal = ('players', )
+    fields = (('name', 'system'), 'plot', 'next_game', 'image')
     list_display = ('__str__', 'id', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
     list_display_links = ('__str__', 'id')
     list_filter = ('system', )
     readonly_fields = ('entry_created_at', 'entry_updated_at')
     search_fields = ['name__icontains', 'world__name__icontains']
-
-    def delete_model(self, request, obj):
-        obj.chat.delete()
-        obj.delete()
-
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.chat.delete()
-        queryset.delete()
