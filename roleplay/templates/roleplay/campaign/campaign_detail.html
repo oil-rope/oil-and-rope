@@ -12,13 +12,24 @@
 
 {% block body_content %}
   <main class="container pb-3">
-    <h1 class="text-center fw-light">
-      {{ object.name }}
-      <br>
-      <small class="lead text-muted">
-        {{ object.resume }}
-      </small>
-    </h1>
+    <header>
+      {% if object.cover_image %}
+        <picture>
+          <img
+            src="{{ object.cover_image.url }}"
+            alt="{% translate "cover image"|title %}"
+            class="img-fluid mx-auto d-block"
+          >
+        </picture>
+      {% endif %}
+      <h1 class="text-center fw-light mt-3">
+        {{ object.name }}
+        <br>
+        <small class="lead text-muted">
+          {{ object.resume }}
+        </small>
+      </h1>
+    </header>
     <hr>
     <nav class="mt-5">
       <div class="nav nav-tabs" id="campaignNavbar" roel="tablist">
@@ -32,10 +43,10 @@
           aria-controls="nav-home"
           aria-selected="true"
         >
-          {% translate "home" context "menu" %}
+          {% translate "home" context "menu name" %}
         </button>
         <button
-          class="nav-link disabled text-uppercase"
+          class="nav-link text-uppercase disabled"
           id="nav-pcs-tab"
           data-bs-toggle="tab"
           data-bs-target="#nav-pcs"
@@ -49,7 +60,7 @@
           <small>{% translate "not yet implemented"|capfirst %}</small>
         </button>
         <button
-          class="nav-link disabled text-uppercase"
+          class="nav-link text-uppercase disabled"
           id="nav-npcs-tab"
           data-bs-toggle="tab"
           data-bs-target="#nav-npcs"
@@ -72,25 +83,44 @@
           aria-controls="nav-sessions"
           aria-selected="true"
         >
-          {% translate "sessions" context "menu" %}
+          {% translate "sessions" %}
         </button>
-      </div>
-      <div class="tab-content" id="campaignNavContent">
-        <div
-          class="tab-pane fade show active"
-          id="nav-home"
-          role="tabpanel"
-          aria-labelledby="nav-home-tab"
+        <button
+          class="nav-link text-uppercase disabled"
+          id="nav-timeline-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-timeline"
+          type="button"
+          role="tab"
+          aria-controls="nav-timeline"
+          aria-selected="true"
         >
+          {% translate "timeline" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link text-uppercase"
+          id="nav-settings-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-settings"
+          type="button"
+          role="tab"
+          aria-controls="nav-settings"
+          aria-selected="true"
+        >
+          {% translate "settings" %}
+      </button>
+      </div>
+      <div class="tab-content pt-3" id="campaignNavContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
           {% include 'roleplay/campaign/include/campaign_home.html' %}
         </div>
-        <div
-          class="tab-pane"
-          id="nav-sessions"
-          role="tabpanel"
-          aria-labelledby="nav-sessions-tab"
-        >
+        <div class="tab-pane" id="nav-sessions" role="tabpanel" aria-labelledby="nav-sessions-tab">
           {% include 'roleplay/campaign/include/campaign_sessions.html' with object=object only %}
+        </div>
+        <div class="tab-pane" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
+          {% include 'roleplay/campaign/include/campaign_settings.html' with object=object user=request.user only %}
         </div>
       </div>
     </nav>
@@ -98,10 +128,10 @@
 {% endblock body_content %}
 
 {% block javascript %}
-<script>
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-</script>
+  <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    })
+  </script>
 {% endblock javascript %}

@@ -1,5 +1,5 @@
 {% load i18n %}
-<section class="p-3">
+<section>
   <h3 class="text-center">
     {% translate "about the campaign"|title %}
   </h3>
@@ -7,7 +7,7 @@
     {{ object.description }}
   </p>
 </section>
-<section class="p-3">
+<section>
   <h3 class="text-center">
     {% translate "about the world"|title %}
     <button
@@ -27,7 +27,7 @@
       </a>
     </small>
   </h3>
-  {% for place in object.place.get_family|slice:3 %}
+  {% for place in object.place.get_family|slice:5 %}
     <article class="pt-3">
       {% if place.level == 0 %}
         <h3 class="text-center fw-lighter">

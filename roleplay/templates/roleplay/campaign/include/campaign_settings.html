@@ -1,0 +1,164 @@
+{% load i18n %}
+{% load static %}
+<section class="row justify-content-center  ">
+  <h3 class="text-center">
+    {% translate "general settings"|capfirst %}
+    {% if user in object.game_masters %}
+      <a href="#no-url" class="btn btn-primary disabled" title="{% translate "edit campaign"|capfirst %}">
+        <i class="ic ic-edit"></i>
+        {% translate "edit"|capfirst %}
+      </a>
+    {% endif %}
+  </h3>
+  <div class="row mt-3 mt-xl-4">
+    <div class="col">
+      <h5 class="text-end">{% translate "name"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.name }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "short description"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.resume }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "description"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.description }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "system"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.get_system_display }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "type"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.is_public %}
+          {% translate "public"|capfirst %}
+        {% else %}
+          {% translate "private"|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "discord channel"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.discord_channel %}
+          <a
+            href="https://discord.com/channels/{{ object.discord_channel.guild_id }}/{{ object.discord_channel.id }}"
+            target="_blank"
+          >
+            {{ object.discord_channel.name }}
+          </a>
+        {% else %}
+          {% translate "not connected."|capfirst %}
+          <br />
+{% blocktranslate with command='..linkchannel' asvar discord_channel_help_text %}
+You can set it up with our bot using '{{ command }}' command.
+{% endblocktranslate %}
+          <small class="text-muted">
+            {{ discord_channel_help_text }}
+          </small>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "start date"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.start_date %}
+          {{ object.start_date }}
+        {% else %}
+          {% translate "not set."|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "end date"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.end_date %}
+          {{ object.end_date }}
+        {% else %}
+          {% translate "not set."|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</section>
+<hr>
+<section class="row justify-content-center  ">
+  <h3 class="text-center">
+    {% translate "players"|capfirst %}
+    {% if user in object.game_masters %}
+      <a href="#no-url" class="btn btn-primary disabled" title="{% translate "add players"|capfirst %}">
+        <i class="ic ic-plus"></i>
+        {% translate "add"|capfirst %}
+      </a>
+    {% endif %}
+  </h3>
+  <div class="row justify-content-around rounded bg-dark bg-opacity-10">
+{# NOTE: Since identation is causing some translations to break we better keep them separated #}
+{% blocktranslate count players=object.users.count asvar player_count %}
+{{ players }} player
+{% plural %}
+{{ players }} players
+{% endblocktranslate %}
+    <h5 class="text-center">{{ player_count }}</h5>
+    {% for player in object.users.all %}
+      <div class="col">
+        {% if player.profile.image %}
+          <img
+            src="{{ player.profile.image.url }}"
+            alt="{% translate "avatar"|capfirst %}"
+            class="rounded-circle"
+            width="75"
+            height="75"
+          >
+        {% else %}
+          <img
+          src="{% static 'img/default_user.png' %}"
+          alt="{% translate "avatar"|capfirst %}"
+          class="rounded-circle"
+          width="75"
+          height="75"
+          >
+        {% endif %}
+        <p>
+          {{ player.username }}
+        </p>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>
+          {% translate "no players."|capfirst %}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+</section>

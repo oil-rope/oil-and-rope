@@ -628,7 +628,7 @@ class Session(TracingMixin):
 
     @property
     def world(self):
-        return self.campaign.world
+        return self.campaign.place
 
     @property
     def players(self):

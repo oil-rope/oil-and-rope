@@ -112,13 +112,13 @@
         <div
           class="row justify-content-around rounded bg-dark bg-opacity-10 mx-1 py-2"
         >
-          <h2 class="text-center">
-            {% blocktranslate count player_count=object.players.count %}
-              {{ player_count }} player
-            {% plural %}
-              {{ player_count }} players
-            {% endblocktranslate %}
-          </h2>
+{# NOTE: Since identation is causing some translations to break we better keep them separated #}
+{% blocktranslate count player_count=object.players.count asvar n_players %}
+{{ player_count }} player
+{% plural %}
+{{ player_count }} players
+{% endblocktranslate %}
+          <h2 class="text-center">{{ n_players }}</h2>
           {% for player in object.players.all %}
             <div class="col">
               {% if player.profile.image %}
