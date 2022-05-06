@@ -227,7 +227,10 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         Checks if user is in players otherwise they have no access.
         """
 
-        return self.request.user in self.get_object().users.all()
+        campaign = self.get_object()
+        if not campaign.is_public:
+            return self.request.user in campaign.users.all()
+        return True
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):

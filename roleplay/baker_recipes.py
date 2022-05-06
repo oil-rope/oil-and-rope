@@ -63,6 +63,13 @@ public_campaign = Recipe(
     is_public=True,
 )
 
+private_campaign = Recipe(
+    Campaign,
+    name=fake.sentence,
+    system=random_roleplay_system,
+    is_public=False,
+)
+
 session = Recipe(
     Session,
     name=fake.sentence,

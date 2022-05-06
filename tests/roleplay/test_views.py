@@ -815,37 +815,39 @@ class TestCampaignDetailView(TestCase):
         cls.world = generate_place(site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.chat = baker.make_recipe('chat.chat')
-        self.instance = self.model.objects.create(
-            name=fake.city(),
-            system=random.choice(enums.RoleplaySystems.values),
-            place=self.world,
-            chat=self.chat,
-        )
-        self.instance.users.add(self.user)
-        self.url = resolve_url(self.instance)
+        self.private_campaign = baker.make_recipe('roleplay.private_campaign', place=self.world)
+        self.private_campaign.users.add(self.user)
+        self.private_campaign_url = resolve_url(self.private_campaign)
+        self.public_campaign = baker.make_recipe('roleplay.public_campaign', place=self.world)
+        self.public_campaign_url = resolve_url(self.public_campaign)
 
     def test_access_anonymous_ko(self):
-        response = self.client.get(self.url)
-        expected_url = f'{self.login_url}?next={self.url}'
+        response = self.client.get(self.private_campaign_url)
+        expected_url = f'{self.login_url}?next={self.private_campaign_url}'
 
         self.assertRedirects(response, expected_url)
 
-    def test_user_not_in_players_ko(self):
+    def test_user_not_in_players_private_campaign_ko(self):
         self.client.force_login(baker.make_recipe('registration.user'))
-        response = self.client.get(self.url)
+        response = self.client.get(self.private_campaign_url)
 
         self.assertEqual(403, response.status_code)
 
-    def test_user_in_players_ok(self):
+    def test_user_in_players_private_campaign_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_user_not_in_players_public_campaign_ok(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.public_campaign_url)
 
         self.assertEqual(200, response.status_code)
 
     def test_template_used_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(self.private_campaign_url)
 
         self.assertTemplateUsed(response, self.template)
 

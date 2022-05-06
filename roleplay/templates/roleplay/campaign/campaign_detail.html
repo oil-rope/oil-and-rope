@@ -82,7 +82,7 @@
           role="tabpanel"
           aria-labelledby="nav-home-tab"
         >
-          {% include 'roleplay/campaign/includes/campaign_home.html' %}
+          {% include 'roleplay/campaign/include/campaign_home.html' %}
         </div>
         <div
           class="tab-pane"
@@ -90,7 +90,7 @@
           role="tabpanel"
           aria-labelledby="nav-sessions-tab"
         >
-          {% include 'roleplay/campaign/includes/campaign_sessions.html' %}
+          {% include 'roleplay/campaign/include/campaign_sessions.html' with object=object only %}
         </div>
       </div>
     </nav>

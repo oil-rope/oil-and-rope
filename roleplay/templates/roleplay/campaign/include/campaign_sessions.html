@@ -1,0 +1,5 @@
+<section class="row justify-content-around p-3">
+  {% for session in object.session_set.all %}
+    {% include 'roleplay/session/include/session_list_item.html' with session=session only %}
+  {% endfor %}
+</section>
