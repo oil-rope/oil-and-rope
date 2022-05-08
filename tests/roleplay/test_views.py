@@ -1322,6 +1322,37 @@ class TestRaceCreateView(TestCase):
         self.assertEqual(self.data_ok['description'], instance.description)
 
 
+class TestRaceDetailView(TestCase):
+    model = models.Race
+    resolver = 'roleplay:place:detail'
+    template = 'roleplay/race/race_detail.html'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.users = baker.make_recipe('registration.user')
+        cls.race = baker.make_recipe('roleplay.race')
+        cls.race_noimage = baker.make_recipe('roleplay.race_noimage')
+
+        cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.race_noimage.users.add(cls.users)
+
+        cls.url = reverse('roleplay:race:detail', kwargs={'pk': cls.race.pk})
+
+    def test_access_template_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url, kwargs={'pk': self.race.pk})
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_noimage_template_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url, kwargs={'pk': self.race_noimage.pk})
+
+        self.assertTemplateUsed(response, self.template)
+
+
 class TestRaceUpdateView(TestCase):
     model = models.Race
     resolver = 'roleplay:place:edit'

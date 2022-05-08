@@ -133,7 +133,6 @@ class RaceForm(forms.ModelForm):
         # self.owner = owner
 
         self.helper = FormHelper(self)
-        self.helper.form_action = 'roleplay:race:create'
         self.helper.form_method = 'POST'
         self.helper.include_media = True
         self.helper.layout = RaceFormLayout(submit_text=submit_text)
