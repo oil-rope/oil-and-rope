@@ -56,6 +56,14 @@ domain = Recipe(
     domain_type=random_domain_type,
 )
 
+campaign = Recipe(
+    Campaign,
+    name=fake.sentence,
+    system=random_roleplay_system,
+    is_public=fake.pybool,
+)
+
+
 public_campaign = Recipe(
     Campaign,
     name=fake.sentence,

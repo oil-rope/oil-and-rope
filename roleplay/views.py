@@ -218,6 +218,18 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     template_name = 'roleplay/place/place_confirm_delete.html'
 
 
+class CampaignPrivateListView(LoginRequiredMixin, ListView):
+    """
+    This view list :class:`~roleplay.models.Campaign` objects that the user is in players.
+    """
+
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_private_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(users__in=[self.request.user])
+
+
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Campaign
     template_name = 'roleplay/campaign/campaign_detail.html'
@@ -265,11 +277,6 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         qs = Place.objects.community_places()
         qs |= Place.objects.user_places(user=self.request.user)
         return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class=form_class)
-        form.fields['world'].queryset = self.get_available_worlds()
-        return form
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -328,11 +335,6 @@ class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         session = self.get_object()
         return self.request.user in session.players.all()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['TABLETOP_URL'] = settings.TABLETOP_URL
-        return context
-
 
 class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Session
@@ -390,8 +392,3 @@ class SessionListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(campaign__users__in=[self.request.user])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['TABLETOP_URL'] = settings.TABLETOP_URL
-        return context

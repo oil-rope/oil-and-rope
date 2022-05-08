@@ -31,6 +31,13 @@ class CampaignManager(models.Manager):
 
         return super().get_queryset().filter(is_public=True)
 
+    def private(self):
+        """
+        Return all private campaigns.
+        """
+
+        return super().get_queryset().filter(is_public=False)
+
 
 class PlaceManager(TreeManager):
 

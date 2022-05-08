@@ -4,7 +4,7 @@
     {% translate "about the campaign"|title %}
   </h3>
   <p>
-    {{ object.description }}
+    {{ object.description|default:_("no description provided...")|capfirst }}
   </p>
 </section>
 <section>
@@ -31,19 +31,23 @@
     <article class="pt-3">
       {% if place.level == 0 %}
         <h3 class="text-center fw-lighter">
-          {{ place.name }} ({{ place.get_site_type_display }})
+          {{ place.resolve_icon|safe }} {{ place.name }} ({{ place.get_site_type_display }})
         </h3>
       {% elif place.level == 1 %}
         <h4 class="text-center fw-lighter">
-          {{ place.name }} ({{ place.get_site_type_display }})
+          {{ place.resolve_icon|safe }} {{ place.name }} ({{ place.get_site_type_display }})
         </h4>
       {% else %}
         <h5 class="text-center fw-lighter">
-          {{ place.name }} ({{ place.get_site_type_display }})
+          {{ place.resolve_icon|safe }} {{ place.name }} ({{ place.get_site_type_display }})
         </h5>
       {% endif %}
       <p>
-        {{ place.description|safe }}
+        {% if place.description %}
+          {{ place.description|safe }}
+        {% else %}
+          {% translate "no description provided..."|capfirst %}
+        {% endif %}
       </p>
     </article>
   {% endfor %}

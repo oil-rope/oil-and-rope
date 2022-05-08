@@ -42,7 +42,7 @@ class CampaignAdmin(admin.ModelAdmin):
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
-    fields = (('name', 'system'), 'plot', 'next_game', 'image')
+    fields = (('name', 'system'), 'plot', 'next_game', 'image', 'campaign')
     list_display = ('__str__', 'id', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
     list_display_links = ('__str__', 'id')
     list_filter = ('system', )

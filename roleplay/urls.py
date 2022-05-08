@@ -19,6 +19,7 @@ WORLD_PATTERNS = [
 
 CAMPAIGN_PATTERNS = [
     path('<int:pk>/', views.CampaignDetailView.as_view(), name='detail'),
+    path('@me/', views.CampaignPrivateListView.as_view(), name='list-private'),
 ]
 
 SESSION_PATTERNS = [

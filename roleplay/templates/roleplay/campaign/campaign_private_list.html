@@ -1,0 +1,17 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <h1 class="display-5 text-center">
+    {% translate "your campaigns"|capfirst %}
+    <br>
+    <small class="text-muted fs-4">{% translate "campaigns you are part of."|capfirst %}</small>
+  </h1>
+  <main class="container pb-3">
+  </main>
+{% endblock body_content %}

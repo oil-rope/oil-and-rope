@@ -1,5 +1,16 @@
+{% load i18n %}
 <section class="row justify-content-around">
   {% for session in object.session_set.all %}
     {% include 'roleplay/session/include/session_list_item.html' with session=session only %}
+  {% empty %}
+    <div class="col">
+      {% if user in object.game_masters %}
+        {% include 'roleplay/session/include/prepare_first_session_card.html' with campaign=object %}
+      {% else %}
+        <h5 class="text-center">
+          {% translate "no sessions yet."|capfirst %}
+        </h5>
+      {% endif %}
+    </div>
   {% endfor %}
 </section>

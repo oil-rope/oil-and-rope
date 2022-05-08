@@ -5,7 +5,7 @@
     {% translate "general settings"|capfirst %}
     {% if user in object.game_masters %}
       <a href="#no-url" class="btn btn-primary disabled" title="{% translate "edit campaign"|capfirst %}">
-        <i class="ic ic-edit"></i>
+        {{ ICONS.EDIT|safe }}
         {% translate "edit"|capfirst %}
       </a>
     {% endif %}
@@ -23,7 +23,7 @@
       <h5 class="text-end">{% translate "short description"|capfirst %}</h5>
     </div>
     <div class="col">
-      <p>{{ object.resume }}</p>
+      <p>{{ object.resume|default:_("no resume provided yet.")|capfirst }}</p>
     </div>
   </div>
   <div class="row">
@@ -117,7 +117,7 @@ You can set it up with our bot using '{{ command }}' command.
     {% translate "players"|capfirst %}
     {% if user in object.game_masters %}
       <a href="#no-url" class="btn btn-primary disabled" title="{% translate "add players"|capfirst %}">
-        <i class="ic ic-plus"></i>
+        {{ ICONS.PLUS|safe }}
         {% translate "add"|capfirst %}
       </a>
     {% endif %}

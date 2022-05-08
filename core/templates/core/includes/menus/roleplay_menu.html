@@ -63,8 +63,9 @@
 
     <li><hr class="dropdown-divider" /></li>
     <li>
-      <a href="#no-url" class="dropdown-item">
-        {% translate "all campaigns"|title %}
+      {% url 'roleplay:campaign:list-private' as campaign_private_list_url %}
+      <a href="{{ campaign_private_list_url }}" class="dropdown-item">
+        {% translate "your campaigns"|title %}
       </a>
     </li>
     <li>

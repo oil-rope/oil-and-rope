@@ -150,6 +150,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.utils.requests_utils',
                 'core.context_processors.language',
+                'core.context_processors.handy_settings',
             ],
             'debug': bool(to_bool(os.getenv('DEBUG_TEMPLATE', 'False'))),
         },

@@ -7,7 +7,7 @@
   {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
   {# NOTE: Is should add a 'as' in order to NOT render on template #}
   {% translate "campaign detail" as breadcrumb_translation %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns,campaign detail' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns=roleplay:campaign:list-private,campaign detail' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -29,6 +29,19 @@
           {{ object.resume }}
         </small>
       </h1>
+      {% if request.user in object.users.all %}
+        <div class="text-center">
+          {{ settings }}
+          <a
+            href="{{ TABLETOP_URL }}/campaign/{{ object.pk }}"
+            class="btn btn-info"
+            target="_blank"
+          >
+            {{ ICONS.DICE|safe }}
+            {% translate "go to tabletop"|capfirst %}
+          </a>
+        </div>
+      {% endif %}
     </header>
     <hr>
     <nav class="mt-5">
@@ -117,10 +130,10 @@
           {% include 'roleplay/campaign/include/campaign_home.html' %}
         </div>
         <div class="tab-pane" id="nav-sessions" role="tabpanel" aria-labelledby="nav-sessions-tab">
-          {% include 'roleplay/campaign/include/campaign_sessions.html' with object=object only %}
+          {% include 'roleplay/campaign/include/campaign_sessions.html' %}
         </div>
         <div class="tab-pane" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
-          {% include 'roleplay/campaign/include/campaign_settings.html' with object=object user=request.user only %}
+          {% include 'roleplay/campaign/include/campaign_settings.html' %}
         </div>
       </div>
     </nav>
