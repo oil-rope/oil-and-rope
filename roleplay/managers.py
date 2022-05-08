@@ -14,6 +14,24 @@ class DomainManager(models.Manager):
         return super().get_queryset().filter(domain_type=DomainTypes.DOMAIN)
 
 
+class CampaignManager(models.Manager):
+    """
+    Specific manager for :class:`~roleplay.models.Campaign` that filters queryset by some common filters.
+
+    Methods
+    -------
+    public()
+        Return all public campaigns.
+    """
+
+    def public(self):
+        """
+        Return all public campaigns.
+        """
+
+        return super().get_queryset().filter(is_public=True)
+
+
 class PlaceManager(TreeManager):
 
     def user_places(self, user):

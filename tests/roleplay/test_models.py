@@ -447,13 +447,16 @@ class TestCampaign(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        # NOTE: This is done because it's better performance than creating a new entries each time
         cls.chat = baker.make_recipe('chat.chat')
         cls.world = generate_place(site_type=SiteTypes.WORLD)
+        cls.owner = baker.make_recipe('registration.user')
 
     def setUp(self):
         self.name = fake.sentence()
         self.instance = self.model.objects.create(
             name=self.name, chat=self.chat, system=random.choice(RoleplaySystems.values), place=self.world,
+            owner=self.owner,
         )
 
     def test_str_ok(self):

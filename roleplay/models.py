@@ -445,6 +445,9 @@ class Campaign(TracingMixin):
         System used.
     cover_image: Optional[:class:`str`]
         Path to the cover image of the campaign.
+    owner: :class:`~registration.models.User`
+        Owner of the campaign.
+        This is used in order to have track of the person who created the campaign.
     is_public: :class:`bool`
         Declares if the campaign is public or not.
     players: List[:class:`~registration.models.User`]
@@ -469,6 +472,8 @@ class Campaign(TracingMixin):
         The discord channel where the campaign is happening.
     """
 
+    objects = managers.CampaignManager()
+
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True, null=False, blank=False)
     name = models.CharField(verbose_name=_('name'), max_length=50)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
@@ -477,6 +482,10 @@ class Campaign(TracingMixin):
     cover_image = models.ImageField(
         verbose_name=_('cover image'), upload_to=default_upload_to, validators=[validate_file_size], null=False,
         blank=True,
+    )
+    owner = models.ForeignKey(
+        verbose_name=_('owner'), to=constants.REGISTRATION_USER, related_name='campaign_owned_set',
+        on_delete=models.CASCADE, db_index=True,
     )
     is_public = models.BooleanField(verbose_name=_('public'), default=False)
     users = models.ManyToManyField(
