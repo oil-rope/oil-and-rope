@@ -59,6 +59,17 @@
               {% translate "sessions" %}
             </a>
           </li>
+          <li class="nav-item">
+            {% url 'roleplay:race:list' as race_list %}
+            <a
+              href="{{ race_list }}"
+              class="nav-link text-uppercase {% if actual_path|startswith:race_list%} active{% endif %}"
+              {% if actual_path|startswith:race_list %}aria-current="page"{% endif %}
+            >
+              <i class="ic-hammer"></i>
+              {% translate "races" %}
+            </a>
+          </li>
         </ul>
 
         <!-- Login and Register -->
