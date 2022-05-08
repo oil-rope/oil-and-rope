@@ -9,7 +9,7 @@ from common.constants import models
 from tests import fake
 
 User = get_user_model()
-Profile = apps.get_model(models.PROFILE_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 
 
 class TestUserSerializer(TestCase):

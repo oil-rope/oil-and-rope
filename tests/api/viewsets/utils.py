@@ -8,7 +8,7 @@ from roleplay.enums import SiteTypes
 
 fake = create_faker()
 
-Place = apps.get_model(models.PLACE_MODEL)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
 
 
 def bake_places(_quantity=None, user=None, owner=None):

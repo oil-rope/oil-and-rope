@@ -13,7 +13,7 @@ fake = create_faker()
 
 
 class TestTrack(TestCase):
-    model = apps.get_model(models.TRACK_MODEL)
+    model = apps.get_model(models.COMMON_TRACK)
 
     @classmethod
     def setUpTestData(cls):

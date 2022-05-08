@@ -13,8 +13,8 @@ from roleplay.utils.dice import roll_dice
 
 LOGGER = logging.getLogger(__name__)
 
-ChatMessage = apps.get_model(constants.CHAT_MESSAGE_MODEL)
-User = apps.get_model(constants.USER_MODEL)
+ChatMessage = apps.get_model(constants.CHAT_MESSAGE)
+User = apps.get_model(constants.REGISTRATION_USER)
 
 
 class ChatConsumer(HandlerJsonWebsocketConsumer):

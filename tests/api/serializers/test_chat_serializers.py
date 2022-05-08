@@ -7,8 +7,8 @@ from api.serializers.chat import (ChatMessageSerializer, ChatSerializer, NestedC
 from common.constants import models
 from tests import fake
 
-Chat = apps.get_model(models.CHAT_MODEL)
-ChatMessage = apps.get_model(models.CHAT_MESSAGE_MODEL)
+Chat = apps.get_model(models.CHAT)
+ChatMessage = apps.get_model(models.CHAT_MESSAGE)
 
 
 class TestChatMessageSerializer(TestCase):
@@ -153,7 +153,7 @@ class TestChatSerializer(TestCase):
 
 
 class TestNestedChatSerializer(TestCase):
-    model = apps.get_model(models.CHAT_MODEL)
+    model = apps.get_model(models.CHAT)
     serializer_class = NestedChatSerializer
 
     @classmethod

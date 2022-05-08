@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 from common.constants import models
 
 User = get_user_model()
-Profile = apps.get_model(models.PROFILE_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 
 base_resolver = 'api:registration'
 

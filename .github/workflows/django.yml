@@ -87,7 +87,7 @@ jobs:
           python manage.py check
 
       - name: Updating Codecov (coverage)
-        if: ${{ success() && matrix.python-version==3.9 }}
+        if: ${{ success() }}
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -27,9 +27,9 @@ from .utils.invitations import send_session_invitations
 LOGGER = logging.getLogger(__name__)
 
 User = get_user_model()
-Place = apps.get_model(models.PLACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
-Race = apps.get_model(models.RACE_MODEL)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
+Race = apps.get_model(models.ROLEPLAY_RACE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -188,6 +188,14 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
                 'user': user
             })
         return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:world:create')
+        # NOTE: Since user is gotten from '?user' QueryParam, `form_action` must replicate this behavior
+        if form.user:
+            form.helper.form_action = f'{form.helper.form_action}?user'
+        return form
 
 
 class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):

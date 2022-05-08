@@ -43,7 +43,6 @@ SHELL_PLUS_PRINT_SQL = True
 SHELL_PLUS_IMPORTS = [
     'from bot.enums import ChannelTypes, EmbedTypes, HttpMethods, MessageTypes',
     'from common.enums import AvailableIcons, JavaScriptActions, WebSocketCloseCodes',
-    'from dynamic_menu.enums import MenuTypes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
 

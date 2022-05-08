@@ -11,10 +11,10 @@ from ..permissions.roleplay import IsGameMasterOrAdmin, IsPlayerOrAdmin, IsPubli
 from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
 from .mixins import StaffListAllMixin, UserListMixin
 
-Domain = apps.get_model(models.DOMAIN_MODEL)
-Place = apps.get_model(models.PLACE_MODEL)
-Race = apps.get_model(models.RACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
+Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Race = apps.get_model(models.ROLEPLAY_RACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 User = get_user_model()
 
 

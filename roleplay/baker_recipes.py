@@ -19,10 +19,10 @@ random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
 random_site_type = functools.partial(random.choice, SiteTypes.values)
 
-Domain = apps.get_model(models.DOMAIN_MODEL)
-Place = apps.get_model(models.PLACE_MODEL)
-Session = apps.get_model(models.SESSION_MODEL)
-Race = apps.get_model(models.RACE_MODEL)
+Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place = apps.get_model(models.ROLEPLAY_PLACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
+Race = apps.get_model(models.ROLEPLAY_RACE)
 
 place = Recipe(
     Place,

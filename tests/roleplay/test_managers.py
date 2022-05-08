@@ -38,7 +38,7 @@ class TestPlaceManager(TestCase):
     def setUp(self):
         self.faker = Faker()
         self.model = models.Place
-        self.user = baker.make(constants.USER_MODEL)
+        self.user = baker.make(constants.REGISTRATION_USER)
         random_int = functools.partial(self.faker.pyint, min_value=1, max_value=100)
 
         self.number_of_houses = random_int()

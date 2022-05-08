@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 
 from common.constants import models
 
-Profile = apps.get_model(models.PROFILE_MODEL)
+Profile = apps.get_model(models.REGISTRATION_PROFILE)
 User = get_user_model()
 
 
