@@ -321,4 +321,5 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         res = super().form_valid(form)
         msg = cfl(_('user updated successfully!'))
         messages.success(self.request, msg)
+        self.request.session['session_language'] = self.object.profile.language
         return res
