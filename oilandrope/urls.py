@@ -30,6 +30,7 @@ urlpatterns += i18n_patterns(
     # Main site
     path('', include('core.urls')),
     # Admin site
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     # API
     path('api/', include('api.urls')),

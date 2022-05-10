@@ -220,14 +220,16 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
 
 class CampaignPrivateListView(LoginRequiredMixin, ListView):
     """
-    This view list :class:`~roleplay.models.Campaign` objects that the user is in players.
+    This view list :model:`roleplay.Campaign` objects that the user is in players.
     """
 
     model = Campaign
     template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(users__in=[self.request.user])
+        return super().get_queryset().filter(
+            users__in=[self.request.user]
+        ).order_by('name', '-entry_created_at')
 
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -387,6 +389,7 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class SessionListView(LoginRequiredMixin, ListView):
     model = Session
+    paginate_by = 6
     template_name = 'roleplay/session/session_list.html'
 
     def get_queryset(self):

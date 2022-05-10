@@ -32,6 +32,8 @@ class SiteTypes(models.IntegerChoices):
     CONTINENT = 16, _('continent')
     WORLD = 17, _('world')
     OCEAN = 18, _('ocean')
+    TEMPLE = 19, _('temple')
+    RUINS = 20, _('ruins')
 
 
 ICON_RESOLVERS = {
@@ -52,5 +54,8 @@ ICON_RESOLVERS = {
     SiteTypes.ISLAND: 'ic-island',
     SiteTypes.COUNTRY: 'ic-flag',
     SiteTypes.CONTINENT: 'ic-continent',
-    SiteTypes.WORLD: 'ic-world'
+    SiteTypes.WORLD: 'ic-world',
+    SiteTypes.OCEAN: 'ic-ocean',
+    SiteTypes.TEMPLE: 'ic-temple',
+    SiteTypes.RUINS: 'ic-ruins',
 }

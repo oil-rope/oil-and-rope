@@ -3,6 +3,7 @@ from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.shortcuts import resolve_url
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -433,42 +434,44 @@ class Campaign(TracingMixin):
 
     Parameters
     ----------
-    id: :class:`int`
+    id: int
         Identifier of the object.
-    name: :class:`str`
+    name: str
         Name of the campaign.
-    description: Optional[:class:`str`]
+    description: Optional[str]
         Description of the campaign.
-    resume: Optional[:class:`str`]
+    gm_info: Optional[str]
+        Information specific to the game master.
+    resume: Optional[str]
         A one line description of the campaign.
-    system: :class:`int`
+    system: int
         System used.
-    cover_image: Optional[:class:`str`]
+    cover_image: Optional[str]
         Path to the cover image of the campaign.
-    owner: :class:`~registration.models.User`
+    owner: :model:`registration.User`
         Owner of the campaign.
         This is used in order to have track of the person who created the campaign.
-    is_public: :class:`bool`
+    is_public: Optional[bool]
         Declares if the campaign is public or not.
-    players: List[:class:`~registration.models.User`]
+    players: List[:model:`registration.User`]
         List of players that are part of the campaign.
-    place: :class:`~roleplay.models.Place`
+    place: :model:`roleplay.Place`
         World where the campaign is happening.
-    start_date: Optional[:class:`datetime.date`]
+    start_date: Optional[datetime.date]
         Date when the campaign starts.
-    end_date: Optional[:class:`datetime.date`]
+    end_date: Optional[datetime.date]
         Date when the campaign ends.
-    discord_channel_id: Optional[:class:`str`]
+    discord_channel_id: Optional[str]
         The discord channel ID where the campaign is happening.
         This will be used to send messages to the discord channel.
-    chat: :class:`~chat.models.Chat`
+    chat: :model:`chat.Chat`
         Chat used by the campaign.
 
     Attributes:
     -----------
-    game_masters: List[:class:`~registration.models.User`]
+    game_masters: List[:model:`registration.User`]
         List of players that are game masters.
-    discord_channel: :class:`~bot.models.Channel`
+    discord_channel: :model:`bot.Channel`
         The discord channel where the campaign is happening.
     """
 
@@ -477,6 +480,10 @@ class Campaign(TracingMixin):
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True, null=False, blank=False)
     name = models.CharField(verbose_name=_('name'), max_length=50)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    gm_info = models.TextField(
+        verbose_name=_('game master information'), help_text=_('information specific to the game master.'),
+        null=False, blank=True,
+    )
     resume = models.CharField(verbose_name=_('resume'), max_length=254, null=False, blank=True)
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     cover_image = models.ImageField(
@@ -518,6 +525,12 @@ class Campaign(TracingMixin):
         if self.discord_channel_id:
             return Channel(id=self.discord_channel_id)
         return None
+
+    @property
+    def sessions_finished(self):
+        return self.session_set.filter(
+            next_game__date__lt=timezone.now(),
+        ).order_by('-next_game')
 
     class Meta:
         verbose_name = _('campaign')
@@ -587,21 +600,23 @@ class Session(TracingMixin):
 
     Parameters
     ----------
-    campaign: :class:`~roleplay.models.Campaign`
+    campaign: :model:`roleplay.Campaign`
         The related campaign.
-    name: :class:`str`
+    name: str
         Name of the session.
-    description: Optional[:class:`str`]
+    description: Optional[str]
         Description of the session.
-    plot: :class:`str`
+    plot: str
         Plot of the session.
-    next_game: Optional[:class:`datetime.datetime`]
+    gm_info: Optional[str]
+        Information specific to the game master.
+    next_game: Optional[datetime.datetime]
         Next session's date.
-    system: :class:`int`
+    system: int
         System used.
-    world: :class:`~roleplay.models.Place`
+    world: :model:`roleplay.Place`
         The world where this session is played.
-    image: Optional[:class:`str`]
+    image: Optional[str]
         Cover image for this session.
 
     Attributes
@@ -617,7 +632,13 @@ class Session(TracingMixin):
     )
     name = models.CharField(verbose_name=_('title'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
-    plot = models.TextField(verbose_name=_('plot'), help_text=_('one line resume'), null=False, blank=True)
+    plot = models.CharField(
+        verbose_name=_('plot'), max_length=254, help_text=_('one line resume.'), null=False, blank=True,
+    )
+    gm_info = models.TextField(
+        verbose_name=_('game master info'), help_text=_('information specific to the game master.'),
+        null=False, blank=True,
+    )
     next_game = models.DateTimeField(
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True,
     )

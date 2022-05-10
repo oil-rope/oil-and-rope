@@ -16,12 +16,14 @@ class DomainManager(models.Manager):
 
 class CampaignManager(models.Manager):
     """
-    Specific manager for :class:`~roleplay.models.Campaign` that filters queryset by some common filters.
+    Specific manager for :model:`roleplay.Campaign` that filters queryset by some common filters.
 
     Methods
     -------
     public()
         Return all public campaigns.
+    private()
+        Return all private campaigns.
     """
 
     def public(self):

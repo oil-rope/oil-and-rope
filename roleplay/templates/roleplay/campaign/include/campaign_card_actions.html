@@ -1,0 +1,39 @@
+{% load i18n %}
+<div class="card-body">
+  <div class="btn-group" role="group" aria-label="{% translate "actions"|capfirst %}">
+    <a href="{{ campaign.get_absolute_url }}" class="btn btn-secondary">
+      {{ ICONS.QUILL|safe }}
+      {% translate "view campaign"|capfirst %}
+    </a>
+    {% if request.user in campaign.game_masters %}
+      <div class="btn-group" role="group">
+        <button
+          id="btnGroupCampaignSettings"
+          type="button"
+          class="btn btn-dark dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          {{ ICONS.COGS|safe }}
+          {% translate "settings"|capfirst %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="btnGroupCampaignSettings">
+          <li>
+            <a href="#no-url" class="dropdown-item disabled">
+              {{ ICONS.EDIT|safe }}
+              {% translate "edit"|capfirst %}
+            </a>
+          </li>
+          {% if request.user == campaign.owner %}
+            <li>
+              <a href="#no-url" class="dropdown-item disabled">
+                {{ ICONS.TRASH|safe }}
+                {% translate "delete"|capfirst %}
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>

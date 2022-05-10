@@ -66,10 +66,11 @@
     </div>
   </div>
   <div class="card-footer">
-    <p class="text-muted text-center">
-      {% with sessions=0 %}
-        {% blocktranslate count counter=sessions %}Used in {{ sessions }} session{% plural %}Used in {{ sessions }} sessions{% endblocktranslate %}
-      {% endwith %}
-    </p>
+{% blocktranslate count campaigns=world.campaign_set.count asvar used_in_campaigns %}
+Used in {{ campaigns }} campaign.
+{% plural %}
+Used in {{ campaigns }} campaigns.
+{% endblocktranslate %}
+    <p class="text-muted text-center">{{ used_in_campaigns }}</p>
   </div>
 </div>

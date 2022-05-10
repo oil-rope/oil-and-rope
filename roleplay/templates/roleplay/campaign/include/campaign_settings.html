@@ -23,15 +23,27 @@
       <h5 class="text-end">{% translate "short description"|capfirst %}</h5>
     </div>
     <div class="col">
-      <p>{{ object.resume|default:_("no resume provided yet.")|capfirst }}</p>
-    </div>
+      <p>
+        {% if object.resume %}
+          {{ object.resume }}
+        {% else %}
+          {% translate "no resume provided yet."|capfirst %}
+        {% endif %}
+        </p>
+      </div>
   </div>
   <div class="row">
     <div class="col">
       <h5 class="text-end">{% translate "description"|capfirst %}</h5>
     </div>
     <div class="col">
-      <p>{{ object.description }}</p>
+      <p>
+        {% if object.description %}
+          {{ object.description }}
+        {% else %}
+          {% translate "no description provided yet."|capfirst %}
+        {% endif %}
+      </p>
     </div>
   </div>
   <div class="row">
@@ -72,8 +84,8 @@
         {% else %}
           {% translate "not connected."|capfirst %}
           <br />
-{% blocktranslate with command='..linkchannel' asvar discord_channel_help_text %}
-You can set it up with our bot using '{{ command }}' command.
+{% blocktranslate with command='linkchannel' asvar discord_channel_help_text %}
+You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' command.
 {% endblocktranslate %}
           <small class="text-muted">
             {{ discord_channel_help_text }}

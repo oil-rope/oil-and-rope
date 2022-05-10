@@ -13,5 +13,18 @@
     <small class="text-muted fs-4">{% translate "campaigns you are part of."|capfirst %}</small>
   </h1>
   <main class="container pb-3">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for campaign in object_list %}
+        {% if campaign.cover_image %}
+          <div class="col">
+            {% include 'roleplay/campaign/include/campaign_card_with_image.html' %}
+          </div>
+        {% else %}
+          <div class="col">
+            {% include 'roleplay/campaign/include/campaign_card.html' %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
   </main>
 {% endblock body_content %}
