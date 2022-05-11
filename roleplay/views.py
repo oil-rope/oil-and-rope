@@ -234,6 +234,10 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
         )
 
 
+class CampaignUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
+    pass
+
+
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Campaign
     template_name = 'roleplay/campaign/campaign_detail.html'

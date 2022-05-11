@@ -809,13 +809,15 @@ class TestPrivateCampaignListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:list-private'
     template = 'roleplay/campaign/campaign_private_list.html'
+    view = views.CampaignPrivateListView
 
     @classmethod
     def setUpTestData(cls):
         cls.url = resolve_url(cls.resolver)
         cls.user = baker.make_recipe('registration.user')
 
-        cls.n_owned_campaigns = fake.pyint(min_value=1, max_value=10)
+        # NOTE: max_value is set to pagination_by in order to get a "full" pagination
+        cls.n_owned_campaigns = fake.pyint(min_value=1, max_value=cls.view.paginate_by)
         owned_campaigns = baker.make_recipe('roleplay.campaign', _quantity=cls.n_owned_campaigns, owner=cls.user)
         [campaign.users.add(cls.user) for campaign in owned_campaigns]
         # Random campaigns
@@ -845,18 +847,6 @@ class TestPrivateCampaignListView(TestCase):
         campaigns = response.context['object_list']
 
         self.assertEqual(len(campaigns), self.n_owned_campaigns)
-
-    def test_not_owned_campaign_is_not_listed_ok(self):
-        another_campaign = baker.make_recipe('roleplay.campaign')
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        campaigns = response.context['object_list']
-
-        # The new campaign should not be in the queryset
-        self.assertEqual(0, campaigns.filter(
-            name=another_campaign.name,
-            place_id=another_campaign.place_id,
-        ).count())
 
 
 class TestCampaignDetailView(TestCase):
