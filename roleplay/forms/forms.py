@@ -97,6 +97,10 @@ class CampaignForm(forms.ModelForm):
 
         self.fields['email_invitations'].label = self.fields['email_invitations'].label.capitalize()
 
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.include_media = True
+
     class Meta:
         fields = (
             'name', 'description', 'gm_info', 'resume', 'system', 'cover_image', 'is_public',
@@ -111,7 +115,9 @@ class CampaignForm(forms.ModelForm):
         return email_invitations
 
     def save(self, commit=True):
-        self.instance.owner = self.user
+        if not self.instance.owner:
+            # NOTE: This is a new campaign, so we need to set the owner.
+            self.instance.owner = self.user
         return super().save(commit)
 
 

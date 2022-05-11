@@ -19,7 +19,10 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="btnGroupCampaignSettings">
           <li>
-            <a href="#no-url" class="dropdown-item disabled">
+            <a
+              href="{% url 'roleplay:campaign:edit' campaign.pk %}"
+              class="dropdown-item"
+            >
               {{ ICONS.EDIT|safe }}
               {% translate "edit"|capfirst %}
             </a>

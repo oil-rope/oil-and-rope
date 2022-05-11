@@ -849,6 +849,85 @@ class TestPrivateCampaignListView(TestCase):
         self.assertEqual(len(campaigns), self.n_owned_campaigns)
 
 
+class TestCampaignUpdateView(TestCase):
+    model = models.Campaign
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:edit'
+    template = 'roleplay/campaign/campaign_update.html'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = baker.make_recipe('roleplay.world')
+
+    def setUp(self):
+        self.campaign_user_is_not_gm = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign_not_gm_url = reverse(self.resolver, kwargs={'pk': self.campaign_user_is_not_gm.pk})
+        self.campaign = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign.add_game_masters(self.user)
+        self.url = reverse(self.resolver, kwargs={'pk': self.campaign.pk})
+
+        self.new_name = fake.sentence(nb_words=2)
+        self.data = {
+            'name': self.new_name,
+            'system': self.campaign.system,
+            'place': self.campaign.place.pk,
+        }
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.campaign_not_gm_url)
+        expected_url = f'{self.login_url}?next={self.campaign_not_gm_url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_not_in_users_access_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.campaign_not_gm_url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_user_in_users_not_game_master_access_ko(self):
+        self.campaign_user_is_not_gm.users.add(self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(self.campaign_not_gm_url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_user_in_users_game_master_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_templated_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_campaign_is_changed_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data)
+        self.campaign.refresh_from_db()
+
+        self.assertEqual(self.new_name, self.campaign.name)
+
+    def test_post_data_does_not_change_owner_ok(self):
+        self.another_user = baker.make_recipe('registration.user')
+        self.campaign.add_game_masters(self.another_user)
+        self.client.force_login(self.another_user)
+        self.client.post(self.url, data=self.data)
+        self.campaign.refresh_from_db()
+
+        self.assertEqual(self.user, self.campaign.owner)
+
+    def test_redirect_to_campaign_detail_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.data)
+
+        self.assertRedirects(response, resolve_url(self.campaign))
+
+
 class TestCampaignDetailView(TestCase):
     model = models.Campaign
     login_url = resolve_url(settings.LOGIN_URL)

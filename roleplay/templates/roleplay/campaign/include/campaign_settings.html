@@ -4,7 +4,11 @@
   <h3 class="text-center">
     {% translate "general settings"|capfirst %}
     {% if user in object.game_masters %}
-      <a href="#no-url" class="btn btn-primary disabled" title="{% translate "edit campaign"|capfirst %}">
+      <a
+        href="{% url 'roleplay:campaign:edit' object.pk %}"
+        class="btn btn-primary"
+        title="{% translate "edit campaign"|capfirst %}"
+      >
         {{ ICONS.EDIT|safe }}
         {% translate "edit"|capfirst %}
       </a>

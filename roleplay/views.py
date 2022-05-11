@@ -237,8 +237,16 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
 
 class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, UpdateView):
     form_class = forms.CampaignForm
+    model = Campaign
     related_name_attr = 'game_masters'
     template_name = 'roleplay/campaign/campaign_update.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+        })
+        return kwargs
 
     def get_success_url(self):
         return resolve_url(self.object)

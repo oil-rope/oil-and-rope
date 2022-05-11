@@ -431,6 +431,8 @@ class Campaign(TracingMixin):
     """
     This model manages campaign for roleplay sessions.
     A campaign is a set up for a game. This will have sessions related which will be the sessions themeselves.
+    A campaign can be public in order for everyone to see it or private in order to be only visible to the persons
+    in users.
 
     Parameters
     ----------
@@ -451,6 +453,7 @@ class Campaign(TracingMixin):
     owner: :model:`registration.User`
         Owner of the campaign.
         This is used in order to have track of the person who created the campaign.
+        This user can and can be not a player of the campaign.
     is_public: Optional[bool]
         Declares if the campaign is public or not.
     players: List[:model:`registration.User`]
