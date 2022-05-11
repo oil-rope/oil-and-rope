@@ -78,6 +78,43 @@ class WorldForm(forms.ModelForm):
         return super().save(commit)
 
 
+class CampaignForm(forms.ModelForm):
+    """
+    This form is used to create or update a campaign, this form also comes with a `TextField` to add players to
+    the campaign.
+    """
+
+    email_invitations = forms.CharField(
+        label=_('email invitations'),
+        widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
+        required=False,
+
+    )
+
+    def __init__(self, user, submit_text=_('create'), *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+        self.fields['email_invitations'].label = self.fields['email_invitations'].label.capitalize()
+
+    class Meta:
+        fields = (
+            'name', 'description', 'gm_info', 'resume', 'system', 'cover_image', 'is_public',
+            'place', 'start_date', 'end_date',
+        )
+        model = models.Campaign
+
+    def clean_email_invitations(self):
+        email_invitations = self.cleaned_data.get('email_invitations')
+        if email_invitations:
+            return email_invitations.splitlines()
+        return email_invitations
+
+    def save(self, commit=True):
+        self.instance.owner = self.user
+        return super().save(commit)
+
+
 class SessionForm(forms.ModelForm):
     next_game = forms.DateTimeField(
         widget=DateTimeWidget,

@@ -188,6 +188,136 @@ class TestWorldForm(TestCase):
         os.unlink(instance.image.path)
 
 
+class TestCampaignForm(TestCase):
+    form_class = forms.CampaignForm
+    model = models.Campaign
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.place = baker.make_recipe('roleplay.world')
+
+    def setUp(self):
+        self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        image_file = self.tmp.name
+        Image.new('RGB', (30, 60), color='red').save(image_file)
+        with open(image_file, 'rb') as image_content:
+            image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
+
+        self.data_ok = {
+            'name': fake.sentence(nb_words=3),
+            'description': fake.paragraph(),
+            'gm_info': fake.paragraph(),
+            'resume': fake.sentence(nb_words=3),
+            'system': random.choice(enums.RoleplaySystems.values),
+            'is_public': fake.pybool(),
+            'place': self.place.pk,
+            'start_date': fake.date_this_year(),
+            'end_date': fake.date_this_year(),
+            'email_invitations': '\n'.join([fake.email() for _ in range(3)]),
+        }
+        self.files_ok = {
+            'cover_image': image,
+        }
+
+    def tearDown(self):
+        self.tmp.close()
+        os.unlink(self.tmp.name)
+
+    def test_data_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_description_ok(self):
+        data_without_description = self.data_ok.copy()
+        del data_without_description['description']
+        form = self.form_class(user=self.user, data=data_without_description, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_gm_info_ok(self):
+        data_without_gm_info = self.data_ok.copy()
+        del data_without_gm_info['gm_info']
+        form = self.form_class(user=self.user, data=data_without_gm_info, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_resume_ok(self):
+        data_without_resume = self.data_ok.copy()
+        del data_without_resume['resume']
+        form = self.form_class(user=self.user, data=data_without_resume, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_cover_image_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_is_public_ok(self):
+        data_without_is_public = self.data_ok.copy()
+        del data_without_is_public['is_public']
+        form = self.form_class(user=self.user, data=data_without_is_public, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_start_date_ok(self):
+        data_without_start_date = self.data_ok.copy()
+        del data_without_start_date['start_date']
+        form = self.form_class(user=self.user, data=data_without_start_date, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_end_date_ok(self):
+        data_without_end_date = self.data_ok.copy()
+        del data_without_end_date['end_date']
+        form = self.form_class(user=self.user, data=data_without_end_date, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_email_invitations_ok(self):
+        data_without_email_invitations = self.data_ok.copy()
+        del data_without_email_invitations['email_invitations']
+        form = self.form_class(user=self.user, data=data_without_email_invitations, files=self.files_ok)
+
+        self.assertTrue(form.is_valid())
+
+    def test_data_without_name_ko(self):
+        data_without_name = self.data_ok.copy()
+        del data_without_name['name']
+        form = self.form_class(user=self.user, data=data_without_name, files=self.files_ok)
+
+        self.assertFalse(form.is_valid())
+
+    def test_data_without_system_ko(self):
+        data_without_system = self.data_ok.copy()
+        del data_without_system['system']
+        form = self.form_class(user=self.user, data=data_without_system, files=self.files_ok)
+
+        self.assertFalse(form.is_valid())
+
+    def test_data_without_place_ko(self):
+        data_without_place = self.data_ok.copy()
+        del data_without_place['place']
+        form = self.form_class(user=self.user, data=data_without_place, files=self.files_ok)
+
+        self.assertFalse(form.is_valid())
+
+    def test_form_email_invitations_is_list_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok, files=self.files_ok)
+        # In order to get cleaned_data with call to form.full_clean()
+        form.full_clean()
+
+        self.assertEqual(list, type(form.cleaned_data['email_invitations']))
+
+    def test_form_save_assigns_owner_ok(self):
+        form = self.form_class(user=self.user, data=self.data_ok, files=self.files_ok)
+        instance = form.save()
+
+        self.assertEqual(self.user, instance.owner)
+
+
 @unittest.skip('TODO: refactor')
 class TestSessionForm(TestCase):
     form_class = forms.SessionForm

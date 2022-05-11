@@ -18,9 +18,10 @@ from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
-from roleplay.forms.layout import SessionFormLayout
 
 from . import enums, forms
+from .forms.layout import SessionFormLayout
+from .mixins import UserInAllWithRelatedNameMixin
 from .utils.invitations import send_session_invitations
 
 LOGGER = logging.getLogger(__name__)
@@ -234,8 +235,13 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
         )
 
 
-class CampaignUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
-    pass
+class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, UpdateView):
+    form_class = forms.CampaignForm
+    related_name_attr = 'game_masters'
+    template_name = 'roleplay/campaign/campaign_update.html'
+
+    def get_success_url(self):
+        return resolve_url(self.object)
 
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
