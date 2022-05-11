@@ -224,12 +224,14 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
     """
 
     model = Campaign
+    ordering = ('name', '-entry_created_at')
+    paginate_by = 6
     template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
         return super().get_queryset().filter(
             users__in=[self.request.user]
-        ).order_by('name', '-entry_created_at')
+        )
 
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
