@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-{% block title %}{% translate "edit"|capfirst %} {{ object.name }}{% endblock title %}
+{% block title %}{% blocktranslate with name=object.name %}Edit {{ name }}{% endblocktranslate %}{% endblock title %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns=roleplay:campaign:list-private,edit' %}
@@ -11,8 +11,9 @@
 {% block body_content %}
   <main class="container pb-3">
     <h1 class="text-center fw-lighter">
-      {% translate "editing"|capfirst %} {{ object.name }}
+      {% blocktranslate with name=object.name %}Editing {{ name }}{% endblocktranslate %}
     </h1>
+    <hr>
     <div class="row jusitfy-content-around">
       <div class="col">
         {% crispy form %}

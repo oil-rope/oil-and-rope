@@ -104,6 +104,101 @@ class WorldFormLayout(layout.Layout):
         )
 
 
+class CampaignFormLayout(layout.Layout):
+    def __init__(self, submit_text):
+        super().__init__(
+            bootstrap.TabHolder(
+                bootstrap.Tab(
+                    _('basic information').capitalize(),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('place'),
+                        ),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('is_public'),
+                            css_class='col-12',
+                        ),
+                        layout.Column(
+                            layout.Field('name', placeholder='The Incredible Adventures of...'),
+                        ),
+                        layout.Column(
+                            layout.Field('summary'),
+                        ),
+                        layout.Column(
+                            layout.Field('system'),
+                        ),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field(
+                                'description',
+                                placeholder=cfl(_('tell us about this adventure!')),
+                                style='resize: none',
+                            ),
+                            css_class='col-md-12',
+                        ),
+                        layout.Column(
+                            layout.Field(
+                                'gm_info',
+                                placeholder=_('write something that game masters need to know...').capitalize(),
+                                style='resize: none',
+                            ),
+                            css_class='col-md-12',
+                        ),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('cover_image'),
+                        ),
+                    ),
+                ),
+                bootstrap.Tab(
+                    _('date settings').capitalize(),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('start_date'),
+                        ),
+                        layout.Column(
+                            layout.Field('end_date'),
+                        ),
+                    ),
+                ),
+                bootstrap.Tab(
+                    _('invite players').capitalize(),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field(
+                                'email_invitations',
+                                placeholder='worldo@oar.com\ndungeon@fog.com\ndude@tabern.com',
+                                style='resize: none',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
+                        reset_button=False,
+                        submit_css_class='col-11 col-md-5 col-lg-4 col-xl-3',
+                    ),
+                ),
+            ),
+            layout.Row(
+                common_layout.Button(
+                    content=_('go back').capitalize(),
+                    css_class='btn-dark col-11 col-md-5 col-lg-4 col-xl-3',
+                    action=JavaScriptActions.GO_BACK.value,
+                    icon='ic-arrow-left',
+                ),
+                css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
+            ),
+        )
+
+
 class SessionFormLayout(layout.Layout):
     def __init__(self, submit_text=_('create')):
         super().__init__(

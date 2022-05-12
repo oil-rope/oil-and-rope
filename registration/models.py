@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
@@ -35,13 +36,19 @@ class User(AbstractUser):
         )
         return races
 
-    def get_absolute_url(self):
-        return resolve_url('registration:user:edit', pk=self.pk)
-
     class Meta:
         db_table = 'auth_user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    def accessible_places(self):
+        Place = apps.get_model(constants.ROLEPLAY_PLACE)
+        community_places = Place.objects.community_places()
+        private_places = Place.objects.user_places(self)
+        return community_places | private_places
+
+    def get_absolute_url(self):
+        return resolve_url('registration:user:edit', pk=self.pk)
 
 
 class Profile(TracingMixin):

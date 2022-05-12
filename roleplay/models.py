@@ -444,7 +444,7 @@ class Campaign(TracingMixin):
         Description of the campaign.
     gm_info: Optional[str]
         Information specific to the game master.
-    resume: Optional[str]
+    summary: Optional[str]
         A one line description of the campaign.
     system: int
         System used.
@@ -487,7 +487,7 @@ class Campaign(TracingMixin):
         verbose_name=_('game master information'), help_text=_('information specific to the game master.'),
         null=False, blank=True,
     )
-    resume = models.CharField(verbose_name=_('resume'), max_length=254, null=False, blank=True)
+    summary = models.CharField(verbose_name=_('summary'), max_length=254, null=False, blank=True)
     system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     cover_image = models.ImageField(
         verbose_name=_('cover image'), upload_to=default_upload_to, validators=[validate_file_size], null=False,
@@ -497,7 +497,9 @@ class Campaign(TracingMixin):
         verbose_name=_('owner'), to=constants.REGISTRATION_USER, related_name='campaign_owned_set',
         on_delete=models.CASCADE, db_index=True,
     )
-    is_public = models.BooleanField(verbose_name=_('public'), default=False)
+    is_public = models.BooleanField(
+        verbose_name=_('public'), help_text=_('can this campaign be accessed by anyone?'), default=False,
+    )
     users = models.ManyToManyField(
         to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='campaign_set',
         through=constants.ROLEPLAY_PLAYER_IN_CAMPAIGN, through_fields=('campaign', 'user'),
@@ -636,7 +638,7 @@ class Session(TracingMixin):
     name = models.CharField(verbose_name=_('title'), max_length=100, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     plot = models.CharField(
-        verbose_name=_('plot'), max_length=254, help_text=_('one line resume.'), null=False, blank=True,
+        verbose_name=_('plot'), max_length=254, help_text=_('one line summary.'), null=False, blank=True,
     )
     gm_info = models.TextField(
         verbose_name=_('game master info'), help_text=_('information specific to the game master.'),

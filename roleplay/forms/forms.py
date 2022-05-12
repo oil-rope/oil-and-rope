@@ -9,10 +9,11 @@ from django.utils.translation import gettext_lazy as _
 
 from common.constants import models as constants
 from common.files import utils
+from common.forms.mixins import FormCapitalizeMixin
 from common.forms.widgets import DateTimeWidget
 
 from .. import enums, models
-from .layout import PlaceLayout, SessionFormLayout, WorldFormLayout
+from .layout import CampaignFormLayout, PlaceLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -78,7 +79,7 @@ class WorldForm(forms.ModelForm):
         return super().save(commit)
 
 
-class CampaignForm(forms.ModelForm):
+class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
     """
     This form is used to create or update a campaign, this form also comes with a `TextField` to add players to
     the campaign.
@@ -95,15 +96,14 @@ class CampaignForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.user = user
 
-        self.fields['email_invitations'].label = self.fields['email_invitations'].label.capitalize()
-
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
         self.helper.include_media = True
+        self.helper.layout = CampaignFormLayout(submit_text=submit_text)
 
     class Meta:
         fields = (
-            'name', 'description', 'gm_info', 'resume', 'system', 'cover_image', 'is_public',
+            'name', 'description', 'gm_info', 'summary', 'system', 'cover_image', 'is_public',
             'place', 'start_date', 'end_date',
         )
         model = models.Campaign

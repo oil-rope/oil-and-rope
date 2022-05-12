@@ -208,7 +208,7 @@ class TestCampaignForm(TestCase):
             'name': fake.sentence(nb_words=3),
             'description': fake.paragraph(),
             'gm_info': fake.paragraph(),
-            'resume': fake.sentence(nb_words=3),
+            'summary': fake.sentence(nb_words=3),
             'system': random.choice(enums.RoleplaySystems.values),
             'is_public': fake.pybool(),
             'place': self.place.pk,
@@ -243,10 +243,10 @@ class TestCampaignForm(TestCase):
 
         self.assertTrue(form.is_valid())
 
-    def test_data_without_resume_ok(self):
-        data_without_resume = self.data_ok.copy()
-        del data_without_resume['resume']
-        form = self.form_class(user=self.user, data=data_without_resume, files=self.files_ok)
+    def test_data_without_summary_ok(self):
+        data_without_summary = self.data_ok.copy()
+        del data_without_summary['summary']
+        form = self.form_class(user=self.user, data=data_without_summary, files=self.files_ok)
 
         self.assertTrue(form.is_valid())
 

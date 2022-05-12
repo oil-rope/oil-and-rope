@@ -56,7 +56,7 @@ class CampaignAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     inlines = [PlayerInCampaignInline]
     fields = (
-        ('name', 'resume', 'system', 'place', 'owner'),
+        ('name', 'summary', 'system', 'place', 'owner'),
         'description',
         ('start_date', 'end_date'),
         'discord_channel_id',

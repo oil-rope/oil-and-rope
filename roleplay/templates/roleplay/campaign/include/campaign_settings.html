@@ -28,10 +28,10 @@
     </div>
     <div class="col">
       <p>
-        {% if object.resume %}
-          {{ object.resume }}
+        {% if object.summary %}
+          {{ object.summary }}
         {% else %}
-          {% translate "no resume provided yet."|capfirst %}
+          {% translate "no summary provided yet."|capfirst %}
         {% endif %}
         </p>
       </div>

@@ -245,8 +245,17 @@ class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, Upda
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
+            'submit_text': _('update').capitalize()
         })
         return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:campaign:edit', pk=self.object.pk)
+        form.fields['place'].queryset = self.request.user.accessible_places().filter(
+            site_type=enums.SiteTypes.WORLD,
+        )
+        return form
 
     def get_success_url(self):
         return resolve_url(self.object)

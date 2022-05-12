@@ -65,7 +65,7 @@
     <li>
       {% url 'roleplay:campaign:list-private' as campaign_private_list_url %}
       <a href="{{ campaign_private_list_url }}" class="dropdown-item">
-        {% translate "your campaigns"|title %}
+        {% translate "your campaigns"|capfirst %}
       </a>
     </li>
     <li>
@@ -74,7 +74,7 @@
         href="{{ session_list_url }}"
         class="dropdown-item {% if request.path == session_list_url %}active{% endif %}"
       >
-        {% translate "all sessions"|title %}
+        {% translate "all sessions"|capfirst %}
       </a>
     </li>
   </ul>

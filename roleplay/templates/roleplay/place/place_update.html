@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-{% block title %}{% translate "edit"|capfirst %} {{ object.name }}{% endblock %}
+{% block title %}{% blocktranslate with name=object.name %}Edit {{ name }}{% endblocktranslate %}{% endblock %}
 
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='worlds=roleplay:world:list,edit' %}
@@ -10,7 +10,9 @@
 
 {% block body_content %}
   <main class="container pb-5">
-    <h1 class="text-center fw-lighter">{% translate "editing"|capfirst %} {{ object.name }}</h1>
+    <h1 class="text-center fw-lighter">
+      {% blocktranslate with name=object.name %}Editing {{ name }}{% endblocktranslate %}
+    </h1>
     <hr class="mx-3" />
     <div class="row justify-content-around px-1">
       {% crispy form %}

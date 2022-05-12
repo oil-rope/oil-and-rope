@@ -7,7 +7,7 @@ from roleplay.utils.dice import roll_dice
 
 class Roleplay(commands.Cog, name='Roleplay'):
     """
-    Roleplay commands such a dice rolling, character sheet editting, world building...
+    Roleplay commands such a dice rolling, character sheet editing, world building...
     """
 
     @commands.command()
