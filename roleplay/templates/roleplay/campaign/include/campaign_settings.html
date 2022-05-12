@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load static %}
-<section class="row justify-content-center  ">
+<section class="row justify-content-center">
   <h3 class="text-center">
     {% translate "general settings"|capfirst %}
     {% if user in object.game_masters %}
@@ -127,8 +127,9 @@ You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' com
     </div>
   </div>
 </section>
+
 <hr>
-<section class="row justify-content-center  ">
+<section class="row justify-content-center">
   <h3 class="text-center">
     {% translate "players"|capfirst %}
     {% if user in object.game_masters %}
@@ -178,3 +179,25 @@ You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' com
     {% endfor %}
   </div>
 </section>
+
+{% if request.user == campaign.owner %}
+  <hr class="text-danger">
+  <section class="row justify-content-around">
+    <h3 class="text-center text-danger fw-light">
+      {% translate "danger zone"|capfirst %}
+    </h3>
+    <div class="col">
+      <div class="row justify-content-around mt-1">
+        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
+          <a
+            href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+            class="btn btn-danger w-100"
+          >
+            {{ ICONS.TRASH|safe }}
+            {% translate "delete"|capfirst %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

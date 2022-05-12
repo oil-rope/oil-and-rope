@@ -235,6 +235,21 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
         )
 
 
+class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def test_func(self):
+        """
+        Checks if user is in players otherwise they have no access.
+        """
+
+        campaign = self.get_object()
+        if not campaign.is_public:
+            return self.request.user in campaign.users.all()
+        return True
+
+
 class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, UpdateView):
     form_class = forms.CampaignForm
     model = Campaign
@@ -261,19 +276,15 @@ class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, Upda
         return resolve_url(self.object)
 
 
-class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class CampaignDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Campaign
-    template_name = 'roleplay/campaign/campaign_detail.html'
+    success_url = reverse_lazy('roleplay:campaign:list-private')
+    template_name = 'roleplay/campaign/campaign_confirm_delete.html'
 
-    def test_func(self):
-        """
-        Checks if user is in players otherwise they have no access.
-        """
-
-        campaign = self.get_object()
-        if not campaign.is_public:
-            return self.request.user in campaign.users.all()
-        return True
+    def get_success_url(self):
+        msg = _('campaign deleted successfully.').capitalize()
+        messages.success(self.request, msg)
+        return super().get_success_url()
 
 
 class SessionCreateView(LoginRequiredMixin, CreateView):

@@ -29,7 +29,10 @@
           </li>
           {% if request.user == campaign.owner %}
             <li>
-              <a href="#no-url" class="dropdown-item disabled">
+              <a
+                href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+                class="dropdown-item"
+              >
                 {{ ICONS.TRASH|safe }}
                 {% translate "delete"|capfirst %}
               </a>

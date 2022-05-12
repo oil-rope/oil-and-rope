@@ -115,7 +115,7 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
         return email_invitations
 
     def save(self, commit=True):
-        if not self.instance.owner:
+        if not self.instance.owner_id:
             # NOTE: This is a new campaign, so we need to set the owner.
             self.instance.owner = self.user
         return super().save(commit)

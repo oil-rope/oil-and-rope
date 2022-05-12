@@ -21,6 +21,7 @@ CAMPAIGN_PATTERNS = [
     path('@me/', views.CampaignPrivateListView.as_view(), name='list-private'),
     path('<int:pk>/', views.CampaignDetailView.as_view(), name='detail'),
     path('edit/<int:pk>/', views.CampaignUpdateView.as_view(), name='edit'),
+    path('delete/<int:pk>/', views.CampaignDeleteView.as_view(), name='delete'),
 ]
 
 SESSION_PATTERNS = [

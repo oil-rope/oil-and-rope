@@ -977,6 +977,60 @@ class TestCampaignDetailView(TestCase):
         self.assertTemplateUsed(response, self.template)
 
 
+class TestCampaignDeleteView(TestCase):
+    model = models.Campaign
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:delete'
+    template = 'roleplay/campaign/campaign_confirm_delete.html'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = baker.make_recipe('roleplay.world')
+        cls.campaign = baker.make_recipe('roleplay.campaign', owner=cls.user, place=cls.world)
+        cls.url = resolve_url(cls.resolver, pk=cls.campaign.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_not_owner_access_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_user_owner_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_campaign_is_deleted_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url)
+
+        self.assertFalse(models.Campaign.objects.filter(pk=self.campaign.pk).exists())
+
+    @mock.patch('roleplay.views.messages')
+    def test_success_message_sent_ok(self, mocker):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'Campaign deleted successfully.',
+        )
+
+
 @unittest.skip('TODO: refactor')
 class TestSessionCreateView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
