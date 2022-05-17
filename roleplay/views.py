@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import resolve_url
+from django.shortcuts import get_object_or_404, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,7 +22,7 @@ from common.views import MultiplePaginatorListView
 from . import enums, forms
 from .forms.layout import SessionFormLayout
 from .mixins import UserInAllWithRelatedNameMixin
-from .utils.invitations import send_session_invitations
+from .utils.invitations import send_campaign_invitations
 
 LOGGER = logging.getLogger(__name__)
 
@@ -219,6 +219,83 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     template_name = 'roleplay/place/place_confirm_delete.html'
 
 
+class CampaignCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.CampaignForm
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_create.html'
+
+    def get_world(self):
+        world_pk = self.kwargs.get('world_pk')
+        return get_object_or_404(Place, pk=world_pk)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update({
+            'place': self.get_world(),
+        })
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'submit_text': _('create').capitalize(),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:campaign:create', world_pk=self.kwargs['world_pk'])
+        form.fields['place'].queryset = self.request.user.accessible_places().filter(
+            site_type=enums.SiteTypes.WORLD,
+        )
+        return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        emails = form.cleaned_data['email_invitations']
+        send_campaign_invitations(self.object, self.request, emails)
+        self.object.add_game_masters(self.request.user)
+        return response
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+
+class CampaignJoinView(SingleObjectMixin, RedirectView):
+    signer_class = TimestampSigner
+    model = Campaign
+
+    def get_signer_instance(self):
+        return self.signer_class()
+
+    def get_email_associated(self):
+        try:
+            signer = self.get_signer_instance()
+            return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
+        except BadSignature:
+            raise Http404()
+
+    def get_user(self):
+        try:
+            # If user is already logged in, use it
+            if self.request.user.is_authenticated:
+                return self.request.user
+            return User.objects.get(email=self.get_email_associated())
+        except User.DoesNotExist:
+            return None
+
+    def get_redirect_url(self, *args, **kwargs):
+        instance = self.get_object()
+        user = self.get_user()
+        if not user:
+            messages.warning(self.request, _('you need an account to join this campaign.').capitalize())
+            return resolve_url(settings.LOGIN_URL)
+        instance.users.add(self.get_user())
+        messages.success(self.request, _('you have joined the campaign.').capitalize())
+        return resolve_url(instance)
+
+
 class CampaignPrivateListView(LoginRequiredMixin, ListView):
     """
     This view list :model:`roleplay.Campaign` objects that the user is in players.
@@ -245,9 +322,13 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         """
 
         campaign = self.get_object()
-        if not campaign.is_public:
-            return self.request.user in campaign.users.all()
-        return True
+        if campaign.is_public:
+            return True
+        if self.request.user.pk in campaign.users.values_list('pk', flat=True):
+            return True
+        if self.request.user.pk == campaign.owner.pk:
+            return True
+        return False
 
 
 class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, UpdateView):
@@ -271,6 +352,12 @@ class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, Upda
             site_type=enums.SiteTypes.WORLD,
         )
         return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        emails = form.cleaned_data['email_invitations']
+        send_campaign_invitations(self.object, self.request, emails)
+        return response
 
     def get_success_url(self):
         return resolve_url(self.object)
@@ -324,45 +411,11 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         self.object.add_game_masters(self.request.user)
         emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        send_session_invitations(self.object, self.request, emails)
+        send_campaign_invitations(self.object, self.request, emails)
         return response
 
     def get_success_url(self):
         return resolve_url(self.object)
-
-
-class SessionJoinView(SingleObjectMixin, RedirectView):
-    signer_class = TimestampSigner
-    model = Session
-
-    def get_signer_instace(self):
-        return self.signer_class()
-
-    def get_email_associated(self):
-        try:
-            signer = self.get_signer_instace()
-            return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
-        except BadSignature:
-            raise Http404()
-
-    def get_user(self):
-        try:
-            # If user is already logged in, use it
-            if self.request.user.is_authenticated:
-                return self.request.user
-            return User.objects.get(email=self.get_email_associated())
-        except User.DoesNotExist:
-            return None
-
-    def get_redirect_url(self, *args, **kwargs):
-        session = self.get_object()
-        user = self.get_user()
-        if not user:
-            messages.warning(self.request, _('you need an account to join this session.').capitalize())
-            return resolve_url(settings.LOGIN_URL)
-        session.players.add(self.get_user())
-        messages.success(self.request, _('you have joined the session.').capitalize())
-        return resolve_url(session)
 
 
 class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -418,7 +471,7 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        send_session_invitations(self.object, self.request, emails)
+        send_campaign_invitations(self.object, self.request, emails)
         return response
 
     def get_success_url(self):

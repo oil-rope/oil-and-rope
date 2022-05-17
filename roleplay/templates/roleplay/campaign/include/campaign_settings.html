@@ -6,7 +6,9 @@
     {% if user in object.game_masters %}
       <a
         href="{% url 'roleplay:campaign:edit' object.pk %}"
-        class="btn btn-primary"
+        class="btn btn-primary btn-sm"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
         title="{% translate "edit campaign"|capfirst %}"
       >
         {{ ICONS.EDIT|safe }}
@@ -133,7 +135,13 @@ You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' com
   <h3 class="text-center">
     {% translate "players"|capfirst %}
     {% if user in object.game_masters %}
-      <a href="#no-url" class="btn btn-primary disabled" title="{% translate "add players"|capfirst %}">
+      <a
+        href="{% url 'roleplay:campaign:edit' object.pk %}"
+        class="btn btn-primary btn-sm fw-bold"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{% translate "To invite more players got to 'Edit' and then 'Invite players'." %}"
+      >
         {{ ICONS.PLUS|safe }}
         {% translate "add"|capfirst %}
       </a>

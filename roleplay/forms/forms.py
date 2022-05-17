@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from common.constants import models as constants
 from common.files import utils
 from common.forms.mixins import FormCapitalizeMixin
-from common.forms.widgets import DateTimeWidget
+from common.forms.widgets import DateTimeWidget, DateWidget
 
 from .. import enums, models
 from .layout import CampaignFormLayout, PlaceLayout, SessionFormLayout, WorldFormLayout
@@ -89,7 +89,6 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
         label=_('email invitations'),
         widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
         required=False,
-
     )
 
     def __init__(self, user, submit_text=_('create'), *args, **kwargs):
@@ -107,6 +106,10 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
             'place', 'start_date', 'end_date',
         )
         model = models.Campaign
+        widgets = {
+            'start_date': DateWidget,
+            'end_date': DateWidget,
+        }
 
     def clean_email_invitations(self):
         email_invitations = self.cleaned_data.get('email_invitations')
@@ -118,13 +121,11 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
         if not self.instance.owner_id:
             # NOTE: This is a new campaign, so we need to set the owner.
             self.instance.owner = self.user
-        return super().save(commit)
+        self.instance = super().save(commit)
+        return self.instance
 
 
 class SessionForm(forms.ModelForm):
-    next_game = forms.DateTimeField(
-        widget=DateTimeWidget,
-    )
     email_invitations = forms.CharField(
         label='',
         widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
@@ -145,6 +146,9 @@ class SessionForm(forms.ModelForm):
         fields = (
             'name', 'plot', 'next_game', 'system', 'campaign',
         )
+        widgets = {
+            'next_game': DateTimeWidget,
+        }
 
     def clean_next_game(self):
         next_game = self.cleaned_data.get('next_game')

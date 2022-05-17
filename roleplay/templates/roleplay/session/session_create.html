@@ -3,9 +3,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}
-  {% translate "create"|capfirst %} {% translate "session"|capfirst %}
-{% endblock title %}
+{% block title %}{% blocktranslate with object=_('session') %}Create {{ object }}{% endblocktranslate %}{% endblock title %}
 
 {% block breadcrumb %}
   {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
@@ -17,7 +15,7 @@
 {% block body_content %}
   <main class="container pb-5">
     <h2 class="display-4 text-center">
-      {% translate "create"|capfirst %} {% translate "session"|capfirst %}
+      {% block title %}{% blocktranslate with object=_('session') %}Create {{ object }}{% endblocktranslate %}{% endblock title %}
     </h2>
     <hr class="mx-5">
     <div class="row">

@@ -20,6 +20,10 @@ class DateWidget(forms.DateInput):
 
     input_type = 'date'
 
+    def __init__(self, *args, **kwargs):
+        kwargs['format'] = '%Y-%m-%d'
+        super().__init__(*args, **kwargs)
+
 
 class TimeWidget(forms.TimeInput):
     """
@@ -27,3 +31,7 @@ class TimeWidget(forms.TimeInput):
     """
 
     input_type = 'time'
+
+    def __init__(*args, **kwargs):
+        kwargs['format'] = '%H:%M'
+        super().__init__(*args, **kwargs)

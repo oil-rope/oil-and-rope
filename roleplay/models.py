@@ -476,6 +476,10 @@ class Campaign(TracingMixin):
         List of players that are game masters.
     discord_channel: :model:`bot.Channel`
         The discord channel where the campaign is happening.
+
+    Methods:
+    --------
+    add_game_masters(*users): Adds users to the campaign as game masters.
     """
 
     objects = managers.CampaignManager()

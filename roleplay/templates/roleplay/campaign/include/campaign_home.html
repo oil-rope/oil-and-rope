@@ -1,7 +1,7 @@
 {% load i18n %}
 <section>
   <h3 class="text-center">
-    {% translate "about the campaign"|title %}
+    {% translate "about the campaign"|capfirst %}
   </h3>
   <p>
     {{ object.description|default:_("no description provided...")|capfirst }}
@@ -10,15 +10,15 @@
 <section>
   <h3 class="text-center">
     {% translate "about the world"|title %}
-    <button
-      type="button"
+    <a
+      href="{% url 'roleplay:place:detail' object.place.pk %}"
       class="btn btn-sm btn-dark fw-bold"
       data-bs-toggle="tooltip"
       data-bs-placement="top"
       title="{% translate "this is not the entire world to take a deep look go to 'see more'"|capfirst %}"
     >
       ?
-    </button>
+    </a>
     <br>
     <small class="lead fs-6">
       {% url 'roleplay:place:detail' object.place.pk as world_detail_url %}
@@ -44,7 +44,7 @@
       {% endif %}
       <p>
         {% if place.description %}
-          {{ place.description|safe }}
+          {{ place.description|safe|truncatechars_html:1000 }}
         {% else %}
           {% translate "no description provided..."|capfirst %}
         {% endif %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-12 14:36+0000\n"
+"POT-Creation-Date: 2022-05-17 11:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,15 +68,15 @@ msgid "user not authenticated."
 msgstr "usuario no autenticado."
 
 #: chat/models.py:23 chat/models.py:59 common/models.py:33
-#: roleplay/models.py:483 roleplay/models.py:576 roleplay/models.py:633
+#: roleplay/models.py:487 roleplay/models.py:580 roleplay/models.py:637
 #, fuzzy
 #| msgid "Identifier"
 msgid "identifier"
 msgstr "identificador"
 
 #: chat/models.py:24 common/models.py:34 roleplay/models.py:34
-#: roleplay/models.py:87 roleplay/models.py:357 roleplay/models.py:484
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:19
+#: roleplay/models.py:87 roleplay/models.py:357 roleplay/models.py:488
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:21
 #, fuzzy
 #| msgid "Chat name"
 msgid "name"
@@ -95,7 +95,7 @@ msgstr "usuarios"
 msgid "discord identifier"
 msgstr "identificador de discord"
 
-#: chat/models.py:38 chat/models.py:61 roleplay/models.py:517
+#: chat/models.py:38 chat/models.py:61 roleplay/models.py:521
 msgid "chat"
 msgstr "chat"
 
@@ -194,7 +194,7 @@ msgstr "comprobación de usuario"
 
 #: common/enums.py:26 registration/models.py:41 registration/models.py:82
 #: registration/templates/registration/user_update.html:6
-#: roleplay/models.py:100 roleplay/models.py:416 roleplay/models.py:578
+#: roleplay/models.py:100 roleplay/models.py:416 roleplay/models.py:582
 msgid "user"
 msgstr "usuario"
 
@@ -240,9 +240,9 @@ msgstr "ciudad"
 
 #: common/enums.py:38 registration/templates/registration/user_update.html:6
 #: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:27
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:13
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:15
 #: roleplay/templates/roleplay/include/world_card.html:29
-#: roleplay/templates/roleplay/place/place_detail.html:175
+#: roleplay/templates/roleplay/place/place_detail.html:163
 #: roleplay/templates/roleplay/session/session_detail.html:55
 msgid "edit"
 msgstr "editar"
@@ -259,9 +259,9 @@ msgstr "pluma"
 msgid "map"
 msgstr "mapa"
 
-#: common/enums.py:42 roleplay/enums.py:33 roleplay/models.py:508
+#: common/enums.py:42 roleplay/enums.py:33 roleplay/models.py:512
 #: roleplay/templates/roleplay/include/world_card.html:59
-#: roleplay/templates/roleplay/place/place_detail.html:102
+#: roleplay/templates/roleplay/place/place_detail.html:90
 #: roleplay/templates/roleplay/world/world_create.html:6
 msgid "world"
 msgstr "mundo"
@@ -319,11 +319,9 @@ msgid "cross thin"
 msgstr "equis fina"
 
 #: common/forms/layout.py:15 roleplay/forms/forms.py:24
-#: roleplay/forms/forms.py:55 roleplay/forms/forms.py:95
+#: roleplay/forms/forms.py:55 roleplay/forms/forms.py:94
 #: roleplay/forms/layout.py:10 roleplay/forms/layout.py:203
-#: roleplay/templates/roleplay/session/session_create.html:7
-#: roleplay/templates/roleplay/session/session_create.html:20
-#: roleplay/templates/roleplay/world/world_create.html:6
+#: roleplay/views.py:242
 #, fuzzy
 #| msgid "Create"
 msgid "create"
@@ -336,21 +334,21 @@ msgid "clear"
 msgstr "limpiar"
 
 #: common/models.py:35 roleplay/models.py:35 roleplay/models.py:88
-#: roleplay/models.py:358 roleplay/models.py:485 roleplay/models.py:639
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:41
+#: roleplay/models.py:358 roleplay/models.py:489 roleplay/models.py:643
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:43
 #, fuzzy
 #| msgid "Description"
 msgid "description"
 msgstr "descripción"
 
-#: common/models.py:37 roleplay/models.py:104 roleplay/models.py:497
+#: common/models.py:37 roleplay/models.py:104 roleplay/models.py:501
 #, fuzzy
 #| msgid "Owner"
 msgid "owner"
 msgstr "dueño"
 
-#: common/models.py:40 roleplay/models.py:501
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:68
+#: common/models.py:40 roleplay/models.py:505
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:70
 msgid "public"
 msgstr "público"
 
@@ -363,7 +361,7 @@ msgstr "archivo"
 #: common/templates/common/include/breadcrumb.html:10
 #: common/templates/common/include/breadcrumb.html:18
 #: core/templates/core/index.html:4
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:59
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:60
 #, fuzzy
 #| msgid "home"
 msgctxt "menu name"
@@ -781,8 +779,8 @@ msgstr "crea tu cuenta"
 
 #: core/templates/core/includes/menu.html:76 registration/forms/forms.py:223
 #: registration/models.py:92 registration/views.py:310
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:155
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:163
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:171
 #: roleplay/templates/roleplay/session/include/session_list_item.html:63
 #: roleplay/templates/roleplay/session/include/session_list_item.html:71
 #: roleplay/templates/roleplay/session/session_detail.html:127
@@ -797,7 +795,7 @@ msgid "personalize even more your user."
 msgstr "personaliza tu usuario incluso más."
 
 #: core/templates/core/includes/menu.html:92
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:125
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:126
 #: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:18
 #: roleplay/templates/roleplay/include/world_card.html:54
 #: roleplay/templates/roleplay/session/session_detail.html:46
@@ -940,15 +938,13 @@ msgid "you've been invited!"
 msgstr "¡has sido invitado/a!"
 
 #: oar_email/templates/email_templates/invitation_email.html:10
-#, python-format
-msgid ""
-"\n"
-"        You've been invited to %(name)s!\n"
-"      "
-msgstr ""
-"\n"
-"        ¡Has sido invitado/a a %(name)s!\n"
-"      "
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "        You've been invited to %(name)s!\n"
+#| "      "
+msgid "You've been invited to %(name)s!"
+msgstr "¡Has sido invitado/a a %(name)s!"
 
 #: oar_email/templates/email_templates/invitation_email.html:19
 #, fuzzy, python-format
@@ -958,30 +954,24 @@ msgstr ""
 #| "%(world_name)s.\n"
 #| "          "
 msgid ""
-"\n"
-"            %(game_master)s invites you to join into an epic quest in the "
-"world of %(world_name)s.\n"
-"          "
+"%(game_master)s invites you to join into an epic quest in the world of "
+"%(place_name)s."
 msgstr ""
-"\n"
-"            %(game_master)s te invita a unirte en una épica misión en el "
-"mundo de %(world_name)s.\n"
-"          "
+"%(game_master)s te invita a unirte en una épica misión en el mundo de "
+"%(place_name)s."
 
 #: oar_email/templates/email_templates/invitation_email.html:24
 msgid "check this world here"
 msgstr "échale un ojo a este mundo aquí"
 
 #: oar_email/templates/email_templates/invitation_email.html:35
-#, python-format
-msgid ""
-"\n"
-"            The adventure of <em>\"%(name)s\"</em> awaits for you!\n"
-"          "
-msgstr ""
-"\n"
-"            ¡La aventura de <em>\"%(name)s\"</em> te espera!\n"
-"          "
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "            The adventure of <em>\"%(name)s\"</em> awaits for you!\n"
+#| "          "
+msgid "The adventure of <em>\"%(name)s\"</em> awaits for you!"
+msgstr "¡La aventura de <em>\"%(name)s\"</em> te espera!"
 
 #: oar_email/templates/email_templates/password_reset_email.html:13
 #, fuzzy
@@ -1157,7 +1147,7 @@ msgid "change password"
 msgstr "cambiar contraseña"
 
 #: registration/forms/layout.py:161 roleplay/views.py:78 roleplay/views.py:210
-#: roleplay/views.py:263 roleplay/views.py:415
+#: roleplay/views.py:344 roleplay/views.py:468
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -1327,6 +1317,7 @@ msgid "set new password"
 msgstr "indicar nueva contraseña"
 
 #: registration/templates/registration/register.html:16
+#: roleplay/templates/roleplay/campaign/campaign_create.html:18
 #, fuzzy
 #| msgid "Start your adventure"
 msgid "start your adventure!"
@@ -1579,11 +1570,11 @@ msgstr ""
 "Una imagen vale más que mil palabras. Tamaño máximo de archivo %(max_size)s "
 "MiB."
 
-#: roleplay/forms/forms.py:89 roleplay/forms/forms.py:137
+#: roleplay/forms/forms.py:89 roleplay/forms/forms.py:138
 msgid "email invitations"
 msgstr "invitaciones por email"
 
-#: roleplay/forms/forms.py:153
+#: roleplay/forms/forms.py:157
 msgid "next game date must be in the future."
 msgstr "la fecha de la siguiente partida debe ser en el futuro."
 
@@ -1623,7 +1614,7 @@ msgstr "invitar jugadores"
 msgid "what will happen in this session?"
 msgstr "¿qué pasará en la siguiente partida?"
 
-#: roleplay/forms/layout.py:224 roleplay/models.py:648
+#: roleplay/forms/layout.py:224 roleplay/models.py:652
 msgid "next session"
 msgstr "siguiente sesión"
 
@@ -1739,91 +1730,92 @@ msgstr "razas"
 msgid "ownership"
 msgstr "propiedad"
 
-#: roleplay/models.py:487
+#: roleplay/models.py:491
 #, fuzzy
 #| msgid "basic information"
 msgid "game master information"
 msgstr "información de maestro de partida"
 
-#: roleplay/models.py:487 roleplay/models.py:644
+#: roleplay/models.py:491 roleplay/models.py:648
 msgid "information specific to the game master."
 msgstr "información específica para el maestro de partida."
 
-#: roleplay/models.py:490
+#: roleplay/models.py:494
 msgid "summary"
 msgstr "resumen"
 
-#: roleplay/models.py:491 roleplay/models.py:650
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:55
+#: roleplay/models.py:495 roleplay/models.py:654
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:57
 msgid "system"
 msgstr "sistema"
 
-#: roleplay/models.py:493
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:20
+#: roleplay/models.py:497
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:21
 #, fuzzy
 #| msgid "Image"
 msgid "cover image"
 msgstr "imagen de portada"
 
-#: roleplay/models.py:501
+#: roleplay/models.py:505
 msgid "can this campaign be accessed by anyone?"
 msgstr "¿puede acceder a esta campaña a cualquiera?"
 
-#: roleplay/models.py:504
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:134
+#: roleplay/models.py:508
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:136
 #, fuzzy
 #| msgid "play"
 msgid "players"
 msgstr "jugadores"
 
-#: roleplay/models.py:511
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:103
+#: roleplay/models.py:515
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:105
 #, fuzzy
 #| msgid "start game"
 msgid "start date"
 msgstr "fecha de inicio"
 
-#: roleplay/models.py:512
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:117
+#: roleplay/models.py:516
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:119
 #, fuzzy
 #| msgid "invalid data"
 msgid "end date"
 msgstr "fecha de finalización"
 
-#: roleplay/models.py:514
+#: roleplay/models.py:518
 msgid "identifier for discord channel"
 msgstr "identificador para el canal de discord"
 
-#: roleplay/models.py:541 roleplay/models.py:582 roleplay/models.py:635
+#: roleplay/models.py:545 roleplay/models.py:586 roleplay/models.py:639
+#: roleplay/templates/roleplay/campaign/campaign_create.html:6
 #, fuzzy
 #| msgid "Create campaign"
 msgid "campaign"
 msgstr "campaña"
 
-#: roleplay/models.py:542
+#: roleplay/models.py:546
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:4
 #, fuzzy
 #| msgid "Create campaign"
 msgid "campaigns"
 msgstr "campañas"
 
-#: roleplay/models.py:585
+#: roleplay/models.py:589
 msgid "game master"
 msgstr "maestro de mazmorra"
 
-#: roleplay/models.py:588
+#: roleplay/models.py:592
 #, fuzzy
 #| msgid "player in session"
 msgid "player in campaign"
 msgstr "jugadores en sesiones"
 
-#: roleplay/models.py:589
+#: roleplay/models.py:593
 #, fuzzy
 #| msgid "players in sessions"
 msgid "players in campaign"
 msgstr "jugadores en sesión"
 
-#: roleplay/models.py:596
+#: roleplay/models.py:600
 #, fuzzy, python-format
 #| msgid "%(player)s in %(session)s (Game Master: %(is_game_master)s)"
 msgid "%(player)s in campaign %(campaign)s (Game Master: %(is_game_master)s)"
@@ -1831,36 +1823,36 @@ msgstr ""
 "%(player)s en la campaña %(campaign)s (Maestro de la mazmorra: "
 "%(is_game_master)s)"
 
-#: roleplay/models.py:638
+#: roleplay/models.py:642
 msgid "title"
 msgstr "título"
 
-#: roleplay/models.py:641
+#: roleplay/models.py:645
 msgid "plot"
 msgstr "trama"
 
-#: roleplay/models.py:641
+#: roleplay/models.py:645
 msgid "one line summary."
 msgstr "resumen de una línea."
 
-#: roleplay/models.py:644
+#: roleplay/models.py:648
 #, fuzzy
 #| msgid "game master"
 msgid "game master info"
 msgstr "información de maestro de partida"
 
-#: roleplay/models.py:652
+#: roleplay/models.py:656
 msgid "cover"
 msgstr "portada"
 
-#: roleplay/models.py:656
-#: roleplay/templates/roleplay/session/session_create.html:7
-#: roleplay/templates/roleplay/session/session_create.html:20
+#: roleplay/models.py:660
+#: roleplay/templates/roleplay/session/session_create.html:6
+#: roleplay/templates/roleplay/session/session_create.html:18
 msgid "session"
 msgstr "sesión"
 
-#: roleplay/models.py:657
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:99
+#: roleplay/models.py:661
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:100
 #: roleplay/templates/roleplay/session/session_list.html:5
 msgid "sessions"
 msgstr "sesiones"
@@ -1914,48 +1906,57 @@ msgstr "cancelar"
 msgid "erase"
 msgstr "eliminar"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:9
+#: roleplay/templates/roleplay/campaign/campaign_create.html:6
+#: roleplay/templates/roleplay/session/session_create.html:6
+#: roleplay/templates/roleplay/session/session_create.html:18
+#: roleplay/templates/roleplay/world/world_create.html:6
+#, python-format
+msgid "Create %(object)s"
+msgstr "Crear %(object)s"
+
+#: roleplay/templates/roleplay/campaign/campaign_create.html:11
+#: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
+#: roleplay/templates/roleplay/include/world_card.html:45
+#: roleplay/templates/roleplay/place/place_detail.html:144
+#, fuzzy
+#| msgid "Create campaign"
+msgid "create campaign"
+msgstr "crear campaña"
+
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:10
 #, fuzzy
 #| msgid "session"
 msgid "campaign detail"
 msgstr "detalle de campaña"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:41
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:42
 #: roleplay/templates/roleplay/session/session_detail.html:34
 msgid "go to tabletop"
 msgstr "ir al tablero"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:71
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:72
 msgctxt "menu"
 msgid "protagonists (PC)"
 msgstr "protagonistas (PJ)"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:73
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:87
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:113
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:74
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:88
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:114
 msgid "not yet implemented"
 msgstr "aún no implementado"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:85
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:86
 msgctxt "menu"
 msgid "characters (NPC)"
 msgstr "personajes (PNJ)"
 
-#: roleplay/templates/roleplay/campaign/campaign_detail.html:111
+#: roleplay/templates/roleplay/campaign/campaign_detail.html:112
 msgid "timeline"
 msgstr "línea de tiempo"
 
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:13
 msgid "campaigns you are part of."
 msgstr "campañas en las que estás participando."
-
-#: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
-#: roleplay/templates/roleplay/include/world_card.html:45
-#: roleplay/templates/roleplay/place/place_detail.html:156
-#, fuzzy
-#| msgid "Create campaign"
-msgid "create campaign"
-msgstr "crear campaña"
 
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
 #, python-format
@@ -1992,7 +1993,7 @@ msgstr "Editando %(name)s"
 
 #: roleplay/templates/roleplay/campaign/include/campaign_card.html:13
 #: roleplay/templates/roleplay/campaign/include/campaign_card_with_image.html:18
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:48
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:50
 #, fuzzy
 #| msgid "No description provided"
 msgid "no description provided yet."
@@ -2010,11 +2011,11 @@ msgstr "acciones"
 msgid "view campaign"
 msgstr "ver campaña"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:34
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:196
+#: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:37
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:205
 #: roleplay/templates/roleplay/include/world_card.html:59
 #: roleplay/templates/roleplay/place/place_confirm_delete.html:3
-#: roleplay/templates/roleplay/place/place_detail.html:181
+#: roleplay/templates/roleplay/place/place_detail.html:169
 #: roleplay/templates/roleplay/session/session_confirm_delete.html:3
 #: roleplay/templates/roleplay/session/session_detail.html:64
 #, fuzzy
@@ -2052,7 +2053,7 @@ msgstr "sobre la campaña"
 #: roleplay/templates/roleplay/campaign/include/campaign_home.html:7
 #: roleplay/templates/roleplay/campaign/include/campaign_home.html:49
 #: roleplay/templates/roleplay/include/world_card.html:15
-#: roleplay/templates/roleplay/place/place_detail.html:72
+#: roleplay/templates/roleplay/place/place_detail.html:183
 #, fuzzy
 #| msgid "No description provided"
 msgid "no description provided..."
@@ -2089,47 +2090,47 @@ msgstr "sin sesiones todavía."
 msgid "general settings"
 msgstr "configuración general"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:10
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:12
 #, fuzzy
 #| msgid "Create campaign"
 msgid "edit campaign"
 msgstr "editar campaña"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:27
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:29
 #, fuzzy
 #| msgid "Description"
 msgid "short description"
 msgstr "descripción corta"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:34
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:36
 #, fuzzy
 #| msgid "No description provided"
 msgid "no summary provided yet."
 msgstr "no se ha dado ningún resumen aún."
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:63
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:65
 #, fuzzy
 #| msgid "Site type"
 msgid "type"
 msgstr "tipo"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:70
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:72
 msgid "private"
 msgstr "privada"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:77
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:79
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord channel"
 msgstr "canal de discord"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:89
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:91
 #, fuzzy
 #| msgid "connect"
 msgid "not connected."
 msgstr "sin conectar."
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:91
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:93
 #, python-format
 msgid ""
 "\n"
@@ -2140,25 +2141,24 @@ msgstr ""
 "Puedes configurarlo con nuestro bot usando el comando '%(BOT_COMMAND_PREFIX)s"
 "%(command)s'.\n"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:110
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:124
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:112
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:126
 msgid "not set."
 msgstr "sin indicar."
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:136
-#, fuzzy
-#| msgid "play"
-msgid "add players"
-msgstr "añadir jugadores"
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:143
+#: roleplay/templates/roleplay/session/session_detail.html:155
+msgid "To invite more players got to 'Edit' and then 'Invite players'."
+msgstr "Para invitar más jugadores ve a 'Editar' y luego 'Invitar jugadores'."
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:138
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:146
 #: roleplay/templates/roleplay/include/world_card.html:50
 #: roleplay/templates/roleplay/place/place_create.html:5
-#: roleplay/templates/roleplay/place/place_detail.html:164
+#: roleplay/templates/roleplay/place/place_detail.html:152
 msgid "add"
 msgstr "añadir"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:144
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:152
 #, python-format
 msgid ""
 "\n"
@@ -2173,13 +2173,13 @@ msgstr[1] ""
 "\n"
 "%(players)s jugadores\n"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:176
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:184
 #, fuzzy
 #| msgid "play"
 msgid "no players."
 msgstr "sin jugadores"
 
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:186
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:195
 msgid "danger zone"
 msgstr "zona peligrosa"
 
@@ -2190,7 +2190,7 @@ msgid "view details"
 msgstr "ver detalles"
 
 #: roleplay/templates/roleplay/include/world_card.html:50
-#: roleplay/templates/roleplay/place/place_detail.html:164
+#: roleplay/templates/roleplay/place/place_detail.html:152
 #, fuzzy
 #| msgid "Biography"
 msgid "geography"
@@ -2262,37 +2262,37 @@ msgstr ""
 "        Creado por %(creator)s (%(created)s)\n"
 "      "
 
-#: roleplay/templates/roleplay/place/place_detail.html:86
+#: roleplay/templates/roleplay/place/place_detail.html:74
 #, fuzzy
 #| msgid "Places"
 msgid "list of places"
 msgstr "lista de lugares"
 
-#: roleplay/templates/roleplay/place/place_detail.html:88
+#: roleplay/templates/roleplay/place/place_detail.html:76
 msgid "go to"
 msgstr "ir a"
 
-#: roleplay/templates/roleplay/place/place_detail.html:99
+#: roleplay/templates/roleplay/place/place_detail.html:87
 msgid "move to main world"
 msgstr "ir al mundo principal"
 
-#: roleplay/templates/roleplay/place/place_detail.html:110
+#: roleplay/templates/roleplay/place/place_detail.html:98
 #, fuzzy
 #| msgid "Parent site"
 msgid "go to parent site"
 msgstr "ir al lugar padre"
 
-#: roleplay/templates/roleplay/place/place_detail.html:126
+#: roleplay/templates/roleplay/place/place_detail.html:114
 #, fuzzy
 #| msgid "Parent site"
 msgid "go to site"
 msgstr "ir al sitio"
 
-#: roleplay/templates/roleplay/place/place_detail.html:144
+#: roleplay/templates/roleplay/place/place_detail.html:132
 msgid "list of options"
 msgstr "lista de opciones"
 
-#: roleplay/templates/roleplay/place/place_detail.html:146
+#: roleplay/templates/roleplay/place/place_detail.html:134
 #, fuzzy
 #| msgid "Position"
 msgid "options"
@@ -2313,7 +2313,7 @@ msgid "then you can join the chat and tabletop assigned to this campaign."
 msgstr "luego puedes unirte al chat y tablero asignados a esta campaña."
 
 #: roleplay/templates/roleplay/session/include/prepare_first_session_card.html:17
-#: roleplay/templates/roleplay/session/session_create.html:13
+#: roleplay/templates/roleplay/session/session_create.html:11
 #, fuzzy
 #| msgid "next session"
 msgid "create session"
@@ -2432,10 +2432,6 @@ msgstr[1] ""
 #| msgid "play"
 msgid "no players"
 msgstr "sin jugadores"
-
-#: roleplay/templates/roleplay/session/session_detail.html:155
-msgid "To invite more players got to 'Edit' and then 'Invite players'."
-msgstr "Para invitar más jugadores ve a 'Editar' y luego 'Invitar jugadores'."
 
 #: roleplay/templates/roleplay/session/session_list.html:14
 #, fuzzy
@@ -2574,35 +2570,40 @@ msgstr "la sintaxis de la tirada `%(roll)s` es incorrecta."
 msgid "a quest for you!"
 msgstr "¡una misión para ti!"
 
-#: roleplay/views.py:285
+#: roleplay/views.py:292
+#, fuzzy
+#| msgid "you've invited to a session!"
+msgid "you need an account to join this campaign."
+msgstr "necesitas una cuenta para unirte a esta campaña."
+
+#: roleplay/views.py:295
+#, fuzzy
+#| msgid "you've invited to a session!"
+msgid "you have joined the campaign."
+msgstr "te has unido a la campaña."
+
+#: roleplay/views.py:372
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "campaign deleted successfully."
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/views.py:361
-#, fuzzy
-#| msgid "you've invited to a session!"
-msgid "you need an account to join this session."
-msgstr "necesitas una cuenta para unirte a esta sesión."
-
-#: roleplay/views.py:364
-#, fuzzy
-#| msgid "you've invited to a session!"
-msgid "you have joined the session."
-msgstr "te has unido a la sesión."
-
-#: roleplay/views.py:395
+#: roleplay/views.py:448
 #, fuzzy
 #| msgid "session"
 msgid "session deleted."
 msgstr "sesión borrada."
 
-#: roleplay/views.py:425
+#: roleplay/views.py:478
 #, fuzzy
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "play"
+#~ msgid "add players"
+#~ msgstr "añadir jugadores"
 
 #, fuzzy
 #~| msgid "Editting"

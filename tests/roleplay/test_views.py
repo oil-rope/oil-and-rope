@@ -804,6 +804,142 @@ class TestWorldUpdateView(TestCase):
         self.assertIsNone(self.community_world.user)
 
 
+class TestCampaignCreateView(TestCase):
+    model = models.Campaign
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:create'
+    template = 'roleplay/campaign/campaign_create.html'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.world = baker.make_recipe('roleplay.world')
+        cls.url = resolve_url(cls.resolver, world_pk=cls.world.pk)
+
+    def setUp(self):
+        self.data_ok = {
+            'place': self.world.pk,
+            'name': fake.sentence(nb_words=2),
+            'system': random.choice(enums.RoleplaySystems.values),
+        }
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = '{login_url}?next={url}'.format(login_url=self.login_url, url=self.url)
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, 'roleplay/campaign/campaign_create.html')
+
+    def test_non_existent_world_ko(self):
+        self.client.force_login(self.user)
+        non_existent_pk = models.Place.objects.last().pk + 1
+        url = reverse('roleplay:campaign:create', kwargs={'world_pk': non_existent_pk})
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_creates_campaign_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.data_ok)
+        campaign = models.Campaign.objects.get(owner__pk=self.user.pk)
+
+        self.assertEqual(self.data_ok['name'], campaign.name)
+        self.assertEqual(self.data_ok['system'], campaign.system)
+        self.assertEqual(self.user, campaign.owner)
+        self.assertEqual(self.world, campaign.place)
+
+    def test_email_invitations_are_sent_ok(self):
+        data = self.data_ok.copy()
+        n_emails = 3
+        emails = [fake.email() for _ in range(n_emails)]
+        data['email_invitations'] = '\n'.join(emails)
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data)
+
+        # NOTE: Since is asynchronous, we need to wait for the email to be sent
+        time.sleep(1)
+        self.assertEqual(len(mail.outbox), n_emails)
+        self.assertEqual(mail.outbox[0].subject, 'A quest for you!')
+
+
+class TestCampaignJoinView(TestCase):
+    model = models.Campaign
+    resolver = 'roleplay:campaign:join'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.instance = baker.make_recipe('roleplay.campaign')
+        cls.signer = TimestampSigner()
+
+    def test_access_with_correct_token_and_existing_user_ok(self):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(self.instance), target_status_code=302)
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_existing_user_messages_ok(self, mock_messages):
+        token = tools.get_token(self.user.email, self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        mock_messages.success.assert_called_once_with(response.wsgi_request, 'You have joined the campaign.')
+
+    def test_access_with_correct_token_and_non_existing_user_redirects_to_login_ko(self):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(settings.LOGIN_URL))
+
+    @mock.patch('roleplay.views.messages')
+    def test_access_with_correct_token_and_non_existing_user_messages_ko(self, mock_messages):
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        mock_messages.warning.assert_called_once_with(
+            response.wsgi_request,
+            'You need an account to join this campaign.'
+        )
+
+    def test_access_with_logged_user_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertRedirects(response, resolve_url(self.instance))
+
+    def test_access_with_logged_user_adds_user_to_players_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        self.client.get(url)
+
+        self.assertIn(self.user, self.instance.users.all())
+
+    def test_access_with_incorrect_token_ko(self):
+        token = f'{fake.email()}:{fake.password()}'
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        response = self.client.get(url)
+
+        self.assertEqual(404, response.status_code)
+
+
 class TestPrivateCampaignListView(TestCase):
     model = models.Campaign
     login_url = resolve_url(settings.LOGIN_URL)
@@ -868,7 +1004,7 @@ class TestCampaignUpdateView(TestCase):
         self.url = reverse(self.resolver, kwargs={'pk': self.campaign.pk})
 
         self.new_name = fake.sentence(nb_words=2)
-        self.data = {
+        self.data_ok = {
             'name': self.new_name,
             'system': self.campaign.system,
             'place': self.campaign.place.pk,
@@ -907,7 +1043,7 @@ class TestCampaignUpdateView(TestCase):
 
     def test_campaign_is_changed_ok(self):
         self.client.force_login(self.user)
-        self.client.post(self.url, data=self.data)
+        self.client.post(self.url, data=self.data_ok)
         self.campaign.refresh_from_db()
 
         self.assertEqual(self.new_name, self.campaign.name)
@@ -916,16 +1052,29 @@ class TestCampaignUpdateView(TestCase):
         self.another_user = baker.make_recipe('registration.user')
         self.campaign.add_game_masters(self.another_user)
         self.client.force_login(self.another_user)
-        self.client.post(self.url, data=self.data)
+        self.client.post(self.url, data=self.data_ok)
         self.campaign.refresh_from_db()
 
         self.assertEqual(self.user, self.campaign.owner)
 
     def test_redirect_to_campaign_detail_ok(self):
         self.client.force_login(self.user)
-        response = self.client.post(self.url, data=self.data)
+        response = self.client.post(self.url, data=self.data_ok)
 
         self.assertRedirects(response, resolve_url(self.campaign))
+
+    def test_email_invitations_are_sent_ok(self):
+        data = self.data_ok.copy()
+        n_emails = 3
+        emails = [fake.email() for _ in range(n_emails)]
+        data['email_invitations'] = '\n'.join(emails)
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=data)
+
+        # NOTE: Since is asynchronous, we need to wait for the email to be sent
+        time.sleep(1)
+        self.assertEqual(len(mail.outbox), n_emails)
+        self.assertEqual(mail.outbox[0].subject, 'A quest for you!')
 
 
 class TestCampaignDetailView(TestCase):
@@ -1182,75 +1331,6 @@ class TestSessionCreateView(TestCase):
         session = self.model.objects.last()
         # NOTE: Field is not nullable, so it's empty string
         self.assertEqual('', session.plot)
-
-
-@unittest.skip('TODO: refactor')
-class TestSessionJoinView(TestCase):
-    model = models.Session
-    resolver = 'roleplay:session:join'
-    view = views.SessionJoinView
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = baker.make_recipe('registration.user')
-        cls.session = baker.make_recipe('roleplay.session')
-        cls.signer = TimestampSigner()
-
-    def test_access_with_correct_token_and_existing_user_ok(self):
-        token = tools.get_token(self.user.email, self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        self.assertRedirects(response, resolve_url(self.session), target_status_code=302)
-
-    @mock.patch('roleplay.views.messages')
-    def test_access_with_correct_token_and_existing_user_messages_ok(self, mock_messages):
-        token = tools.get_token(self.user.email, self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        mock_messages.success.assert_called_once_with(response.wsgi_request, 'You have joined the session.')
-
-    def test_access_with_correct_token_and_non_existing_user_redirects_to_login_ko(self):
-        token = tools.get_token(fake.email(), self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        self.assertRedirects(response, resolve_url(settings.LOGIN_URL))
-
-    @mock.patch('roleplay.views.messages')
-    def test_access_with_correct_token_and_non_existing_user_messages_ko(self, mock_messages):
-        token = tools.get_token(fake.email(), self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        mock_messages.warning.assert_called_once_with(
-            response.wsgi_request,
-            'You need an account to join this session.'
-        )
-
-    def test_access_with_logged_user_ok(self):
-        self.client.force_login(self.user)
-        token = tools.get_token(fake.email(), self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        self.assertRedirects(response, resolve_url(self.session))
-
-    def test_access_with_logged_user_adds_user_to_players_ok(self):
-        self.client.force_login(self.user)
-        token = tools.get_token(fake.email(), self.signer)
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        self.client.get(url)
-
-        self.assertIn(self.user, self.session.players.all())
-
-    def test_access_with_incorrect_token_ko(self):
-        token = f'{fake.email()}:{fake.password()}'
-        url = resolve_url(self.resolver, pk=self.session.pk, token=token)
-        response = self.client.get(url)
-
-        self.assertEqual(404, response.status_code)
 
 
 @unittest.skip('TODO: refactor')
