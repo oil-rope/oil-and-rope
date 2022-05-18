@@ -1,29 +1,9 @@
-from django.contrib import admin, messages
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext
+from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
+from core.admin import make_private, make_public
+
 from . import models
-
-
-@admin.action(description=_('Mark selected campaigns as public'), permissions=['change'])
-def make_public(modeladmin, request, queryset):
-    updated = queryset.update(is_public=True)
-    modeladmin.message_user(request, ngettext(
-        '%d instance was successfully marked as public.',
-        '%d instances were successfully marked as public.',
-        updated,
-    ) % updated, messages.SUCCESS)
-
-
-@admin.action(description=_('Mark selected campaigns as private'), permissions=['change'])
-def make_private(modeladmin, request, queryset):
-    updated = queryset.update(is_public=False)
-    modeladmin.message_user(request, ngettext(
-        '%d instance was successfully marked as private.',
-        '%d instances were successfully marked as private.',
-        updated,
-    ) % updated, messages.SUCCESS)
 
 
 @admin.register(models.Domain)

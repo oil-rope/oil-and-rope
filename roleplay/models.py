@@ -1,5 +1,6 @@
 from ckeditor.fields import RichTextField
 from django.apps import apps
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.shortcuts import resolve_url
@@ -436,50 +437,57 @@ class Campaign(TracingMixin):
 
     Parameters
     ----------
-    id: int
+    id: :class:`int`
         Identifier of the object.
-    name: str
+    name: :class:`str`
         Name of the campaign.
-    description: Optional[str]
+    description: Optional[:class:`str`]
         Description of the campaign.
-    gm_info: Optional[str]
+    gm_info: Optional[:class:`str`]
         Information specific to the game master.
-    summary: Optional[str]
+    summary: Optional[:class:`str`]
         A one line description of the campaign.
-    system: int
+    system: :class:`int`
         System used.
-    cover_image: Optional[str]
+    cover_image: Optional[:class:`str`]
         Path to the cover image of the campaign.
-    owner: :model:`registration.User`
+    owner: :class:`~registration.models.User`
         Owner of the campaign.
         This is used in order to have track of the person who created the campaign.
         This user can and can be not a player of the campaign.
-    is_public: Optional[bool]
+    is_public: Optional[:class:`bool`]
         Declares if the campaign is public or not.
-    players: List[:model:`registration.User`]
+    players: List[:class:`~registration.models.User`]
         List of players that are part of the campaign.
-    place: :model:`roleplay.Place`
+    place: :class:`~roleplay.models.Place`
         World where the campaign is happening.
-    start_date: Optional[datetime.date]
+    start_date: Optional[:class:`datetime.date`]
         Date when the campaign starts.
-    end_date: Optional[datetime.date]
+    end_date: Optional[:class:`datetime.date`]
         Date when the campaign ends.
-    discord_channel_id: Optional[str]
+    discord_channel_id: Optional[:class:`str`]
         The discord channel ID where the campaign is happening.
         This will be used to send messages to the discord channel.
-    chat: :model:`chat.Chat`
+    chat: :class:`~chat.models.Chat`
         Chat used by the campaign.
 
     Attributes:
     -----------
-    game_masters: List[:model:`registration.User`]
+    votes: List[:class:`~roleplay.models.Vote`]
+        Votes related to the campaign.
+    game_masters: List[:class:`~registration.models.User`]
         List of players that are game masters.
-    discord_channel: :model:`bot.Channel`
+    discord_channel: :class:`~bot.models.Channel`
         The discord channel where the campaign is happening.
+    total_votes: :class:`int`
+        The number of votes resulting from subtracting negative from positive votes.
 
     Methods:
     --------
-    add_game_masters(*users): Adds users to the campaign as game masters.
+    vote(user: :class:`~registration.models.User`, vote: :class:`bool`)
+        Vote for the campaign with the given user and positive if the vote is True.
+    add_game_masters(*users)
+        Adds users to the campaign as game masters.
     """
 
     objects = managers.CampaignManager()
@@ -521,13 +529,17 @@ class Campaign(TracingMixin):
         to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
         related_name='campaign_set', db_index=True, blank=False, null=False,
     )
+    votes = GenericRelation(
+        verbose_name=_('votes'), to=constants.COMMON_VOTE, related_query_name='campaign_set',
+        content_type_field='content_type', object_id_field='object_id',
+    )
 
-    @property
-    def game_masters(self):
+    def get_game_masters(self):
         gms = self.users.filter(
             player_in_campaign_set__is_game_master=True,
         )
         return gms
+    game_masters = cached_property(get_game_masters)
 
     @property
     def discord_channel(self):
@@ -535,16 +547,30 @@ class Campaign(TracingMixin):
             return Channel(id=self.discord_channel_id)
         return None
 
-    @property
-    def sessions_finished(self):
+    def get_sessions_finished(self):
         return self.session_set.filter(
             next_game__date__lt=timezone.now(),
         ).order_by('-next_game')
+    sessions_finished = cached_property(get_sessions_finished)
 
     class Meta:
         verbose_name = _('campaign')
         verbose_name_plural = _('campaigns')
         ordering = ['-entry_created_at', 'name']
+
+    def vote(self, user, vote):
+        """
+        Votes for the campaign.
+
+        Parameters
+        ----------
+        user: :class:`~registration.models.User`
+            User that is voting.
+        vote: :class:`bool`
+            Declares if vote is positive or negative.
+        """
+
+        return self.votes.create(user=user, is_positive=vote)
 
     def add_game_masters(self, *users):
         """
@@ -567,7 +593,7 @@ class PlayerInCampaign(TracingMixin):
     """
     This models manages the 'M2M through' for :class:`~roleplay.models.Campaign`.
 
-    Paramaters
+    Parameters
     ---------
     id: :class:`int`
         The identifier of the object.

@@ -14,31 +14,49 @@ class DomainManager(models.Manager):
         return super().get_queryset().filter(domain_type=DomainTypes.DOMAIN)
 
 
-class CampaignManager(models.Manager):
+class CampaignQuerySet(models.QuerySet):
     """
     Specific manager for :model:`roleplay.Campaign` that filters queryset by some common filters.
 
     Methods
     -------
+    with_votes()
+        Return all campaigns with votes annotated.
     public()
         Return all public campaigns.
     private()
         Return all private campaigns.
     """
 
+    def with_votes(self):
+        """
+        Return all campaigns with votes annotated.
+        The new :class:`~django.db.models.QuerySet` will have the following fields:
+        `positive_votes`, `negative_votes` and `total_votes`.
+        """
+
+        return super().annotate(
+            positive_votes=models.Count('votes', filter=models.Q(votes__is_positive=True)),
+            negative_votes=models.Count('votes', filter=models.Q(votes__is_positive=False)),
+            total_votes=models.F('positive_votes') - models.F('negative_votes'),
+        )
+
     def public(self):
         """
         Return all public campaigns.
         """
 
-        return super().get_queryset().filter(is_public=True)
+        return super().filter(is_public=True)
 
     def private(self):
         """
         Return all private campaigns.
         """
 
-        return super().get_queryset().filter(is_public=False)
+        return super().filter(is_public=False)
+
+
+CampaignManager = models.Manager.from_queryset(CampaignQuerySet)
 
 
 class PlaceManager(TreeManager):

@@ -90,11 +90,10 @@
         {% else %}
           {% translate "not connected."|capfirst %}
           <br />
-{% blocktranslate with command='linkchannel' asvar discord_channel_help_text %}
-You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' command.
-{% endblocktranslate %}
           <small class="text-muted">
-            {{ discord_channel_help_text }}
+            {% blocktranslate with command='linkchannel' trimmed %}
+              You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' command.
+            {% endblocktranslate %}
           </small>
         {% endif %}
       </p>
@@ -128,6 +127,14 @@ You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' com
       </p>
     </div>
   </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "votes"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.total_votes }}</p>
+    </div>
+  </div>
 </section>
 
 <hr>
@@ -149,12 +156,13 @@ You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' com
   </h3>
   <div class="row justify-content-around rounded bg-dark bg-opacity-10">
 {# NOTE: Since identation is causing some translations to break we better keep them separated #}
-{% blocktranslate count players=object.users.count asvar player_count %}
-{{ players }} player
-{% plural %}
-{{ players }} players
-{% endblocktranslate %}
-    <h5 class="text-center">{{ player_count }}</h5>
+    <h5 class="text-center">
+      {% blocktranslate count players=object.users.count trimmed %}
+        {{ players }} player
+      {% plural %}
+        {{ players }} players
+      {% endblocktranslate %}
+    </h5>
     {% for player in object.users.all %}
       <div class="col">
         {% if player.profile.image %}

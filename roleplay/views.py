@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, resolve_url
 from django.urls import reverse_lazy
@@ -296,14 +297,23 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
         return resolve_url(instance)
 
 
+class CampaignPublicListView(LoginRequiredMixin, ListView):
+    model = Campaign
+    ordering = ('total_votes', 'name', '-entry_created_at')
+    paginate_by = 6
+    queryset = Campaign.objects.public().with_votes().select_related('owner')
+    template_name = 'roleplay/campaign/campaign_list.html'
+
+
 class CampaignPrivateListView(LoginRequiredMixin, ListView):
     """
     This view list :model:`roleplay.Campaign` objects that the user is in players.
     """
 
     model = Campaign
-    ordering = ('name', '-entry_created_at')
+    ordering = ('total_votes', 'name', '-entry_created_at')
     paginate_by = 6
+    queryset = Campaign.objects.with_votes().select_related('owner')
     template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
@@ -314,19 +324,33 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Campaign
+    # NOTE: The complexity of this queryset will allow us to not repeat the same SQL query
+    queryset = Campaign.objects.prefetch_related(
+        Prefetch('users', queryset=User.objects.select_related('profile')),
+    ).select_related('owner').with_votes()
     template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def get_object(self, queryset=None):
+        """
+        We override this method to ensure `self.object` is not retrieved again.
+        """
+
+        if hasattr(self, 'object'):
+            return self.object
+        return super().get_object(queryset)
 
     def test_func(self):
         """
         Checks if user is in players otherwise they have no access.
         """
 
-        campaign = self.get_object()
-        if campaign.is_public:
+        self.object = self.get_object()
+        if self.object.is_public:
             return True
-        if self.request.user.pk in campaign.users.values_list('pk', flat=True):
+        # NOTE: We don't use `values_list` with `flat=True` since we do a `prefetch_related`
+        if self.request.user.pk in self.object.users.all():
             return True
-        if self.request.user.pk == campaign.owner.pk:
+        if self.request.user.pk == self.object.owner.pk:
             return True
         return False
 

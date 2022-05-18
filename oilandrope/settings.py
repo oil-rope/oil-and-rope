@@ -55,8 +55,6 @@ INSTALLED_APPS = [
     # Must be settled before 'django.contrib.admin' to work correctly on admin
     'modeltranslation',
     'django.contrib.admin',
-    # Django admindocs (https://docs.djangoproject.com/en/4.0/ref/contrib/admin/admindocs/)
-    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

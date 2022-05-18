@@ -25,15 +25,14 @@
           </div>
         {% endif %}
       {% empty %}
-{% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title asvar empty_campaigns_text %}
-Go to '{{ site }}' and click '{{ action }}' to create one.
-{% endblocktranslate %}
-        <div class="col text-center mt-5">
-          <h3>
-            {% translate "you are not part of any campaigns."|capfirst %}
-            <br>
-            <small class="text-muted fw-light">
-              {{ empty_campaigns_text }}
+      <div class="col text-center mt-5">
+        <h3>
+          {% translate "you are not part of any campaigns."|capfirst %}
+          <br>
+          <small class="text-muted fw-light">
+              {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+                Go to '{{ site }}' and click '{{ action }}' to create one.
+              {% endblocktranslate %}
             </small>
           </h3>
         </div>

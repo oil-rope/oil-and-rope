@@ -1,11 +1,10 @@
 {% load i18n %}
-{% blocktranslate with last_time_played=campaign.sessions_finished.first.next_game asvar last_time_played_text %}
-Played last time on {{ last_time_played }}.
-{% endblocktranslate %}
 <div class="card-footer">
   {% if campaign.sessions_finished %}
     <small class="text-muted">
-      {{ last_time_played_text }}
+      {% blocktranslate with last_time_played=campaign.sessions_finished.first.next_game trimmed %}
+        Played last time on {{ last_time_played }}.
+      {% endblocktranslate %}
     </small>
   {% else %}
     <small class="text-muted">{% translate "not played yet."|capfirst %}</small>

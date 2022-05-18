@@ -10,6 +10,7 @@ REGISTRATION_PROFILE = 'registration.Profile'
 
 # Common
 COMMON_TRACK = 'common.Track'
+COMMON_VOTE = 'common.Vote'
 
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'
