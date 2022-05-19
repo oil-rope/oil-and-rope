@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 from mptt.models import TreeManager
 
 from .enums import DomainTypes, SiteTypes
@@ -57,6 +58,27 @@ class CampaignQuerySet(models.QuerySet):
 
 
 CampaignManager = models.Manager.from_queryset(CampaignQuerySet)
+
+
+class SessionQuerySet(models.QuerySet):
+    """
+    Specific manager for :model:`roleplay.Session` that filters queryset by some common filters.
+
+    Methods
+    -------
+    finished()
+        Return all finished sessions.
+    """
+
+    def finished(self):
+        """
+        Return all finished sessions.
+        """
+
+        return super().filter(next_game__date__lt=timezone.now())
+
+
+SessionManager = models.Manager.from_queryset(SessionQuerySet)
 
 
 class PlaceManager(TreeManager):

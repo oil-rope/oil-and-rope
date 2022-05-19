@@ -1,5 +1,6 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
 {% block breadcrumb %}
@@ -15,38 +16,34 @@
   <main class="container pb-3">
     <div class="row justify-content-around row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       {% for campaign in object_list %}
-        {% if campaign.cover_image %}
-          <div class="col">
-            {% include 'roleplay/campaign/include/campaign_card_with_image.html' %}
-          </div>
-        {% else %}
-          <div class="col">
-            {% include 'roleplay/campaign/include/campaign_card.html' %}
-          </div>
-        {% endif %}
-      {% empty %}
-      <div class="col text-center mt-5">
-        <h3>
-          {% translate "you are not part of any campaigns."|capfirst %}
-          <br>
-          <small class="text-muted fw-light">
-              {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
-                Go to '{{ site }}' and click '{{ action }}' to create one.
-              {% endblocktranslate %}
-            </small>
-          </h3>
+        <div class="col">
+          {% include 'roleplay/campaign/include/campaign_card.html' %}
         </div>
-        <div class="w-100 d-none d-md-block"></div>
-        <div class="col-12">
-          <a
-            href="{% url 'roleplay:world:list' %}"
-            class="btn btn-lg btn-primary w-100"
-          >
-            {% translate "worlds"|capfirst %}
-          </a>
+      {% empty %}
+        <div class="col text-center mt-5">
+          <h3>
+            {% translate "you are not part of any campaigns."|capfirst %}
+            <br>
+            <small class="text-muted fw-light">
+                {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+                  Go to '{{ site }}' and click '{{ action }}' to create one.
+                {% endblocktranslate %}
+              </small>
+            </h3>
+          </div>
+          <div class="w-100 d-none d-md-block"></div>
+          <div class="col-12">
+            <a
+              href="{% url 'roleplay:world:list' %}"
+              class="btn btn-lg btn-primary w-100"
+            >
+              {% translate "worlds"|capfirst %}
+            </a>
+          </div>
         </div>
       {% endfor %}
     </div>
+
     {% if is_paginated %}
       <div class="row mt-4">
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
@@ -54,3 +51,10 @@
     {% endif %}
   </main>
 {% endblock body_content %}
+
+{% block javascript %}
+  <script type="module">
+    import setUpTooltip from '{% static "js/setupUtils.js" %}'
+    setUpTooltip();
+  </script>
+{% endblock javascript %}

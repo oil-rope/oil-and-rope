@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
-from django.db.models import Prefetch
+from django.db.models import OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, resolve_url
 from django.urls import reverse_lazy
@@ -29,6 +29,7 @@ LOGGER = logging.getLogger(__name__)
 
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
+PlayerInCampaign = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
 User = get_user_model()
 
@@ -311,24 +312,51 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
     """
 
     model = Campaign
-    ordering = ('total_votes', 'name', '-entry_created_at')
+    ordering = ('-total_votes', 'name', '-entry_created_at')
     paginate_by = 6
-    queryset = Campaign.objects.with_votes().select_related('owner')
+    # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
+    queryset = None
     template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(
+        self.queryset = Campaign.objects.with_votes().select_related('owner').filter(
             users__in=[self.request.user]
         )
+
+        # Adding last session so we avoid SQL queries
+        sessions_finished = Session.objects.finished().filter(
+            campaign=OuterRef('pk'),
+        ).order_by('-next_game')
+        self.queryset = self.queryset.annotate(
+            last_session_date=Subquery(sessions_finished.values('next_game')[:1])
+        )
+
+        # Adding if the user is GM so we avoid SQL queries
+        self.queryset = self.queryset.annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        )
+
+        return super().get_queryset()
 
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Campaign
-    # NOTE: The complexity of this queryset will allow us to not repeat the same SQL query
-    queryset = Campaign.objects.prefetch_related(
-        Prefetch('users', queryset=User.objects.select_related('profile')),
-    ).select_related('owner').with_votes()
+    # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
+    queryset = None
     template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def get_queryset(self):
+        # NOTE: The complexity of this queryset will allow us to not repeat the same SQL query
+        self.queryset = Campaign.objects.prefetch_related(
+            Prefetch('users', queryset=User.objects.select_related('profile')),
+            'session_set',
+        ).select_related('owner').with_votes()
+        return super().get_queryset()
 
     def get_object(self, queryset=None):
         """

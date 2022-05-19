@@ -1,11 +1,13 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from core.admin import TracingMixinAdmin, make_private, make_public
 
-from .models import Track, Vote
+from . import models
 
 
-@admin.register(Track)
+@admin.register(models.Track)
 class TrackAdmin(TracingMixinAdmin):
     actions = [make_public, make_private]
     fields = ('name', 'description', 'owner', 'public', 'file')
@@ -15,8 +17,9 @@ class TrackAdmin(TracingMixinAdmin):
     search_fields = ['id', 'name', 'owner__username']
 
 
-@admin.register(Vote)
+@admin.register(models.Vote)
 class VoteAdmin(TracingMixinAdmin):
+    actions = ['make_positive', 'make_negative']
     autocomplete_fields = [
         'user',
     ]
@@ -41,4 +44,23 @@ class VoteAdmin(TracingMixinAdmin):
     )
     search_fields = [
         'id__icontains',
+        'user__username__icontains',
     ]
+
+    @admin.action(description=_('Mark selected votes as positive'))
+    def make_positive(self, request, queryset):
+        updated = queryset.update(is_positive=True)
+        self.message_user(request, ngettext(
+            '%d vote was successfully marked as positive.',
+            '%d votes were successfully marked as positive.',
+            updated,
+        ) % updated, messages.SUCCESS)
+
+    @admin.action(description=_('Mark selected votes as negative'))
+    def make_negative(self, request, queryset):
+        updated = queryset.update(is_positive=False)
+        self.message_user(request, ngettext(
+            '%d vote was successfully marked as negative.',
+            '%d votes were successfully marked as negative.',
+            updated,
+        ) % updated, messages.SUCCESS)

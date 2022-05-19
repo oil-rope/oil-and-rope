@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.shortcuts import resolve_url
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -431,7 +430,7 @@ class RaceUser(TracingMixin):
 class Campaign(TracingMixin):
     """
     This model manages campaign for roleplay sessions.
-    A campaign is a set up for a game. This will have sessions related which will be the sessions themeselves.
+    A campaign is a set up for a game. This will have sessions related which will be the sessions themselves.
     A campaign can be public in order for everyone to see it or private in order to be only visible to the persons
     in users.
 
@@ -534,24 +533,11 @@ class Campaign(TracingMixin):
         content_type_field='content_type', object_id_field='object_id',
     )
 
-    def get_game_masters(self):
-        gms = self.users.filter(
-            player_in_campaign_set__is_game_master=True,
-        )
-        return gms
-    game_masters = cached_property(get_game_masters)
-
     @property
     def discord_channel(self):
         if self.discord_channel_id:
             return Channel(id=self.discord_channel_id)
         return None
-
-    def get_sessions_finished(self):
-        return self.session_set.filter(
-            next_game__date__lt=timezone.now(),
-        ).order_by('-next_game')
-    sessions_finished = cached_property(get_sessions_finished)
 
     class Meta:
         verbose_name = _('campaign')
@@ -659,6 +645,8 @@ class Session(TracingMixin):
     game_masters: List[:class:`~registration.models.User`]
         Game masters of this session.
     """
+
+    objects = managers.SessionManager()
 
     id = models.AutoField(verbose_name=_('identifier'), primary_key=True, blank=False, null=False, db_index=True)
     campaign = models.ForeignKey(

@@ -1,8 +1,8 @@
 {% load i18n %}
 <div class="card-footer">
-  {% if campaign.sessions_finished %}
+  {% if campaign.last_session_date %}
     <small class="text-muted">
-      {% blocktranslate with last_time_played=campaign.sessions_finished.first.next_game trimmed %}
+      {% blocktranslate with last_time_played=campaign.last_session_date trimmed %}
         Played last time on {{ last_time_played }}.
       {% endblocktranslate %}
     </small>

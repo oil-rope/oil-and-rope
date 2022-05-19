@@ -5,7 +5,7 @@
       {{ ICONS.QUILL|safe }}
       {% translate "view campaign"|capfirst %}
     </a>
-    {% if request.user in campaign.game_masters %}
+    {% if campaign.user_is_game_master or request.user == campaign.owner %}
       <div class="btn-group" role="group">
         <button
           id="btnGroupCampaignSettings"
