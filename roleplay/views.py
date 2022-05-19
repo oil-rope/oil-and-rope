@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.list import MultipleObjectMixin
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
@@ -298,30 +299,15 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
         return resolve_url(instance)
 
 
-class CampaignPublicListView(LoginRequiredMixin, ListView):
-    model = Campaign
-    ordering = ('total_votes', 'name', '-entry_created_at')
-    paginate_by = 6
-    queryset = Campaign.objects.public().with_votes().select_related('owner')
-    template_name = 'roleplay/campaign/campaign_list.html'
-
-
-class CampaignPrivateListView(LoginRequiredMixin, ListView):
-    """
-    This view list :model:`roleplay.Campaign` objects that the user is in players.
-    """
-
+class CampaignComplexQuerySetMixin(MultipleObjectMixin):
     model = Campaign
     ordering = ('-total_votes', 'name', '-entry_created_at')
     paginate_by = 6
     # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
     queryset = None
-    template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
-        self.queryset = Campaign.objects.with_votes().select_related('owner').filter(
-            users__in=[self.request.user]
-        )
+        self.queryset = Campaign.objects.with_votes().select_related('owner')
 
         # Adding last session so we avoid SQL queries
         sessions_finished = Session.objects.finished().filter(
@@ -342,6 +328,32 @@ class CampaignPrivateListView(LoginRequiredMixin, ListView):
         )
 
         return super().get_queryset()
+
+
+class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListView):
+    """
+    This view handles the list of campaigns that are public.
+    """
+
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_public=True)
+
+
+class CampaignUserListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListView):
+    """
+    This view list :model:`roleplay.Campaign` objects that the user is in players.
+    """
+
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_private_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            users__in=[self.request.user]
+        )
 
 
 class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
@@ -376,9 +388,9 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         if self.object.is_public:
             return True
         # NOTE: We don't use `values_list` with `flat=True` since we do a `prefetch_related`
-        if self.request.user.pk in self.object.users.all():
+        if self.request.user in self.object.users.all():
             return True
-        if self.request.user.pk == self.object.owner.pk:
+        if self.request.user.pk == self.object.owner_id:
             return True
         return False
 

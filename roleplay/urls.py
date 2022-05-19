@@ -18,7 +18,7 @@ WORLD_PATTERNS = [
 ]
 
 CAMPAIGN_PATTERNS = [
-    path('@me/', views.CampaignPrivateListView.as_view(), name='list-private'),
+    path('@me/', views.CampaignUserListView.as_view(), name='list-private'),
     path('<int:pk>/', views.CampaignDetailView.as_view(), name='detail'),
     path('create/<int:world_pk>/', views.CampaignCreateView.as_view(), name='create'),
     path('<int:pk>/<str:token>/', views.CampaignJoinView.as_view(), name='join'),

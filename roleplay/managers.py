@@ -23,10 +23,6 @@ class CampaignQuerySet(models.QuerySet):
     -------
     with_votes()
         Return all campaigns with votes annotated.
-    public()
-        Return all public campaigns.
-    private()
-        Return all private campaigns.
     """
 
     def with_votes(self):
@@ -41,20 +37,6 @@ class CampaignQuerySet(models.QuerySet):
             negative_votes=models.Count('votes', filter=models.Q(votes__is_positive=False)),
             total_votes=models.F('positive_votes') - models.F('negative_votes'),
         )
-
-    def public(self):
-        """
-        Return all public campaigns.
-        """
-
-        return super().filter(is_public=True)
-
-    def private(self):
-        """
-        Return all private campaigns.
-        """
-
-        return super().filter(is_public=False)
 
 
 CampaignManager = models.Manager.from_queryset(CampaignQuerySet)

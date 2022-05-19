@@ -940,12 +940,12 @@ class TestCampaignJoinView(TestCase):
         self.assertEqual(404, response.status_code)
 
 
-class TestPrivateCampaignListView(TestCase):
+class TestCampaignUserListView(TestCase):
     model = models.Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:list-private'
     template = 'roleplay/campaign/campaign_private_list.html'
-    view = views.CampaignPrivateListView
+    view = views.CampaignUserListView
 
     @classmethod
     def setUpTestData(cls):
@@ -1116,6 +1116,14 @@ class TestCampaignDetailView(TestCase):
     def test_user_not_in_players_public_campaign_ok(self):
         self.client.force_login(baker.make_recipe('registration.user'))
         response = self.client.get(self.public_campaign_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_user_is_owner_of_campaign_ok(self):
+        campaign = baker.make_recipe('roleplay.campaign', owner=self.user)
+        url = resolve_url(campaign)
+        self.client.force_login(self.user)
+        response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
 

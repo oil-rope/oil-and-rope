@@ -533,6 +533,14 @@ class Campaign(TracingMixin):
         content_type_field='content_type', object_id_field='object_id',
     )
 
+    def get_game_masters(self):
+        """
+        Returns the list of game masters.
+        """
+
+        return self.users.filter(player_in_campaign_set__is_game_master=True)
+    game_masters = cached_property(get_game_masters)
+
     @property
     def discord_channel(self):
         if self.discord_channel_id:
