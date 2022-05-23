@@ -49,13 +49,15 @@ class AvailableIcons(models.TextChoices):
     TRIANGLE_RELATION = '<i class="ic-triangle-relation"></i>', _('triangle relation')
     DIANA = '<i class="ic-diana"></i>', _('diana')
     GLOBE = '<i class="ic-globe"></i>', _('globe')
-    DOTS_HORIZONATL_TRIPLE = '<i class="ic-dots-horizontal-triple"></i>', _('dots horizontal triple')
+    DOTS_HORIZONTAL_TRIPLE = '<i class="ic-dots-horizontal-triple"></i>', _('dots horizontal triple')
     MENU_THIN = '<i class="ic-menu-thin"></i>', _('menu thin')
     CIRCLE_CROSS_THIN = '<i class="ic-circle-cross-thin"></i>', _('circle cross thin')
     CROSS_THIN = '<i class="ic-cross-thin"></i>', _('cross thin')
     TWITTER = '<i class="ic-twitter"></i>', 'Twitter'
     GITHUB = '<i class="ic-github"></i>', 'GitHub'
     DISCORD = '<i class="ic-discord"></i>', 'Discord'
+    GOOGLE = '<i class="ic-google"></i>', 'Google'
+    MAGNIFYING_GLASS = '<i class="ic-magnifying-glass"></i>', _('magnifying glass')
 
     @classmethod
     def choices_with_empty(cls):

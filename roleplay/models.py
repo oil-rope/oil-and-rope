@@ -121,108 +121,6 @@ class Place(MPTTModel, TracingMixin):
     def get_absolute_url(self):
         return resolve_url('roleplay:place:detail', pk=self.pk)
 
-    def get_houses(self):
-        houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
-        houses = list(houses)
-        return houses
-    houses = cached_property(get_houses, name='houses')
-
-    def get_towns(self):
-        towns = self.get_descendants().filter(site_type=SiteTypes.TOWN)
-        towns = list(towns)
-        return towns
-    towns = cached_property(get_towns, name='towns')
-
-    def get_villages(self):
-        villages = self.get_descendants().filter(site_type=SiteTypes.VILLAGE)
-        villages = list(villages)
-        return villages
-    villages = cached_property(get_villages, name='villages')
-
-    def get_cities(self):
-        cities = self.get_descendants().filter(site_type=SiteTypes.CITY)
-        cities = list(cities)
-        return cities
-    cities = cached_property(get_cities, name='cities')
-
-    def get_metropolis(self):
-        metropolis = self.get_descendants().filter(site_type=SiteTypes.METROPOLIS)
-        metropolis = list(metropolis)
-        return metropolis
-    metropolis = cached_property(get_metropolis, name='metropolis')
-
-    def get_forests(self):
-        forests = self.get_descendants().filter(site_type=SiteTypes.FOREST)
-        forests = list(forests)
-        return forests
-    forests = cached_property(get_forests, name='forests')
-
-    def get_hills(self):
-        hills = self.get_descendants().filter(site_type=SiteTypes.HILLS)
-        hills = list(hills)
-        return hills
-    hills = cached_property(get_hills, name='hills')
-
-    def get_mountains(self):
-        mountains = self.get_descendants().filter(site_type=SiteTypes.MOUNTAINS)
-        mountains = list(mountains)
-        return mountains
-    mountains = cached_property(get_mountains, name='mountains')
-
-    def get_mines(self):
-        mines = self.get_descendants().filter(site_type=SiteTypes.MINES)
-        mines = list(mines)
-        return mines
-    mines = cached_property(get_mines, name='mines')
-
-    def get_rivers(self):
-        rivers = self.get_descendants().filter(site_type=SiteTypes.RIVER)
-        rivers = list(rivers)
-        return rivers
-    rivers = cached_property(get_rivers, name='rivers')
-
-    def get_seas(self):
-        seas = self.get_descendants().filter(site_type=SiteTypes.SEA)
-        seas = list(seas)
-        return seas
-    seas = cached_property(get_seas, name='seas')
-
-    def get_deserts(self):
-        deserts = self.get_descendants().filter(site_type=SiteTypes.DESERT)
-        deserts = list(deserts)
-        return deserts
-    deserts = cached_property(get_deserts, name='deserts')
-
-    def get_tundras(self):
-        tundras = self.get_descendants().filter(site_type=SiteTypes.TUNDRA)
-        tundras = list(tundras)
-        return tundras
-    tundras = cached_property(get_tundras, name='tundras')
-
-    def get_unusual(self):
-        unusual = self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
-        unusual = list(unusual)
-        return unusual
-    unusual = cached_property(get_unusual, name='unusual')
-
-    def get_islands(self):
-        islands = self.get_descendants().filter(site_type=SiteTypes.ISLAND)
-        islands = list(islands)
-        return islands
-    islands = cached_property(get_islands, name='islands')
-
-    def get_countries(self):
-        countries = self.get_descendants().filter(site_type=SiteTypes.COUNTRY)
-        countries = list(countries)
-        return countries
-    countries = cached_property(get_countries, name='countries')
-
-    def get_continents(self):
-        continents = self.get_descendants().filter(site_type=SiteTypes.CONTINENT)
-        continents = list(continents)
-        return continents
-    continents = cached_property(get_continents, name='continents')
-
     def get_worlds(self):
         worlds = self.get_descendants().filter(site_type=SiteTypes.WORLD)
         worlds = list(worlds)
@@ -469,24 +367,6 @@ class Campaign(TracingMixin):
         This will be used to send messages to the discord channel.
     chat: :class:`~chat.models.Chat`
         Chat used by the campaign.
-
-    Attributes:
-    -----------
-    votes: List[:class:`~roleplay.models.Vote`]
-        Votes related to the campaign.
-    game_masters: List[:class:`~registration.models.User`]
-        List of players that are game masters.
-    discord_channel: :class:`~bot.models.Channel`
-        The discord channel where the campaign is happening.
-    total_votes: :class:`int`
-        The number of votes resulting from subtracting negative from positive votes.
-
-    Methods:
-    --------
-    vote(user: :class:`~registration.models.User`, vote: :class:`bool`)
-        Vote for the campaign with the given user and positive if the vote is True.
-    add_game_masters(*users)
-        Adds users to the campaign as game masters.
     """
 
     objects = managers.CampaignManager()
@@ -629,7 +509,7 @@ class Session(TracingMixin):
 
     Parameters
     ----------
-    campaign: :model:`roleplay.Campaign`
+    campaign: :class:`~roleplay.models.Campaign`
         The related campaign.
     name: str
         Name of the session.
@@ -643,15 +523,10 @@ class Session(TracingMixin):
         Next session's date.
     system: int
         System used.
-    world: :model:`roleplay.Place`
+    world: :class:`~roleplay.models.Place`
         The world where this session is played.
     image: Optional[str]
         Cover image for this session.
-
-    Attributes
-    ----------
-    game_masters: List[:class:`~registration.models.User`]
-        Game masters of this session.
     """
 
     objects = managers.SessionManager()

@@ -15,13 +15,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
+from django_filters.views import FilterView
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.views import MultiplePaginatorListView
 
-from . import enums, forms
+from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
 from .mixins import UserInAllWithRelatedNameMixin
 from .utils.invitations import send_campaign_invitations
@@ -330,11 +331,12 @@ class CampaignComplexQuerySetMixin(MultipleObjectMixin):
         return super().get_queryset()
 
 
-class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListView):
+class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, FilterView):
     """
     This view handles the list of campaigns that are public.
     """
 
+    filterset_class = filters.CampaignFilter
     model = Campaign
     template_name = 'roleplay/campaign/campaign_list.html'
 
@@ -344,7 +346,7 @@ class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListVie
 
 class CampaignUserListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListView):
     """
-    This view list :model:`roleplay.Campaign` objects that the user is in players.
+    This view list :class:`~roleplay.models.Campaign` objects that the user is in players.
     """
 
     model = Campaign

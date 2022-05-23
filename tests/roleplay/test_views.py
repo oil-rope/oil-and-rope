@@ -940,6 +940,50 @@ class TestCampaignJoinView(TestCase):
         self.assertEqual(404, response.status_code)
 
 
+class TestCampaignListView(TestCase):
+    model = models.Campaign
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:list'
+    template = 'roleplay/campaign/campaign_list.html'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = resolve_url(cls.resolver)
+        cls.user = baker.make_recipe('registration.user')
+
+    def test_anonymous_access_ok(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_user_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_private_campaigns_are_not_listed_ok(self):
+        self.client.force_login(self.user)
+        campaign = baker.make_recipe('roleplay.campaign', is_public=False)
+        response = self.client.get(self.url)
+
+        self.assertNotIn(campaign, response.context['campaign_list'])
+
+    def test_public_campaigns_are_listed_ok(self):
+        self.client.force_login(self.user)
+        campaign = baker.make_recipe('roleplay.campaign', is_public=True)
+        response = self.client.get(self.url)
+
+        self.assertIn(campaign, response.context['campaign_list'])
+
+
 class TestCampaignUserListView(TestCase):
     model = models.Campaign
     login_url = resolve_url(settings.LOGIN_URL)

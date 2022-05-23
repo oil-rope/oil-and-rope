@@ -11,7 +11,7 @@ def send_campaign_invitations(campaign, request, emails, subject=None, signer=No
 
     Parameters
     ----------
-    campaign: :model:`roleplay.Session`
+    campaign: :class:`~roleplay.models.Session`
         The session to invite.
     request: :class:`~django.http.request.HttpRequest`
         The request to use to generate the invitation link and get user.

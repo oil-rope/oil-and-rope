@@ -1,0 +1,53 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load string_utils %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <h1 class="display-5 text-center">
+    {% translate "community campaigns"|capfirst %}
+  </h1>
+  <main class="container pb-3 mt-4">
+    <h3>
+      {% translate "filter campaigns"|capfirst %}
+    </h3>
+    {% crispy filter.form %}
+    <div class="my-5"></div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-around">
+      {% for object in campaign_list %}
+        <div class="col">
+          {% include 'roleplay/campaign/include/campaign_card.html' with campaign=object %}
+        </div>
+      {% empty %}
+        <div class="col text-center mt-5">
+          <h2>
+            {% translate "seems like we don't have any campaign right now."|capfirst %}
+            <br>
+            <small class="text-muted fw-light">
+              {% translate "but you can create one!"|capfirstletter %}
+            </small>
+          </h2>
+        </div>
+        <div class="w-100 d-none d-md-block"></div>
+        <div class="col-12">
+          <p class="text-center">
+            {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+              Go to '{{ site }}' and click '{{ action }}' to create one.
+            {% endblocktranslate %}
+          </p>
+          <a
+            href="{% url 'roleplay:world:list' %}"
+            class="btn btn-lg btn-primary w-100"
+          >
+            {% translate "worlds"|capfirst %}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+{% endblock body_content %}

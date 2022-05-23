@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
+{% block title %}{% translate "your campaigns"|capfirst %}{% endblock title %}
 {% block breadcrumb %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns' %}
 {% endblock breadcrumb %}
@@ -21,17 +21,17 @@
         </div>
       {% empty %}
         <div class="col text-center mt-5">
-          <h3>
+          <h2>
             {% translate "you are not part of any campaigns."|capfirst %}
             <br>
             <small class="text-muted fw-light">
-                {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
-                  Go to '{{ site }}' and click '{{ action }}' to create one.
-                {% endblocktranslate %}
-              </small>
-            </h3>
-          </div>
-          <div class="w-100 d-none d-md-block"></div>
+              {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+                Go to '{{ site }}' and click '{{ action }}' to create one.
+              {% endblocktranslate %}
+            </small>
+          </h2>
+        </div>
+        <div class="w-100 d-none d-md-block"></div>
           <div class="col-12">
             <a
               href="{% url 'roleplay:world:list' %}"

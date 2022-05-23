@@ -152,138 +152,6 @@ class TestPlace(TestCase):
         for place in self.model.objects.all():
             os.unlink(place.image.path)
 
-    # TODO: Refactor this test so is not that complex
-    def test_nested_world_ok(self):  # noqa
-        universe = self.model.objects.create(name='Universe', site_type=self.enum.WORLD)
-        world = self.model.objects.create(name='World', site_type=self.enum.WORLD, parent_site=universe)
-
-        self.assertIn(world, universe.get_worlds())
-
-        continents = []
-        for _ in range(0, 3):
-            continents.append(
-                self.model.objects.create(name=fake.country(), site_type=self.enum.CONTINENT, parent_site=world)
-            )
-
-        countries = []
-        seas = []
-        rivers = []
-        unusual = []
-        for continent in continents:
-            self.assertIn(continent, world.get_continents())
-            countries.append(
-                self.model.objects.create(
-                    name=fake.country(), site_type=self.enum.COUNTRY, parent_site=continent
-                )
-            )
-            seas.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.SEA, parent_site=continent)
-            )
-            rivers.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.RIVER, parent_site=continent)
-            )
-            unusual.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.UNUSUAL, parent_site=continent)
-            )
-
-        for sea in seas:
-            self.assertIn(sea, world.get_seas())
-
-        for river in rivers:
-            self.assertIn(river, world.get_rivers())
-
-        for unusual in unusual:
-            self.assertIn(unusual, world.get_unusual())
-
-        islands = []
-        cities = []
-        mountains = []
-        mines = []
-        deserts = []
-        tundras = []
-        hills = []
-        metropolis = []
-        for country in countries:
-            self.assertIn(country, world.get_countries())
-            islands.append(
-                self.model.objects.create(name=fake.country(), site_type=self.enum.ISLAND, parent_site=country)
-            )
-            cities.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.CITY, parent_site=country)
-            )
-            mountains.append(
-                self.model.objects.create(
-                    name=fake.country(), site_type=self.enum.MOUNTAINS, parent_site=country
-                )
-            )
-            deserts.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.DESERT, parent_site=country)
-            )
-            hills.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.HILLS, parent_site=country)
-            )
-            tundras.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.TUNDRA, parent_site=country)
-            )
-            mines.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.MINES, parent_site=country)
-            )
-            metropolis.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.METROPOLIS, parent_site=country)
-            )
-
-        forests = []
-        for island in islands:
-            self.assertIn(island, world.get_islands())
-            forests.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.FOREST, parent_site=island)
-            )
-
-        for m in metropolis:
-            self.assertIn(m, world.get_metropolis())
-
-        villages = []
-        towns = []
-        for city in cities:
-            self.assertIn(city, world.get_cities())
-            villages.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.VILLAGE, parent_site=city)
-            )
-            towns.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.TOWN, parent_site=city)
-            )
-
-        houses = []
-        for village in villages:
-            self.assertIn(village, world.get_villages())
-            houses.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.HOUSE, parent_site=village)
-            )
-
-        for town in towns:
-            self.assertIn(town, world.get_towns())
-
-        for house in houses:
-            self.assertIn(house, world.get_houses())
-
-        for mountain in mountains:
-            self.assertIn(mountain, world.get_mountains())
-
-        for mine in mines:
-            self.assertIn(mine, world.get_mines())
-
-        for desert in deserts:
-            self.assertIn(desert, world.get_deserts())
-
-        for hill in hills:
-            self.assertIn(hill, world.get_hills())
-
-        for forest in forests:
-            self.assertIn(forest, world.get_forests())
-
-        for tundra in tundras:
-            self.assertIn(tundra, world.get_tundras())
-
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
         name = fake.password(length=101)
@@ -478,6 +346,12 @@ class TestCampaign(TestCase):
         self.instance.discord_channel_id = CHANNEL
         self.instance.save()
         self.assertIsNotNone(self.instance.discord_channel)
+
+    def test_vote_ok(self):
+        self.instance.vote(self.owner, True)
+        instance = self.model.objects.with_votes().get(pk=self.instance.pk)
+
+        self.assertEqual(instance.positive_votes, 1)
 
 
 class TestPlayerInCampaign(TestCase):

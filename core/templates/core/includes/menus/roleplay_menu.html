@@ -64,8 +64,20 @@
     <li><hr class="dropdown-divider" /></li>
     <li>
       {% url 'roleplay:campaign:list-private' as campaign_private_list_url %}
-      <a href="{{ campaign_private_list_url }}" class="dropdown-item">
+      <a
+        href="{{ campaign_private_list_url }}"
+        class="dropdown-item {% if request.path == campaign_private_list_url %}active{% endif %}"
+      >
         {% translate "your campaigns"|capfirst %}
+      </a>
+    </li>
+    <li>
+      {% url 'roleplay:campaign:list' as campaign_list_url %}
+      <a
+        href="{{ campaign_list_url }}"
+        class="dropdown-item {% if request.path == campaign_list_url %}active{% endif %}"
+      >
+        {% translate "public campaigns"|capfirst %}
       </a>
     </li>
     <li>

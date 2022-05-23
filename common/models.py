@@ -57,7 +57,7 @@ class Vote(TracingMixin):
 
     Parameters
     ----------
-    id: :class:`uuid.UUID`
+    id: :class:`~uuid.UUID`
         The unique identifier of the vote.
         We use vote instead of :class:`int` since there'll be a lot of records of this.
     is_positive: :class:`bool`
@@ -70,11 +70,6 @@ class Vote(TracingMixin):
     object_id: :class:`int`
         The identifier of the associated object.
         NOTE: This will work as long as the identifier is an int, we need to have that in mind.
-
-    Attributes
-    ----------
-    content_object: :class:`~django.db.models.Model`
-        The object assigned to the vote.
     """
 
     VOTABLE_MODELS = ('campaign', 'place')

@@ -51,9 +51,6 @@ MANAGERS = ADMINS
 
 # Application definition
 INSTALLED_APPS = [
-    # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
-    # Must be settled before 'django.contrib.admin' to work correctly on admin
-    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,28 +59,30 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
-    # Bootstrap5 template
-    'crispy_bootstrap5',
-    # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
-    'crispy_forms',
-    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
-    'ckeditor',
-    # API RestFramework (https://www.django-rest-framework.org/)
-    'rest_framework',
-    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
-    'rest_framework.authtoken',
-    # Django CORS (https://github.com/adamchainz/django-cors-headers)
-    'corsheaders',
-    # DjangoMptt (https://django-mptt.readthedocs.io/)
-    'mptt',
     # DjangoAllAuth (https://django-allauth.readthedocs.io/)
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     # DjangoAllAuth for Google (https://django-allauth.readthedocs.io/en/latest/providers.html#google)
     'allauth.socialaccount.providers.google',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
+    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
+    'ckeditor',
+    # Bootstrap5 template
+    'crispy_bootstrap5',
+    # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
+    'crispy_forms',
+    # Django CORS (https://github.com/adamchainz/django-cors-headers)
+    'corsheaders',
+    # django-filter (https://django-filter.readthedocs.io/)
+    'django_filters',
+    # DjangoMptt (https://django-mptt.readthedocs.io/)
+    'mptt',
+    # API RestFramework (https://www.django-rest-framework.org/)
+    'rest_framework',
+    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
+    'rest_framework.authtoken',
     # Source
     'core.apps.CoreConfig',
     # API

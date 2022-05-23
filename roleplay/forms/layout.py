@@ -1,7 +1,7 @@
 from crispy_forms import bootstrap, layout
 from django.utils.translation import gettext_lazy as _
 
-from common.enums import JavaScriptActions
+from common.enums import AvailableIcons, JavaScriptActions
 from common.forms import layout as common_layout
 from common.templatetags.string_utils import capfirstletter as cfl
 
@@ -52,7 +52,7 @@ class PlaceLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
@@ -97,7 +97,7 @@ class WorldFormLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
@@ -192,7 +192,7 @@ class CampaignFormLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-5 col-lg-4 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
             ),
@@ -253,7 +253,7 @@ class SessionFormLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
