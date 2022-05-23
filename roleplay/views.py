@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.signing import BadSignature, TimestampSigner
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, resolve_url
+from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +20,7 @@ from django_filters.views import FilterView
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
+from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
 
 from . import enums, filters, forms
@@ -363,6 +364,21 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
     queryset = None
     template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def post(self, *args, **kwargs):
+        # If a post request is made, we'll send a message to GMs in order for the user to join campaign
+        HtmlThreadMail(
+            'email_templates/campaign_join_request.html',
+            request=self.request,
+            context={'user': self.request.user, 'object': self.object},
+            subject=cfl(_('new player wants to join your adventure!')),
+            to=[email for email in self.object.game_masters.values_list('email', flat=True)],
+        ).send()
+        messages.success(
+            self.request,
+            _('You\'ve requested to join this adventure. Once the GMs accepts your request, you\'ll receive an email.'),
+        )
+        return redirect(self.object)
 
     def get_queryset(self):
         # NOTE: The complexity of this queryset will allow us to not repeat the same SQL query

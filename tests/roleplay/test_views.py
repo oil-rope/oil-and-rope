@@ -1177,6 +1177,26 @@ class TestCampaignDetailView(TestCase):
 
         self.assertTemplateUsed(response, self.template)
 
+    @mock.patch('roleplay.views.messages')
+    def test_request_join_ok(self, mocker):
+        self.client.force_login(self.user)
+        response = self.client.post(self.private_campaign_url)
+
+        mocker.success.assert_called_once_with(
+            response.wsgi_request,
+            'You\'ve requested to join this adventure. Once the GMs accepts your request, you\'ll receive an email.',
+        )
+        self.assertRedirects(response, self.private_campaign_url)
+
+    def test_email_sent_ok(self):
+        self.private_campaign.add_game_masters(baker.make_recipe('registration.user'))
+        self.client.force_login(self.user)
+        self.client.post(self.private_campaign_url)
+
+        time.sleep(1)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
+
 
 class TestCampaignDeleteView(TestCase):
     model = models.Campaign

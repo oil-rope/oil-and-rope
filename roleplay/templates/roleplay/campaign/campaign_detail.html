@@ -42,6 +42,17 @@
             {% translate "go to tabletop"|capfirst %}
           </a>
         </div>
+      {% else %}
+        <form method="POST" class="text-center">
+          {% csrf_token %}
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            {{ ICONS.JOIN|safe }}
+            {% translate "request to join"|capfirst %}
+          </button>
+        </form>
       {% endif %}
     </header>
     <hr>
