@@ -33,7 +33,7 @@
             <i class="ic ic-dice"></i>
             {% translate "go to tabletop"|capfirst %}
           </a>
-          {% if user in object.game_masters %}
+          {% if object.user_is_game_master %}
             <div class="dropdown col col-xl-3">
               <button
                 class="btn btn-secondary dropdown-toggle w-100"
@@ -71,10 +71,14 @@
         <div class="row mt-3 mx-1">
           <div class="col bg-light bg-opacity-50">
             <p>
-              {% blocktranslate with date=object.next_game|date:"l, j F Y" time=object.next_game|date:"fA" %}
-                <span class="fw-bold">Next session will be on</span><br />
-                {{ date }} at {{ time }}
-              {% endblocktranslate %}
+              {% if object.next_game %}
+                <span class="fw-bold">
+                  {% translate "next session will be"|capfirst %}
+                </span>
+                <br>
+                {{ object.next_game }}
+                <br>
+              {% endif %}
             </p>
           </div>
           <div class="w-100"></div>
@@ -93,13 +97,13 @@
             </h4>
             <hr>
             <h5 class="text-center fw-lighter">
-              {{ object.world.name }}
+              {{ object.campaign.place.name }}
             </h5>
             <p>
-              {{ object.world.description|safe|truncatechars_html:250 }}
+              {{ object.campaign.place.description|safe|truncatechars_html:250 }}
               <br />
               <a
-                href="{% url 'roleplay:place:detail' object.world.pk %}"
+                href="{% url 'roleplay:place:detail' object.campaign.place.pk %}"
                 title="{% translate "go to world"|capfirst %}"
               >
                 {% translate "learn more"|capfirst %}
@@ -112,14 +116,14 @@
         <div
           class="row justify-content-around rounded bg-dark bg-opacity-10 mx-1 py-2"
         >
-{# NOTE: Since identation is causing some translations to break we better keep them separated #}
-{% blocktranslate count player_count=object.players.count asvar n_players %}
-{{ player_count }} player
-{% plural %}
-{{ player_count }} players
-{% endblocktranslate %}
-          <h2 class="text-center">{{ n_players }}</h2>
-          {% for player in object.players.all %}
+          <h2 class="text-center">
+            {% blocktranslate count player_count=object.campaign.users.count trimmed %}
+              {{ player_count }} player
+            {% plural %}
+              {{ player_count }} players
+            {% endblocktranslate %}
+          </h2>
+          {% for player in object.campaign.users.all %}
             <div class="col">
               {% if player.profile.image %}
                 <img
@@ -150,7 +154,7 @@
             </div>
           {% endfor %}
           <p>
-            {% if request.user in object.game_masters %}
+            {% if request.user in object.campaign.game_masters %}
               <small class="text-muted">
                 {% translate "To invite more players got to 'Edit' and then 'Invite players'." %}
               </small>

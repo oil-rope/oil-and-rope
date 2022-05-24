@@ -36,6 +36,11 @@ class User(AbstractUser):
         )
         return races
 
+    @property
+    def sessions(self):
+        Session = apps.get_model(constants.ROLEPLAY_SESSION)
+        return Session.objects.select_related('campaign').filter(campaign__users=self)
+
     class Meta:
         db_table = 'auth_user'
         verbose_name = _('user')

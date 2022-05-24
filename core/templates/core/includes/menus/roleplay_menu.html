@@ -43,7 +43,7 @@
         {% translate "recent sessions" %}
       </h6>
     </li>
-    {% for session in request.user.session_set.all|slice:3|dictsortreversed:"entry_updated_at" %}
+    {% for session in request.user.sessions|slice:3|dictsortreversed:"entry_updated_at" %}
       <li>
         {% url 'roleplay:session:detail' session.pk as session_detail_url %}
         <a

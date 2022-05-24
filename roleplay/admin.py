@@ -75,7 +75,7 @@ class CampaignAdmin(admin.ModelAdmin):
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     fields = (
-        ('name', 'system'),
+        'name',
         'plot',
         'description',
         'next_game',
@@ -86,12 +86,11 @@ class SessionAdmin(admin.ModelAdmin):
         '__str__',
         'id',
         'name',
-        'system',
         'next_game',
         'entry_created_at',
         'entry_updated_at',
     )
     list_display_links = ('__str__', 'id', 'name',)
-    list_filter = ('system', )
+    list_filter = ('next_game', 'entry_created_at', 'entry_updated_at')
     readonly_fields = ('entry_created_at', 'entry_updated_at')
-    search_fields = ['name__icontains', 'world__name__icontains']
+    search_fields = ['name__icontains', 'campaign__place__name__icontains']

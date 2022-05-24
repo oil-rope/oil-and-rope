@@ -408,7 +408,7 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         # NOTE: We don't use `values_list` with `flat=True` since we do a `prefetch_related`
         if self.request.user in self.object.users.all():
             return True
-        if self.request.user.pk == self.object.owner_id:
+        if self.request.user == self.object.owner:
             return True
         return False
 
@@ -461,40 +461,32 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
     model = Session
     template_name = 'roleplay/session/session_create.html'
 
-    def get_world(self):
-        """
-        Checks that given world exists and is not private.
-        """
+    def get_campaign(self):
+        # Only Game Masters can create sessions for a campaign
+        campaign_qs = Campaign.objects.annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        ).filter(user_is_game_master=True)
+        return get_object_or_404(campaign_qs, pk=self.kwargs['campaign_pk'])
 
-        world = self.get_available_worlds().filter(pk=self.kwargs['pk'])
-        if world:
-            return world.get()
-        raise Http404()
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'campaign': self.get_campaign(),
+        })
+        return kwargs
 
     def get_initial(self):
         initial = super().get_initial()
         next_week = timezone.now() + timezone.timedelta(days=7)
         initial.update({
-            'world': self.get_world(),
             'next_game': next_week.strftime('%Y-%m-%dT%H:%M'),
         })
         return initial
-
-    def get_available_worlds(self):
-        """
-        Gets community maps and user's private maps.
-        """
-
-        qs = Place.objects.community_places()
-        qs |= Place.objects.user_places(user=self.request.user)
-        return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        self.object.add_game_masters(self.request.user)
-        emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        send_campaign_invitations(self.object, self.request, emails)
-        return response
 
     def get_success_url(self):
         return resolve_url(self.object)
@@ -504,13 +496,33 @@ class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Session
     template_name = 'roleplay/session/session_detail.html'
 
+    def get_queryset(self):
+        self.queryset = Session.objects.select_related(
+            'campaign'
+        ).prefetch_related(
+            Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
+        ).annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('campaign'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        )
+        return super().get_queryset()
+
+    def get_object(self, queryset=None):
+        if hasattr(self, 'object'):
+            return self.object
+        return super().get_object(queryset)
+
     def test_func(self):
         """
         Checks that user is in players.
         """
 
-        session = self.get_object()
-        return self.request.user in session.players.all()
+        self.object = self.get_object()
+        return self.request.user in self.object.campaign.users.all()
 
 
 class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

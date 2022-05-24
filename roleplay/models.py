@@ -272,11 +272,10 @@ class Race(TracingMixin):
         through=constants.ROLEPLAY_RACE_USER,
     )
 
-    def get_owners(self):
+    @property
+    def owners(self):
         qs = self.users.filter(m2m_race_set__is_owner=True)
         return qs
-
-    owners = cached_property(func=get_owners, name='owners')
 
     def add_owners(self, *users):
         # Getting RaceUser model
@@ -413,13 +412,13 @@ class Campaign(TracingMixin):
         content_type_field='content_type', object_id_field='object_id',
     )
 
-    def get_game_masters(self):
+    @property
+    def game_masters(self):
         """
         Returns the list of game masters.
         """
 
         return self.users.filter(player_in_campaign_set__is_game_master=True)
-    game_masters = cached_property(get_game_masters)
 
     @property
     def discord_channel(self):
@@ -458,6 +457,14 @@ class Campaign(TracingMixin):
 
     def get_absolute_url(self):
         return resolve_url('roleplay:campaign:detail', pk=self.pk)
+
+    def clean(self):
+        """
+        Validates the campaign.
+        """
+
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            raise ValidationError(_('start date must be before end date.').capitalize())
 
     def __str__(self):
         return f'{self.name} [{self.pk}]'
@@ -511,21 +518,17 @@ class Session(TracingMixin):
     ----------
     campaign: :class:`~roleplay.models.Campaign`
         The related campaign.
-    name: str
+    name: `str`
         Name of the session.
-    description: Optional[str]
+    description: Optional[`str`]
         Description of the session.
-    plot: str
+    plot: `str`
         Plot of the session.
-    gm_info: Optional[str]
+    gm_info: Optional[`str`]
         Information specific to the game master.
     next_game: Optional[datetime.datetime]
         Next session's date.
-    system: int
-        System used.
-    world: :class:`~roleplay.models.Place`
-        The world where this session is played.
-    image: Optional[str]
+    image: Optional[`str`]
         Cover image for this session.
     """
 
@@ -548,7 +551,6 @@ class Session(TracingMixin):
     next_game = models.DateTimeField(
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True,
     )
-    system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
     image = models.ImageField(
         verbose_name=_('cover'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
     )
@@ -556,31 +558,10 @@ class Session(TracingMixin):
     class Meta:
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
-        ordering = ['-entry_created_at', 'name']
-
-    @property
-    def chat(self):
-        return self.campaign.chat
-
-    @property
-    def world(self):
-        return self.campaign.place
-
-    @property
-    def players(self):
-        players = self.campaign.users.all()
-        return players
-
-    @property
-    def game_masters(self):
-        gms = self.players.filter(
-            player_in_campaign_set__is_game_master=True
-        )
-        return gms
+        ordering = ['-next_game', 'name', '-entry_updated_at']
 
     def get_absolute_url(self):
         return resolve_url('roleplay:session:detail', pk=self.pk)
 
     def __str__(self):
-        system = RoleplaySystems(self.system)
-        return f'{self.name} [{system.label.title()}]'
+        return f'{self.name} [{self.campaign.get_system_display()}]'

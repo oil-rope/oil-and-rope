@@ -1,5 +1,18 @@
 {% load i18n %}
+
 <section class="row justify-content-around">
+  <div class="col col-md-8 col-lg-4 col-xl-auto">
+    <a
+      href="{% url 'roleplay:session:create' campaign.pk %}"
+      class="btn btn-secondary w-100"
+      title="{% translate "create a new session"|capfirst %}"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+    >
+      {% translate "create session"|capfirst %}
+    </a>
+  </div>
+  <div class="w-100 my-2"></div>
   {% for session in object.session_set.all %}
     {% include 'roleplay/session/include/session_list_item.html' with session=session only %}
   {% empty %}

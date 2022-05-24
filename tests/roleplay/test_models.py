@@ -3,6 +3,7 @@ import pathlib
 import random
 import tempfile
 import unittest
+from datetime import timedelta
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
@@ -10,6 +11,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
@@ -353,6 +355,15 @@ class TestCampaign(TestCase):
 
         self.assertEqual(instance.positive_votes, 1)
 
+    def test_clean_start_date_greater_end_date_ko(self):
+        self.instance.start_date = timezone.now() + timedelta(days=1)
+        self.instance.end_date = timezone.now()
+
+        with self.assertRaises(ValidationError) as ex:
+            self.instance.clean()
+        ex = ex.exception
+        self.assertEqual('Start date must be before end date.', ex.message)
+
 
 class TestPlayerInCampaign(TestCase):
     model = PlayerInCampaign
@@ -369,38 +380,19 @@ class TestPlayerInCampaign(TestCase):
         self.assertEqual(expected, str(instance))
 
 
-@unittest.skip('TODO: refactor')
 class TestSession(TestCase):
     model = Session
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make_recipe('registration.user')
-        cls.chat = baker.make_recipe('chat.chat')
-        cls.world = baker.make_recipe('roleplay.world')
-        cls.campaign = baker.make_recipe('roleplay.public_campaign')
+        cls.campaign = baker.make_recipe('roleplay.campaign')
 
     def test_str_ok(self):
         name = fake.word()
         instance = self.model.objects.create(
             name=name,
-            chat=self.chat,
-            system=RoleplaySystems.PATHFINDER_1,
-            world=self.world,
             campaign=self.campaign,
         )
-        system = RoleplaySystems(instance.system)
-        expected = f'{name} [{system.label.title()}]'
+        expected = f'{name} [{instance.campaign.get_system_display()}]'
 
         self.assertEqual(expected, str(instance))
-
-    def test_property_game_masters_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        users = baker.make(_model=User, _quantity=iterations)
-        instace = baker.make(self.model, world=self.world)
-        instace.add_game_masters(*users)
-
-        expected = iterations
-        result = instace.game_masters.count()
-
-        self.assertEqual(expected, result)

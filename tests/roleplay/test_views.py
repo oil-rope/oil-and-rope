@@ -12,7 +12,6 @@ from django.core.signing import TimestampSigner
 from django.shortcuts import resolve_url
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
-from django.utils import timezone
 from model_bakery import baker
 from PIL import Image
 
@@ -989,7 +988,6 @@ class TestCampaignListView(TestCase):
         get_rq = rq.get(self.url)
         get_rq.user = self.user
         performed_queries = (
-            'SELECT [...] FROM contenttypes_contenttype for Paginator',
             'SELECT [...] FROM roleplay_campaign COMPLEX',
         )
 
@@ -1046,7 +1044,6 @@ class TestCampaignUserListView(TestCase):
         get_rq = rq.get(self.url)
         get_rq.user = self.user
         performed_queries = (
-            'SELECT [...] FROM contenttypes_contenttype for Paginator',
             'SELECT [...] FROM roleplay_campaign COMPLEX',
         )
 
@@ -1277,7 +1274,6 @@ class TestCampaignDeleteView(TestCase):
         )
 
 
-@unittest.skip('TODO: refactor')
 class TestSessionCreateView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
@@ -1288,19 +1284,17 @@ class TestSessionCreateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
-        cls.world = baker.make_recipe('roleplay.world')
-        cls.campaign = baker.make_recipe('roleplay.public_campaign')
+        cls.campaign = baker.make_recipe('roleplay.campaign')
+        cls.campaign.add_game_masters(cls.user)
 
     def setUp(self):
-        self.url = resolve_url(self.resolver, pk=self.world.pk)
+        self.url = resolve_url(self.resolver, campaign_pk=self.campaign.pk)
         self.data_ok = {
-            'name': fake.word(),
-            'plot': fake.paragraph(),
-            'next_game': timezone.now() + timezone.timedelta(days=1),
-            'system': enums.RoleplaySystems.PATHFINDER_1,
-            'world': self.world.pk,
-            'campaign': self.campaign.pk,
-            'email_invitations': '\n'.join([fake.safe_email() for _ in range(3)])
+            'name': fake.sentence(),
+            'description': fake.paragraph(),
+            'plot': fake.sentence(nb_words=4),
+            'gm_info': fake.paragraph(),
+            'next_game': fake.future_datetime(),
         }
 
     def test_access_anonymous_ko(self):
@@ -1308,6 +1302,12 @@ class TestSessionCreateView(TestCase):
         expected_url = f'{self.login_url}?next={self.url}'
 
         self.assertRedirects(response, expected_url)
+
+    def test_access_non_game_master_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(404, response.status_code)
 
     def test_access_logged_user_ok(self):
         self.client.force_login(self.user)
@@ -1321,48 +1321,6 @@ class TestSessionCreateView(TestCase):
 
         self.assertTemplateUsed(response, self.template)
 
-    def test_access_with_non_existing_world_ko(self):
-        self.client.force_login(self.user)
-        non_existent_pk = self.world.pk + 1
-        url = resolve_url(self.resolver, pk=non_existent_pk)
-        response = self.client.get(url)
-
-        self.assertEqual(404, response.status_code)
-
-    def test_access_with_private_world_ko(self):
-        world = baker.make_recipe('roleplay.private_world')
-        url = resolve_url(self.resolver, pk=world.pk)
-        self.client.force_login(self.user)
-        response = self.client.get(url)
-
-        self.assertEqual(404, response.status_code)
-
-    def test_session_is_created_with_correct_data_ok(self):
-        self.client.force_login(self.user)
-        self.client.post(self.url, data=self.data_ok)
-
-        session = self.model.objects.last()
-        self.assertEqual(self.data_ok['name'], session.name)
-        self.assertEqual(self.data_ok['plot'], session.plot)
-        self.assertEqual(self.data_ok['next_game'], session.next_game)
-        self.assertEqual(self.data_ok['system'], session.system)
-        self.assertEqual(self.data_ok['world'], session.world.pk)
-
-    def test_session_is_created_with_current_user_as_game_master_ok(self):
-        self.client.force_login(self.user)
-        self.client.post(self.url, data=self.data_ok)
-
-        session = self.model.objects.last()
-        self.assertIn(self.user, session.game_masters)
-
-    def test_session_is_created_and_emails_are_sent_ok(self):
-        self.client.force_login(self.user)
-        self.client.post(self.url, data=self.data_ok)
-        emails = self.data_ok['email_invitations'].split('\n')
-
-        time.sleep(1)
-        self.assertEqual(len(emails), len(mail.outbox))
-
     def test_post_data_without_name_ko(self):
         data_without_name = self.data_ok.copy()
         del data_without_name['name']
@@ -1371,33 +1329,6 @@ class TestSessionCreateView(TestCase):
         response = self.client.post(self.url, data=data_without_name)
 
         self.assertFormError(response, 'form', 'name', 'This field is required.')
-
-    def test_post_data_without_next_game_ko(self):
-        data_without_next_game = self.data_ok.copy()
-        del data_without_next_game['next_game']
-
-        self.client.force_login(self.user)
-        response = self.client.post(self.url, data=data_without_next_game)
-
-        self.assertFormError(response, 'form', 'next_game', 'This field is required.')
-
-    def test_post_data_without_system_ko(self):
-        data_without_system = self.data_ok.copy()
-        del data_without_system['system']
-
-        self.client.force_login(self.user)
-        response = self.client.post(self.url, data=data_without_system)
-
-        self.assertFormError(response, 'form', 'system', 'This field is required.')
-
-    def test_post_data_without_world_ko(self):
-        data_without_world = self.data_ok.copy()
-        del data_without_world['world']
-
-        self.client.force_login(self.user)
-        response = self.client.post(self.url, data=data_without_world)
-
-        self.assertFormError(response, 'form', 'world', 'This field is required.')
 
     def test_post_data_next_game_in_the_past_ko(self):
         data_with_past_next_game = self.data_ok.copy()
@@ -1408,26 +1339,12 @@ class TestSessionCreateView(TestCase):
 
         self.assertFormError(response, 'form', 'next_game', 'Next game date must be in the future.')
 
-    def test_post_data_without_email_invitations_ok(self):
-        data_without_email_invitations = self.data_ok.copy()
-        del data_without_email_invitations['email_invitations']
-
+    def test_post_data_redirect_ok(self):
         self.client.force_login(self.user)
-        self.client.post(self.url, data=data_without_email_invitations)
+        response = self.client.post(self.url, data=self.data_ok)
+        session_created = self.model.objects.order_by('entry_created_at').last()
 
-        time.sleep(1)
-        self.assertEqual(0, len(mail.outbox))
-
-    def test_post_data_without_plot_ok(self):
-        data_without_plot = self.data_ok.copy()
-        del data_without_plot['plot']
-
-        self.client.force_login(self.user)
-        self.client.post(self.url, data=data_without_plot)
-
-        session = self.model.objects.last()
-        # NOTE: Field is not nullable, so it's empty string
-        self.assertEqual('', session.plot)
+        self.assertRedirects(response, resolve_url(session_created))
 
 
 @unittest.skip('TODO: refactor')

@@ -1,24 +1,21 @@
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import ImproperlyConfigured
 
 
-class OwnerRequiredMixin:
+class OwnerRequiredMixin(UserPassesTestMixin):
     """
     Checks if user is owner by :class:`owner_attribute`.
     """
 
     owner_attr = 'owner'
 
-    def dispatch(self, request, *args, **kwargs):
-        # If user is not authenticated keep on
-        if not self.request.user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-
+    def test_func(self):
         if not self.owner_attr:
             raise ImproperlyConfigured('OwnerRequiredMixin requires a definition of \'owner_attr\'.')
 
         # Checking for owner
-        obj = self.get_object()
-        if self.request.user != getattr(obj, self.owner_attr):
-            raise PermissionDenied
+        self.object = self.get_object()
+        if self.request.user == getattr(self.object, self.owner_attr):
+            return True
 
-        return super().dispatch(request, *args, **kwargs)
+        return False

@@ -53,7 +53,7 @@
         </div>
         <div class="card-footer">
           <div class="row">
-            {% for player in session.players.all|slice:3 %}
+            {% for player in session.campaign.users.all|slice:3 %}
               <div class="col text-center">
                 {% if player.profile.image %}
                   <img

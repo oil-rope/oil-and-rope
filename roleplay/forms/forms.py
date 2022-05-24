@@ -91,14 +91,16 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
         required=False,
     )
 
-    def __init__(self, user, submit_text=_('create'), *args, **kwargs):
+    def __init__(self, user, submit_text=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        if not submit_text:
+            submit_text = _('create').capitalize()
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
         self.helper.include_media = True
-        self.helper.layout = CampaignFormLayout(submit_text=submit_text)
+        self.helper.layout = CampaignFormLayout(submit_text)
 
     class Meta:
         fields = (
@@ -126,25 +128,20 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
 
 
 class SessionForm(forms.ModelForm):
-    email_invitations = forms.CharField(
-        label='',
-        widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
-        required=False,
-    )
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, campaign, submit_text=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.fields['email_invitations'].label = _('email invitations').capitalize()
+        self.campaign = campaign
+        if not submit_text:
+            submit_text = _('create').capitalize()
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.layout = SessionFormLayout()
+        self.helper.layout = SessionFormLayout(submit_text)
 
     class Meta:
         model = models.Session
         fields = (
-            'name', 'plot', 'next_game', 'system', 'campaign',
+            'name', 'description', 'plot', 'gm_info', 'next_game', 'image',
         )
         widgets = {
             'next_game': DateTimeWidget,
@@ -158,5 +155,5 @@ class SessionForm(forms.ModelForm):
         return next_game
 
     def save(self, commit=True):
-        self.instance = super().save(False)
+        self.instance.campaign = self.campaign
         return super().save(commit)
