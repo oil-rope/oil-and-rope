@@ -10,7 +10,7 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
 from django.shortcuts import resolve_url
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -945,6 +945,7 @@ class TestCampaignListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:list'
     template = 'roleplay/campaign/campaign_list.html'
+    view = views.CampaignListView
 
     @classmethod
     def setUpTestData(cls):
@@ -982,6 +983,18 @@ class TestCampaignListView(TestCase):
         response = self.client.get(self.url)
 
         self.assertIn(campaign, response.context['campaign_list'])
+
+    def test_query_performance_ok(self):
+        rq = RequestFactory()
+        get_rq = rq.get(self.url)
+        get_rq.user = self.user
+        performed_queries = (
+            'SELECT [...] FROM contenttypes_contenttype for Paginator',
+            'SELECT [...] FROM roleplay_campaign COMPLEX',
+        )
+
+        with self.assertNumQueries(len(performed_queries)):
+            self.view.as_view()(get_rq)
 
 
 class TestCampaignUserListView(TestCase):
@@ -1027,6 +1040,18 @@ class TestCampaignUserListView(TestCase):
         campaigns = response.context['object_list']
 
         self.assertEqual(len(campaigns), self.n_owned_campaigns)
+
+    def test_query_performance_ok(self):
+        rq = RequestFactory()
+        get_rq = rq.get(self.url)
+        get_rq.user = self.user
+        performed_queries = (
+            'SELECT [...] FROM contenttypes_contenttype for Paginator',
+            'SELECT [...] FROM roleplay_campaign COMPLEX',
+        )
+
+        with self.assertNumQueries(len(performed_queries)):
+            self.view.as_view()(get_rq)
 
 
 class TestCampaignUpdateView(TestCase):
