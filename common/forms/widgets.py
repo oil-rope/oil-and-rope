@@ -23,15 +23,3 @@ class DateWidget(forms.DateInput):
     def __init__(self, *args, **kwargs):
         kwargs['format'] = '%Y-%m-%d'
         super().__init__(*args, **kwargs)
-
-
-class TimeWidget(forms.TimeInput):
-    """
-    A widget using HTML5 time type.
-    """
-
-    input_type = 'time'
-
-    def __init__(*args, **kwargs):
-        kwargs['format'] = '%H:%M'
-        super().__init__(*args, **kwargs)

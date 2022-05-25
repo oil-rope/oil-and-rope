@@ -121,12 +121,6 @@ class Place(MPTTModel, TracingMixin):
     def get_absolute_url(self):
         return resolve_url('roleplay:place:detail', pk=self.pk)
 
-    def get_worlds(self):
-        worlds = self.get_descendants().filter(site_type=SiteTypes.WORLD)
-        worlds = list(worlds)
-        return worlds
-    worlds = cached_property(get_worlds, name='worlds')
-
     @property
     def is_house(self):
         return self.site_type == SiteTypes.HOUSE
