@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 08:59+0000\n"
+"POT-Creation-Date: 2022-05-25 14:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "identificador"
 msgid "name"
 msgstr "nombre"
 
-#: chat/models.py:25 common/enums.py:27 registration/models.py:47
+#: chat/models.py:25 common/enums.py:27 registration/models.py:48
 #: roleplay/models.py:271
 #, fuzzy
 #| msgid "Users"
@@ -214,8 +214,8 @@ msgstr "dado"
 msgid "user check"
 msgstr "comprobación de usuario"
 
-#: common/enums.py:26 common/models.py:81 registration/models.py:46
-#: registration/models.py:87
+#: common/enums.py:26 common/models.py:81 registration/models.py:47
+#: registration/models.py:88
 #: registration/templates/registration/user_update.html:6
 #: roleplay/models.py:100 roleplay/models.py:313 roleplay/models.py:490
 msgid "user"
@@ -345,6 +345,10 @@ msgstr "equis fina"
 msgid "magnifying glass"
 msgstr "lupa"
 
+#: common/filters/forms.py:13 roleplay/filters/layouts.py:38
+msgid "search"
+msgstr "buscar"
+
 #: common/forms/layout.py:17 roleplay/forms/forms.py:24
 #: roleplay/forms/forms.py:55 roleplay/forms/forms.py:98
 #: roleplay/forms/forms.py:135 roleplay/forms/layout.py:10
@@ -422,6 +426,12 @@ msgstr "%(user)s votó %(is_positive)s en %(model)s (%(id)s)"
 msgctxt "menu name"
 msgid "home"
 msgstr "inicio"
+
+#: common/templates/common/include/filter_accordion.html:14
+#, fuzzy
+#| msgid "search"
+msgid "advance search"
+msgstr "búsqueda avanzada"
 
 #: common/templates/common/include/paginator.html:3
 #, fuzzy, python-format
@@ -859,7 +869,7 @@ msgid "create your account"
 msgstr "crea tu cuenta"
 
 #: core/templates/core/includes/menu.html:76 registration/forms/forms.py:223
-#: registration/models.py:97 registration/views.py:310
+#: registration/models.py:98 registration/views.py:310
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:171
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:179
 #: roleplay/templates/roleplay/session/include/session_card.html:63
@@ -956,8 +966,8 @@ msgid "world building"
 msgstr "construcción de mundo"
 
 #: core/templates/core/includes/menus/worldbuilding_menu.html:24
-#: roleplay/templates/roleplay/campaign/campaign_list.html:39
-#: roleplay/templates/roleplay/campaign/campaign_list.html:47
+#: roleplay/templates/roleplay/campaign/campaign_list.html:41
+#: roleplay/templates/roleplay/campaign/campaign_list.html:49
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:40
 #: roleplay/templates/roleplay/world/world_list.html:5
@@ -1189,25 +1199,25 @@ msgstr "este email no pertenece a ningún usuario."
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:214 registration/models.py:89
+#: registration/forms/forms.py:214 registration/models.py:90
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:215 registration/models.py:90
+#: registration/forms/forms.py:215 registration/models.py:91
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:220 registration/models.py:93
+#: registration/forms/forms.py:220 registration/models.py:94
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:222 registration/models.py:95
+#: registration/forms/forms.py:222 registration/models.py:96
 #, fuzzy
 #| msgid "Website"
 msgid "website"
@@ -1259,7 +1269,7 @@ msgid "change password"
 msgstr "cambiar contraseña"
 
 #: registration/forms/layout.py:162 roleplay/views.py:82 roleplay/views.py:214
-#: roleplay/views.py:427 roleplay/views.py:563
+#: roleplay/views.py:427 roleplay/views.py:571
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -1271,13 +1281,13 @@ msgstr "actualizar"
 msgid "premium user"
 msgstr "usuario premium"
 
-#: registration/models.py:107
+#: registration/models.py:108
 #, fuzzy
 #| msgid "Profile"
 msgid "profile"
 msgstr "perfil"
 
-#: registration/models.py:108
+#: registration/models.py:109
 #, fuzzy
 #| msgid "Profiles"
 msgid "profiles"
@@ -1642,19 +1652,21 @@ msgstr "templo"
 msgid "ruins"
 msgstr "ruinas"
 
-#: roleplay/filters/filters.py:19
+#: roleplay/filters/filters.py:25 roleplay/filters/filters.py:49
 #, fuzzy
 #| msgid "Position"
 msgid "active"
 msgstr "activo"
 
-#: roleplay/filters/filters.py:20
+#: roleplay/filters/filters.py:26
 msgid "search only for active campaigns"
 msgstr "busca solo campañas activas"
 
-#: roleplay/filters/layouts.py:38
-msgid "search"
-msgstr "buscar"
+#: roleplay/filters/filters.py:50
+#, fuzzy
+#| msgid "search only for active campaigns"
+msgid "search only for active sessions"
+msgstr "busca solo sesiones activas"
 
 #: roleplay/forms/forms.py:27
 #, fuzzy
@@ -1955,7 +1967,7 @@ msgstr "sesión"
 
 #: roleplay/models.py:561
 #: roleplay/templates/roleplay/campaign/campaign_detail.html:111
-#: roleplay/templates/roleplay/session/session_list.html:5
+#: roleplay/templates/roleplay/session/session_list.html:6
 msgid "sessions"
 msgstr "sesiones"
 
@@ -1994,7 +2006,7 @@ msgstr "esta acción no puede ser deshecha."
 
 #: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:48
 #: roleplay/templates/roleplay/place/place_confirm_delete.html:37
-#: roleplay/templates/roleplay/session/session_confirm_delete.html:45
+#: roleplay/templates/roleplay/session/session_confirm_delete.html:41
 #, fuzzy
 #| msgid "Cancel"
 msgid "cancel"
@@ -2002,7 +2014,7 @@ msgstr "cancelar"
 
 #: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:51
 #: roleplay/templates/roleplay/place/place_confirm_delete.html:39
-#: roleplay/templates/roleplay/session/session_confirm_delete.html:47
+#: roleplay/templates/roleplay/session/session_confirm_delete.html:43
 #, fuzzy
 #| msgid "Erase"
 msgid "erase"
@@ -2017,7 +2029,7 @@ msgid "Create %(object)s"
 msgstr "Crear %(object)s"
 
 #: roleplay/templates/roleplay/campaign/campaign_create.html:11
-#: roleplay/templates/roleplay/campaign/campaign_list.html:39
+#: roleplay/templates/roleplay/campaign/campaign_list.html:41
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
 #: roleplay/templates/roleplay/include/world_card.html:45
 #: roleplay/templates/roleplay/place/place_detail.html:144
@@ -2069,25 +2081,19 @@ msgstr "línea de tiempo"
 msgid "community campaigns"
 msgstr "campañas de la comunidad"
 
-#: roleplay/templates/roleplay/campaign/campaign_list.html:17
-#, fuzzy
-#| msgid "Create campaign"
-msgid "filter campaigns"
-msgstr "filtrar campañas"
-
-#: roleplay/templates/roleplay/campaign/campaign_list.html:29
+#: roleplay/templates/roleplay/campaign/campaign_list.html:31
 #, fuzzy
 #| msgid "Seems like we don't have comunity worlds"
 msgid "seems like we don't have any campaign right now."
 msgstr "parece que no tenemos ninguna campaña en este momento."
 
-#: roleplay/templates/roleplay/campaign/campaign_list.html:32
+#: roleplay/templates/roleplay/campaign/campaign_list.html:34
 #, fuzzy
 #| msgid "Would you like to create one?"
 msgid "but you can create one!"
 msgstr "¡pero puedes crear una!"
 
-#: roleplay/templates/roleplay/campaign/campaign_list.html:39
+#: roleplay/templates/roleplay/campaign/campaign_list.html:41
 #: roleplay/templates/roleplay/campaign/campaign_private_list.html:28
 #, fuzzy, python-format
 #| msgid ""
@@ -2568,19 +2574,19 @@ msgstr "sin jugadores"
 msgid "your list of sessions"
 msgstr "tu lista de sesiones"
 
-#: roleplay/templates/roleplay/session/session_list.html:22
+#: roleplay/templates/roleplay/session/session_list.html:30
 #, fuzzy
 #| msgid "Seems like you don't have any world yet"
 msgid "seems like you don't have any session."
 msgstr "parece que no tienes ninguna aún."
 
-#: roleplay/templates/roleplay/session/session_list.html:24
+#: roleplay/templates/roleplay/session/session_list.html:32
 msgid "you can create one epic quest but first you need to select your world."
 msgstr ""
 "puedes crear una aventura épica, pero antes tienes que seleccionar tu mundo."
 
-#: roleplay/templates/roleplay/session/session_list.html:29
-#: roleplay/templates/roleplay/session/session_list.html:32
+#: roleplay/templates/roleplay/session/session_list.html:37
+#: roleplay/templates/roleplay/session/session_list.html:40
 #, fuzzy
 #| msgid "Delete"
 msgid "go to world selection"
@@ -2731,17 +2737,22 @@ msgstr ""
 msgid "campaign deleted successfully."
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/views.py:543
+#: roleplay/views.py:544
 #, fuzzy
 #| msgid "session"
 msgid "session deleted."
 msgstr "sesión borrada."
 
-#: roleplay/views.py:573
+#: roleplay/views.py:581
 #, fuzzy
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "Create campaign"
+#~ msgid "filter campaigns"
+#~ msgstr "filtrar campañas"
 
 #~ msgid ""
 #~ "\n"

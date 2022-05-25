@@ -4,18 +4,20 @@ import tempfile
 import time
 from unittest import mock
 
+import pytest
 from django.conf import settings
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
 from django.shortcuts import resolve_url
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from model_bakery import baker
 from PIL import Image
 
 from common import tools
 from roleplay import enums, models, views
+from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 from .. import fake
 from ..utils import generate_place
@@ -977,7 +979,12 @@ class TestCampaignListView(TestCase):
 
     def test_public_campaigns_are_listed_ok(self):
         self.client.force_login(self.user)
-        campaign = baker.make_recipe('roleplay.campaign', is_public=True)
+        campaign = baker.make_recipe('roleplay.public_campaign')
+        # We also get to create some campaign with image and description to complete coverage
+        baker.make_recipe('roleplay.public_campaign', description=fake.paragraph())
+        baker.make_recipe('roleplay.public_campaign', cover_image=fake.file_name(category='image'))
+        # We also create a session in order to get last session footer
+        baker.make_recipe('roleplay.session', campaign=campaign, next_game=fake.past_date())
         response = self.client.get(self.url)
 
         self.assertIn(campaign, response.context['campaign_list'])
@@ -1006,10 +1013,11 @@ class TestCampaignUserListView(TestCase):
         cls.url = resolve_url(cls.resolver)
         cls.user = baker.make_recipe('registration.user')
 
+    def setUp(self):
         # NOTE: max_value is set to pagination_by in order to get a "full" pagination
-        cls.n_owned_campaigns = fake.pyint(min_value=1, max_value=cls.view.paginate_by)
-        owned_campaigns = baker.make_recipe('roleplay.campaign', _quantity=cls.n_owned_campaigns, owner=cls.user)
-        [campaign.users.add(cls.user) for campaign in owned_campaigns]
+        self.n_owned_campaigns = fake.pyint(min_value=1, max_value=self.view.paginate_by)
+        owned_campaigns = baker.make_recipe('roleplay.campaign', _quantity=self.n_owned_campaigns, owner=self.user)
+        [campaign.users.add(self.user) for campaign in owned_campaigns]
         # Random campaigns
         baker.make_recipe('roleplay.campaign', _quantity=fake.pyint(min_value=1, max_value=10))
 
@@ -1048,6 +1056,14 @@ class TestCampaignUserListView(TestCase):
 
         with self.assertNumQueries(len(performed_queries)):
             self.view.as_view()(get_rq)
+
+    @pytest.mark.coverage
+    def test_empty_campaigns_ok(self):
+        self.model.objects.all().delete()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Go to \'Worlds\' and click \'Create Campaign\' to create one.')
 
 
 class TestCampaignUpdateView(TestCase):
@@ -1217,6 +1233,71 @@ class TestCampaignDetailView(TestCase):
         time.sleep(1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
+
+    @pytest.mark.coverage
+    def test_campaign_with_image_and_other_fields_ok(self):
+        # NOTE: start_date, end_date, summary
+        self.client.force_login(self.user)
+        self.private_campaign.summary = fake.sentence()
+        self.private_campaign.description = fake.paragraph()
+        self.private_campaign.cover_image = fake.file_name(category='image')
+        self.private_campaign.start_date = fake.date_time_this_year()
+        self.private_campaign.end_date = fake.past_datetime()
+        self.private_campaign.save()
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response, self.private_campaign.cover_image.url)
+
+    @pytest.mark.coverage
+    def test_campaign_with_complex_place_ok(self):
+        self.client.force_login(self.user)
+        place_with_child = generate_place(level=1, parent_site=self.world)
+        place_with_child.children_sites.add(generate_place(level=2))
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response, place_with_child.name)
+
+    @pytest.mark.coverage
+    def test_campaign_with_sessions_ok(self):
+        self.client.force_login(self.user)
+        session = baker.make_recipe('roleplay.session', campaign=self.private_campaign)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response, session.name)
+
+    @pytest.mark.coverage
+    def test_campaign_with_game_masters_ok(self):
+        gm = baker.make_recipe('registration.user')
+        self.client.force_login(gm)
+        self.private_campaign.add_game_masters(gm)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response, 'General settings')
+        self.assertContains(response, resolve_url('roleplay:campaign:edit', pk=self.private_campaign.pk))
+
+    @pytest.mark.coverage
+    def test_campaign_with_player_with_profile_image_ok(self):
+        self.client.force_login(self.user)
+        user_with_profile_image = baker.make_recipe('registration.user')
+        profile_with_image = user_with_profile_image.profile
+        profile_with_image.image = fake.file_name(category='image')
+        profile_with_image.save(update_fields=['image'])
+        self.private_campaign.users.add(user_with_profile_image)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response, user_with_profile_image.profile.image.url)
+
+    @pytest.mark.coverage
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_campaign_with_discord_channel_ok(self):
+        self.client.force_login(self.user)
+        self.private_campaign.discord_channel_id = CHANNEL
+        self.private_campaign.save(update_fields=['discord_channel_id'])
+        response = self.client.get(self.private_campaign_url)
+        GUILD_ID = self.private_campaign.discord_channel.guild_id
+        discord_channel_url = f'https://discord.com/channels/{GUILD_ID}/{CHANNEL}'
+
+        self.assertContains(response, discord_channel_url)
 
 
 class TestCampaignDeleteView(TestCase):
