@@ -6,26 +6,25 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from common.constants import models
+from common.filters.forms import BasicFilterForm
+from common.filters.mixins import FilterCapitalizeMixin
+from common.forms.widgets import DateWidget
 
-from .forms import CampaignFilterForm
+from ..enums import RoleplaySystems
 
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 
 
-class CampaignFilter(filters.FilterSet):
-    place = filters.CharFilter(field_name='place__name', lookup_expr='contains')
-    owner = filters.CharFilter(field_name='owner__username', lookup_expr='contains')
+class CampaignFilter(FilterCapitalizeMixin, filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    summary = filters.CharFilter(field_name='summary', lookup_expr='icontains')
+    place = filters.CharFilter(field_name='place__name', lookup_expr='icontains')
+    owner = filters.CharFilter(field_name='owner__username', lookup_expr='iexact')
     active = filters.BooleanFilter(
         field_name='end_date', method='get_active', label=_('active'),
         help_text=_('search only for active campaigns'), widget=CheckboxInput,
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for filter_name in self.filters:
-            self.filters[filter_name].label = self.filters[filter_name].label.capitalize()
-            if 'help_text' in self.filters[filter_name].extra:
-                self.filters[filter_name].extra['help_text'] = self.filters[filter_name].extra['help_text'].capitalize()
 
     def get_active(self, queryset, field_name, value):
         if value:
@@ -35,4 +34,28 @@ class CampaignFilter(filters.FilterSet):
     class Meta:
         model = Campaign
         fields = ['name', 'summary', 'system', 'place', 'owner']
-        form = CampaignFilterForm
+        form = BasicFilterForm
+
+
+class SessionFilter(FilterCapitalizeMixin, filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    plot = filters.CharFilter(field_name='plot', lookup_expr='icontains')
+    place = filters.CharFilter(field_name='campaign__place__name', lookup_expr='contains')
+    system = filters.ChoiceFilter(field_name='campaign__system', choices=RoleplaySystems.choices)
+    next_game = filters.DateFilter(
+        field_name='next_game', lookup_expr='date__gte', widget=DateWidget,
+    )
+    active = filters.BooleanFilter(
+        field_name='next_game', method='get_active', label=_('active'),
+        help_text=_('search only for active sessions'), widget=CheckboxInput,
+    )
+
+    def get_active(self, queryset, field_name, value):
+        if value:
+            return queryset.filter(Q(next_game__isnull=True) | Q(next_game__gte=timezone.now()))
+        return queryset
+
+    class Meta:
+        model = Session
+        fields = ['campaign', 'name', 'plot', 'system', 'place', 'next_game', 'active']
+        form = BasicFilterForm

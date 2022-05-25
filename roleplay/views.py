@@ -583,9 +583,15 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('roleplay:session:detail', kwargs={'pk': self.object.pk})
 
 
-class SessionListView(LoginRequiredMixin, ListView):
+class SessionListView(LoginRequiredMixin, FilterView):
+    filterset_class = filters.SessionFilter
     model = Session
     paginate_by = 6
+    queryset = Session.objects.select_related(
+        'campaign'
+    ).prefetch_related(
+        Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
+    )
     template_name = 'roleplay/session/session_list.html'
 
     def get_queryset(self):

@@ -1,6 +1,7 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}{% translate "sessions"|capfirst %} {% endblock title %}
 
@@ -9,10 +10,17 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-  <main class="container pb-3">
-    <h1 class="display-5 text-center">
-      {% translate "your list of sessions"|capfirst %}
-    </h1>
+  <h1 class="display-5 text-center">
+    {% translate "your list of sessions"|capfirst %}
+  </h1>
+
+  <main class="container pb-3 mt-4">
+    <div class="row justify-content-center mb-5">
+      <div class="col col-md-10 col-lg-8">
+        {% include 'common/include/filter_accordion.html' with filter=filter only %}
+      </div>
+    </div>
+
     <div class="row row-cols-1 row-cols-lg-2 g-4 justify-content-around">
       {% for session in object_list %}
         {% include 'roleplay/session/include/session_card.html' with session=session %}
