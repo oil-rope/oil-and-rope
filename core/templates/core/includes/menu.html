@@ -60,11 +60,11 @@
             </a>
           </li>
           <li class="nav-item">
-            {% url 'roleplay:race:list' as race_list %}
+            {% url 'roleplay:race:list' as race_list_url %}
             <a
-              href="{{ race_list }}"
-              class="nav-link text-uppercase {% if actual_path|startswith:race_list%} active{% endif %}"
-              {% if actual_path|startswith:race_list %}aria-current="page"{% endif %}
+              href="{{ race_list_url }}"
+              class="nav-link text-uppercase {% if actual_path|startswith:race_list_url %} active{% endif %}"
+              {% if actual_path|startswith:race_list_url %}aria-current="page"{% endif %}
             >
               <i class="ic-hammer"></i>
               {% translate "races" %}

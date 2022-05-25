@@ -59,8 +59,6 @@ class RaceInline(admin.TabularInline):
 class RaceAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'entry_created_at',
-        'entry_updated_at',
         'name',
         'description',
         'strength',
@@ -71,6 +69,8 @@ class RaceAdmin(admin.ModelAdmin):
         'charisma',
         'affected_by_armor',
         'image',
+        'entry_created_at',
+        'entry_updated_at',
     )
 
     inlines = [
@@ -84,22 +84,3 @@ class RaceAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ('users',)
     search_fields = ('name',)
-
-
-@admin.register(models.RaceUser)
-class RaceUserAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'entry_created_at',
-        'entry_updated_at',
-        'user',
-        'race',
-        'is_owner',
-    )
-    list_filter = (
-        'entry_created_at',
-        'entry_updated_at',
-        'user',
-        'race',
-        'is_owner',
-    )

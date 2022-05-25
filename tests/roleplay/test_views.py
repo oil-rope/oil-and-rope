@@ -1334,11 +1334,12 @@ class TestRaceDetailView(TestCase):
         cls.race_noimage = baker.make_recipe('roleplay.race_noimage')
 
         cls.race.users.add(cls.users)
-        cls.owner = cls.users
-
         cls.race_noimage.users.add(cls.users)
 
+        cls.owner = cls.users
+
         cls.url = reverse('roleplay:race:detail', kwargs={'pk': cls.race.pk})
+        cls.url_noimage = reverse('roleplay:race:detail', kwargs={'pk': cls.race_noimage.pk})
 
     def test_access_template_used_is_correct_ok(self):
         self.client.force_login(self.users)
@@ -1348,7 +1349,7 @@ class TestRaceDetailView(TestCase):
 
     def test_noimage_template_used_is_correct_ok(self):
         self.client.force_login(self.users)
-        response = self.client.get(self.url, kwargs={'pk': self.race_noimage.pk})
+        response = self.client.get(self.url_noimage, kwargs={'pk': self.race_noimage.pk})
 
         self.assertTemplateUsed(response, self.template)
 
@@ -1451,19 +1452,13 @@ class TestRaceListView(TestCase):
 
         cls.users = baker.make_recipe('registration.user')
 
-        cls.race = cls.model.objects.create(
-            name=fake.word(),
-            description=fake.paragraph(),
-            strength=fake.random_int(min=-5, max=5),
-            dexterity=fake.random_int(min=-5, max=5),
-            charisma=fake.random_int(min=-5, max=5),
-            constitution=fake.random_int(min=-5, max=5),
-            intelligence=fake.random_int(min=-5, max=5),
-            affected_by_armor=fake.boolean(),
-            wisdom=fake.random_int(min=-5, max=5),
-            image=fake.image_url(),
-        )
+        cls.race_noimage = baker.make_recipe('roleplay.race_noimage')
+        cls.race = baker.make_recipe('roleplay.race')
+
         cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.race_noimage.users.add(cls.users)
         cls.owner = cls.users
 
         cls.url = reverse('roleplay:race:list')

@@ -133,7 +133,20 @@ class RaceForm(forms.ModelForm):
         self.helper.layout = RaceFormLayout(submit_text=submit_text)
 
     class Meta:
-        exclude = ()
+        fields = (
+            'name',
+            'description',
+            'strength',
+            'dexterity',
+            'constitution',
+            'intelligence',
+            'wisdom',
+            'charisma',
+            'affected_by_armor',
+            'image',
+            'users'
+        )
+
         model = models.Race
         help_texts = {
             'image': _(

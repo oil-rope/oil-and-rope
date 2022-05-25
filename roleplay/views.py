@@ -28,8 +28,8 @@ LOGGER = logging.getLogger(__name__)
 
 User = get_user_model()
 Place = apps.get_model(models.ROLEPLAY_PLACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
 Race = apps.get_model(models.ROLEPLAY_RACE)
+Session = apps.get_model(models.ROLEPLAY_SESSION)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -414,7 +414,7 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
     template_name = 'roleplay/race/race_detail.html'
 
 
-class RaceUpdateView(LoginRequiredMixin, UpdateView):
+class RaceUpdateView(LoginRequiredMixin, UpdateView, UserPassesTestMixin):
     """
     This view updates a race
     """
@@ -425,67 +425,29 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form_kwargs(self, form_class=None):
         kwargs = super().get_form_kwargs()
+        kwargs['submit_text'] = _('update').capitalize()
 
-        is_user = False
-        for user in kwargs['instance'].users.all():
-            if user == self.request.user:
-                is_user = True
+        user = self.request.user
+        instance = self.get_object()
 
-        if is_user is False:
+        if user not in instance.users.all():
             raise PermissionDenied
 
-        kwargs['submit_text'] = _('update').capitalize()
         return kwargs
 
     def get_success_url(self):
         return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
 
 
-class RaceListView(LoginRequiredMixin, MultiplePaginatorListView):
+class RaceListView(LoginRequiredMixin, ListView):
     """
     this view deletes a race
     """
 
     model = Race
-    success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_list.html'
     paginate_by = 10
-    race_page_kwarg = 'page_races'
     queryset = Race.objects.all()
-
-    def get_races(self):
-        return self.model.objects.all()
-
-    def paginate_races(self, page_size):
-        queryset = self.get_races()
-        page_kwarg = self.race_page_kwarg
-        return self.paginate_queryset_by_page_kwarg(queryset, page_size, page_kwarg)
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data()
-
-        queryset = object_list if object_list is not None else self.object_list
-        page_size = self.get_paginate_by(queryset)
-
-        races = self.get_races()
-        context['races'] = races
-        user = self.request.user
-        context['user'] = user
-
-        if not page_size:  # pragma: no cover
-            return context
-
-        # User worlds
-        paginator, page, queryset, is_paginated = self.paginate_races(page_size)
-        context.update({
-            'race_paginator': paginator,
-            'race_page_obj': page,
-            'race_is_paginated': is_paginated,
-            'races': queryset,
-            'races_full': races,
-        })
-
-        return context
 
 
 class RaceDeleteView(LoginRequiredMixin, DeleteView):
