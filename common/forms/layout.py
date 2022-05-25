@@ -4,7 +4,7 @@ from django.template.base import Template
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
-from ..enums import AvailableIcons
+from ..enums import AvailableIcons, JavaScriptActions
 
 
 class SubmitClearLayout(layout.Layout):
@@ -71,7 +71,7 @@ class Button(layout.Layout):
         super().__init__(*fields)
         self.content = content
         self.type = type
-        self.action = action
+        self.action = action.value if isinstance(action, JavaScriptActions) else action
         self.icon = icon.value if isinstance(icon, AvailableIcons) else icon
         self.template = kwargs.pop('template', self.template)
 

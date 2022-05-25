@@ -35,7 +35,7 @@
               <div class="my-2"></div>
               <a
                 class="small link-info text-decoration-none"
-                href="{{ TABLETOP_URL }}/session/{{ session.pk }}"
+                href="{{ TABLETOP_URL }}/campaign/{{ session.campaign.pk }}"
                 target="_blank"
               >
                 <i class="ic ic-dice"></i>
@@ -43,7 +43,7 @@
               </a>
             </h4>
             <small class="text-muted">
-              [{{ session.get_system_display }}]
+              [{{ session.campaign.get_system_display }}]
             </small>
           </div>
           <hr>

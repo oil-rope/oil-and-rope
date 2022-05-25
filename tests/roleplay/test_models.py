@@ -338,7 +338,7 @@ class TestCampaign(TestCase):
         game_masters = baker.make(constants.REGISTRATION_USER, 3)
         self.instance.add_game_masters(*game_masters)
 
-        self.assertEqual(self.instance.game_masters.count(), len(game_masters))
+        self.assertEqual(len(self.instance.game_masters), len(game_masters))
 
     def test_discord_channel_empty_is_none(self):
         self.assertIsNone(self.instance.discord_channel)

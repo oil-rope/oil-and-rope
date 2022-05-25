@@ -127,7 +127,7 @@ class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
         return self.instance
 
 
-class SessionForm(forms.ModelForm):
+class SessionForm(FormCapitalizeMixin, forms.ModelForm):
     def __init__(self, campaign, submit_text=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.campaign = campaign

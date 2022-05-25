@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.list import MultipleObjectMixin
 from django_filters.views import FilterView
 
 from common.constants import models
@@ -301,10 +300,8 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
         return resolve_url(instance)
 
 
-class CampaignComplexQuerySetMixin(MultipleObjectMixin):
+class CampaignComplexQuerySetMixin:
     model = Campaign
-    ordering = ('-total_votes', 'name', '-entry_created_at')
-    paginate_by = 6
     # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
     queryset = None
 
@@ -339,6 +336,8 @@ class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, FilterV
 
     filterset_class = filters.CampaignFilter
     model = Campaign
+    ordering = ('-total_votes', 'name', '-entry_created_at')
+    paginate_by = 6
     template_name = 'roleplay/campaign/campaign_list.html'
 
     def get_queryset(self):
@@ -351,6 +350,8 @@ class CampaignUserListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, Lis
     """
 
     model = Campaign
+    ordering = ('-total_votes', 'name', '-entry_created_at')
+    paginate_by = 6
     template_name = 'roleplay/campaign/campaign_private_list.html'
 
     def get_queryset(self):
@@ -372,7 +373,7 @@ class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             request=self.request,
             context={'user': self.request.user, 'object': self.object},
             subject=cfl(_('new player wants to join your adventure!')),
-            to=[email for email in self.object.game_masters.values_list('email', flat=True)],
+            to=[gm.email for gm in self.object.game_masters],
         ).send()
         messages.success(
             self.request,

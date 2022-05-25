@@ -21,7 +21,10 @@ class UserInAllWithRelatedNameMixin(SingleObjectMixin, UserPassesTestMixin):
         if not hasattr(obj, self.related_name_attr):
             raise ImproperlyConfigured('Object does not have \'related_name_attr\'.')
         # Checking if user is in players
-        if self.request.user in getattr(obj, self.related_name_attr).all():
+        rel_descriptor = getattr(obj, self.related_name_attr)
+        # Sometimes because of caching we get a list instead of a queryset
+        rel_descriptor = rel_descriptor.all() if hasattr(rel_descriptor, 'all') else rel_descriptor
+        if self.request.user in rel_descriptor:
             return True
 
         return False

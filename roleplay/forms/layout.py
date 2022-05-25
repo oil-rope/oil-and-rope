@@ -201,4 +201,30 @@ class CampaignFormLayout(layout.Layout):
 
 class SessionFormLayout(layout.Layout):
     def __init__(self, submit_text):
-        super().__init__()
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('name'), css_class='col-md-4'),
+                layout.Column(layout.Field('plot'), css_class='col-md-4'),
+                layout.Column(layout.Field('next_game'), css_class='col-md-4'),
+                layout.Column(layout.Field('description', style='resize: none'), css_class='col-md-6'),
+                layout.Column(layout.Field('gm_info', style='resize: none'), css_class='col-md-6'),
+                layout.Column(layout.Field('image')),
+            ),
+            layout.Row(
+                layout.Column(
+                    layout.Submit('submit', submit_text, css_class='btn btn-primary w-100'),
+                    css_class='col-11 col-md-5 col-lg-4 col-xl-3'
+                ),
+                layout.Div(css_class='d-none d-xl-block w-100 my-2'),
+                layout.Column(
+                    common_layout.Button(
+                        content=_('go back').capitalize(),
+                        css_class='btn-dark w-100',
+                        action=JavaScriptActions.GO_BACK,
+                        icon=AvailableIcons.ARROW_LEFT,
+                    ),
+                    css_class='col-11 col-md-5 col-lg-4 col-xl-3 mt-3 mt-md-0'
+                ),
+                css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
+            ),
+        )
