@@ -1331,15 +1331,15 @@ class TestRaceDetailView(TestCase):
     def setUpTestData(cls) -> None:
         cls.users = baker.make_recipe('registration.user')
         cls.race = baker.make_recipe('roleplay.race')
-        cls.race_noimage = baker.make_recipe('roleplay.race_noimage')
+        cls.race_without_optional = baker.make_recipe('roleplay.race_without_optional')
 
         cls.race.users.add(cls.users)
-        cls.race_noimage.users.add(cls.users)
+        cls.race_without_optional.users.add(cls.users)
 
         cls.owner = cls.users
 
         cls.url = reverse('roleplay:race:detail', kwargs={'pk': cls.race.pk})
-        cls.url_noimage = reverse('roleplay:race:detail', kwargs={'pk': cls.race_noimage.pk})
+        cls.url_without_optional = reverse('roleplay:race:detail', kwargs={'pk': cls.race_without_optional.pk})
 
     def test_access_template_used_is_correct_ok(self):
         self.client.force_login(self.users)
@@ -1347,9 +1347,9 @@ class TestRaceDetailView(TestCase):
 
         self.assertTemplateUsed(response, self.template)
 
-    def test_noimage_template_used_is_correct_ok(self):
+    def test_without_optional_template_used_is_correct_ok(self):
         self.client.force_login(self.users)
-        response = self.client.get(self.url_noimage, kwargs={'pk': self.race_noimage.pk})
+        response = self.client.get(self.url_without_optional, kwargs={'pk': self.race_without_optional.pk})
 
         self.assertTemplateUsed(response, self.template)
 
@@ -1452,13 +1452,13 @@ class TestRaceListView(TestCase):
 
         cls.users = baker.make_recipe('registration.user')
 
-        cls.race_noimage = baker.make_recipe('roleplay.race_noimage')
+        cls.race_without_optional = baker.make_recipe('roleplay.race_without_optional')
         cls.race = baker.make_recipe('roleplay.race')
 
         cls.race.users.add(cls.users)
         cls.owner = cls.users
 
-        cls.race_noimage.users.add(cls.users)
+        cls.race_without_optional.users.add(cls.users)
         cls.owner = cls.users
 
         cls.url = reverse('roleplay:race:list')
@@ -1476,6 +1476,14 @@ class TestRaceListView(TestCase):
         self.assertEqual(200, response.status_code)
 
     def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_template_paginator_ok(self):
+        baker.make_recipe('roleplay.race', self.view.paginate_by)
+
         self.client.force_login(self.users)
         response = self.client.get(self.url)
 

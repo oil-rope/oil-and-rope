@@ -75,20 +75,13 @@ race = Recipe(
     charisma=fake.random_int(min=-5, max=5),
     constitution=fake.random_int(min=-5, max=5),
     intelligence=fake.random_int(min=-5, max=5),
-    affected_by_armor=fake.boolean(),
+    affected_by_armor=True,
     wisdom=fake.random_int(min=-5, max=5),
     image=fake.image_url(),
 )
 
-race_noimage = Recipe(
-    Race,
-    name=fake.word(),
-    description=fake.paragraph(),
-    strength=fake.random_int(min=-5, max=5),
-    dexterity=fake.random_int(min=-5, max=5),
-    charisma=fake.random_int(min=-5, max=5),
-    constitution=fake.random_int(min=-5, max=5),
-    intelligence=fake.random_int(min=-5, max=5),
-    affected_by_armor=fake.boolean(),
-    wisdom=fake.random_int(min=-5, max=5),
+race_without_optional = race.extend(
+    description='',
+    image='',
+    affected_by_armor=False,
 )
