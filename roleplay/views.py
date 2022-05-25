@@ -495,14 +495,15 @@ class SessionCreateView(LoginRequiredMixin, CreateView):
 
 class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Session
+    queryset = Session.objects.select_related(
+        'campaign'
+    ).prefetch_related(
+        Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
+    )
     template_name = 'roleplay/session/session_detail.html'
 
     def get_queryset(self):
-        self.queryset = Session.objects.select_related(
-            'campaign'
-        ).prefetch_related(
-            Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
-        ).annotate(
+        qs = super().get_queryset().annotate(
             user_is_game_master=Subquery(
                 PlayerInCampaign.objects.filter(
                     campaign=OuterRef('campaign'),
@@ -510,7 +511,7 @@ class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
                 ).values('is_game_master')
             )
         )
-        return super().get_queryset()
+        return qs
 
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):
@@ -536,8 +537,8 @@ class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         Checks that user is game master.
         """
 
-        session = self.get_object()
-        return self.request.user in session.game_masters
+        self.object = self.get_object()
+        return self.request.user in self.object.campaign.game_masters
 
     def get_success_url(self):
         msg = _('session deleted.').capitalize()
@@ -556,7 +557,14 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
 
         session = self.get_object()
-        return self.request.user in session.game_masters
+        return self.request.user in session.campaign.game_masters
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'campaign': self.object.campaign,
+        })
+        return kwargs
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -581,5 +589,7 @@ class SessionListView(LoginRequiredMixin, ListView):
     template_name = 'roleplay/session/session_list.html'
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(campaign__users__in=[self.request.user])
+        qs = super().get_queryset().filter(
+            campaign__users__in=[self.request.user],
+        )
+        return qs

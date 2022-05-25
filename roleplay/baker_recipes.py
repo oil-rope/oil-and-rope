@@ -3,7 +3,7 @@ import random
 
 from django.apps import apps
 from django.utils import timezone as tz
-from model_bakery.recipe import Recipe, foreign_key, related
+from model_bakery.recipe import Recipe, foreign_key
 
 from common.constants import models
 from common.utils import create_faker
@@ -81,9 +81,8 @@ private_campaign = Recipe(
 session = Recipe(
     Session,
     name=fake.sentence,
+    description=fake.words,
     plot=fake.paragraph,
-    players=related(user),
+    gm_info=fake.paragraph,
     next_game=random_date_after_today,
-    system=random_roleplay_system,
-    world=foreign_key(world),
 )

@@ -2,7 +2,6 @@ import os
 import random
 import tempfile
 import time
-import unittest
 from unittest import mock
 
 from django.conf import settings
@@ -1347,7 +1346,6 @@ class TestSessionCreateView(TestCase):
         self.assertRedirects(response, resolve_url(session_created))
 
 
-@unittest.skip('TODO: refactor')
 class TestSessionDetailView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
@@ -1359,8 +1357,9 @@ class TestSessionDetailView(TestCase):
     def setUpTestData(cls):
         cls.user_in_players = baker.make_recipe('registration.user')
         cls.user_not_in_players = baker.make_recipe('registration.user')
+        cls.campaign = baker.make_recipe('roleplay.campaign', users=[cls.user_in_players])
 
-        cls.session = baker.make_recipe('roleplay.session', players=[cls.user_in_players])
+        cls.session = baker.make_recipe('roleplay.session', campaign=cls.campaign)
         cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
 
     def test_anonymous_access_ko(self):
@@ -1386,7 +1385,7 @@ class TestSessionDetailView(TestCase):
         profile = user.profile
         profile.image = SimpleUploadedFile('test_image.jpg', b'file_content', content_type='image/jpeg')
         profile.save()
-        self.session.players.add(user)
+        self.session.campaign.users.add(user)
         self.client.force_login(user)
         response = self.client.get(self.url)
 
@@ -1394,7 +1393,7 @@ class TestSessionDetailView(TestCase):
 
     def test_access_with_game_master_ok(self):
         session = baker.make_recipe('roleplay.session')
-        session.add_game_masters(self.user_in_players)
+        session.campaign.add_game_masters(self.user_in_players)
         self.client.force_login(self.user_in_players)
         url = resolve_url(self.resolver, pk=session.pk)
         response = self.client.get(url)
@@ -1408,7 +1407,6 @@ class TestSessionDetailView(TestCase):
         self.assertTemplateUsed(response, self.template)
 
 
-@unittest.skip('TODO: refactor')
 class TestSessionDeleteView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
@@ -1420,9 +1418,10 @@ class TestSessionDeleteView(TestCase):
     def setUpTestData(cls):
         cls.user_in_game_masters = baker.make_recipe('registration.user')
         cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+        cls.campaign = baker.make_recipe('roleplay.campaign')
+        cls.campaign.add_game_masters(cls.user_in_game_masters)
 
-        cls.session = baker.make_recipe('roleplay.session')
-        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.session = baker.make_recipe('roleplay.session', campaign=cls.campaign)
         cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
 
     def test_anonymous_access_ko(self):
@@ -1473,7 +1472,6 @@ class TestSessionDeleteView(TestCase):
         )
 
 
-@unittest.skip('TODO: refactor')
 class TestSessionUpdateView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
@@ -1485,9 +1483,10 @@ class TestSessionUpdateView(TestCase):
     def setUpTestData(cls):
         cls.user_in_game_masters = baker.make_recipe('registration.user')
         cls.user_not_in_game_masters = baker.make_recipe('registration.user')
+        cls.campaign = baker.make_recipe('roleplay.campaign')
+        cls.campaign.add_game_masters(cls.user_in_game_masters)
 
-        cls.session = baker.make_recipe('roleplay.session')
-        cls.session.add_game_masters(cls.user_in_game_masters)
+        cls.session = baker.make_recipe('roleplay.session', campaign=cls.campaign)
         cls.url = resolve_url(cls.resolver, pk=cls.session.pk)
 
     def test_anonymous_access_ko(self):
@@ -1519,9 +1518,7 @@ class TestSessionUpdateView(TestCase):
         data = {
             'name': name,
             'plot': fake.text(),
-            'system': self.session.system,
             'next_game': self.session.next_game,
-            'world': self.session.world.pk,
             'campaign': self.session.campaign.pk,
         }
         self.client.force_login(self.user_in_game_masters)
@@ -1535,9 +1532,7 @@ class TestSessionUpdateView(TestCase):
         data = {
             'name': fake.sentence(),
             'plot': fake.text(),
-            'system': self.session.system,
             'next_game': self.session.next_game,
-            'world': self.session.world.pk,
             'campaign': self.session.campaign.pk,
         }
         self.client.force_login(self.user_in_game_masters)
@@ -1549,7 +1544,6 @@ class TestSessionUpdateView(TestCase):
         )
 
 
-@unittest.skip('TODO: refactor')
 class TestSessionListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = models.Session
@@ -1567,7 +1561,7 @@ class TestSessionListView(TestCase):
         baker.make_recipe(
             baker_recipe_name='roleplay.session',
             _quantity=fake.pyint(min_value=1, max_value=10),
-            players=[cls.user, cls.another_user],
+            campaign=baker.make_recipe('roleplay.campaign', users=[cls.user, cls.another_user]),
         )
         cls.url = resolve_url(cls.resolver)
 
@@ -1593,10 +1587,13 @@ class TestSessionListView(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
-        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
+        self.assertEqual(self.user.sessions.count(), response.context['object_list'].count())
 
     def test_access_session_with_image_ok(self):
-        session = baker.make_recipe('roleplay.session', players=[self.user])
+        session = baker.make_recipe(
+            'roleplay.session',
+            campaign=baker.make_recipe('roleplay.campaign', users=[self.user])
+        )
         session.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
         session.save()
         self.client.force_login(self.user)
@@ -1609,4 +1606,4 @@ class TestSessionListView(TestCase):
         response = self.client.get(self.url)
         baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
 
-        self.assertEqual(self.user.session_set.count(), response.context['object_list'].count())
+        self.assertEqual(self.user.sessions.count(), response.context['object_list'].count())
