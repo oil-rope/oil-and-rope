@@ -1553,17 +1553,19 @@ class TestSessionListView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.url = resolve_url(cls.resolver)
+
         cls.user = baker.make_recipe('registration.user')
+        profile = cls.user.profile
+        profile.image = fake.file_name(category='image')
+        profile.save(update_fields=['image'])
         cls.another_user = baker.make_recipe('registration.user')
-        another_user_profile = cls.another_user.profile
-        another_user_profile.image = SimpleUploadedFile('image.png', b'file_content', content_type='image/png')
-        another_user_profile.save()
+
         baker.make_recipe(
             baker_recipe_name='roleplay.session',
-            _quantity=fake.pyint(min_value=1, max_value=10),
+            _quantity=fake.pyint(min_value=1, max_value=cls.view.paginate_by),
             campaign=baker.make_recipe('roleplay.campaign', users=[cls.user, cls.another_user]),
         )
-        cls.url = resolve_url(cls.resolver)
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
@@ -1607,3 +1609,25 @@ class TestSessionListView(TestCase):
         baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
 
         self.assertEqual(self.user.sessions.count(), response.context['object_list'].count())
+
+    def test_access_session_list_with_more_than_three_players_ok(self):
+        self.client.force_login(self.user)
+
+        session = baker.make_recipe(
+            'roleplay.session',
+            campaign=baker.make_recipe('roleplay.campaign')
+        )
+        session.campaign.users.add(self.user, *baker.make_recipe('registration.user', _quantity=3))
+        response = self.client.get(self.url)
+
+        self.assertInHTML('and more...', response.rendered_content)
+
+    def test_query_performance_ok(self):
+        rq = RequestFactory().get(self.url)
+        rq.user = self.user
+        queries = (
+            'SELECT [...] FROM roleplay.session',
+        )
+
+        with self.assertNumQueries(len(queries)):
+            self.view.as_view()(rq)

@@ -39,7 +39,8 @@ class User(AbstractUser):
     @property
     def sessions(self):
         Session = apps.get_model(constants.ROLEPLAY_SESSION)
-        return Session.objects.select_related('campaign').filter(campaign__users__in=[self])
+        sessions = Session.objects.filter(campaign__users__in=[self])
+        return sessions
 
     class Meta:
         db_table = 'auth_user'

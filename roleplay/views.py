@@ -356,7 +356,7 @@ class CampaignUserListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, Lis
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            users__in=[self.request.user]
+            users=self.request.user
         )
 
 
@@ -596,6 +596,6 @@ class SessionListView(LoginRequiredMixin, FilterView):
 
     def get_queryset(self):
         qs = super().get_queryset().filter(
-            campaign__users__in=[self.request.user],
+            campaign__users=self.request.user,
         )
         return qs
