@@ -37,7 +37,7 @@
             aria-haspopup="true"
             aria-expanded="false"
           >
-            <i class="ic ic-dots-horizontal-triple"></i>
+            {{ ICONS.COG|safe }}
           </button>
           <div class="dropdown-menu" aria-labelledby="world_{{ world.pk }}_actions">
             <a href="{% url 'roleplay:campaign:create' world.pk %}" class="dropdown-item">

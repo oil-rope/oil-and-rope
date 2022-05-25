@@ -989,6 +989,12 @@ class TestCampaignListView(TestCase):
 
         self.assertIn(campaign, response.context['campaign_list'])
 
+    @pytest.mark.coverage
+    def test_public_campaigns_with_pagination_ok(self):
+        self.client.force_login(self.user)
+        baker.make_recipe('roleplay.public_campaign', self.view.paginate_by)
+        self.client.get(self.url)
+
     def test_query_performance_ok(self):
         rq = RequestFactory()
         get_rq = rq.get(self.url)

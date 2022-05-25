@@ -49,6 +49,15 @@
                 <li>
                   <a
                     class="dropdown-item"
+                    href="{{ object.campaign.get_absolute_url }}"
+                  >
+                    {{ ICONS.QUILL|safe }}
+                    {% translate "go to campaign"|capfirst %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
                     href="{% url 'roleplay:session:edit' object.pk %}"
                   >
                     <i class="ic ic-edit"></i>
@@ -153,13 +162,6 @@
               </p>
             </div>
           {% endfor %}
-          <p>
-            {% if request.user in object.campaign.game_masters %}
-              <small class="text-muted">
-                {% translate "To invite more players got to 'Edit' and then 'Invite players'." %}
-              </small>
-            {% endif %}
-          </p>
         </div>
       </div>
     </div>

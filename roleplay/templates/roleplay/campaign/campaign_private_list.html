@@ -49,6 +49,12 @@
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
       </div>
     {% endif %}
+
+    <div class="row mt-5">
+      <div class="col">
+        {% include 'roleplay/campaign/include/campaign_create_footer.html' only %}
+      </div>
+    </div>
   </main>
 {% endblock body_content %}
 

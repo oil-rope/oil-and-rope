@@ -20,6 +20,15 @@
         <ul class="dropdown-menu" aria-labelledby="btnGroupCampaignSettings">
           <li>
             <a
+              href="{% url 'roleplay:session:create' campaign.pk %}"
+              class="dropdown-item"
+            >
+              {{ ICONS.PLUS|safe }}
+              {% translate "add session"|capfirst %}
+            </a>
+          </li>
+          <li>
+            <a
               href="{% url 'roleplay:campaign:edit' campaign.pk %}"
               class="dropdown-item"
             >

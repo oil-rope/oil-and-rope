@@ -594,6 +594,13 @@ class SessionListView(LoginRequiredMixin, FilterView):
     )
     template_name = 'roleplay/session/session_list.html'
 
+    def get_filterset(self, filterset_class):
+        filterset = super().get_filterset(filterset_class)
+        filterset.filters['campaign'].queryset = Campaign.objects.filter(
+            users=self.request.user,
+        )
+        return filterset
+
     def get_queryset(self):
         qs = super().get_queryset().filter(
             campaign__users=self.request.user,
