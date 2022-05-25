@@ -21,7 +21,7 @@ class TestCampaignPreSave(TestCase):
 
     def setUp(self):
         self.data_ok = {
-            'name': fake.sentence(),
+            'name': fake.sentence(nb_words=3),
             'system': random.choice(RoleplaySystems.values),
             'owner': self.owner,
             'place': self.world,

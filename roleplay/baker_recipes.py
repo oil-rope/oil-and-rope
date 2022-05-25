@@ -32,20 +32,11 @@ place = Recipe(
     owner=foreign_key(user),
 )
 
-world = Recipe(
-    Place,
-    name=fake.country,
-    description=fake.paragraph,
+world = place.extend(
     site_type=SiteTypes.WORLD,
-    owner=foreign_key(user),
 )
 
-private_world = Recipe(
-    Place,
-    name=fake.country,
-    description=fake.paragraph,
-    site_type=SiteTypes.WORLD,
-    owner=foreign_key(user),
+private_world = world.extend(
     user=foreign_key(user),
 )
 
@@ -58,31 +49,24 @@ domain = Recipe(
 
 campaign = Recipe(
     Campaign,
-    name=fake.sentence,
+    name=functools.partial(fake.sentence, nb_words=3),
     system=random_roleplay_system,
     is_public=fake.pybool,
 )
 
-
-public_campaign = Recipe(
-    Campaign,
-    name=fake.sentence,
-    system=random_roleplay_system,
+public_campaign = campaign.extend(
     is_public=True,
 )
 
-private_campaign = Recipe(
-    Campaign,
-    name=fake.sentence,
-    system=random_roleplay_system,
+private_campaign = campaign.extend(
     is_public=False,
 )
 
 session = Recipe(
     Session,
     name=fake.sentence,
-    description=fake.words,
-    plot=fake.paragraph,
+    description=fake.paragraph,
+    plot=fake.words,
     gm_info=fake.paragraph,
     next_game=random_date_after_today,
 )

@@ -323,7 +323,7 @@ class TestCampaign(TestCase):
         cls.owner = baker.make_recipe('registration.user')
 
     def setUp(self):
-        self.name = fake.sentence()
+        self.name = fake.sentence(nb_words=3)
         self.instance = self.model.objects.create(
             name=self.name, chat=self.chat, system=random.choice(RoleplaySystems.values), place=self.world,
             owner=self.owner,

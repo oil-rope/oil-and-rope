@@ -334,7 +334,7 @@ class TestSessionForm(TestCase):
             image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
 
         self.data_ok = {
-            'name': fake.sentence(),
+            'name': fake.sentence(nb_words=3),
             'description': fake.paragraph(),
             'plot': fake.sentence(nb_words=4),
             'gm_info': fake.paragraph(),
