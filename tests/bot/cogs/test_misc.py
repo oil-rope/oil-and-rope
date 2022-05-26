@@ -20,20 +20,3 @@ async def test_shutdown_owner_ok(bot, mocker):
     assert dpytest.verify().message().content(
         content='Shutting down...'
     ), 'Bot is not being shutdown'
-
-
-@pytest.mark.asyncio
-async def test_roll_bad_syntax_ko(bot):
-    roll = f'{bot.command_prefix}roll 1d20+'
-    await dpytest.message(content=roll)
-
-    assert dpytest.verify().message().content('Dice roll `1d20+` syntax is incorrect.'), 'Bad syntax passes'
-
-
-@pytest.mark.asyncio
-async def test_roll_ok(bot):
-    roll = f'{bot.command_prefix}roll 20'
-    await dpytest.message(content=roll)
-
-    # NOTE: Since we cannot test if embed is sent correctly we just assume no errors has been launched.
-    assert True

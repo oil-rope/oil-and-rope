@@ -1,6 +1,7 @@
 import logging
 import random
 from typing import List
+from unittest import mock
 
 import requests
 from model_bakery import baker
@@ -61,3 +62,8 @@ def generate_place(_quantity=1, with_user=False, **kwargs) -> List[roleplay.mode
         places += [roleplay.models.Place.objects.create(**params)]
 
     return places if len(places) > 1 else places[0]
+
+
+class AsyncMock(mock.MagicMock):
+    async def __call__(self, *args, **kwargs):
+        return super(AsyncMock, self).__call__(*args, **kwargs)

@@ -32,3 +32,18 @@ class Roleplay(commands.Cog, name='Roleplay'):
             await ctx.send(embed=embed_roll)
         except OilAndRopeException as ex:
             await ctx.send(ex.message)
+
+    @commands.command()
+    async def linkchannel(self, ctx: commands.Context, name: str = ''):
+        """
+        Links current channel to Campaign.
+        This campaign can be passed as `name` or selected by reacting to the embed message.
+
+        Parameters
+        ----------
+        name: Optional
+            Name of the campaign.
+            E.g. ..linkchannel "My Campaign"
+        """
+
+        await ctx.send('This command is not implemented yet.')
