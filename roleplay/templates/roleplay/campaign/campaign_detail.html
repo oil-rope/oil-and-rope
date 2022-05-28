@@ -154,7 +154,7 @@
 
 {% block javascript %}
   <script type="module">
-    import setUpTooltip from '{% static "js/setupUtils.js" %}'
+    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
     setUpTooltip();
   </script>
 {% endblock javascript %}

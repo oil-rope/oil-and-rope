@@ -83,6 +83,12 @@
   });
 </script>
 
+<!-- Web permissions -->
+{# NOTE: Since we're gonna use them a lot #}
+<script>
+  Notification.requestPermission();
+</script>
+
 <!-- JavaScript -->
 {% block javascript %}
 {% endblock javascript %}

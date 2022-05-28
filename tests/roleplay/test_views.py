@@ -5,6 +5,7 @@ import time
 from unittest import mock
 
 import pytest
+from django.apps import apps
 from django.conf import settings
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,11 +17,15 @@ from model_bakery import baker
 from PIL import Image
 
 from common import tools
+from common.constants import models as constants
 from roleplay import enums, models, views
 from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 from .. import fake
 from ..utils import generate_place
+
+ContentType = apps.get_model(constants.CONTENT_TYPE)
+Vote = apps.get_model(constants.COMMON_VOTE)
 
 
 class TestPlaceCreateView(TestCase):
@@ -994,6 +999,36 @@ class TestCampaignListView(TestCase):
         self.client.force_login(self.user)
         baker.make_recipe('roleplay.public_campaign', self.view.paginate_by)
         self.client.get(self.url)
+
+    @pytest.mark.coverage
+    def test_campaign_with_user_voted_positive_ok(self):
+        self.client.force_login(self.user)
+        campaign = baker.make_recipe('roleplay.public_campaign')
+        baker.make(
+            _model=Vote,
+            is_positive=True,
+            user=self.user,
+            content_type=ContentType.objects.get_for_model(campaign),
+            object_id=campaign.pk,
+        )
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'btn btn-success disabled')
+
+    @pytest.mark.coverage
+    def test_campaign_with_user_voted_negative_ok(self):
+        self.client.force_login(self.user)
+        campaign = baker.make_recipe('roleplay.public_campaign')
+        baker.make(
+            _model=Vote,
+            is_positive=False,
+            user=self.user,
+            content_type=ContentType.objects.get_for_model(campaign),
+            object_id=campaign.pk,
+        )
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'btn btn-danger disabled')
 
     def test_query_performance_ok(self):
         rq = RequestFactory()

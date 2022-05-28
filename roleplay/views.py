@@ -29,11 +29,13 @@ from .utils.invitations import send_campaign_invitations
 
 LOGGER = logging.getLogger(__name__)
 
+ContentType = apps.get_model(models.CONTENT_TYPE)
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
 PlayerInCampaign = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
 User = get_user_model()
+Vote = apps.get_model(models.COMMON_VOTE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -324,6 +326,17 @@ class CampaignComplexQuerySetMixin:
                     user=self.request.user,
                 ).values('is_game_master')
             )
+        )
+
+        # NOTE: This will return `True` or `False` and `None` if user hasn't voted yet
+        self.queryset = self.queryset.annotate(
+            user_vote=Subquery(
+                Vote.objects.filter(
+                    content_type=ContentType.objects.get_for_model(Campaign),
+                    object_id=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_positive')[:1]
+            ),
         )
 
         return super().get_queryset()

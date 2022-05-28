@@ -1,5 +1,6 @@
 {% extends 'core/layout.html' %}
 {% load i18n %}
+{% load static %}
 {% load string_utils %}
 
 {% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
@@ -20,7 +21,7 @@
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-around">
-      {% for object in campaign_list %}
+      {% for object in object_list %}
         <div class="col">
           {% include 'roleplay/campaign/include/campaign_card.html' with campaign=object %}
         </div>
@@ -64,3 +65,11 @@
     </div>
   </main>
 {% endblock body_content %}
+
+{% block javascript %}
+  <script type="module">
+    import { setUpLikeDislike, setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    setUpTooltip();
+    setUpLikeDislike();
+  </script>
+{% endblock javascript %}
