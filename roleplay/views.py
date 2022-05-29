@@ -393,7 +393,7 @@ class RaceCreateView(LoginRequiredMixin, CreateView):
     template_name = 'roleplay/race/race_create.html'
 
     def get_success_url(self):
-        return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
+        return resolve_url(self.object)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

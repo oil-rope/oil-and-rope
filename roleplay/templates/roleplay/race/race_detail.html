@@ -6,18 +6,23 @@
     {{ name }}
 {% endblock title %}
 
+{% block breadcrumb %}
+  {% translate "race detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:list, race detail' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
   <main class="container-fluid">
-    <h3 class="font-ds-lighter display-4 text-center">
+    <h3 class="font-ds-lighter display-4 justify-content-center">
       {{ object.name }}
     </h3>
     <div class="col-12">
       <div class="d-flex row justify-content-center ">
         <picture class="d-flex justify-content-center"> 
           {% if object.image %}
-          <img height="250px" load="lazy" src="{{ object.image.url }}" alt="Race image">
+            <img height="250px" load="lazy" src="{{ object.image.url }}" alt="Race image">
           {% else %}
-          <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color.svg' %}" alt="Oil & Rope Logo">
+            <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color.svg' %}" alt="Oil & Rope Logo">
           {% endif %}
         </picture>
       </div>
@@ -49,7 +54,7 @@
         </div>
         <div class="row">
           <h5 class="justify-content-center">
-            {% translate 'affected by Armor'|capfirst %}: 
+            {% translate 'affected by armor'|capfirst %}: 
               {% if object.affected_by_armor %}
                 &#10004;
               {% else %}

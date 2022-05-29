@@ -1902,7 +1902,7 @@ msgstr "borrar raza"
 #: roleplay/templates/roleplay/race/race_detail.html:52
 #, fuzzy
 #| msgid "Affected by armor"
-msgid "affected by Armor"
+msgid "affected by armor"
 msgstr "afectado por la armadura"
 
 #: roleplay/templates/roleplay/session/include/session_list_item.html:12

@@ -182,7 +182,7 @@ class RaceFormLayout(layout.Layout):
                     ),
                 ),
                 bootstrap.Tab(
-                    _('Attributes').title(),
+                    _('attributes').title(),
                     layout.Row(
                         layout.Column('strength'),
                         layout.Column('dexterity'),

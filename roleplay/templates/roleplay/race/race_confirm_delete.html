@@ -4,7 +4,7 @@
 {% load string_utils %}
 
 {% block breadcrumb %}
-  {% translate "race delete" %}
+  {% translate "race delete" as breadcrumb_translation %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:list,race delete' %}
 {% endblock breadcrumb %}
 

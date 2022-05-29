@@ -7,6 +7,11 @@
   {% translate "create"|capfirst %} {% translate "race"|capfirst %}
 {% endblock title %}
 
+{% block breadcrumb %}
+  {% translate "create race" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:create,create race' %}
+{% endblock breadcrumb %}
+
 {% block body_content %}
   <main class="container py-5">
     <h2 class="display-4 text-center">
@@ -20,6 +25,3 @@
     </div>
   </main>
 {% endblock body_content %}
-
-{% block javascript %}
-{% endblock javascript %}
