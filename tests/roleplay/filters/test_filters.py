@@ -19,3 +19,19 @@ class TestCampaignFilter(TestCase):
         qs = self.filter_class(data={'active': False}).qs
 
         self.assertIn(campaign, qs)
+
+
+class TestSessionFilter(TestCase):
+    filter_class = filters.SessionFilter
+
+    def test_get_active_true_with_next_game_in_past_session_is_not_listed(self):
+        session = baker.make_recipe('roleplay.session', next_game=timezone.now() - timezone.timedelta(days=1))
+        qs = self.filter_class(data={'active': True}).qs
+
+        self.assertNotIn(session, qs)
+
+    def test_get_active_false_with_next_game_in_past_session_is_listed(self):
+        session = baker.make_recipe('roleplay.session', next_game=timezone.now() - timezone.timedelta(days=1))
+        qs = self.filter_class(data={'active': False}).qs
+
+        self.assertIn(session, qs)
