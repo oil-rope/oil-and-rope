@@ -86,10 +86,15 @@ class TestVoteView(TestCase):
 
         self.assertEqual(404, response.status_code)
 
-    def test_access_authenticated_update_vote_ok(self):
+    def test_access_authenticated_existing_vote_ok(self):
         self.client.force_login(self.user)
-        baker.make(Vote, user=self.user, is_positive=False)
-        response = self.client.get(self.url, is_positive=True)
-        vote = Vote.objects.get(pk=response.json()['id'])
+        vote = baker.make_recipe(
+            'common.campaign_vote',
+            user=self.user,
+            is_positive=False,
+            object_id=self.instance.pk,
+        )
+        self.client.get(self.url, data={'is_positive': True})
+        vote.refresh_from_db()
 
         self.assertTrue(vote.is_positive)
