@@ -22,6 +22,8 @@ from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
+    # Prometheus metrics
+    path('', include('django_prometheus.urls')),
     # JavaScript translations
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
