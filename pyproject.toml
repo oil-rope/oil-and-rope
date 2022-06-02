@@ -20,6 +20,7 @@ django-cors-headers = "^3.11"
 django-filter = "^21.1"
 django-mptt = "^0.13"
 django-mptt-admin = "^2.2"
+django-prometheus = "^2.2"
 djangorestframework = "^3.12"
 docutils = "~0.17.1"  # Required by admindocs even if not used
 Faker = "^13.3"
