@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-18 16:34+0000\n"
+"POT-Creation-Date: 2022-06-08 17:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,14 +68,14 @@ msgid "user not authenticated."
 msgstr "usuario no autenticado."
 
 #: chat/models.py:23 chat/models.py:59 common/models.py:33
-#: roleplay/models.py:454 roleplay/models.py:521
+#: roleplay/models.py:457 roleplay/models.py:524
 #, fuzzy
 #| msgid "Identifier"
 msgid "identifier"
 msgstr "identificador"
 
 #: chat/models.py:24 common/models.py:34 roleplay/models.py:32
-#: roleplay/models.py:85 roleplay/models.py:355 roleplay/models.py:455
+#: roleplay/models.py:85 roleplay/models.py:355 roleplay/models.py:458
 #, fuzzy
 #| msgid "Chat name"
 msgid "name"
@@ -94,7 +94,7 @@ msgstr "usuarios"
 msgid "discord identifier"
 msgstr "identificador de discord"
 
-#: chat/models.py:38 chat/models.py:61 roleplay/models.py:462
+#: chat/models.py:38 chat/models.py:61 roleplay/models.py:465
 msgid "chat"
 msgstr "chat"
 
@@ -193,7 +193,7 @@ msgstr "comprobación de usuario"
 
 #: common/enums.py:26 registration/models.py:52 registration/models.py:84
 #: registration/templates/registration/user_update.html:6 roleplay/models.py:98
-#: roleplay/models.py:414
+#: roleplay/models.py:417
 msgid "user"
 msgstr "usuario"
 
@@ -259,7 +259,7 @@ msgstr "pluma"
 msgid "map"
 msgstr "mapa"
 
-#: common/enums.py:42 roleplay/enums.py:33 roleplay/models.py:470
+#: common/enums.py:42 roleplay/enums.py:33 roleplay/models.py:473
 #: roleplay/templates/roleplay/include/world_card.html:59
 #: roleplay/templates/roleplay/place/place_detail.html:102
 #: roleplay/templates/roleplay/world/world_create.html:6
@@ -322,7 +322,7 @@ msgstr "equis fina"
 #: roleplay/forms/forms.py:54 roleplay/forms/forms.py:125
 #: roleplay/forms/layout.py:10 roleplay/forms/layout.py:108
 #: roleplay/templates/roleplay/race/race_create.html:7
-#: roleplay/templates/roleplay/race/race_create.html:13
+#: roleplay/templates/roleplay/race/race_create.html:18
 #: roleplay/templates/roleplay/session/session_create.html:7
 #: roleplay/templates/roleplay/session/session_create.html:20
 #: roleplay/templates/roleplay/world/world_create.html:6 roleplay/views.py:402
@@ -770,7 +770,7 @@ msgstr "activar navegación"
 msgid "worlds"
 msgstr "mundos"
 
-#: core/templates/core/includes/menu.html:61 roleplay/models.py:480
+#: core/templates/core/includes/menu.html:61 roleplay/models.py:483
 #: roleplay/templates/roleplay/session/session_list.html:5
 msgid "sessions"
 msgstr "sesiones"
@@ -955,13 +955,13 @@ msgstr ""
 msgid "to accomplish the requested task please click on link below."
 msgstr "para realizar dicha tarea has click en el link de debajo."
 
-#: oilandrope/settings.py:241
+#: oilandrope/settings.py:245
 #, fuzzy
 #| msgid "English"
 msgid "english"
 msgstr "inglés"
 
-#: oilandrope/settings.py:242
+#: oilandrope/settings.py:246
 #, fuzzy
 #| msgid "Spanish"
 msgid "spanish"
@@ -1113,7 +1113,7 @@ msgstr "cambiar contraseña"
 #: registration/forms/layout.py:161
 #: roleplay/templates/roleplay/race/race_update.html:7
 #: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:78
-#: roleplay/views.py:210 roleplay/views.py:357 roleplay/views.py:437
+#: roleplay/views.py:210 roleplay/views.py:357 roleplay/views.py:428
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -1500,7 +1500,7 @@ msgid "this place belongs to..."
 msgstr "este lugar pertenece a..."
 
 #: roleplay/forms/forms.py:32 roleplay/forms/forms.py:60
-#: roleplay/forms/forms.py:140
+#: roleplay/forms/forms.py:153
 #, fuzzy, python-format
 #| msgid "A picture is worth a thousand words"
 msgid "A picture is worth a thousand words. Max size file %(max_size)s MiB."
@@ -1530,7 +1530,7 @@ msgstr "información básica"
 msgid "what will happen in this session?"
 msgstr "¿qué pasará en la siguiente partida?"
 
-#: roleplay/forms/layout.py:129 roleplay/models.py:466
+#: roleplay/forms/layout.py:129 roleplay/models.py:469
 msgid "next session"
 msgstr "siguiente sesión"
 
@@ -1551,7 +1551,7 @@ msgid "domain type"
 msgstr "tipo de dominio"
 
 #: roleplay/models.py:37 roleplay/models.py:91 roleplay/models.py:368
-#: roleplay/models.py:475
+#: roleplay/models.py:478
 #, fuzzy
 #| msgid "Image"
 msgid "image"
@@ -1593,43 +1593,43 @@ msgstr "lugares"
 msgid "a private world must have owner"
 msgstr "un mundo privado debe tener propietario"
 
-#: roleplay/models.py:357 roleplay/templates/roleplay/race/race_detail.html:33
+#: roleplay/models.py:357 roleplay/templates/roleplay/race/race_detail.html:38
 #, fuzzy
 #| msgid "Strength"
 msgid "strength"
 msgstr "fuerza"
 
-#: roleplay/models.py:358 roleplay/templates/roleplay/race/race_detail.html:36
+#: roleplay/models.py:358 roleplay/templates/roleplay/race/race_detail.html:41
 #, fuzzy
 #| msgid "Dexterity"
 msgid "dexterity"
 msgstr "destreza"
 
-#: roleplay/models.py:359 roleplay/templates/roleplay/race/race_detail.html:39
+#: roleplay/models.py:359 roleplay/templates/roleplay/race/race_detail.html:44
 #, fuzzy
 #| msgid "Constitution"
 msgid "constitution"
 msgstr "constitución"
 
-#: roleplay/models.py:360 roleplay/templates/roleplay/race/race_detail.html:42
+#: roleplay/models.py:360 roleplay/templates/roleplay/race/race_detail.html:47
 #, fuzzy
 #| msgid "Intelligence"
 msgid "intelligence"
 msgstr "inteligencia"
 
-#: roleplay/models.py:361 roleplay/templates/roleplay/race/race_detail.html:45
+#: roleplay/models.py:361 roleplay/templates/roleplay/race/race_detail.html:50
 #, fuzzy
 #| msgid "Wisdom"
 msgid "wisdom"
 msgstr "sabiduría"
 
-#: roleplay/models.py:362 roleplay/templates/roleplay/race/race_detail.html:48
+#: roleplay/models.py:362 roleplay/templates/roleplay/race/race_detail.html:53
 #, fuzzy
 #| msgid "Charisma"
 msgid "charisma"
 msgstr "carisma"
 
-#: roleplay/models.py:364
+#: roleplay/models.py:364 roleplay/templates/roleplay/race/race_detail.html:57
 #, fuzzy
 #| msgid "Affected by armor"
 msgid "affected by armor"
@@ -1641,73 +1641,73 @@ msgstr "afectado por la armadura"
 msgid "declares if this race is affected by armor penalties"
 msgstr "indica si la raza es afectada por penalizadores al llevar armadura"
 
-#: roleplay/models.py:391 roleplay/models.py:418
+#: roleplay/models.py:391 roleplay/models.py:421
 #: roleplay/templates/roleplay/include/race_card.html:53
 #: roleplay/templates/roleplay/race/race_create.html:7
-#: roleplay/templates/roleplay/race/race_create.html:13
+#: roleplay/templates/roleplay/race/race_create.html:18
 #: roleplay/templates/roleplay/race/race_update.html:7
 msgid "race"
 msgstr "raza"
 
-#: roleplay/models.py:421
+#: roleplay/models.py:424
 #, fuzzy
 #| msgid "Ownership"
 msgid "ownership"
 msgstr "propiedad"
 
-#: roleplay/models.py:456
+#: roleplay/models.py:459
 msgid "plot"
 msgstr "trama"
 
-#: roleplay/models.py:458
+#: roleplay/models.py:461
 #, fuzzy
 #| msgid "play"
 msgid "players"
 msgstr "jugadores"
 
-#: roleplay/models.py:468
+#: roleplay/models.py:471
 msgid "system"
 msgstr "sistema"
 
-#: roleplay/models.py:479 roleplay/models.py:524
+#: roleplay/models.py:482 roleplay/models.py:527
 #: roleplay/templates/roleplay/session/session_create.html:7
 #: roleplay/templates/roleplay/session/session_create.html:20
 msgid "session"
 msgstr "sesión"
 
-#: roleplay/models.py:501
+#: roleplay/models.py:504
 #, fuzzy
 #| msgid "Seems like you haven't any world"
 msgid "session hasn't any world."
 msgstr "la sesión no tiene ningún mundo."
 
-#: roleplay/models.py:505
+#: roleplay/models.py:508
 #, fuzzy
 #| msgid "world must be a world"
 msgid "world must be a world."
 msgstr "el mundo debe ser de tipo 'mundo'"
 
-#: roleplay/models.py:528
+#: roleplay/models.py:531
 #, fuzzy
 #| msgid "play"
 msgid "player"
 msgstr "jugador"
 
-#: roleplay/models.py:530
+#: roleplay/models.py:533
 msgid "game master"
 msgstr "maestro de mazmorra"
 
-#: roleplay/models.py:533
+#: roleplay/models.py:536
 msgid "player in session"
 msgstr "jugadores en sesiones"
 
-#: roleplay/models.py:534
+#: roleplay/models.py:537
 #, fuzzy
 #| msgid "players in sessions"
 msgid "players in session"
 msgstr "jugadores en sesión"
 
-#: roleplay/models.py:540
+#: roleplay/models.py:543
 #, python-format
 msgid "%(player)s in %(session)s (Game Master: %(is_game_master)s)"
 msgstr ""
@@ -1899,11 +1899,17 @@ msgstr "editando"
 msgid "race delete"
 msgstr "borrar raza"
 
-#: roleplay/templates/roleplay/race/race_detail.html:52
+#: roleplay/templates/roleplay/race/race_create.html:11
 #, fuzzy
-#| msgid "Affected by armor"
-msgid "affected by armor"
-msgstr "afectado por la armadura"
+#| msgid "Create one"
+msgid "create race"
+msgstr "crear raza"
+
+#: roleplay/templates/roleplay/race/race_detail.html:10
+#, fuzzy
+#| msgid "Delete"
+msgid "race detail"
+msgstr "detalle de raza"
 
 #: roleplay/templates/roleplay/session/include/session_list_item.html:12
 #: roleplay/templates/roleplay/session/include/session_list_item.html:18
@@ -2183,6 +2189,63 @@ msgstr "sesión borrada."
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "Affected by armor"
+#~ msgid "affected by Armor"
+#~ msgstr "afectado por la armadura"
+
+#, fuzzy
+#~| msgid "Welcome to Oil &amp; Rope traveller!"
+#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
+#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
+
+#, fuzzy
+#~| msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
+#~ msgid "Oil &amp;amp; Rope is a Django project for managing Roleplay Games"
+#~ msgstr ""
+#~ "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
+
+#, fuzzy
+#~| msgid ""
+#~| "Oil &amp; Rope was born from the problem that some websites for managing "
+#~| "roleplay games are quite <i>rough</i>."
+#~ msgid ""
+#~ "Oil &amp;amp; Rope was born from the problem that some websites for "
+#~ "managing roleplay games are quite &lt;i>rough&lt;/i>."
+#~ msgstr ""
+#~ "Oil &amp; Rope nació como solución a un problema: la gestión <i>tosca</i> "
+#~ "de juegos de mesa en línea."
+
+#, fuzzy
+#~| msgid ""
+#~| "Oil &amp; Rope is an open-source project and can be found on <a href="
+#~| "\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
+#~| "\">GitHub</a>."
+#~ msgid ""
+#~ "Oil &amp;amp; Rope is an open-source project and can be found on &lt;a "
+#~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
+#~ "\">GitHub&lt;/a>."
+#~ msgstr ""
+#~ "Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a "
+#~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
+#~ "\">GitHub</a>."
+
+#, fuzzy
+#~| msgid ""
+#~| "We are a group of people with different professional profiles "
+#~| "(developers, designers, composers, …) and one thought in common,<br><i "
+#~| "class=\"font-weight-bold\">\"make an incredible experience for "
+#~| "roleplaying online!\"</i>."
+#~ msgid ""
+#~ "We are a group of people with different professional profiles "
+#~ "(developers, designers, composers, &#8230;) and one thought in common,&lt;"
+#~ "br>&lt;i class=\"font-weight-bold\">\"make an incredible experience for "
+#~ "roleplaying online!\"&lt;/i>."
+#~ msgstr ""
+#~ "Somos un grupo de personas con diferentes perfiles profesionales "
+#~ "(desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i "
+#~ "class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
 
 #, fuzzy, python-format
 #~| msgid ""
