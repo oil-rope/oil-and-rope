@@ -57,7 +57,13 @@ class AvailableIcons(models.TextChoices):
     GITHUB = '<i class="ic-github"></i>', 'GitHub'
     DISCORD = '<i class="ic-discord"></i>', 'Discord'
     GOOGLE = '<i class="ic-google"></i>', 'Google'
-    MAGNIFYING_GLASS = '<i class="ic-magnifying-glass"></i>', _('magnifying glass')
+    SEARCH = '<i class="bi bi-search"></i>', _('search')
+    THUMBS_UP = '<i class="bi bi-hand-thumbs-up"></i>', _('thumbs up')
+    THUMBS_UP_FILL = '<i class="bi bi-hand-thumbs-up-fill"></i>', _('thumbs up fill')
+    THUMBS_DOWN = '<i class="bi bi-hand-thumbs-down"></i>', _('thumbs down')
+    THUMBS_DOWN_FILL = '<i class="bi bi-hand-thumbs-down-fill"></i>', _('thumbs down fill')
+    INFO = '<i class="bi bi-info"></i>', _('info')
+    INFO_LG = '<i class="bi bi-info-lg"></i>', _('info lg')
 
     @classmethod
     def choices_with_empty(cls):

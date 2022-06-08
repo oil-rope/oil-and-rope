@@ -14,8 +14,7 @@
     data-bs-target="{{ model }}#{{ object.pk }}"
     data-bs-type="like"
   >
-    {{ ICONS.THUMB_UP|safe }}
-    &#128077; {# NOTE: This is a thumb up #}
+    {{ ICONS.THUMBS_UP_FILL|safe }}
   </button>
 
   <button
@@ -27,7 +26,6 @@
     data-bs-target="{{ model }}#{{ object.pk }}"
     data-bs-type="dislike"
   >
-    {{ ICONS.THUMB_DOWN|safe }}
-    &#128078; {# NOTE: This is a thumb down #}
+    {{ ICONS.THUMBS_DOWN_FILL|safe }}
   </button>
 </div>
