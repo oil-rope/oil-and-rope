@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     'corsheaders',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
+    # django-prometheus (https://github.com/korfuri/django-prometheus#quickstart)
+    'django_prometheus',
     # DjangoAllAuth (https://django-allauth.readthedocs.io/)
     'allauth',
     'allauth.account',
@@ -104,6 +106,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -113,6 +116,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # Changing messages tags to Bootstrap
