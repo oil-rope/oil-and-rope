@@ -392,6 +392,9 @@ class Race(TracingMixin):
         verbose_name_plural = _('races')
         ordering = ['-entry_created_at', 'name']
 
+    def get_absolute_url(self):
+        return resolve_url('roleplay:race:detail', pk=self.pk)
+
     def __str__(self):
         return f'{self.name} [{self.pk}]'
 
