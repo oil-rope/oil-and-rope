@@ -11,15 +11,17 @@
 {% block body_content %}
   <div class="container">
       <h2 class="display-5 text-center">
-        {% translate Races %}
-        <a
-          title="{% translate Race %}"
-          href="{% url 'roleplay:race:create' %}"
-         class="btn btn-lg btn-dark"
-        >
-          <span class="ic-plus"></span>
-        </a>
+        {% translate 'races'|capfirst %}
       </h2>
+      <div class="row justify-content-center">
+          <a
+        title="{% translate 'create new race'|capfirst %}" href="{% url 'roleplay:race:create' %}?user"
+        href="{% url 'roleplay:race:create' %}"
+       class="col col-lg-4 btn btn-lg btn-dark"
+      >
+        <i class="ic-plus"></i>
+        Añadir
+      </a>
       <div class="w-100 py-2"></div>
       {% if is_paginated %}
         {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
