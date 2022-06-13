@@ -17,7 +17,7 @@
         <div class="card p-md-5">
           <div class="card-body">
             <p class="text-end">
-              <button class="btn" onclick="goBack();">
+              <button class="btn" onclick="{{ JAVASCRIPT.GO_BACK }}">
                 <i class="ic ic-cross-thin text-danger"></i>
               </button>
             </p>
@@ -31,15 +31,11 @@
             </p>
           </div>
           <div class="card-body mt-xl-5">
-            <form
-              class="d-flex justify-content-around"
-              action="{% url 'roleplay:session:delete' object.pk %}"
-              method="post"
-            >
+            <form class="d-flex justify-content-around" action="{% url 'roleplay:session:delete' object.pk %}" method="POST">
               {% csrf_token %}
               <button
                 type="button"
-                onclick="goBack();"
+                onclick="{{ JAVASCRIPT.GO_BACK }}"
                 class="col-5 col-xl-4 btn btn-dark"
               >
                 {% translate 'cancel'|capfirst %}

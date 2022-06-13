@@ -1,7 +1,7 @@
 from crispy_forms import bootstrap, layout
 from django.utils.translation import gettext_lazy as _
 
-from common.enums import JavaScriptActions
+from common.enums import AvailableIcons, JavaScriptActions
 from common.forms import layout as common_layout
 from common.templatetags.string_utils import capfirstletter as cfl
 
@@ -52,7 +52,7 @@ class PlaceLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
@@ -97,42 +97,76 @@ class WorldFormLayout(layout.Layout):
                     content=_('go back').capitalize(),
                     css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
                 css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
             ),
         )
 
 
-class SessionFormLayout(layout.Layout):
-    def __init__(self, submit_text=_('create')):
+class CampaignFormLayout(layout.Layout):
+    def __init__(self, submit_text):
         super().__init__(
             bootstrap.TabHolder(
                 bootstrap.Tab(
-                    _('basic information').title(),
+                    _('basic information').capitalize(),
                     layout.Row(
-                        layout.Column('name'),
-                        layout.Column('system'),
-                        layout.Column('world'),
+                        layout.Column(
+                            layout.Field('place'),
+                        ),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('is_public'),
+                            css_class='col-12',
+                        ),
+                        layout.Column(
+                            layout.Field('name', placeholder='The Incredible Adventures of...'),
+                        ),
+                        layout.Column(
+                            layout.Field('summary'),
+                        ),
+                        layout.Column(
+                            layout.Field('system'),
+                        ),
                     ),
                     layout.Row(
                         layout.Column(
                             layout.Field(
-                                'plot',
-                                placeholder=cfl(_('what will happen in this session?')),
-                                style='resize: none'
+                                'description',
+                                placeholder=cfl(_('tell us about this adventure!')),
+                                style='resize: none',
                             ),
+                            css_class='col-md-12',
+                        ),
+                        layout.Column(
+                            layout.Field(
+                                'gm_info',
+                                placeholder=_('write something that game masters need to know...').capitalize(),
+                                style='resize: none',
+                            ),
+                            css_class='col-md-12',
+                        ),
+                    ),
+                    layout.Row(
+                        layout.Column(
+                            layout.Field('cover_image'),
                         ),
                     ),
                 ),
                 bootstrap.Tab(
-                    _('next session').title(),
+                    _('date settings').capitalize(),
                     layout.Row(
-                        layout.Column('next_game'),
-                    )
+                        layout.Column(
+                            layout.Field('start_date'),
+                        ),
+                        layout.Column(
+                            layout.Field('end_date'),
+                        ),
+                    ),
                 ),
                 bootstrap.Tab(
-                    _('invite players').title(),
+                    _('invite players').capitalize(),
                     layout.Row(
                         layout.Column(
                             layout.Field(
@@ -149,18 +183,49 @@ class SessionFormLayout(layout.Layout):
                     common_layout.SubmitClearLayout(
                         submit_text=submit_text.capitalize(),
                         reset_button=False,
-                        submit_css_class='col-5 col-lg-6 col-xl-3',
+                        submit_css_class='col-11 col-md-5 col-lg-4 col-xl-3',
                     ),
                 ),
             ),
             layout.Row(
                 common_layout.Button(
                     content=_('go back').capitalize(),
-                    css_class='btn-dark col-11 col-md-7 col-lg-6 col-xl-3',
+                    css_class='btn-dark col-11 col-md-5 col-lg-4 col-xl-3',
                     action=JavaScriptActions.GO_BACK.value,
-                    icon='ic-arrow-left',
+                    icon=AvailableIcons.ARROW_LEFT,
                 ),
-                css_class='justify-content-around mt-3 mt-md-5 mt-lg-3',
+                css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
+            ),
+        )
+
+
+class SessionFormLayout(layout.Layout):
+    def __init__(self, submit_text):
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('name'), css_class='col-md-4'),
+                layout.Column(layout.Field('plot'), css_class='col-md-4'),
+                layout.Column(layout.Field('next_game'), css_class='col-md-4'),
+                layout.Column(layout.Field('description', style='resize: none'), css_class='col-md-6'),
+                layout.Column(layout.Field('gm_info', style='resize: none'), css_class='col-md-6'),
+                layout.Column(layout.Field('image')),
+            ),
+            layout.Row(
+                layout.Column(
+                    layout.Submit('submit', submit_text, css_class='btn btn-primary w-100'),
+                    css_class='col-11 col-md-5 col-lg-4 col-xl-3'
+                ),
+                layout.Div(css_class='d-none d-xl-block w-100 my-2'),
+                layout.Column(
+                    common_layout.Button(
+                        content=_('go back').capitalize(),
+                        css_class='btn-dark w-100',
+                        action=JavaScriptActions.GO_BACK,
+                        icon=AvailableIcons.ARROW_LEFT,
+                    ),
+                    css_class='col-11 col-md-5 col-lg-4 col-xl-3 mt-3 mt-md-0'
+                ),
+                css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
             ),
         )
 

@@ -9,10 +9,11 @@ from django.utils.translation import gettext_lazy as _
 
 from common.constants import models as constants
 from common.files import utils
-from common.forms.widgets import DateTimeWidget
+from common.forms.mixins import FormCapitalizeMixin
+from common.forms.widgets import DateTimeWidget, DateWidget
 
 from .. import enums, models
-from .layout import PlaceLayout, RaceFormLayout, SessionFormLayout, WorldFormLayout
+from .layout import CampaignFormLayout, PlaceLayout, RaceFormLayout, SessionFormLayout, WorldFormLayout
 
 LOGGER = logging.getLogger(__name__)
 
@@ -78,30 +79,73 @@ class WorldForm(forms.ModelForm):
         return super().save(commit)
 
 
-class SessionForm(forms.ModelForm):
-    next_game = forms.DateTimeField(
-        widget=DateTimeWidget,
-    )
+class CampaignForm(FormCapitalizeMixin, forms.ModelForm):
+    """
+    This form is used to create or update a campaign, this form also comes with a `TextField` to add players to
+    the campaign.
+    """
+
     email_invitations = forms.CharField(
-        label='',
+        label=_('email invitations'),
         widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}),
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, submit_text=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.fields['email_invitations'].label = _('email invitations').capitalize()
+        self.user = user
+        if not submit_text:
+            submit_text = _('create').capitalize()
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'POST'
-        self.helper.layout = SessionFormLayout()
+        self.helper.include_media = True
+        self.helper.layout = CampaignFormLayout(submit_text)
+
+    class Meta:
+        fields = (
+            'name', 'description', 'gm_info', 'summary', 'system', 'cover_image', 'is_public',
+            'place', 'start_date', 'end_date',
+        )
+        model = models.Campaign
+        widgets = {
+            'start_date': DateWidget,
+            'end_date': DateWidget,
+        }
+
+    def clean_email_invitations(self):
+        email_invitations = self.cleaned_data.get('email_invitations')
+        if email_invitations:
+            return email_invitations.splitlines()
+        return email_invitations
+
+    def save(self, commit=True):
+        if not self.instance.owner_id:
+            # NOTE: This is a new campaign, so we need to set the owner.
+            self.instance.owner = self.user
+        self.instance = super().save(commit)
+        return self.instance
+
+
+class SessionForm(FormCapitalizeMixin, forms.ModelForm):
+    def __init__(self, campaign, submit_text=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.campaign = campaign
+        if not submit_text:
+            submit_text = _('create').capitalize()
+
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'POST'
+        self.helper.layout = SessionFormLayout(submit_text)
 
     class Meta:
         model = models.Session
         fields = (
-            'name', 'plot', 'next_game', 'system', 'world',
+            'name', 'description', 'plot', 'gm_info', 'next_game', 'image',
         )
+        widgets = {
+            'next_game': DateTimeWidget,
+        }
 
     def clean_next_game(self):
         next_game = self.cleaned_data.get('next_game')
@@ -111,12 +155,7 @@ class SessionForm(forms.ModelForm):
         return next_game
 
     def save(self, commit=True):
-        self.instance = super().save(False)
-        if commit:
-            chat = Chat.objects.create(
-                name=f'{self.instance.name} chat',
-            )
-            self.instance.chat = chat
+        self.instance.campaign = self.campaign
         return super().save(commit)
 
 

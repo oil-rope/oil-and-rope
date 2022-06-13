@@ -6,7 +6,6 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
-from roleplay.enums import SiteTypes
 from tests import fake
 from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
@@ -28,17 +27,6 @@ class TestUser(TestCase):
         [r.add_owners(self.instance) for r in races]
 
         result = self.instance.owned_races.count()
-        expected_result = iterations
-
-        self.assertEqual(expected_result, result)
-
-    def test_gm_sessions_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        world = baker.make(Place, site_type=SiteTypes.WORLD)
-        sessions = baker.make(_model=Session, _quantity=iterations, world=world)
-        [s.add_game_masters(self.instance) for s in sessions]
-
-        result = self.instance.gm_sessions.count()
         expected_result = iterations
 
         self.assertEqual(expected_result, result)

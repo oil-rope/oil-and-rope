@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-3">
       <div class="col-12">
         {% static 'roleplay/img/places/default_image.png' as default_image %}
         <picture>
@@ -64,18 +64,6 @@
     </div>
 
     <div class="row justify-content-around">
-      <div class="col-11">
-        <p>
-          {% if object.description %}
-            {{ object.description|safe }}
-          {% else %}
-            {% translate "no description provided..."|capfirst %}
-          {% endif %}
-        </p>
-      </div>
-    </div>
-
-    <div class="row justify-content-around mt-4">
       <div class="col-11 col-sm-5 col-xl-3 btn-group dropdown mt-3 px-0">
         <button
           class="btn btn-primary dropdown-toggle {% if not object.get_children and object.get_root == object %}disabled{% endif %}"
@@ -149,7 +137,7 @@
           {% if object.is_world %}
             <li>
               <a
-                href="{% url 'roleplay:session:create' object.pk %}"
+                href="{% url 'roleplay:campaign:create' object.pk %}"
                 class="dropdown-item"
               >
                 <i class="ic ic-quill"></i>
@@ -183,6 +171,18 @@
             </li>
           {% endif %}
         </ul>
+      </div>
+    </div>
+
+    <div class="row justify-content-around">
+      <div class="col-11">
+        <p>
+          {% if object.description %}
+            {{ object.description|safe }}
+          {% else %}
+            {% translate "no description provided..."|capfirst %}
+          {% endif %}
+        </p>
       </div>
     </div>
   </main>

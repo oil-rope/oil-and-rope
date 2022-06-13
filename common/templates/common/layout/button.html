@@ -1,11 +1,13 @@
 <button
   title="{{ button.content }}"
-  type="button"
+  type="{{ button.type }}"
   {{ button.flat_attrs|safe }}
-  onclick="{{ button.action }}"
+  {% if button.action %}
+    onclick="{{ button.action }}"
+  {% endif %}
 >
   {% if button.icon %}
-    <i class="ic {{ button.icon }}"></i>
+    {{ button.icon|safe }}
   {% endif %}
   {{ button.content }}
 </button>

@@ -31,6 +31,9 @@
     .django-ckeditor-widget {
       width: 100%;
     }
+    .asteriskField {
+      color: var(--bs-danger);
+    }
   </style>
 
   <title>{% block title %}{% endblock title %} | Oil &amp; Rope</title>
@@ -78,6 +81,12 @@
       $('.alert.alert-dismissible.timed').alert('close');
     }, dismissibleSeconds * 1000);
   });
+</script>
+
+<!-- Web permissions -->
+{# NOTE: Since we're gonna use them a lot #}
+<script>
+  Notification.requestPermission();
 </script>
 
 <!-- JavaScript -->

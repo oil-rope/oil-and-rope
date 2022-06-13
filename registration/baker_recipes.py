@@ -27,6 +27,11 @@ staff_user = user.extend(
     is_staff=True
 )
 
+superuser = user.extend(
+    is_superuser=True,
+    is_staff=True,
+)
+
 premium_user = user.extend(
     is_premium=True
 )

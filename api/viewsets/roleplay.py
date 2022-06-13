@@ -1,21 +1,13 @@
-from django.apps import apps
-from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.settings import api_settings
 
-from common.constants import models
+from roleplay.models import Domain, Place, Race
 
 from ..permissions import common
-from ..permissions.roleplay import IsGameMasterOrAdmin, IsPlayerOrAdmin, IsPublicOrStaff
-from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
-from .mixins import StaffListAllMixin, UserListMixin
-
-Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-Race = apps.get_model(models.ROLEPLAY_RACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
-User = get_user_model()
+from ..permissions.roleplay import IsPublicOrStaff
+from ..serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
+from .mixins import UserListMixin
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -104,29 +96,3 @@ class RaceViewSet(UserListMixin, viewsets.ModelViewSet):
             qs = user.race_set.all()
 
         return qs
-
-
-class SessionViewSet(StaffListAllMixin, UserListMixin, viewsets.ModelViewSet):
-    related_name = 'gm_sessions'
-    queryset = Session.objects.all()
-    permission_classes = [IsAuthenticated & IsPlayerOrAdmin]
-    serializer_class = SessionSerializer
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        # NOTE: Staff user needs to have access to all sessions that are not specific user lists
-        if self.request.user.is_staff and self.action not in ('user_list', 'list'):
-            return qs
-        return qs.filter(
-            players__in=[self.request.user]
-        )
-
-    def get_permissions(self):
-        if self.action in ('partial_update', 'update', 'destroy'):
-            self.permission_classes = [IsGameMasterOrAdmin]
-        return super(SessionViewSet, self).get_permissions()
-
-    def perform_create(self, serializer):
-        obj = serializer.save()
-        obj.add_game_masters(self.request.user)
-        return obj

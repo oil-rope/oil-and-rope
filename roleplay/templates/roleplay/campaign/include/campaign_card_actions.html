@@ -1,0 +1,54 @@
+{% load i18n %}
+<div class="card-body">
+  <div class="btn-group" role="group" aria-label="{% translate "actions"|capfirst %}">
+    <a href="{{ campaign.get_absolute_url }}" class="btn btn-secondary">
+      {{ ICONS.QUILL|safe }}
+      {% translate "view campaign"|capfirst %}
+    </a>
+    {% if campaign.user_is_game_master or request.user == campaign.owner %}
+      <div class="btn-group" role="group">
+        <button
+          id="btnGroupCampaignSettings"
+          type="button"
+          class="btn btn-dark dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          {{ ICONS.COGS|safe }}
+          {% translate "settings"|capfirst %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="btnGroupCampaignSettings">
+          <li>
+            <a
+              href="{% url 'roleplay:session:create' campaign.pk %}"
+              class="dropdown-item"
+            >
+              {{ ICONS.PLUS|safe }}
+              {% translate "add session"|capfirst %}
+            </a>
+          </li>
+          <li>
+            <a
+              href="{% url 'roleplay:campaign:edit' campaign.pk %}"
+              class="dropdown-item"
+            >
+              {{ ICONS.EDIT|safe }}
+              {% translate "edit"|capfirst %}
+            </a>
+          </li>
+          {% if request.user == campaign.owner %}
+            <li>
+              <a
+                href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+                class="dropdown-item"
+              >
+                {{ ICONS.TRASH|safe }}
+                {% translate "delete"|capfirst %}
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>

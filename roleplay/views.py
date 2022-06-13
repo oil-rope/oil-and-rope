@@ -7,29 +7,37 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
+from django.db.models import OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import resolve_url
+from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from django_filters.views import FilterView
 
 from common.constants import models
 from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
+from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
-from roleplay.forms.layout import SessionFormLayout
 
-from . import enums, forms
-from .utils.invitations import send_session_invitations
+from . import enums, filters, forms
+from .forms.layout import SessionFormLayout
+from .mixins import UserInAllWithRelatedNameMixin
+from .utils.invitations import send_campaign_invitations
 
 LOGGER = logging.getLogger(__name__)
 
-User = get_user_model()
+ContentType = apps.get_model(models.CONTENT_TYPE)
+Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
+PlayerInCampaign = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
 Race = apps.get_model(models.ROLEPLAY_RACE)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
+User = get_user_model()
+Vote = apps.get_model(models.COMMON_VOTE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -219,65 +227,59 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     template_name = 'roleplay/place/place_confirm_delete.html'
 
 
-class SessionCreateView(LoginRequiredMixin, CreateView):
-    form_class = forms.SessionForm
-    model = Session
-    template_name = 'roleplay/session/session_create.html'
+class CampaignCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.CampaignForm
+    model = Campaign
+    template_name = 'roleplay/campaign/campaign_create.html'
 
     def get_world(self):
-        """
-        Checks that given world exists and is not private.
-        """
-
-        world = self.get_available_worlds().filter(pk=self.kwargs['pk'])
-        if world:
-            return world.get()
-        raise Http404()
+        world_pk = self.kwargs.get('world_pk')
+        return get_object_or_404(Place, pk=world_pk)
 
     def get_initial(self):
         initial = super().get_initial()
-        next_week = timezone.now() + timezone.timedelta(days=7)
         initial.update({
-            'world': self.get_world(),
-            'next_game': next_week.strftime('%Y-%m-%dT%H:%M'),
+            'place': self.get_world(),
         })
         return initial
 
-    def get_available_worlds(self):
-        """
-        Gets community maps and user's private maps.
-        """
-
-        qs = Place.objects.community_places()
-        qs |= Place.objects.user_places(user=self.request.user)
-        return qs.filter(site_type=enums.SiteTypes.WORLD).order_by('name')
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'submit_text': _('create').capitalize(),
+        })
+        return kwargs
 
     def get_form(self, form_class=None):
-        form = super().get_form(form_class=form_class)
-        form.fields['world'].queryset = self.get_available_worlds()
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:campaign:create', world_pk=self.kwargs['world_pk'])
+        form.fields['place'].queryset = self.request.user.accessible_places().filter(
+            site_type=enums.SiteTypes.WORLD,
+        )
         return form
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        emails = form.cleaned_data['email_invitations']
+        send_campaign_invitations(self.object, self.request, emails)
         self.object.add_game_masters(self.request.user)
-        emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        send_session_invitations(self.object, self.request, emails)
         return response
 
     def get_success_url(self):
-        return resolve_url(self.object)
+        return self.object.get_absolute_url()
 
 
-class SessionJoinView(SingleObjectMixin, RedirectView):
+class CampaignJoinView(SingleObjectMixin, RedirectView):
     signer_class = TimestampSigner
-    model = Session
+    model = Campaign
 
-    def get_signer_instace(self):
+    def get_signer_instance(self):
         return self.signer_class()
 
     def get_email_associated(self):
         try:
-            signer = self.get_signer_instace()
+            signer = self.get_signer_instance()
             return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
         except BadSignature:
             raise Http404()
@@ -292,32 +294,252 @@ class SessionJoinView(SingleObjectMixin, RedirectView):
             return None
 
     def get_redirect_url(self, *args, **kwargs):
-        session = self.get_object()
+        instance = self.get_object()
         user = self.get_user()
         if not user:
-            messages.warning(self.request, _('you need an account to join this session.').capitalize())
+            messages.warning(self.request, _('you need an account to join this campaign.').capitalize())
             return resolve_url(settings.LOGIN_URL)
-        session.players.add(self.get_user())
-        messages.success(self.request, _('you have joined the session.').capitalize())
-        return resolve_url(session)
+        instance.users.add(self.get_user())
+        messages.success(self.request, _('you have joined the campaign.').capitalize())
+        return resolve_url(instance)
+
+
+class CampaignComplexQuerySetMixin:
+    model = Campaign
+    # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
+    queryset = None
+
+    def get_queryset(self):
+        self.queryset = Campaign.objects.with_votes().select_related('owner')
+
+        # Adding last session so we avoid SQL queries
+        sessions_finished = Session.objects.finished().filter(
+            campaign=OuterRef('pk'),
+        ).order_by('-next_game')
+        self.queryset = self.queryset.annotate(
+            last_session_date=Subquery(sessions_finished.values('next_game')[:1])
+        )
+
+        # Adding if the user is GM so we avoid SQL queries
+        self.queryset = self.queryset.annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        )
+
+        # NOTE: This will return `True` or `False` and `None` if user hasn't voted yet
+        self.queryset = self.queryset.annotate(
+            user_vote=Subquery(
+                Vote.objects.filter(
+                    content_type=ContentType.objects.get_for_model(Campaign),
+                    object_id=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_positive')[:1]
+            ),
+        )
+
+        return super().get_queryset()
+
+
+class CampaignListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, FilterView):
+    """
+    This view handles the list of campaigns that are public.
+    """
+
+    filterset_class = filters.CampaignFilter
+    model = Campaign
+    ordering = ('-total_votes', 'name', '-entry_created_at')
+    paginate_by = 6
+    template_name = 'roleplay/campaign/campaign_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_public=True)
+
+
+class CampaignUserListView(LoginRequiredMixin, CampaignComplexQuerySetMixin, ListView):
+    """
+    This view list :class:`~roleplay.models.Campaign` objects that the user is in players.
+    """
+
+    model = Campaign
+    ordering = ('-total_votes', 'name', '-entry_created_at')
+    paginate_by = 6
+    template_name = 'roleplay/campaign/campaign_private_list.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            users=self.request.user
+        )
+
+
+class CampaignDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Campaign
+    # NOTE: Since this declaration is complex enough we'll write it down in `get_queryset`
+    queryset = None
+    template_name = 'roleplay/campaign/campaign_detail.html'
+
+    def post(self, *args, **kwargs):
+        # If a post request is made, we'll send a message to GMs in order for the user to join campaign
+        HtmlThreadMail(
+            'email_templates/campaign_join_request.html',
+            request=self.request,
+            context={'user': self.request.user, 'object': self.object},
+            subject=cfl(_('new player wants to join your adventure!')),
+            to=[gm.email for gm in self.object.game_masters],
+        ).send()
+        messages.success(
+            self.request,
+            _('You\'ve requested to join this adventure. Once the GMs accepts your request, you\'ll receive an email.'),
+        )
+        return redirect(self.object)
+
+    def get_queryset(self):
+        # NOTE: The complexity of this queryset will allow us to not repeat the same SQL query
+        self.queryset = Campaign.objects.prefetch_related(
+            Prefetch('users', queryset=User.objects.select_related('profile')),
+            'session_set',
+        ).select_related('owner').with_votes()
+        return super().get_queryset()
+
+    def get_object(self, queryset=None):
+        """
+        We override this method to ensure `self.object` is not retrieved again.
+        """
+
+        if hasattr(self, 'object'):
+            return self.object
+        return super().get_object(queryset)
+
+    def test_func(self):
+        """
+        Checks if user is in players otherwise they have no access.
+        """
+
+        self.object = self.get_object()
+        if self.object.is_public:
+            return True
+        # NOTE: We don't use `values_list` with `flat=True` since we do a `prefetch_related`
+        if self.request.user in self.object.users.all():
+            return True
+        if self.request.user == self.object.owner:
+            return True
+        return False
+
+
+class CampaignUpdateView(LoginRequiredMixin, UserInAllWithRelatedNameMixin, UpdateView):
+    form_class = forms.CampaignForm
+    model = Campaign
+    related_name_attr = 'game_masters'
+    template_name = 'roleplay/campaign/campaign_update.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'submit_text': _('update').capitalize()
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.helper.form_action = resolve_url('roleplay:campaign:edit', pk=self.object.pk)
+        form.fields['place'].queryset = self.request.user.accessible_places().filter(
+            site_type=enums.SiteTypes.WORLD,
+        )
+        return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        emails = form.cleaned_data['email_invitations']
+        send_campaign_invitations(self.object, self.request, emails)
+        return response
+
+    def get_success_url(self):
+        return resolve_url(self.object)
+
+
+class CampaignDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+    model = Campaign
+    success_url = reverse_lazy('roleplay:campaign:list-private')
+    template_name = 'roleplay/campaign/campaign_confirm_delete.html'
+
+    def get_success_url(self):
+        msg = _('campaign deleted successfully.').capitalize()
+        messages.success(self.request, msg)
+        return super().get_success_url()
+
+
+class SessionCreateView(LoginRequiredMixin, CreateView):
+    form_class = forms.SessionForm
+    model = Session
+    template_name = 'roleplay/session/session_create.html'
+
+    def get_campaign(self):
+        # Only Game Masters can create sessions for a campaign
+        campaign_qs = Campaign.objects.annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('pk'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        ).filter(user_is_game_master=True)
+        return get_object_or_404(campaign_qs, pk=self.kwargs['campaign_pk'])
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'campaign': self.get_campaign(),
+        })
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        next_week = timezone.now() + timezone.timedelta(days=7)
+        initial.update({
+            'next_game': next_week.strftime('%Y-%m-%dT%H:%M'),
+        })
+        return initial
+
+    def get_success_url(self):
+        return resolve_url(self.object)
 
 
 class SessionDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Session
+    queryset = Session.objects.select_related(
+        'campaign'
+    ).prefetch_related(
+        Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
+    )
     template_name = 'roleplay/session/session_detail.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset().annotate(
+            user_is_game_master=Subquery(
+                PlayerInCampaign.objects.filter(
+                    campaign=OuterRef('campaign'),
+                    user=self.request.user,
+                ).values('is_game_master')
+            )
+        )
+        return qs
+
+    def get_object(self, queryset=None):
+        if hasattr(self, 'object'):
+            return self.object
+        return super().get_object(queryset)
 
     def test_func(self):
         """
         Checks that user is in players.
         """
 
-        session = self.get_object()
-        return self.request.user in session.players.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['TABLETOP_URL'] = settings.TABLETOP_URL
-        return context
+        self.object = self.get_object()
+        return self.request.user in self.object.campaign.users.all()
 
 
 class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -330,8 +552,8 @@ class SessionDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         Checks that user is game master.
         """
 
-        session = self.get_object()
-        return self.request.user in session.game_masters
+        self.object = self.get_object()
+        return self.request.user in self.object.campaign.game_masters
 
     def get_success_url(self):
         msg = _('session deleted.').capitalize()
@@ -350,7 +572,14 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
 
         session = self.get_object()
-        return self.request.user in session.game_masters
+        return self.request.user in session.campaign.game_masters
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'campaign': self.object.campaign,
+        })
+        return kwargs
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -360,7 +589,7 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         emails = form.cleaned_data.get('email_invitations', '').splitlines()
-        send_session_invitations(self.object, self.request, emails)
+        send_campaign_invitations(self.object, self.request, emails)
         return response
 
     def get_success_url(self):
@@ -369,13 +598,23 @@ class SessionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('roleplay:session:detail', kwargs={'pk': self.object.pk})
 
 
-class SessionListView(LoginRequiredMixin, ListView):
+class SessionListView(LoginRequiredMixin, FilterView):
+    filterset_class = filters.SessionFilter
     model = Session
+    paginate_by = 6
+    queryset = Session.objects.select_related(
+        'campaign'
+    ).prefetch_related(
+        Prefetch('campaign__users', queryset=User.objects.select_related('profile')),
+    )
     template_name = 'roleplay/session/session_list.html'
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(players__in=[self.request.user])
+    def get_filterset(self, filterset_class):
+        filterset = super().get_filterset(filterset_class)
+        filterset.filters['campaign'].queryset = Campaign.objects.filter(
+            users=self.request.user,
+        )
+        return filterset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -458,3 +697,9 @@ class RaceDeleteView(LoginRequiredMixin, DeleteView):
     model = Race
     success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_confirm_delete.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset().filter(
+            users=self.request.user,
+        )
+        return qs

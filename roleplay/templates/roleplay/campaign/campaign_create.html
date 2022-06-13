@@ -1,0 +1,27 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load string_utils %}
+
+{% block title %}{% blocktranslate with object=_('campaign') %}Create {{ object }}{% endblocktranslate %}{% endblock title %}
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "create campaign" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns=roleplay:campaign:list-private,create campaign' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-5">
+    <h1 class="display-5 text-center">
+      {% translate "start your adventure!"|capfirstletter %}
+    </h1>
+    <hr>
+    <div class="row">
+      <div class="col">
+        {% crispy form %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}

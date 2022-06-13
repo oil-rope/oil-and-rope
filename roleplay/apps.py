@@ -5,3 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class RoleplayConfig(AppConfig):
     name = 'roleplay'
     verbose_name = _('roleplay')
+
+    def ready(self):
+        # Importing handlers to register signals
+        import roleplay.signals.handlers  # noqa

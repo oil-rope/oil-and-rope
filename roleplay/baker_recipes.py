@@ -3,7 +3,7 @@ import random
 
 from django.apps import apps
 from django.utils import timezone as tz
-from model_bakery.recipe import Recipe, foreign_key, related
+from model_bakery.recipe import Recipe, foreign_key
 
 from common.constants import models
 from common.utils import create_faker
@@ -19,6 +19,7 @@ random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
 random_site_type = functools.partial(random.choice, SiteTypes.values)
 
+Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
 Session = apps.get_model(models.ROLEPLAY_SESSION)
@@ -32,20 +33,11 @@ place = Recipe(
     owner=foreign_key(user),
 )
 
-world = Recipe(
-    Place,
-    name=fake.country,
-    description=fake.paragraph,
+world = place.extend(
     site_type=SiteTypes.WORLD,
-    owner=foreign_key(user),
 )
 
-private_world = Recipe(
-    Place,
-    name=fake.country,
-    description=fake.paragraph,
-    site_type=SiteTypes.WORLD,
-    owner=foreign_key(user),
+private_world = world.extend(
     user=foreign_key(user),
 )
 
@@ -56,14 +48,28 @@ domain = Recipe(
     domain_type=random_domain_type,
 )
 
+campaign = Recipe(
+    Campaign,
+    name=functools.partial(fake.sentence, nb_words=3),
+    system=random_roleplay_system,
+    is_public=fake.pybool,
+)
+
+public_campaign = campaign.extend(
+    is_public=True,
+)
+
+private_campaign = campaign.extend(
+    is_public=False,
+)
+
 session = Recipe(
     Session,
     name=fake.sentence,
-    plot=fake.paragraph,
-    players=related(user),
+    description=fake.paragraph,
+    plot=fake.words,
+    gm_info=fake.paragraph,
     next_game=random_date_after_today,
-    system=random_roleplay_system,
-    world=foreign_key(world),
 )
 
 race = Recipe(

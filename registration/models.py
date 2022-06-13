@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
@@ -7,7 +8,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone
-from django.utils.functional import keep_lazy
 from django.utils.translation import gettext_lazy as _
 
 from bot.models import User as DiscordUser
@@ -37,20 +37,24 @@ class User(AbstractUser):
         return races
 
     @property
-    @keep_lazy(models.QuerySet)
-    def gm_sessions(self):
-        sessions = self.session_set.filter(
-            player_in_session_set__is_game_master=True
-        )
+    def sessions(self):
+        Session = apps.get_model(constants.ROLEPLAY_SESSION)
+        sessions = Session.objects.filter(campaign__users__in=[self])
         return sessions
-
-    def get_absolute_url(self):
-        return resolve_url('registration:user:edit', pk=self.pk)
 
     class Meta:
         db_table = 'auth_user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    def accessible_places(self):
+        Place = apps.get_model(constants.ROLEPLAY_PLACE)
+        community_places = Place.objects.community_places()
+        private_places = Place.objects.user_places(self)
+        return community_places | private_places
+
+    def get_absolute_url(self):
+        return resolve_url('registration:user:edit', pk=self.pk)
 
 
 class Profile(TracingMixin):

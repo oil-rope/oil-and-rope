@@ -44,7 +44,7 @@
           <div
             class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4"
           >
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
+            {% include 'roleplay/include/world_card.html' with world=world user=request.user %}
           </div>
         {% endfor %}
       </div>
@@ -92,7 +92,7 @@
         {% for world in page_obj %}
           <div
             class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
-            {% include 'roleplay/include/world_card.html' with world=world user=request.user only %}
+            {% include 'roleplay/include/world_card.html' with world=world user=request.user %}
           </div>
         {% endfor %}
       </div>
