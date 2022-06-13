@@ -8,7 +8,7 @@ repository = "https://github.com/oil-rope/oil-and-rope/"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "4.0.3"
+Django = "4.0.4"
 channels = "^3.0"
 channels-redis = "^3.3"
 crispy-bootstrap5 = "^0.6"
@@ -32,7 +32,7 @@ python-dotenv = "^0.19"
 python3-openid = "^3.2"  # Requirement for `django-allauth`
 requests = "^2.27"
 requests-oauthlib = "^1.3"  # Requirement for `django-allauth`
-Twisted = {extras = ["tls", "http2"], version = "^22.2"}
+Twisted = {extras = ["tls", "http2"], version = "^22.4"}
 xlrd = "^2.0"
 
 [tool.poetry.dev-dependencies]
