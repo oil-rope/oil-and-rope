@@ -1,0 +1,31 @@
+{% load i18n %}
+<div
+  class="btn-group"
+  role="group"
+  aria-label="{% translate "voting buttons"|capfirst %}"
+  data-bs-toggle="like-dislike"
+>
+  <button
+    {% if object.user_vote %}
+      class="btn btn-success disabled"
+    {% else %}
+      class="btn btn-outline-success"
+    {% endif %}
+    data-bs-target="{{ model }}#{{ object.pk }}"
+    data-bs-type="like"
+  >
+    {{ ICONS.THUMBS_UP_FILL|safe }}
+  </button>
+
+  <button
+    {% if not object.user_vote and object.user_vote is not None %}
+      class="btn btn-danger disabled"
+    {% else %}
+      class="btn btn-outline-danger"
+    {% endif %}
+    data-bs-target="{{ model }}#{{ object.pk }}"
+    data-bs-type="dislike"
+  >
+    {{ ICONS.THUMBS_DOWN_FILL|safe }}
+  </button>
+</div>

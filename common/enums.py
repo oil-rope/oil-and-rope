@@ -49,13 +49,21 @@ class AvailableIcons(models.TextChoices):
     TRIANGLE_RELATION = '<i class="ic-triangle-relation"></i>', _('triangle relation')
     DIANA = '<i class="ic-diana"></i>', _('diana')
     GLOBE = '<i class="ic-globe"></i>', _('globe')
-    DOTS_HORIZONATL_TRIPLE = '<i class="ic-dots-horizontal-triple"></i>', _('dots horizontal triple')
+    DOTS_HORIZONTAL_TRIPLE = '<i class="ic-dots-horizontal-triple"></i>', _('dots horizontal triple')
     MENU_THIN = '<i class="ic-menu-thin"></i>', _('menu thin')
     CIRCLE_CROSS_THIN = '<i class="ic-circle-cross-thin"></i>', _('circle cross thin')
     CROSS_THIN = '<i class="ic-cross-thin"></i>', _('cross thin')
     TWITTER = '<i class="ic-twitter"></i>', 'Twitter'
     GITHUB = '<i class="ic-github"></i>', 'GitHub'
     DISCORD = '<i class="ic-discord"></i>', 'Discord'
+    GOOGLE = '<i class="ic-google"></i>', 'Google'
+    SEARCH = '<i class="bi bi-search"></i>', _('search')
+    THUMBS_UP = '<i class="bi bi-hand-thumbs-up"></i>', _('thumbs up')
+    THUMBS_UP_FILL = '<i class="bi bi-hand-thumbs-up-fill"></i>', _('thumbs up fill')
+    THUMBS_DOWN = '<i class="bi bi-hand-thumbs-down"></i>', _('thumbs down')
+    THUMBS_DOWN_FILL = '<i class="bi bi-hand-thumbs-down-fill"></i>', _('thumbs down fill')
+    INFO = '<i class="bi bi-info"></i>', _('info')
+    INFO_LG = '<i class="bi bi-info-lg"></i>', _('info lg')
 
     @classmethod
     def choices_with_empty(cls):

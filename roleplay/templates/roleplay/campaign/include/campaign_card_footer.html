@@ -1,0 +1,15 @@
+{% load i18n %}
+<div class="card-footer">
+  {% if campaign.last_session_date %}
+    <small class="text-muted">
+      {% blocktranslate with last_time_played=campaign.last_session_date trimmed %}
+        Played last time on {{ last_time_played }}.
+      {% endblocktranslate %}
+    </small>
+  {% else %}
+    <small class="text-muted">{% translate "not played yet."|capfirst %}</small>
+  {% endif %}
+</div>
+<div class="card-footer">
+  {% include 'common/include/like_dislike_buttons.html' with model='roleplay.campaign' %}
+</div>

@@ -1,25 +1,30 @@
 import os
 import pathlib
+import random
 import tempfile
 import unittest
-from datetime import datetime
+from datetime import timedelta
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 from tests import fake
+from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from tests.utils import generate_place
 
+Campaign = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
+PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
 Domain = apps.get_model(constants.ROLEPLAY_DOMAIN)
 Place = apps.get_model(constants.ROLEPLAY_PLACE)
-PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
 Race = apps.get_model(constants.ROLEPLAY_RACE)
 RaceUser = apps.get_model(constants.ROLEPLAY_RACE_USER)
 Session = apps.get_model(constants.ROLEPLAY_SESSION)
@@ -148,138 +153,6 @@ class TestPlace(TestCase):
 
         for place in self.model.objects.all():
             os.unlink(place.image.path)
-
-    # TODO: Refactor this test so is not that complex
-    def test_nested_world_ok(self):  # noqa
-        universe = self.model.objects.create(name='Universe', site_type=self.enum.WORLD)
-        world = self.model.objects.create(name='World', site_type=self.enum.WORLD, parent_site=universe)
-
-        self.assertIn(world, universe.get_worlds())
-
-        continents = []
-        for _ in range(0, 3):
-            continents.append(
-                self.model.objects.create(name=fake.country(), site_type=self.enum.CONTINENT, parent_site=world)
-            )
-
-        countries = []
-        seas = []
-        rivers = []
-        unusual = []
-        for continent in continents:
-            self.assertIn(continent, world.get_continents())
-            countries.append(
-                self.model.objects.create(
-                    name=fake.country(), site_type=self.enum.COUNTRY, parent_site=continent
-                )
-            )
-            seas.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.SEA, parent_site=continent)
-            )
-            rivers.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.RIVER, parent_site=continent)
-            )
-            unusual.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.UNUSUAL, parent_site=continent)
-            )
-
-        for sea in seas:
-            self.assertIn(sea, world.get_seas())
-
-        for river in rivers:
-            self.assertIn(river, world.get_rivers())
-
-        for unusual in unusual:
-            self.assertIn(unusual, world.get_unusual())
-
-        islands = []
-        cities = []
-        mountains = []
-        mines = []
-        deserts = []
-        tundras = []
-        hills = []
-        metropolis = []
-        for country in countries:
-            self.assertIn(country, world.get_countries())
-            islands.append(
-                self.model.objects.create(name=fake.country(), site_type=self.enum.ISLAND, parent_site=country)
-            )
-            cities.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.CITY, parent_site=country)
-            )
-            mountains.append(
-                self.model.objects.create(
-                    name=fake.country(), site_type=self.enum.MOUNTAINS, parent_site=country
-                )
-            )
-            deserts.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.DESERT, parent_site=country)
-            )
-            hills.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.HILLS, parent_site=country)
-            )
-            tundras.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.TUNDRA, parent_site=country)
-            )
-            mines.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.MINES, parent_site=country)
-            )
-            metropolis.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.METROPOLIS, parent_site=country)
-            )
-
-        forests = []
-        for island in islands:
-            self.assertIn(island, world.get_islands())
-            forests.append(
-                self.model.objects.create(name=fake.name(), site_type=self.enum.FOREST, parent_site=island)
-            )
-
-        for m in metropolis:
-            self.assertIn(m, world.get_metropolis())
-
-        villages = []
-        towns = []
-        for city in cities:
-            self.assertIn(city, world.get_cities())
-            villages.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.VILLAGE, parent_site=city)
-            )
-            towns.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.TOWN, parent_site=city)
-            )
-
-        houses = []
-        for village in villages:
-            self.assertIn(village, world.get_villages())
-            houses.append(
-                self.model.objects.create(name=fake.city(), site_type=self.enum.HOUSE, parent_site=village)
-            )
-
-        for town in towns:
-            self.assertIn(town, world.get_towns())
-
-        for house in houses:
-            self.assertIn(house, world.get_houses())
-
-        for mountain in mountains:
-            self.assertIn(mountain, world.get_mountains())
-
-        for mine in mines:
-            self.assertIn(mine, world.get_mines())
-
-        for desert in deserts:
-            self.assertIn(desert, world.get_deserts())
-
-        for hill in hills:
-            self.assertIn(hill, world.get_hills())
-
-        for forest in forests:
-            self.assertIn(forest, world.get_forests())
-
-        for tundra in tundras:
-            self.assertIn(tundra, world.get_tundras())
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
@@ -439,99 +312,87 @@ class TestRaceUser(TestCase):
         self.assertEqual(expected, str(instance))
 
 
+class TestCampaign(TestCase):
+    model = Campaign
+
+    @classmethod
+    def setUpTestData(cls):
+        # NOTE: This is done because it's better performance than creating a new entries each time
+        cls.chat = baker.make_recipe('chat.chat')
+        cls.world = generate_place(site_type=SiteTypes.WORLD)
+        cls.owner = baker.make_recipe('registration.user')
+
+    def setUp(self):
+        self.name = fake.sentence(nb_words=3)
+        self.instance = self.model.objects.create(
+            name=self.name, chat=self.chat, system=random.choice(RoleplaySystems.values), place=self.world,
+            owner=self.owner,
+        )
+
+    def test_str_ok(self):
+        expected = f'{self.name} [{self.instance.pk}]'
+
+        self.assertEqual(expected, str(self.instance))
+
+    def test_add_game_masters(self):
+        game_masters = baker.make(constants.REGISTRATION_USER, 3)
+        self.instance.add_game_masters(*game_masters)
+
+        self.assertEqual(len(self.instance.game_masters), len(game_masters))
+
+    def test_discord_channel_empty_is_none(self):
+        self.assertIsNone(self.instance.discord_channel)
+
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_discord_channel_ok(self):
+        self.instance.discord_channel_id = CHANNEL
+        self.instance.save()
+        self.assertIsNotNone(self.instance.discord_channel)
+
+    def test_vote_ok(self):
+        self.instance.vote(self.owner, True)
+        instance = self.model.objects.with_votes().get(pk=self.instance.pk)
+
+        self.assertEqual(instance.positive_votes, 1)
+
+    def test_clean_start_date_greater_end_date_ko(self):
+        self.instance.start_date = timezone.now() + timedelta(days=1)
+        self.instance.end_date = timezone.now()
+
+        with self.assertRaises(ValidationError) as ex:
+            self.instance.clean()
+        ex = ex.exception
+        self.assertEqual('Start date must be before end date.', ex.message)
+
+
+class TestPlayerInCampaign(TestCase):
+    model = PlayerInCampaign
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.campaign = baker.make(constants.ROLEPLAY_CAMPAIGN)
+        cls.user = baker.make(constants.REGISTRATION_USER)
+
+    def test_str_ok(self):
+        instance = self.model.objects.create(campaign=self.campaign, user=self.user)
+        expected = f'{instance.user.username} in campaign {instance.campaign.name} (Game Master: False)'
+
+        self.assertEqual(expected, str(instance))
+
+
 class TestSession(TestCase):
     model = Session
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make_recipe('registration.user')
-        cls.chat = baker.make_recipe('chat.chat')
-        cls.world = baker.make_recipe('roleplay.world')
+        cls.campaign = baker.make_recipe('roleplay.campaign')
 
     def test_str_ok(self):
         name = fake.word()
         instance = self.model.objects.create(
             name=name,
-            chat=self.chat,
-            system=RoleplaySystems.PATHFINDER,
-            world=self.world,
+            campaign=self.campaign,
         )
-        system = RoleplaySystems(instance.system)
-        expected = f'{name} [{system.label.title()}]'
+        expected = f'{name} [{instance.campaign.get_system_display()}]'
 
         self.assertEqual(expected, str(instance))
-
-    def test_clean_non_world_ko(self):
-        place = baker.make(constants.ROLEPLAY_PLACE, site_type=SiteTypes.CITY)
-        session = self.model(
-            name=fake.word(),
-            plot=fake.paragraph(),
-            next_game=datetime.now(),
-            system=RoleplaySystems.PATHFINDER,
-            world=place,
-        )
-
-        with self.assertRaisesRegex(ValidationError, 'World must be a world'):
-            session.clean()
-
-    def test_clean_no_world_given_ko(self):
-        session = self.model(
-            name=fake.word(),
-            plot=fake.paragraph(),
-            next_game=datetime.now(),
-            system=RoleplaySystems.PATHFINDER,
-        )
-
-        with self.assertRaisesRegex(ValidationError, 'Session hasn\'t any world'):
-            session.clean()
-
-    def test_add_game_masters_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        users = baker.make(_model=User, _quantity=iterations)
-        instace = baker.make(self.model, world=self.world)
-        queries = (
-            'Bulk Create',
-        )
-
-        with self.assertNumQueries(len(queries)):
-            instace.add_game_masters(*users)
-
-        expected = iterations
-        result = PlayerInSession.objects.filter(
-            player__in=users,
-            is_game_master=True
-        ).count()
-
-        self.assertEqual(expected, result)
-
-    def test_property_game_masters_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        users = baker.make(_model=User, _quantity=iterations)
-        instace = baker.make(self.model, world=self.world)
-        instace.add_game_masters(*users)
-
-        expected = iterations
-        result = instace.game_masters.count()
-
-        self.assertEqual(expected, result)
-
-
-class TestPlayerInSession(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = PlayerInSession
-        cls.world = baker.make(Place, site_type=SiteTypes.WORLD)
-        cls.session = baker.make(Session, world=cls.world)
-
-    def setUp(self):
-        self.instance = baker.make(self.model, session=self.session)
-
-    def test_str_ok(self):
-        expected_str = '%(player)s in %(session)s (Game Master: %(is_game_master)s)' % {
-            'player': self.instance.player,
-            'session': self.instance.session,
-            'is_game_master': self.instance.is_game_master,
-        }
-        result_str = str(self.instance)
-
-        self.assertEqual(expected_str, result_str)

@@ -17,7 +17,7 @@
         <div class="card p-md-5">
           <div class="card-body">
             <p class="text-end">
-              <button class="btn" onclick="goBack();">
+              <button class="btn" onclick="{{ JAVASCRIPT.GO_BACK }}">
                 <i class="ic ic-cross-thin text-danger"></i>
               </button>
             </p>
@@ -34,7 +34,7 @@
             <form class="d-flex justify-content-around" action="{% url 'roleplay:place:delete' object.pk %}"
                   method="post">
               {% csrf_token %}
-              <input type="button" onclick="goBack();" value="{% translate 'cancel'|capfirst %}"
+              <input type="button" onclick="{{ JAVASCRIPT.GO_BACK }}" value="{% translate 'cancel'|capfirst %}"
                      class="col-5 col-xl-4 btn btn-dark">
               <input type="submit" value="{% translate 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
             </form>

@@ -10,6 +10,7 @@ REGISTRATION_PROFILE = 'registration.Profile'
 
 # Common
 COMMON_TRACK = 'common.Track'
+COMMON_VOTE = 'common.Vote'
 
 # Bot
 DISCORD_USER_MODEL = 'bot.DiscordUser'
@@ -20,12 +21,13 @@ DISCORD_TEXT_CHANNEL_MODEL = 'bot.DiscordTextChannel'
 CONTENT_TYPE = 'contenttypes.ContentType'
 
 # Roleplay
+ROLEPLAY_CAMPAIGN = 'roleplay.Campaign'
+ROLEPLAY_PLAYER_IN_CAMPAIGN = 'roleplay.PlayerInCampaign'
 ROLEPLAY_DOMAIN = 'roleplay.Domain'
 ROLEPLAY_PLACE = 'roleplay.Place'
 ROLEPLAY_RACE = 'roleplay.Race'
 ROLEPLAY_RACE_USER = 'roleplay.RaceUser'
 ROLEPLAY_SESSION = 'roleplay.Session'
-ROLEPLAY_PLAYER_IN_SESSION = 'roleplay.PlayerInSession'
 
 # Chat
 CHAT = 'chat.Chat'

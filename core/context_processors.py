@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils.translation import get_language_from_request
 
+from common.enums import AvailableIcons, JavaScriptActions
 from registration.models import Profile
 
 
@@ -28,4 +29,26 @@ def language(request):
     request.session['session_language'] = language
     content['lan'] = language
 
+    return content
+
+
+def handy_settings(request):
+    """
+    Sets handy settings for the frontend.
+
+    This includes:
+      - TABLETOP_URL
+      - BOT_COMMAND_PREFIX
+      - BOT_INVITATION
+      - ICONS
+      - JAVASCRIPT
+    """
+
+    content = {
+        'TABLETOP_URL': settings.TABLETOP_URL,
+        'BOT_COMMAND_PREFIX': settings.BOT_COMMAND_PREFIX,
+        'BOT_INVITATION': settings.BOT_INVITATION,
+        'ICONS': {icon.name: icon.value for icon in AvailableIcons},
+        'JAVASCRIPT': {js.name: js.value for js in JavaScriptActions},
+    }
     return content

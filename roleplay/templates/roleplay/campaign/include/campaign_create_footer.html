@@ -1,0 +1,18 @@
+{% load i18n %}
+<section id="createCampaignFooter" class="text-center">
+  <h5>
+    {% translate "or you can create one yourself"|capfirst %}
+    <br>
+    <small class="text-muted">
+      {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+        Go to '{{ site }}' and click '{{ action }}' to create one.
+      {% endblocktranslate %}
+    </small>
+  </h5>
+  <a
+    class="btn btn-link"
+    href="{% url 'roleplay:world:list' %}"
+  >
+    {% translate "go to worlds"|capfirst %}
+  </a>
+</section>

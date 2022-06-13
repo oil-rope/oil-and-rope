@@ -20,10 +20,6 @@ class DateWidget(forms.DateInput):
 
     input_type = 'date'
 
-
-class TimeWidget(forms.TimeInput):
-    """
-    A widget using HTML5 time type.
-    """
-
-    input_type = 'time'
+    def __init__(self, *args, **kwargs):
+        kwargs['format'] = '%Y-%m-%d'
+        super().__init__(*args, **kwargs)

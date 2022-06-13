@@ -1,0 +1,160 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ object.name }}{% endblock title %}
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "campaign detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns=roleplay:campaign:list-private,campaign detail' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container pb-3">
+    <header>
+      {% if object.cover_image %}
+        <picture>
+          <img
+            src="{{ object.cover_image.url }}"
+            alt="{% translate "cover image"|title %}"
+            class="img-fluid mx-auto d-block"
+          >
+        </picture>
+      {% endif %}
+      <h1 class="text-center fw-light mt-3">
+        {{ object.name }}
+        <br>
+        <small class="lead text-muted">
+          {{ object.summary }}
+        </small>
+      </h1>
+      {% if request.user in object.users.all %}
+        <div class="text-center">
+          {{ settings }}
+          <a
+            href="{{ TABLETOP_URL }}/campaign/{{ object.pk }}"
+            class="btn btn-info"
+            target="_blank"
+          >
+            {{ ICONS.DICE|safe }}
+            {% translate "go to tabletop"|capfirst %}
+          </a>
+        </div>
+      {% else %}
+        <form method="POST" class="text-center">
+          {% csrf_token %}
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            {{ ICONS.JOIN|safe }}
+            {% translate "request to join"|capfirst %}
+          </button>
+        </form>
+      {% endif %}
+    </header>
+    <hr>
+    <nav class="mt-5">
+      <div class="nav nav-tabs" id="campaignNavbar" roel="tablist">
+        <button
+          class="nav-link text-uppercase active"
+          id="nav-home-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-home"
+          type="button"
+          role="tab"
+          aria-controls="nav-home"
+          aria-selected="true"
+        >
+          {% translate "home" context "menu name" %}
+        </button>
+        <button
+          class="nav-link text-uppercase disabled"
+          id="nav-pcs-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-pcs"
+          type="button"
+          role="tab"
+          aria-controls="nav-pcs"
+          aria-selected="true"
+        >
+          {% translate "protagonists (PC)" context "menu" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link text-uppercase disabled"
+          id="nav-npcs-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-npcs"
+          type="button"
+          role="tab"
+          aria-controls="nav-npcs"
+          aria-selected="true"
+        >
+          {% translate "characters (NPC)" context "menu" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link text-uppercase"
+          id="nav-sessions-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-sessions"
+          type="button"
+          role="tab"
+          aria-controls="nav-sessions"
+          aria-selected="true"
+        >
+          {% translate "sessions" %}
+        </button>
+        <button
+          class="nav-link text-uppercase disabled"
+          id="nav-timeline-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-timeline"
+          type="button"
+          role="tab"
+          aria-controls="nav-timeline"
+          aria-selected="true"
+        >
+          {% translate "timeline" %}
+          <br>
+          <small>{% translate "not yet implemented"|capfirst %}</small>
+        </button>
+        <button
+          class="nav-link text-uppercase"
+          id="nav-settings-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-settings"
+          type="button"
+          role="tab"
+          aria-controls="nav-settings"
+          aria-selected="true"
+        >
+          {% translate "settings" %}
+      </button>
+      </div>
+      <div class="tab-content pt-3" id="campaignNavContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+          {% include 'roleplay/campaign/include/campaign_home.html' %}
+        </div>
+        <div class="tab-pane" id="nav-sessions" role="tabpanel" aria-labelledby="nav-sessions-tab">
+          {% include 'roleplay/campaign/include/campaign_sessions.html' %}
+        </div>
+        <div class="tab-pane" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
+          {% include 'roleplay/campaign/include/campaign_settings.html' %}
+        </div>
+      </div>
+    </nav>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script type="module">
+    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    setUpTooltip();
+  </script>
+{% endblock javascript %}

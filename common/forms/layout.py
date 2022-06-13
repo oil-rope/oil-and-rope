@@ -4,6 +4,8 @@ from django.template.base import Template
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
+from ..enums import AvailableIcons, JavaScriptActions
+
 
 class SubmitClearLayout(layout.Layout):
     """
@@ -65,11 +67,12 @@ class Button(layout.Layout):
     field_classes = 'btn'
     template = 'common/layout/button.html'
 
-    def __init__(self, content, action='return;', icon=None, *fields, **kwargs):
+    def __init__(self, content, type='button', action=None, icon=None, *fields, **kwargs):
         super().__init__(*fields)
         self.content = content
-        self.action = action
-        self.icon = icon
+        self.type = type
+        self.action = action.value if isinstance(action, JavaScriptActions) else action
+        self.icon = icon.value if isinstance(icon, AvailableIcons) else icon
         self.template = kwargs.pop('template', self.template)
 
         # We turn  css_class into class

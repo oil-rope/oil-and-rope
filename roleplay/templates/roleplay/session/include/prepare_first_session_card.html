@@ -1,0 +1,20 @@
+{% load i18n %}
+<div class="card text-center">
+  <div class="card-body">
+    <h3 class="card-title">
+      {% translate "prepare your first session"|capfirst %}
+    </h3>
+    <p class="card-text">
+      {% translate "in order to start playing you need to create a new session."|capfirst %}
+    </p>
+    <p class="card-text">
+      {% translate "then you can join the chat and tabletop assigned to this campaign."|capfirst %}
+    </p>
+  </div>
+  <div class="card-body">
+    {% url 'roleplay:session:create' campaign.pk as session_create_url %}
+    <a href="{{ session_create_url }}" class="btn btn-primary">
+      {% translate "create session"|title %}
+    </a>
+  </div>
+</div>

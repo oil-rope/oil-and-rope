@@ -1,0 +1,75 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load static %}
+{% load string_utils %}
+
+{% block title %}{% translate "campaigns"|capfirst %}{% endblock title %}
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <h1 class="display-5 text-center">
+    {% translate "community campaigns"|capfirst %}
+  </h1>
+
+  <main class="container pb-3 mt-4">
+    <div class="row justify-content-center mb-5">
+      <div class="col col-md-10 col-lg-8 col-xl-10">
+        {% include 'common/include/filter_accordion.html' with filter=filter only %}
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-around">
+      {% for object in object_list %}
+        <div class="col">
+          {% include 'roleplay/campaign/include/campaign_card.html' with campaign=object %}
+        </div>
+      {% empty %}
+        <div class="col text-center mt-5">
+          <h2>
+            {% translate "seems like we don't have any campaign right now."|capfirst %}
+            <br>
+            <small class="text-muted fw-light">
+              {% translate "but you can create one!"|capfirstletter %}
+            </small>
+          </h2>
+        </div>
+        <div class="w-100 d-none d-md-block"></div>
+        <div class="col-12">
+          <p class="text-center">
+            {% blocktranslate with site=_('worlds')|capfirst action=_('create campaign')|title trimmed %}
+              Go to '{{ site }}' and click '{{ action }}' to create one.
+            {% endblocktranslate %}
+          </p>
+          <a
+            href="{% url 'roleplay:world:list' %}"
+            class="btn btn-lg btn-primary w-100"
+          >
+            {% translate "worlds"|capfirst %}
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+      <div class="row mt-4">
+        {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
+      </div>
+    {% endif %}
+
+    <div class="row mt-5">
+      <div class="col">
+        {% include 'roleplay/campaign/include/campaign_create_footer.html' only %}
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script type="module">
+    import { setUpLikeDislike, setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    setUpTooltip();
+    setUpLikeDislike();
+  </script>
+{% endblock javascript %}
