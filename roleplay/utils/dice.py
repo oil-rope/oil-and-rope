@@ -1,6 +1,7 @@
 import random
 import re
 from collections import defaultdict
+from typing import Optional
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -11,7 +12,7 @@ DICE_ROLL_PATTERN = r'^((\d+|\d*[dD]\d+)([-+](\d+|\d*[dD]\d+))*)$'
 DICE_REGEX = re.compile(DICE_ROLL_PATTERN)
 
 
-def is_dice_roll(roll: str) -> re.Match or None:
+def is_dice_roll(roll: str) -> Optional[re.Match]:
     """
     Checks by pattern if roll is a valid dice roll.
     This includes `nDy`, `ndy` and mixes with numbers `+` and `-`.
@@ -26,7 +27,7 @@ def is_dice_roll(roll: str) -> re.Match or None:
     return matcher
 
 
-def roll_dice_logic(d_roll: str) -> list:
+def roll_dice_logic(d_roll: str) -> list[int]:
     """
     This method will execute a dice roll and return the result as a list with all rolled numbers.
 
@@ -44,7 +45,7 @@ def roll_dice_logic(d_roll: str) -> list:
     return [random.randint(1, d_face) for _n in range(0, d_number)]
 
 
-def roll_dice(roll: str) -> tuple[int, defaultdict]:
+def roll_dice(roll: str) -> tuple[int, defaultdict[str, list[int]]]:
     """
     This function separates and executes the rolling, addition and subtraction needed.
     It also checks if roll comes with `settings.BOT_COMMAND_PREFIX` and if so, it will

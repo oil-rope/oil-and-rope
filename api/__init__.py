@@ -6,7 +6,13 @@ Oil & Rope API System is a complex group of functions and views powered by Djang
 access information through API calls.
 """
 
-from oilandrope import __version__
-
 __title__ = 'Oil & Rope API System'
-__version__ = __version__
+__version__ = (1, 0, 0)
+
+
+def get_version() -> str:
+    """
+    Reads `__version__` from the top-level package.
+    """
+
+    return '.'.join(str(x) for x in __version__)

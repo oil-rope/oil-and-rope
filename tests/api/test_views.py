@@ -3,7 +3,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from oilandrope import __version__
+from api import get_version
 
 
 class TestApiVersionView(APITestCase):
@@ -36,7 +36,7 @@ class TestApiVersionView(APITestCase):
     def test_expected_version_ok(self):
         response = self.client.get(self.url)
 
-        self.assertEqual(__version__, response.json()['version'])
+        self.assertEqual(get_version(), response.json()['version'])
 
 
 class TestURLResolverViewSet(APITestCase):

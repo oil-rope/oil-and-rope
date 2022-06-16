@@ -79,6 +79,8 @@ INSTALLED_APPS = [
     'django_filters',
     # django-prometheus (https://github.com/korfuri/django-prometheus#quickstart)
     'django_prometheus',
+    # Django Rest Framework Swagger (https://drf-yasg.readthedocs.io/en/stable/)
+    'drf_yasg',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
     # API RestFramework (https://www.django-rest-framework.org/)
@@ -347,8 +349,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
+    # Versioning configuration
+    # https://www.django-rest-framework.org/api-guide/versioning/#configuring-the-versioning-scheme
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': '1',
+    'ALLOWED_VERSIONS': ['1'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
+    'PAGE_SIZE': 30,
 }
 
 # Email System
