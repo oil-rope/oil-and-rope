@@ -24,6 +24,8 @@ from django.views.i18n import JavaScriptCatalog
 urlpatterns = [
     # Prometheus metrics
     path('', include('django_prometheus.urls')),
+    # API is served by Django REST Framework
+    path('api/', include('api.urls')),
     # JavaScript translations
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
@@ -33,8 +35,6 @@ urlpatterns += i18n_patterns(
     path('', include('core.urls')),
     # Admin site
     path('admin/', admin.site.urls),
-    # API
-    path('api/', include('api.urls')),
     # Common
     path('common/', include('common.urls')),
     # Auth system

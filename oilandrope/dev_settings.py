@@ -50,3 +50,5 @@ SHELL_PLUS_IMPORTS = [
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
 
 SHOW_COLLAPSED = True
+
+SWAGGER_SETTINGS['DEFAULT_API_URL'] = 'http://127.0.0.1:8000/api/docs/'

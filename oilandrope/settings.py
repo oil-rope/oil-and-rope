@@ -358,6 +358,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 30,
 }
 
+# Settings for `drf-yasg` Swagger UI
+# https://drf-yasg.readthedocs.io/en/stable/settings.html#swagger-settings
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_API_URL': 'https://oilandrope-project.com/api/',
+}
+
 # Email System
 # https://docs.djangoproject.com/en/2.2/ref/settings/#email-host
 

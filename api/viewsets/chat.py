@@ -1,8 +1,10 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
+from rest_framework.request import Request
 
 from common.constants import models
 
@@ -32,12 +34,22 @@ class ChatViewSet(viewsets.ReadOnlyModelViewSet):
             return qs
         return Chat.objects.all()
 
+    @swagger_auto_schema(tags=['chat'])
+    def list(self, request: Request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['chat'])
+    def retrieve(self, request: Request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['chat'])
     @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
-    def list_all(self, request, *args, **kwargs):
+    def list_all(self, request: Request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+    @swagger_auto_schema(tags=['chat'])
     @action(methods=['get'], detail=True, url_name='detail-nested', url_path='nested')
-    def nested_retrieve(self, request, *args, **kwargs):
+    def nested_retrieve(self, request: Request, *args, **kwargs):
         self.serializer_class = NestedChatSerializer
         return self.retrieve(request, *args, **kwargs)
 
