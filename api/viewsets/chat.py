@@ -1,6 +1,5 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
@@ -20,36 +19,28 @@ class ChatViewSet(viewsets.ReadOnlyModelViewSet):
     ViewSet for :class:`~chat.models.Chat`.
     """
 
-    queryset = None
+    queryset = Chat.objects.all()
     serializer_class = ChatSerializer
 
     def get_queryset(self):
         user = self.request.user
-        qs = Chat.objects.filter(
+        qs = super().get_queryset().filter(
             users__in=[user],
         )
-        if not user.is_staff:
-            return qs
-        if self.action == 'list':
-            return qs
-        return Chat.objects.all()
+        return qs
 
-    @swagger_auto_schema(tags=['chat'])
     def list(self, request: Request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['chat'])
     def retrieve(self, request: Request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['chat'])
-    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
-    def list_all(self, request: Request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['chat'])
     @action(methods=['get'], detail=True, url_name='detail-nested', url_path='nested')
-    def nested_retrieve(self, request: Request, *args, **kwargs):
+    def retrieve_nested(self, request: Request, *args, **kwargs):
+        """
+        Retrieve chat with messages as objects instead of IDs.
+        """
+
         self.serializer_class = NestedChatSerializer
         return self.retrieve(request, *args, **kwargs)
 
@@ -59,7 +50,7 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
     ViewSet for :class:`~chat.models.ChatMessage`.
     """
 
-    queryset = None
+    queryset = ChatMessage.objects.all()
     serializer_class = NestedChatMessageSerializer
 
     def get_permissions(self):
@@ -69,36 +60,36 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = ChatMessage.objects.filter(
+        qs = super().get_queryset().filter(
             author=user,
         )
-        if not user.is_staff:
-            return qs
-        if self.action == 'list':
-            return qs
-        return ChatMessage.objects.all()
+        return qs
+
+    def list(self, request: Request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request: Request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    def destroy(self, request: Request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    def partial_update(self, request: Request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         self.serializer_class = ChatMessageSerializer
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        if self.request.user.is_staff:
-            return serializer.save()
-        # Regular user should not be able to set other author than themself
+        # Regular user should not be able to set other author than themselves
         return serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
-        if self.request.user.is_staff:
-            return serializer.save()
-        instance = self.get_object()
-        # Regular user should not be able to change chat
-        return serializer.save(chat=instance.chat)
 
     def update(self, request, *args, **kwargs):
         self.serializer_class = ChatMessageSerializer
         return super().update(request, *args, **kwargs)
 
-    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
-    def list_all(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        # Regular user should not be able to change chat
+        return serializer.save(chat=instance.chat)

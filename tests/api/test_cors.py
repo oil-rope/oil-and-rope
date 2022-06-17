@@ -61,7 +61,7 @@ class TestAPICors(APITestCase):
         self.assertEqual(expected_data, data)
 
     def test_get_authenticated_user_ok(self):
-        url = resolve_url('api:registration:user-detail', pk='@me')
+        url = resolve_url('api:registration:user')
         self.client.credentials(**self.auth_headers)
         response = self.client.get(url)
 
@@ -94,7 +94,7 @@ class TestLiveAPICORS(LiveServerTestCase):
         }
 
     def test_authenticated_user_just_with_cookie_ok(self):
-        user_url = resolve_url('api:registration:user-detail', pk='@me')
+        user_url = resolve_url('api:registration:user')
         url = f'{self.live_server_url}{user_url}'
         session_cookie = self.get_cookie_session()
 

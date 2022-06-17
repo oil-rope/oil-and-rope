@@ -12,11 +12,13 @@ class Chat(TracingMixin):
 
     Parameters
     ----------
-    name: str
+    id: :class:`int`
+        Identifier of the chat (auto-incremented).
+    name: :class:`str`
         Name of the Chat Room.
     users: List[:class:`~registration.models.User`]
         Users in this chat.
-    discord_id: Optional[str]
+    discord_id: Optional[:class:`str`]
         Discord chat associated if given.
     """
 
@@ -48,6 +50,8 @@ class ChatMessage(TracingMixin):
 
     Parameters
     ----------
+    id: :class:`int`
+        Identifier of the chat (auto-incremented).
     chat: :class:`~chat.models.Chat`
         Chat associated to this message.
     message: :class:`str`

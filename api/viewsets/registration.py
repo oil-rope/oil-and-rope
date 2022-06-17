@@ -1,69 +1,45 @@
-from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
-from common.constants import models
+from registration.models import User
 
-from ..permissions.registration import IsUserOrAdmin, IsUserProfileOrAdmin
-from ..serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
-
-Profile = apps.get_model(models.REGISTRATION_PROFILE)
-User = get_user_model()
+from ..serializers.registration import BotSerializer, UserSerializer
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet for :class:`User`.
-    """
-
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserOrAdmin]
-    queryset = User.objects.all()
+class UserViewSet(APIView):
+    queryset = User.objects.none()
     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        if self.action == 'list':
-            self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
+    @extend_schema(
+        operation_id='api:registration:user',
+        summary='Get user',
+    )
+    def get(self, request: Request):
+        """
+        Gets logged user and returns it as a JSON object.
+        """
 
-    def get_object(self):
-        if self.kwargs[self.lookup_url_kwarg or self.lookup_field] == '@me':
-            return self.request.user
-        return super().get_object()
-
-
-class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet for :class:`Profile`.
-    """
-
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [IsUserProfileOrAdmin]
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-    def get_permissions(self):
-        if self.action == 'list':
-            self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
-
-    def get_object(self):
-        if self.kwargs[self.lookup_url_kwarg or self.lookup_field] == '@me':
-            return self.request.user.profile
-        return super().get_object()
+        return Response(data=self.serializer_class(request.user).data, status=status.HTTP_200_OK)
 
 
-class BotViewSet(viewsets.ViewSet):
-    """
-    ViewSet for Oil & Rope Bot.
-    """
-
+class BotViewSet(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = BotSerializer
 
-    def list(self, request):
+    @extend_schema(
+        operation_id='api:registration:bot',
+        summary='Get Oil & Rope Bot',
+    )
+    def get(self, _) -> Response:
+        """
+        Gets Oil & Rope Bot and returns it as a JSON object.
+        """
+
         bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
-        serializer = BotSerializer(bot)
+        serializer = self.serializer_class(bot)
         return Response(data=serializer.data)

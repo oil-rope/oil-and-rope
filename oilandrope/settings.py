@@ -79,8 +79,8 @@ INSTALLED_APPS = [
     'django_filters',
     # django-prometheus (https://github.com/korfuri/django-prometheus#quickstart)
     'django_prometheus',
-    # Django Rest Framework Swagger (https://drf-yasg.readthedocs.io/en/stable/)
-    'drf_yasg',
+    # drf_spectacular (https://drf-spectacular.readthedocs.io/)
+    'drf_spectacular',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
     # API RestFramework (https://www.django-rest-framework.org/)
@@ -349,6 +349,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # Versioning configuration
     # https://www.django-rest-framework.org/api-guide/versioning/#configuring-the-versioning-scheme
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
@@ -358,11 +359,14 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 30,
 }
 
-# Settings for `drf-yasg` Swagger UI
-# https://drf-yasg.readthedocs.io/en/stable/settings.html#swagger-settings
+# Settings for drf_spectacular
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
 
-SWAGGER_SETTINGS = {
-    'DEFAULT_API_URL': 'https://oilandrope-project.com/api/',
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Oil & Rope API',
+    'DESCRIPTION': 'Online roleplay easy and intuitive. Now API!',
+    'VERSION': REST_FRAMEWORK['DEFAULT_VERSION'],
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # Email System
