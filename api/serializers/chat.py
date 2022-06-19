@@ -25,6 +25,12 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         )
 
 
+class ChatMessageRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatMessage
+        fields = ('message',)
+
+
 class NestedChatMessageSerializer(ChatMessageSerializer):
     """
     More handy serializer for `JSON` instances. Not able to be writable.

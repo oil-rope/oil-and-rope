@@ -555,6 +555,18 @@ python-versions = "*"
 pytest-asyncio = "*"
 
 [[package]]
+name = "drf-nested-routers"
+version = "0.93.4"
+description = "Nested resources for the Django Rest Framework"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Django = ">=1.11"
+djangorestframework = ">=3.6.0"
+
+[[package]]
 name = "drf-spectacular"
 version = "0.22.1"
 description = "Sane and flexible OpenAPI 3 schema generation for Django REST framework"
@@ -1843,7 +1855,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e33d438eaff252b285f9937e598b709c9d0c68ad46043bdd754cefb30db275a4"
+content-hash = "fd0bcf1b4fc16e77f07be0d095acc621245e285b8e6b6001dc8596668dffb512"
 
 [metadata.files]
 aiohttp = [
@@ -2170,6 +2182,10 @@ docutils = [
 dpytest = [
     {file = "dpytest-0.5.3-py3-none-any.whl", hash = "sha256:d991909aca44ac095157ddca4e7f68e928e277d19bdc2a9d2908d3346b5ca309"},
     {file = "dpytest-0.5.3.tar.gz", hash = "sha256:cfd8afb929bf006972c4bd9c13b36f9dee19a057d4c408b4b6b31acfea340ff4"},
+]
+drf-nested-routers = [
+    {file = "drf-nested-routers-0.93.4.tar.gz", hash = "sha256:01aa556b8c08608bb74fb34f6ca065a5183f2cda4dc0478192cc17a2581d71b0"},
+    {file = "drf_nested_routers-0.93.4-py2.py3-none-any.whl", hash = "sha256:996b77f3f4dfaf64569e7b8f04e3919945f90f95366838ca5b8bed9dd709d6c5"},
 ]
 drf-spectacular = [
     {file = "drf-spectacular-0.22.1.tar.gz", hash = "sha256:866e16ddaae167a1234c76cd8c351161373551db994ce9665b347b32d5daf38b"},

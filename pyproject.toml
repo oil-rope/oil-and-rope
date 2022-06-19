@@ -22,6 +22,7 @@ django-mptt = "^0.13"
 django-mptt-admin = "^2.2"
 django-prometheus = "^2.2"
 djangorestframework = "^3.12"
+drf-nested-routers = "^0.93"
 drf-spectacular = "^0.22.1"
 docutils = "~0.17.1"  # Required by admindocs even if not used
 Faker = "^13.3"

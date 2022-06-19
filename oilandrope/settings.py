@@ -367,6 +367,8 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Online roleplay easy and intuitive. Now API!',
     'VERSION': REST_FRAMEWORK['DEFAULT_VERSION'],
     'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_PUBLIC': True,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
 }
 
 # Email System

@@ -1,4 +1,5 @@
 from django.urls import include, path
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.authtoken.views import ObtainAuthToken
 
@@ -12,8 +13,14 @@ UTILS_PATTERNS = [
     path('roll/', api.RollView.as_view(), name='roll_dice'),
 ]
 
+obtain_token_view = extend_schema_view(
+    post=extend_schema(
+        summary='Get token',
+        description='Get token for given username and password.',
+    ),
+)(ObtainAuthToken.as_view())
 AUTH_PATTERNS = [
-    path('token/', ObtainAuthToken.as_view(), name='token'),
+    path('token/', obtain_token_view, name='token'),
 ]
 
 urlpatterns = [
