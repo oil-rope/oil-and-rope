@@ -400,7 +400,7 @@ CORS_ALLOW_METHODS = [
 
 # https://github.com/adamchainz/django-cors-headers#cors_urls_regex
 
-CORS_URLS_REGEX = r'^/(en|es)/api/.*$'
+CORS_URLS_REGEX = r'^/api/.*$'
 
 # https://github.com/adamchainz/django-cors-headers#cors_allow_headers
 

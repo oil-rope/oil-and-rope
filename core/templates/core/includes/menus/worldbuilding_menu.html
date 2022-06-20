@@ -20,7 +20,7 @@
         class="dropdown-item {% if actual_path|startswith:world_list %} active{% endif %}"
         {% if actual_path|startswith:world_list %} aria-current="true"{% endif %}
       >
-        <i class="ic ic-world"></i>
+        {{ ICONS.WORLD|safe }}
         {% translate "worlds"|title %}
       </a>
     </li>
