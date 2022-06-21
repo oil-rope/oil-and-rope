@@ -1,13 +1,7 @@
-from django.apps import apps
 from rest_framework import serializers
 
-from common.constants import models
-
-Chat = apps.get_model(models.CHAT)
-Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-Race = apps.get_model(models.ROLEPLAY_RACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
+from bot.models import Channel
+from roleplay.models import Campaign, Domain, Place, Race
 
 
 class DomainSerializer(serializers.ModelSerializer):
@@ -37,11 +31,28 @@ class PlaceSerializer(serializers.ModelSerializer):
         )
 
 
+class CampaignSerializer(serializers.ModelSerializer):
+    discord_channel = serializers.SerializerMethodField()
+
+    def get_discord_channel(self, obj) -> str | None:
+        discord_channel: Channel | None = obj.discord_channel
+        if discord_channel:
+            return discord_channel.get_url()
+        return discord_channel
+
+    class Meta:
+        model = Campaign
+        fields = (
+            'id', 'name', 'description', 'summary', 'cover_image', 'owner', 'users', 'place', 'start_date',
+            'end_date', 'discord_channel', 'chat', 'entry_created_at', 'entry_updated_at',
+        )
+
+
 class RaceSerializer(serializers.ModelSerializer):
 
     owners = serializers.SerializerMethodField(method_name='get_owners')
 
-    def get_owners(self, obj):
+    def get_owners(self, obj) -> list[int]:
         owners_pk = obj.owners.values_list('pk', flat=True)
         return list(owners_pk)
 

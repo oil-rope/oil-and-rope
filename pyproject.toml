@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/oil-rope/oil-and-rope/"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10.0"
 Django = "4.0.4"
 channels = "^3.0"
 channels-redis = "^3.3"

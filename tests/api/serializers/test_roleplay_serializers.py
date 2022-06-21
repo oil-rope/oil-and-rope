@@ -1,11 +1,16 @@
+import unittest
+
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from model_bakery import baker
 
-from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
+from api.serializers.roleplay import CampaignSerializer, DomainSerializer, PlaceSerializer, RaceSerializer
 from common.constants import models
+from roleplay.models import Campaign
 from tests import fake
+from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from tests.utils import check_litecord_connection
 
 Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)
@@ -131,3 +136,24 @@ class TestRaceSerializer(TestCase):
 
         self.assertIsInstance(owners, list)
         self.assertListEqual([user.pk], owners)
+
+
+class TestCampaignSerializer(TestCase):
+    serializer_class = CampaignSerializer
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
+
+    def test_get_discord_channel_with_empty_discord_channel_id_ok(self):
+        serializer = self.serializer_class(self.instance)
+
+        self.assertIsNone(serializer.data['discord_channel'])
+
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
+    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    def test_get_discord_channel_with_discord_channel_id_ok(self):
+        self.instance.discord_channel_id = CHANNEL
+        serializer = self.serializer_class(self.instance)
+
+        self.assertIsNotNone(serializer.data['discord_channel'])

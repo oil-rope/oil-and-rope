@@ -3,7 +3,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.authtoken.views import ObtainAuthToken
 
-from .routers import chat, registration
+from .routers import chat, registration, roleplay
 from .viewsets import api
 
 app_name = 'api'
@@ -32,4 +32,5 @@ urlpatterns = [
     path('utils/', include((UTILS_PATTERNS, 'utils'))),
     path('registration/', include((registration.urls, 'registration'))),
     path('chat/', include((chat.urls, 'chat'))),
+    path('roleplay/', include((roleplay.urls, 'roleplay'))),
 ]

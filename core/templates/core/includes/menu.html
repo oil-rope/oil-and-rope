@@ -32,8 +32,12 @@
       <!-- Navbar Menu -->
       <div class="collapse navbar-collapse" id="navbarOilAndRope">
         <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-          {% include 'core/includes/menus/worldbuilding_menu.html' %}
-          {% include 'core/includes/menus/roleplay_menu.html' %}
+          {% if request.user.is_authenticated %}
+            {% include 'core/includes/menus/worldbuilding_menu.html' %}
+            {% include 'core/includes/menus/roleplay_menu.html' %}
+          {% else %}
+            {% include 'core/includes/menus/home_menu.html' %}
+          {% endif %}
           {% include 'core/includes/menus/developer_portal_menu.html' %}
         </ul>
 

@@ -1,3 +1,5 @@
+from typing import Type
+
 from django.conf import settings
 
 from bot.enums import ChannelTypes, MessageTypes
@@ -103,13 +105,13 @@ class Channel(ApiMixin):
         self.type = ChannelTypes(self.type)
 
     @classmethod
-    def get_base_url(cls):
+    def get_base_url(cls) -> str:
         return f'{settings.DISCORD_API_URL}channels/'
 
-    def get_url(self, url=None):
+    def get_url(self, url=None) -> str:
         return f'{self.base_url}{self.id}'
 
-    def send_message(self, content, embed=None):
+    def send_message(self, content, embed=None) -> Type['Message']:
         url = f'{self.url}/messages'
         data = {
             'content': content
@@ -125,12 +127,12 @@ class Channel(ApiMixin):
         msg = Message(self, msg_id, embed=embed, response=response)
         return msg
 
-    def __str__(self):
+    def __str__(self) -> str:
         if hasattr(self, 'name'):
             return f'Channel {self.name} ({self.id})'
         return f'Channel {self.type.name} ({self.id})'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
 

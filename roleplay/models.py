@@ -1,3 +1,5 @@
+from typing import Optional
+
 from ckeditor.fields import RichTextField
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericRelation
@@ -347,7 +349,7 @@ class Campaign(TracingMixin):
         This user can and can be not a player of the campaign.
     is_public: Optional[:class:`bool`]
         Declares if the campaign is public or not.
-    players: List[:class:`~registration.models.User`]
+    users: List[:class:`~registration.models.User`]
         List of players that are part of the campaign.
     place: :class:`~roleplay.models.Place`
         World where the campaign is happening.
@@ -416,7 +418,7 @@ class Campaign(TracingMixin):
     game_masters = cached_property(get_game_masters)
 
     @property
-    def discord_channel(self):
+    def discord_channel(self) -> Optional[Channel]:
         if self.discord_channel_id:
             return Channel(id=self.discord_channel_id)
         return None

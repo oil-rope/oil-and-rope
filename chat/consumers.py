@@ -1,20 +1,20 @@
+import json
 import logging
 
+from channels.auth import login
 from channels.db import database_sync_to_async
-from django.apps import apps
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from api.serializers.chat import NestedChatMessageSerializer, WebSocketChatSerializer
-from common.constants import models as constants
+from api.serializers.chat import ChatMessageSerializer, WebSocketChatSerializer
+from chat.models import ChatMessage
 from common.enums import WebSocketCloseCodes
 from core.consumers import HandlerJsonWebsocketConsumer
+from core.exceptions import OilAndRopeException
+from registration.models import User
 from roleplay.utils.dice import roll_dice
 
 LOGGER = logging.getLogger(__name__)
-
-ChatMessage = apps.get_model(constants.CHAT_MESSAGE)
-User = apps.get_model(constants.REGISTRATION_USER)
 
 
 class ChatConsumer(HandlerJsonWebsocketConsumer):
@@ -28,6 +28,14 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         await super().disconnect(code)
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
+        json_data = json.loads(text_data)
+        # Authenticating by given token
+        if 'token' in json_data:
+            user = await self.get_user(json_data['token'])
+            if user:
+                await login(self.scope, user, backend='django.contrib.auth.backends.ModelBackend')
+                await database_sync_to_async(self.scope['session'].save)()
+
         self.user = self.scope['user']
         if not self.user.is_authenticated:
             msg = _('user not authenticated.').capitalize()
@@ -37,6 +45,13 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             })
             return await super().close(code=WebSocketCloseCodes.UNAUTHORIZED.value)
         return await super().receive(text_data, bytes_data, **kwargs)
+
+    @database_sync_to_async
+    def get_user(self, token):
+        user = User.objects.filter(auth_token=token)
+        if user.exists():
+            return user.first()
+        return None
 
     @database_sync_to_async
     def register_message(self, author_id: int, chat_id: int, message: str) -> ChatMessage:
@@ -49,17 +64,23 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
     @database_sync_to_async
     def register_roll_message(self, chat_id: int, message: str) -> tuple[ChatMessage, dict]:
         bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
-        result, roll = roll_dice(message)
-        message = result
-        return ChatMessage.objects.create(
-            author_id=bot.pk,
-            chat_id=chat_id,
-            message=result,
-        ), roll
+        try:
+            result, roll = roll_dice(message)
+        except OilAndRopeException as ex:
+            # NOTE: If roll fails, we send message to chat with error message
+            result = ex.message
+            roll = {}
+        finally:
+            message = result
+            return ChatMessage.objects.create(
+                author_id=bot.id,
+                chat_id=chat_id,
+                message=result,
+            ), dict(roll)
 
     @database_sync_to_async
     def get_serialized_message(self, message: ChatMessage) -> dict:
-        serialized_message = NestedChatMessageSerializer(message)
+        serialized_message = ChatMessageSerializer(message)
         return serialized_message.data
 
     async def setup_channel_layer(self, content):
