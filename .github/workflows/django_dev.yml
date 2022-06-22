@@ -60,6 +60,8 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
+      # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
+      # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
         run: |
           cp .env.example .env
