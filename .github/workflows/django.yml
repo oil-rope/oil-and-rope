@@ -47,44 +47,52 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
+
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        id: cache-poetry
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install poetry
+        run: |
+          pip install poetry
 
       - name: Install dependencies
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         run: |
-          sudo apt update
-          sudo apt install -y firefox-geckodriver
-          python -m pip install --upgrade pip poetry
-          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
-          pip install -r /tmp/requirements.txt
+          poetry install
 
       - name: Lint with flake8
         run: |
-          pip install flake8
-          flake8 --config=setup.cfg
+          poetry run flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-          pip install -U isort
-          isort . --check --diff
+          poetry run isort . --check --diff
 
+      # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
+      # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test
-          coverage xml
+          poetry run coverage run ./manage.py test -- --no-cov
+          poetry run coverage report
 
       - name: Django Check
         run: |
-          python manage.py migrate
-          python manage.py check
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
 
       - name: Updating Codecov (coverage)
         if: ${{ success() }}
