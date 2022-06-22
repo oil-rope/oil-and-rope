@@ -26,7 +26,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10']
 
     steps:
       - uses: actions/checkout@v2
@@ -34,33 +34,26 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y firefox-geckodriver
-          python -m pip install --upgrade pip poetry
-          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
-          pip install -r /tmp/requirements.txt
+          python -m pip install poetry
+          poetry install
 
       - name: Lint with flake8
         run: |
-          pip install flake8
-          flake8 --config=setup.cfg
+          poetry run flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-          pip install -U isort
-          isort . --check --diff
+          poetry run isort . --check --diff
 
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test --settings oilandrope.dev_settings
-          coverage xml
+          poetry run ./manage.py test -- --cov-fail-under=96
 
       - name: Django Check
         run: |
-          python manage.py migrate --settings oilandrope.dev_settings
-          python manage.py check --settings oilandrope.dev_settings
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check

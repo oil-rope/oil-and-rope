@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
@@ -9,8 +8,6 @@ from chat.models import Chat, ChatMessage
 
 from ..serializers.chat import (ChatMessageCreateRequestSerializer, ChatMessageSerializer,
                                 ChatMessageUpdateRequestSerializer, ChatSerializer)
-
-User = get_user_model()
 
 
 @extend_schema_view(
@@ -43,7 +40,7 @@ class ChatMessageViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet)
     queryset = ChatMessage.objects.all()
     serializer_class = ChatMessageSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         qs = super().get_queryset().filter(
             chat__id=self.kwargs['chat_pk'],
             chat__users__in=[self.request.user],
