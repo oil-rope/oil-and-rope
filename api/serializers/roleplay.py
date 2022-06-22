@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import serializers
 
 from bot.models import Channel
@@ -34,8 +36,8 @@ class PlaceSerializer(serializers.ModelSerializer):
 class CampaignSerializer(serializers.ModelSerializer):
     discord_channel = serializers.SerializerMethodField()
 
-    def get_discord_channel(self, obj) -> str | None:
-        discord_channel: Channel | None = obj.discord_channel
+    def get_discord_channel(self, obj) -> Optional[str]:
+        discord_channel: Optional[Channel] = obj.discord_channel
         if discord_channel:
             return discord_channel.get_url()
         return discord_channel
