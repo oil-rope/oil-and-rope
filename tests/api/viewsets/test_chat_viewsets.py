@@ -79,9 +79,19 @@ class TestChatMessageViewSet(APITestCase):
     def test_partial_update_ok(self):
         self.client.force_login(self.user)
         old_msg = self.message.message
-        response = self.client.patch(f'{self.url}{self.message.id}/', data={'message': fake.sentence()}, format='json')
+        url = f'{self.url}{self.message.id}/'
+        response = self.client.patch(url, data={'message': fake.sentence()}, format='json')
         message = response.json()
 
         self.assertNotEqual(old_msg, message['message'])
         self.message.refresh_from_db()
         self.assertEqual(self.message.message, message['message'])
+
+    def test_partial_update_non_author_ko(self):
+        msg: ChatMessage = baker.make_recipe('chat.message')
+
+        url = f'{self.url}{msg.id}/'
+        self.client.force_login(self.user)
+        response = self.client.patch(url, data={'message': fake.sentence()}, format='json')
+
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)

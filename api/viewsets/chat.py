@@ -45,6 +45,9 @@ class ChatMessageViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet)
             chat__id=self.kwargs['chat_pk'],
             chat__users__in=[self.request.user],
         )
+        # User can only edit their own messages
+        if self.action == 'partial_update':
+            qs = qs.filter(author=self.request.user)
         return qs
 
     @extend_schema(
@@ -74,10 +77,6 @@ class ChatMessageViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet)
         Update content of given message.
         """
 
-        # User can only edit their own messages
-        self.queryset = self.get_queryset().filter(
-            author=self.request.user,
-        )
         data_serializer = ChatMessageUpdateRequestSerializer(data=request.data)
         data_serializer.is_valid(raise_exception=True)
         serializer = self.get_serializer(instance=self.get_object(), data=data_serializer.data, partial=True)

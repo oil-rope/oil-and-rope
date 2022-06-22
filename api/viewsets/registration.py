@@ -12,6 +12,7 @@ from ..serializers.registration import BotSerializer, UserSerializer
 
 
 class UserViewSet(APIView):
+    # NOTE: This is used by `drf_spectacular` to generate Swagger
     queryset = User.objects.none()
     serializer_class = UserSerializer
 
@@ -19,7 +20,7 @@ class UserViewSet(APIView):
         operation_id='api:registration:user',
         summary='Get user',
     )
-    def get(self, request: Request):
+    def get(self, request: Request, *args, **kwargs):
         """
         Gets logged user and returns it as a JSON object.
         """
@@ -35,7 +36,7 @@ class BotViewSet(APIView):
         operation_id='api:registration:bot',
         summary='Get Oil & Rope Bot',
     )
-    def get(self, _) -> Response:
+    def get(self, *args, **kwargs) -> Response:
         """
         Gets Oil & Rope Bot and returns it as a JSON object.
         """
