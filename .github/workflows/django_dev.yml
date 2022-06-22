@@ -35,8 +35,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # NOTE: For some reason when using `poetry run` instead of `python ./manage.py` some files are reached resulting
-      # in incomplete coverage. In order to use `python` we need to export dependencies all the time, so this is why
+      # NOTE: For some reason when using `poetry run` instead of `coverage run ./manage.py` some files are reached resulting
+      # in incomplete coverage. In order to use `coverage run` we need to export dependencies all the time, so this is why
       # we are caching.
       - name: Cache dependencies
         id: cache-dependencies
@@ -56,7 +56,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 --config=setup.cfg
+          python -m flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
@@ -65,7 +65,8 @@ jobs:
       - name: Pytest
         run: |
           cp .env.example .env
-          python ./manage.py test
+          coverage run ./manage.py test -- --no-cov
+          coverage xml
 
       - name: Django Check
         run: |
