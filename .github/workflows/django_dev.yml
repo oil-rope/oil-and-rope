@@ -29,31 +29,45 @@ jobs:
         python-version: ['3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
+      # NOTE: For some reason when using `poetry run` instead of `python ./manage.py` some files are reached resulting
+      # in incomplete coverage. In order to use `python` we need to export dependencies all the time, so this is why
+      # we are caching.
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          python -m pip install poetry
-          poetry install
+          pip install poetry
+          poetry export --dev --without-hashes --output=./requirements.txt
+          pip install -r ./requirements.txt
 
       - name: Lint with flake8
         run: |
-          poetry run flake8 --config=setup.cfg
+          flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-          poetry run isort . --check --diff
+           isort . --check --diff
 
       - name: Pytest
         run: |
           cp .env.example .env
-          poetry run ./manage.py test -- --cov-fail-under=96
+          python ./manage.py test
 
       - name: Django Check
         run: |
-          poetry run ./manage.py migrate
-          poetry run ./manage.py check
+          python ./manage.py migrate
+          python ./manage.py check
