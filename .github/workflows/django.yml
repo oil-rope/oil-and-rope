@@ -87,7 +87,7 @@ jobs:
         run: |
           cp .env.example .env
           poetry run coverage run ./manage.py test -- --no-cov
-          poetry run coverage report
+          poetry run coverage xml
 
       - name: Django Check
         run: |
