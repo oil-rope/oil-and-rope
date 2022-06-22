@@ -30,45 +30,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      # NOTE: For some reason when using `poetry run` instead of `coverage run ./manage.py` some files are reached resulting
-      # in incomplete coverage. In order to use `coverage run` we need to export dependencies all the time, so this is why
-      # we are caching.
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'poetry'
 
       - name: Install dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          pip install poetry
-          poetry export --dev --without-hashes --output=./requirements.txt
-          pip install -r ./requirements.txt
+          poetry install
 
       - name: Lint with flake8
         run: |
-          python -m flake8 --config=setup.cfg
+          poetry run flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-           isort . --check --diff
+          poetry run isort . --check --diff
 
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run ./manage.py test -- --no-cov
-          coverage xml
+          poetry run coverage run ./manage.py test -- --no-cov
+          poetry run coverage report
 
       - name: Django Check
         run: |
-          python ./manage.py migrate
-          python ./manage.py check
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
