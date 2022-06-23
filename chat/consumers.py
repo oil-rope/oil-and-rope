@@ -1,7 +1,5 @@
-import json
 import logging
 
-from channels.auth import login
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -9,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from api.serializers.chat import ChatMessageSerializer, WebSocketChatSerializer
 from chat.models import ChatMessage
 from common.enums import WebSocketCloseCodes
-from core.consumers import HandlerJsonWebsocketConsumer
+from core.consumers import HandlerJsonWebsocketConsumer, TokenAuthenticationMixin
 from core.exceptions import OilAndRopeException
 from registration.models import User
 from roleplay.utils.dice import roll_dice
@@ -17,10 +15,10 @@ from roleplay.utils.dice import roll_dice
 LOGGER = logging.getLogger(__name__)
 
 
-class ChatConsumer(HandlerJsonWebsocketConsumer):
-    user = None
+class ChatConsumer(TokenAuthenticationMixin, HandlerJsonWebsocketConsumer):
     chat_group_name = None
     serializer_class = WebSocketChatSerializer
+    user = None
 
     async def disconnect(self, code):
         if self.chat_group_name:
@@ -28,15 +26,8 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         await super().disconnect(code)
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
-        json_data = json.loads(text_data)
-        # Authenticating by given token
-        if 'token' in json_data:
-            user = await self.get_user(json_data['token'])
-            if user:
-                await login(self.scope, user, backend='django.contrib.auth.backends.ModelBackend')
-                await database_sync_to_async(self.scope['session'].save)()
-
-        self.user = self.scope['user']
+        await self.authenticate(text_data)
+        self.user: User = self.scope['user']
         if not self.user.is_authenticated:
             msg = _('user not authenticated.').capitalize()
             await super().send_json({
@@ -45,13 +36,6 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
             })
             return await super().close(code=WebSocketCloseCodes.UNAUTHORIZED.value)
         return await super().receive(text_data, bytes_data, **kwargs)
-
-    @database_sync_to_async
-    def get_user(self, token):
-        user = User.objects.filter(auth_token=token)
-        if user.exists():
-            return user.first()
-        return None
 
     @database_sync_to_async
     def register_message(self, author_id: int, chat_id: int, message: str) -> ChatMessage:
