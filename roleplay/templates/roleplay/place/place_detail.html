@@ -193,9 +193,9 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
 
   {# NOTE: Create Place Detail API for TreeMap #}
-  {% comment %} <script
+  <script
     data-api-url="{% url 'api:roleplay:place-detail' object.pk %}"
     data-root-element="#treeView"
     src="{% static 'roleplay/js/places/listPlaces.js' %}"
-  ></script> {% endcomment %}
+  ></script>
 {% endblock javascript %}

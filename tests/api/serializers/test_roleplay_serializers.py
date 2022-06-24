@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from model_bakery import baker
 
-from api.serializers.roleplay import CampaignSerializer, DomainSerializer, PlaceSerializer, RaceSerializer
+from api.serializers.roleplay import CampaignSerializer, DomainSerializer, PlaceNestedSerializer, RaceSerializer
 from common.constants import models
 from roleplay.models import Campaign
 from tests import fake
@@ -53,7 +53,7 @@ class TestPlaceSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = Place
-        cls.serializer = PlaceSerializer
+        cls.serializer = PlaceNestedSerializer
 
     def test_empty_data_ok(self):
         qs = self.model.objects.all()
