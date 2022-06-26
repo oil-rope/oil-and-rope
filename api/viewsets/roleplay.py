@@ -1,7 +1,7 @@
-from django.db.models import Q, QuerySet
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, viewsets
 
+from roleplay.managers import CampaignQuerySet, PlaceQuerySet
 from roleplay.models import Campaign, Place
 
 from ..serializers.roleplay import CampaignSerializer, PlaceNestedSerializer
@@ -15,8 +15,8 @@ class CampaignViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
 
-    def get_queryset(self) -> QuerySet:
-        qs: QuerySet = super().get_queryset()
+    def get_queryset(self) -> CampaignQuerySet:
+        qs: CampaignQuerySet = super().get_queryset()
         return qs.filter(
             users__in=[self.request.user],
         )
@@ -29,8 +29,7 @@ class PlaceNestedViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceNestedSerializer
 
-    def get_queryset(self) -> QuerySet:
-        qs: QuerySet = super().get_queryset()
-        return qs.filter(
-            Q(user__isnull=True) | Q(user=self.request.user)
-        )
+    def get_queryset(self) -> PlaceQuerySet:
+        qs: PlaceQuerySet = super().get_queryset()
+        qs = qs.community_places() | Place.objects.filter(owner=self.request.user)
+        return qs

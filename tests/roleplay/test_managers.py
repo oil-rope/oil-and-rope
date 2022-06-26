@@ -1,19 +1,14 @@
 import functools
 
-from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from model_bakery import baker
 
-from common.constants import models as constants
+from common.models import Vote
 from roleplay.enums import DomainTypes, SiteTypes
-
-from .. import fake
-
-Campaign = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
-ContentType = apps.get_model(constants.CONTENT_TYPE)
-Domain = apps.get_model(constants.ROLEPLAY_DOMAIN)
-Place = apps.get_model(constants.ROLEPLAY_PLACE)
-Vote = apps.get_model(constants.COMMON_VOTE)
+from roleplay.models import Campaign, Domain, Place
+from tests import fake
+from tests.utils import generate_place
 
 
 class TestDomainManager(TestCase):
@@ -62,25 +57,9 @@ class TestPlaceManager(TestCase):
         random_int = functools.partial(fake.pyint, min_value=1, max_value=100)
 
         self.number_of_worlds = random_int()
-        baker.make(self.model, self.number_of_worlds, site_type=self.enum.WORLD)
+        generate_place(self.number_of_worlds, site_type=self.enum.WORLD, is_public=True)
 
         self.total = self.number_of_worlds
-
-    def test_user_places(self):
-        quantity = 5
-        expected_queries = 1
-        baker.make(self.model, quantity, user=self.user, owner=self.user)
-        with self.assertNumQueries(expected_queries):
-            result = self.model.objects.user_places(user=self.user)
-            self.assertEqual(quantity, result.count())
-
-    def test_own_places(self):
-        quantity = 5
-        expected_queries = 1
-        baker.make(self.model, quantity, user=self.user, owner=self.user)
-        with self.assertNumQueries(expected_queries):
-            result = self.model.objects.own_places(self.user)
-            self.assertEqual(quantity, result.count())
 
     def test_community_places(self):
         expected_queries = 1

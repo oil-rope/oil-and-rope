@@ -11,6 +11,7 @@ from common.constants import models as constants
 from common.files import utils
 from common.forms.mixins import FormCapitalizeMixin
 from common.forms.widgets import DateTimeWidget, DateWidget
+from registration.models import User
 
 from .. import enums, models
 from .layout import CampaignFormLayout, PlaceLayout, SessionFormLayout, WorldFormLayout
@@ -40,22 +41,20 @@ class PlaceForm(forms.ModelForm):
         self.helper.layout = PlaceLayout(submit_text)
 
     class Meta:
-        exclude = ('owner', 'user')
+        exclude = ('owner', )
         model = models.Place
 
     def save(self, commit=True):
         parent_site = self.instance.parent_site
         self.instance.owner = parent_site.owner
-        self.instance.user = parent_site.user
         return super().save(commit)
 
 
 class WorldForm(forms.ModelForm):
-
-    def __init__(self, owner, user=None, submit_text=_('create'), *args, **kwargs):
+    def __init__(self, owner: User, public: bool = True, submit_text: str = _('create'), *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = user
         self.owner = owner
+        self.public = public
 
         # NOTE: Using Meta options `help_texts` does not translate the help text.
         self.fields['image'].help_text = _('A picture is worth a thousand words. Max size file %(max_size)s MiB.') % {
@@ -72,10 +71,10 @@ class WorldForm(forms.ModelForm):
         model = models.Place
 
     def save(self, commit=True):
-        if self.user:
-            self.instance.user = self.user
+        self.instance: models.Place
         self.instance.owner = self.owner
         self.instance.site_type = enums.SiteTypes.WORLD
+        self.instance.is_public = self.public
         return super().save(commit)
 
 

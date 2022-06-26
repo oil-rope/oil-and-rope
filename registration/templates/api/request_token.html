@@ -34,9 +34,10 @@
           </div>
           <div class="card-footer">
             <p class="text-center">
-              {% blocktranslate with api='<a target="_blank" href="https://github.com/oil-rope/oil-and-rope/wiki/Server-API">API REST</a>' %}
-                For more information check our {{ api }}.
-              {% endblocktranslate %}
+              {% translate "see docs"|capfirst %}
+              <a href="{% url 'api:swagger' %}" target="_blank">
+                {{ ICONS.BOX_ARROW_UP_RIGHT|safe }}
+              </a>
             </p>
           </div>
         </div>

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, List, Optional
 
 from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
@@ -59,7 +59,7 @@ class DomainSerializer(serializers.ModelSerializer):
 class PlaceNestedSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
-    def get_children(self, obj: Place):
+    def get_children(self, obj: Place) -> List[Dict]:
         children: PlaceQuerySet = obj.get_children()
         if not children:
             return []

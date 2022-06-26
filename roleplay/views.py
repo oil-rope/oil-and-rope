@@ -21,6 +21,7 @@ from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from roleplay.models import Campaign, Place, PlayerInCampaign, Session
 
 from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
@@ -30,10 +31,6 @@ from .utils.invitations import send_campaign_invitations
 LOGGER = logging.getLogger(__name__)
 
 ContentType = apps.get_model(models.CONTENT_TYPE)
-Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-PlayerInCampaign = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
 User = get_user_model()
 Vote = apps.get_model(models.COMMON_VOTE)
 
@@ -92,14 +89,13 @@ class PlaceDetailView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        user = request.user
 
         # Community world
-        if not self.object.user or not self.object.owner:
+        if self.object.is_public:
             return response
 
         # Private world
-        if user == self.object.user:
+        if not self.object.is_public and self.object.owner == request.user:
             return response
 
         return HttpResponseForbidden()
@@ -121,7 +117,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
 
     def get_user_worlds(self):
         user = self.request.user
-        return self.model.objects.user_places(user=user.id).filter(site_type=self.enum.WORLD)
+        return self.model.objects.filter(owner=user, site_type=self.enum.WORLD, is_public=False)
 
     def get_community_worlds(self):
         return self.model.objects.community_places().filter(site_type=self.enum.WORLD)
@@ -191,7 +187,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         })
         if 'user' in self.request.GET:
             kwargs.update({
-                'user': user
+                'public': False
             })
         return kwargs
 
@@ -199,7 +195,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         form = super().get_form(form_class)
         form.helper.form_action = resolve_url('roleplay:world:create')
         # NOTE: Since user is gotten from '?user' QueryParam, `form_action` must replicate this behavior
-        if form.user:
+        if form.public:
             form.helper.form_action = f'{form.helper.form_action}?user'
         return form
 
