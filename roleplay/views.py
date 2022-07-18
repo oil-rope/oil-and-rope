@@ -21,6 +21,7 @@ from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from roleplay.managers import PlaceQuerySet
 from roleplay.models import Campaign, Place, PlayerInCampaign, Session
 
 from . import enums, filters, forms
@@ -115,15 +116,20 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     queryset = Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'
 
-    def get_user_worlds(self):
+    def get_queryset(self) -> PlaceQuerySet:
+        return super().get_queryset().filter(site_type=enums.SiteTypes.WORLD)
+
+    def get_private_worlds(self):
         user = self.request.user
-        return self.model.objects.filter(owner=user, site_type=self.enum.WORLD, is_public=False)
+        qs = self.get_queryset()
+        return qs.filter(owner=user, is_public=False)
 
     def get_community_worlds(self):
-        return self.model.objects.community_places().filter(site_type=self.enum.WORLD)
+        qs = self.get_queryset()
+        return qs.community_places()
 
     def paginate_user_worlds(self, page_size):
-        queryset = self.get_user_worlds()
+        queryset = self.get_private_worlds()
         page_kwarg = self.user_worlds_page_kwarg
         return self.paginate_queryset_by_page_kwarg(queryset, page_size, page_kwarg)
 
@@ -138,7 +144,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
         queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
 
-        user_worlds = self.get_user_worlds()
+        user_worlds = self.get_private_worlds()
         context['user_worlds'] = user_worlds
 
         community_worlds = self.get_community_worlds()

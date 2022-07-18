@@ -344,6 +344,96 @@ class TestPlaceDeleteView(TestCase):
         self.assertEqual(403, response.status_code)
 
 
+class TestWorldListView(TestCase):
+    model = models.Place
+    resolver = 'roleplay:world:list'
+    view = views.WorldListView
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = baker.make_recipe('registration.user')
+        cls.public_worlds_count = fake.pyint(min_value=2, max_value=cls.view.paginate_by)
+        cls.private_worlds_count = fake.pyint(min_value=2, max_value=cls.view.paginate_by)
+        cls.url = resolve_url(cls.resolver)
+
+    def setUp(self) -> None:
+        self.public_worlds = generate_place(self.public_worlds_count, is_public=True, site_type=enums.SiteTypes.WORLD)
+        self.private_worlds = generate_place(
+            self.private_worlds_count, is_public=False, owner=self.user, site_type=enums.SiteTypes.WORLD,
+        )
+
+    def test_anonymous_access_ko(self):
+        login_url = resolve_url(settings.LOGIN_URL)
+        expected_url = f'{login_url}?next={self.url}'
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, expected_url=expected_url)
+
+    def test_authenticated_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_private_worlds_are_listed_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, self.private_worlds[0].name)
+
+    def test_authenticated_empty_private_worlds_ok(self):
+        # NOTE: We can work around this with a new user since it won't have any worlds
+        user = baker.make_recipe('registration.user')
+        self.client.force_login(user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Seems like you haven\'t any world.')
+
+    def test_authenticated_empty_community_worlds_ok(self):
+        [place.delete() for place in self.public_worlds]
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Seems like we don\'t have community worlds.')
+
+    def test_authenticated_private_worlds_paginated_ok(self):
+        generate_place(self.view.paginate_by, is_public=False, site_type=enums.SiteTypes.WORLD, owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_public_worlds_paginated_ok(self):
+        generate_place(self.view.paginate_by, is_public=True, site_type=enums.SiteTypes.WORLD)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_place_without_description_ok(self):
+        self.public_worlds[0].description = ''
+        self.public_worlds[0].save()
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    # NOTE: These two tests are dumps since `common/include/paginator.html` does not have tests
+    def test_pagination_has_previous_and_next_ok(self):
+        generate_place(self.view.paginate_by * 3, is_public=True, site_type=enums.SiteTypes.WORLD)
+        self.client.force_login(self.user)
+        response = self.client.get(f'{self.url}?page=2')
+
+        self.assertEqual(200, response.status_code)
+
+    def test_pagination_has_not_next_ok(self):
+        generate_place(self.view.paginate_by * 2, is_public=True, site_type=enums.SiteTypes.WORLD)
+        self.client.force_login(self.user)
+        response = self.client.get(f'{self.url}?page=last')
+
+        self.assertEqual(200, response.status_code)
+
+
 class TestCampaignCreateView(TestCase):
     model = models.Campaign
     login_url = resolve_url(settings.LOGIN_URL)
