@@ -2,17 +2,13 @@ name: (Prod) Django Checker
 
 on:
   push:
-    branches:
-      - master
-      - develop
-      - release/*
   pull_request:
     branches:
       - master
       - develop
 
 jobs:
-  python:
+  python-with-postgres:
     name: Python with PostgreSQL & Redis
     runs-on: ubuntu-latest
     env:
@@ -22,6 +18,8 @@ jobs:
       DB_NAME: oilandrope
       DB_USER: postgres
       DB_PASSWORD: p4ssw0rd@
+      DB_HOST: postgres
+      DB_PORT: 5432
 
     # Set up Postgres and Redis
     services:
@@ -47,23 +45,31 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
+
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        id: cache-poetry
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install poetry
+        run: |
+          pip install poetry
 
       - name: Install dependencies
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         run: |
-          sudo apt update
-          sudo apt install -y firefox-geckodriver
-          python -m pip install --upgrade pip poetry
-          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
-          pip install -r /tmp/requirements.txt
+          poetry install
 
       - name: Lint with flake8
         run: |
@@ -75,22 +81,28 @@ jobs:
           pip install -U isort
           isort . --check --diff
 
+      # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
+      # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
         run: |
           cp .env.example .env
-          coverage run manage.py test
-          coverage xml
+          poetry run coverage run ./manage.py test -- --no-cov
+          poetry run coverage report
 
       - name: Django Check
         run: |
           python manage.py migrate
           python manage.py check
 
-      - name: Updating Codecov (coverage)
-        if: ${{ success() }}
-        uses: codecov/codecov-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          file: ./coverage.xml
-          verbose: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        if: ${{ success() }}
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: oilandrope/core:${{ github.ref_name }}
