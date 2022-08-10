@@ -73,13 +73,11 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          pip install flake8
-          flake8 --config=setup.cfg
+          poetry run flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-          pip install -U isort
-          isort . --check --diff
+          poetry run isort . --check --diff
 
       # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
       # `coverage run` in order to get a full coverage (difference is almost 10%)
@@ -91,8 +89,8 @@ jobs:
 
       - name: Django Check
         run: |
-          python manage.py migrate
-          python manage.py check
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
