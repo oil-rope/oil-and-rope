@@ -101,7 +101,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image
-        if: ${{ success() }}
+        if: ${{ success() && matrix.python-version == 3.9 }}
         uses: docker/build-push-action@v3
         with:
           push: true
