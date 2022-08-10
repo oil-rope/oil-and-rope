@@ -2,6 +2,7 @@ import os
 import random
 import tempfile
 import time
+import unittest
 from unittest import mock
 
 import pytest
@@ -22,7 +23,7 @@ from roleplay import enums, models, views
 from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 from .. import fake
-from ..utils import generate_place
+from ..utils import check_litecord_connection, generate_place
 
 ContentType = apps.get_model(constants.CONTENT_TYPE)
 Vote = apps.get_model(constants.COMMON_VOTE)
@@ -955,6 +956,7 @@ class TestCampaignDetailView(TestCase):
 
     @pytest.mark.coverage
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_campaign_with_discord_channel_ok(self):
         self.client.force_login(self.user)
         self.private_campaign.discord_channel_id = CHANNEL

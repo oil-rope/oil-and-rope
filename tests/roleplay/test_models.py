@@ -17,10 +17,11 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
+
 from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
-from tests import fake
-from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
-from tests.utils import generate_place
+from .. import fake
+from ..bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from ..utils import check_litecord_connection, generate_place
 
 User = apps.get_model(constants.REGISTRATION_USER)
 
@@ -237,6 +238,7 @@ class TestCampaign(TestCase):
     def test_discord_channel_empty_is_none(self):
         self.assertIsNone(self.instance.discord_channel)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_discord_channel_ok(self):
         self.instance.discord_channel_id = CHANNEL

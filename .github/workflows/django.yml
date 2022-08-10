@@ -1,36 +1,30 @@
-name: (Prod) Django Checker
+name: Oil & Rope CI
 
 on:
-  push:
-    branches:
-      - master
-      - develop
-      - release/*
-  pull_request:
-    branches:
-      - master
-      - develop
+  [push]
 
 jobs:
-  python:
+  python-with-postgres:
     name: Python with PostgreSQL & Redis
     runs-on: ubuntu-latest
     env:
       # NOTE: This is needed for coverage on HTML
       DEBUG_TEMPLATE: True
       DJANGO_SETTINGS_MODULE: oilandrope.settings
-      DB_NAME: oilandrope
-      DB_USER: postgres
+      DB_USER: oilandrope
       DB_PASSWORD: p4ssw0rd@
+      DB_NAME: oilandrope_db
+      DB_HOST: localhost
+      DB_PORT: 5432
 
     # Set up Postgres and Redis
     services:
       postgres:
         image: postgres:14
         env:
+          POSTGRES_USER: oilandrope
           POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: postgres
-          POSTGRES_DB: oilandrope
+          POSTGRES_DB: oilandrope_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -87,18 +81,22 @@ jobs:
         run: |
           cp .env.example .env
           poetry run coverage run ./manage.py test -- --no-cov
-          poetry run coverage xml
+          poetry run coverage report
 
       - name: Django Check
         run: |
           poetry run ./manage.py migrate
           poetry run ./manage.py check
 
-      - name: Updating Codecov (coverage)
-        if: ${{ success() }}
-        uses: codecov/codecov-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          file: ./coverage.xml
-          verbose: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        if: ${{ success() }}
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: oilandrope/core:${{ github.ref_name }}-${{ matrix.python-version }}
