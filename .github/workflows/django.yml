@@ -1,11 +1,7 @@
-name: (Prod) Django Checker
+name: Oil & Rope CI
 
 on:
-  push:
-  pull_request:
-    branches:
-      - master
-      - develop
+  [push]
 
 jobs:
   python-with-postgres:
@@ -15,10 +11,10 @@ jobs:
       # NOTE: This is needed for coverage on HTML
       DEBUG_TEMPLATE: True
       DJANGO_SETTINGS_MODULE: oilandrope.settings
-      DB_NAME: oilandrope
-      DB_USER: postgres
+      DB_USER: oilandrope
       DB_PASSWORD: p4ssw0rd@
-      DB_HOST: postgres
+      DB_NAME: oilandrope_db
+      DB_HOST: localhost
       DB_PORT: 5432
 
     # Set up Postgres and Redis
@@ -26,9 +22,9 @@ jobs:
       postgres:
         image: postgres:14
         env:
+          POSTGRES_USER: oilandrope
           POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: postgres
-          POSTGRES_DB: oilandrope
+          POSTGRES_DB: oilandrope_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
