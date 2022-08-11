@@ -1,9 +1,13 @@
+import logging
 import pathlib
+from typing import Union
 
 from dotenv import dotenv_values, load_dotenv
 
+LOGGER = logging.getLogger(__name__)
 
-def check_env_file(env_file: pathlib.Path):
+
+def check_env_file(env_file: pathlib.Path) -> None:
     """
     Checks that all values in .env.example are in .env file.
     """
@@ -27,7 +31,7 @@ def check_env_file(env_file: pathlib.Path):
         raise Warning(f'Some values are missing from \'{env_file}\': {missing_values}')
 
 
-def load_env_file(env_file: pathlib.Path or str):
+def load_env_file(env_file: Union[pathlib.Path, str]) -> bool:
     """
     Looks for the given .env file and sets up Environment Variables.
     """
@@ -36,7 +40,8 @@ def load_env_file(env_file: pathlib.Path or str):
         env_file = pathlib.Path(env_file)
 
     if not env_file.is_file() or not env_file.exists():
-        raise ImportError(f'File \'{env_file}\' couldn\'t be found')
+        LOGGER.warning('File \'%s\' couldn\'t be found. Using environment variables', str(env_file))
+        return False
 
     check_env_file(env_file)
     return load_dotenv(env_file, override=False, verbose=True, encoding='utf-8')

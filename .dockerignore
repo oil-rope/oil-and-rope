@@ -1,0 +1,3 @@
+# We don't need Dockerfiles inside Docker
+docker/**
+!docker/docker-entrypoint.sh
