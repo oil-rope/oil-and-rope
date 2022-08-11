@@ -100,10 +100,8 @@ jobs:
         if: ${{ success() }}
         uses: docker/build-push-action@v3
         env:
-          DOCKERFILE_FOLDER: docker/${{ matrix.python-version }}
-          DOCKERFILE: ${{ env.DOCKERFILE_FOLDER }}/Dockerfile.${{ env.CONTEXT }}
+          DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
         with:
           push: true
           tags: oilandrope/core:${{ github.ref_name }}${{ matrix.python-version != '3.9' && matrix.python-version }}
-          # file: ${{ env.DOCKERFILE }}
-          file: docker/3.9/Dockerfile.dev
+          file: ${{ env.DOCKERFILE }}
