@@ -8,7 +8,7 @@ repository = "https://github.com/oil-rope/oil-and-rope/"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "4.0.4"
+Django = "4.0.7"
 channels = "^3.0"
 channels-redis = "^3.3"
 crispy-bootstrap5 = "^0.6"
