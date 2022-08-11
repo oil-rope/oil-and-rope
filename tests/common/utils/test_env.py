@@ -32,8 +32,3 @@ class TestEnv(TestCase):
         env_file = self.tmp_file
         with self.assertRaisesRegex(Warning, r'Some values are missing from .+'):
             load_env_file(str(env_file))
-
-    def test_load_env_non_existent_file_ko(self):
-        env_file = fake.file_path()
-        with self.assertRaisesRegex(ImportError, r'File .+ couldn\'t be found'):
-            load_env_file(env_file)
