@@ -17,15 +17,16 @@ COPY . /app/
 COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 
 # In order to always have Gunicorn against 0.0.0.0:8000 we set the following environment variables
-ENV GUNICORN_DAEMON="False" \
+ENV GUNICORN_WSGI_MODULE="oilandrope.wsgi" \
+GUNICORN_DAEMON="False" \
 GUNICORN_ACCESS_LOGFILE="-" \
 GUNICORN_ERROR_LOGFILE="-" \
 GUNICORN_SOCK="" \
 GUNICORN_IP="0.0.0.0" \
 GUNICORN_PORT="8000" \
-DJANGO_SETTINGS_MODULE="oilandrope.settings" \
-DEBUG="False" \
-DEBUG_TEMPLATE="False"
+DJANGO_SETTINGS_MODULE="oilandrope.dev_settings" \
+DEBUG="True" \
+DEBUG_TEMPLATE="True"
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
