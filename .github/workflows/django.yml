@@ -80,8 +80,9 @@ jobs:
       # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
       # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
+        env:
+          DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
         run: |
-          cp .env.example .env
           poetry run coverage run ./manage.py test -- --no-cov
           poetry run coverage report
 
