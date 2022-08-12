@@ -17,8 +17,8 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-
 from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
+
 from .. import fake
 from ..bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 from ..utils import check_litecord_connection, generate_place
