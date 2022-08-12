@@ -97,12 +97,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Since the format `developmentType/Code` is invalid we need to replace it
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]${{ github.ref_name }}" | sed -e 's/\//-/g'
+        id: extra_branch_name
+
       - name: Build & Push Image
         if: ${{ success() }}
         uses: docker/build-push-action@v3
         env:
           DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
+          TAG: ${{ steps.extra_branch_name.outputs.branch }}
+          EXTRA_TAG: ${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
         with:
           push: true
-          tags: oilandrope/core:${{ github.ref_name }}${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
+          tags: oilandrope/core:${{ env.TAG }}${{ env.EXTRA_TAG }}
           file: ${{ env.DOCKERFILE }}
