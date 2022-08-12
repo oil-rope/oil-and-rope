@@ -102,7 +102,10 @@ jobs:
         uses: docker/build-push-action@v3
         env:
           DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
+          # Since the format `developmentType/Code` is invalid we need to replace it
+          TAG: echo "##[set-output name=branch;]${{ github.ref_name }}" | sed -e 's/\//-/g'
+          EXTRA_TAG: ${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
         with:
           push: true
-          tags: oilandrope/core:${{ github.ref_name }}${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
+          tags: oilandrope/core:${{ env.TAG }}${{ env.EXTRA_TAG }}
           file: ${{ env.DOCKERFILE }}
