@@ -243,6 +243,3 @@ dist
 .vscode/
 .idea/
 *.code-workspace
-
-# Configuration
-bot/config/configuration.ini

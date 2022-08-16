@@ -1,6 +1,8 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
+from core.admin import make_private, make_public
+
 from . import models
 
 
@@ -24,28 +26,71 @@ class PlaceAdmin(DraggableMPTTAdmin):
     search_fields = ['name__icontains']
 
 
-class PlayersInSessionInline(admin.TabularInline):
-    model = models.PlayerInSession
+class PlayerInCampaignInline(admin.TabularInline):
+    model = models.PlayerInCampaign
     extra = 1
+
+
+@admin.register(models.Campaign)
+class CampaignAdmin(admin.ModelAdmin):
+    date_hierarchy = 'entry_created_at'
+    inlines = [PlayerInCampaignInline]
+    fields = (
+        ('name', 'summary', 'system', 'place', 'owner'),
+        'description',
+        ('start_date', 'end_date'),
+        'discord_channel_id',
+        'cover_image',
+        'is_public',
+    )
+    list_display = (
+        '__str__',
+        'id',
+        'name',
+        'system',
+        'owner',
+        'is_public',
+        'place',
+        'start_date',
+        'end_date',
+        'chat',
+        'entry_created_at',
+        'entry_updated_at',
+    )
+    list_display_links = ('__str__', 'id', 'name')
+    list_filter = (
+        'system',
+        'is_public',
+        'start_date',
+        'end_date',
+        'entry_created_at',
+        'entry_updated_at',
+    )
+    readonly_fields = ('entry_created_at', 'entry_updated_at')
+    search_fields = ['name__icontains', 'owner__username__icontains']
+    actions = [make_public, make_private]
 
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
-    inlines = (PlayersInSessionInline, )
-    fields = (('name', 'system'), 'plot', 'next_game', 'chat', 'world', 'image')
-    filter_horizontal = ('players', )
-    list_display = ('__str__', 'id', 'system', 'next_game', 'entry_created_at', 'entry_updated_at')
-    list_display_links = ('__str__', 'id')
-    list_filter = ('system', )
+    fields = (
+        'name',
+        'plot',
+        'description',
+        'next_game',
+        'image',
+        'campaign',
+    )
+    list_display = (
+        '__str__',
+        'id',
+        'name',
+        'next_game',
+        'entry_created_at',
+        'entry_updated_at',
+    )
+    list_display_links = ('__str__', 'id', 'name',)
+    list_filter = ('next_game', 'entry_created_at', 'entry_updated_at')
     readonly_fields = ('entry_created_at', 'entry_updated_at')
-    search_fields = ['name__icontains', 'world__name__icontains']
-
-    def delete_model(self, request, obj):
-        obj.chat.delete()
-        obj.delete()
-
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.chat.delete()
-        queryset.delete()
+    search_fields = ['name__icontains', 'campaign__place__name__icontains']

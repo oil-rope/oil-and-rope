@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(to_bool(os.getenv('DEBUG', 'False')))
@@ -51,9 +51,6 @@ MANAGERS = ADMINS
 
 # Application definition
 INSTALLED_APPS = [
-    # Dynamic translation (https://django-modeltranslation.readthedocs.io/)
-    # Must be settled before 'django.contrib.admin' to work correctly on admin
-    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,28 +59,32 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # The “sites” framework (https://docs.djangoproject.com/en/2.2/ref/contrib/sites/)
     'django.contrib.sites',
-    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
-    'channels',
-    # Bootstrap5 template
-    'crispy_bootstrap5',
-    # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
-    'crispy_forms',
-    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
-    'ckeditor',
-    # API RestFramework (https://www.django-rest-framework.org/)
-    'rest_framework',
-    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
-    'rest_framework.authtoken',
-    # Django CORS (https://github.com/adamchainz/django-cors-headers)
-    'corsheaders',
-    # DjangoMptt (https://django-mptt.readthedocs.io/)
-    'mptt',
     # DjangoAllAuth (https://django-allauth.readthedocs.io/)
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     # DjangoAllAuth for Google (https://django-allauth.readthedocs.io/en/latest/providers.html#google)
     'allauth.socialaccount.providers.google',
+    # DjangoChannels (https://channels.readthedocs.io/en/latest/index.html)
+    'channels',
+    # CKEditor's RichText (https://django-ckeditor.readthedocs.io/en/latest/)
+    'ckeditor',
+    # Bootstrap5 template
+    'crispy_bootstrap5',
+    # Model-Bootstrap Forms (https://django-crispy-forms.readthedocs.io/)
+    'crispy_forms',
+    # Django CORS (https://github.com/adamchainz/django-cors-headers)
+    'corsheaders',
+    # django-filter (https://django-filter.readthedocs.io/)
+    'django_filters',
+    # django-prometheus (https://github.com/korfuri/django-prometheus#quickstart)
+    'django_prometheus',
+    # DjangoMptt (https://django-mptt.readthedocs.io/)
+    'mptt',
+    # API RestFramework (https://www.django-rest-framework.org/)
+    'rest_framework',
+    # RestFramework Token (https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication)
+    'rest_framework.authtoken',
     # Source
     'core.apps.CoreConfig',
     # API
@@ -104,6 +105,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -113,6 +115,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # Changing messages tags to Bootstrap
@@ -150,6 +153,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.utils.requests_utils',
                 'core.context_processors.language',
+                'core.context_processors.handy_settings',
             ],
             'debug': bool(to_bool(os.getenv('DEBUG_TEMPLATE', 'False'))),
         },
@@ -167,7 +171,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             'hosts': [
-                (os.environ['CHANNEL_LAYER_HOST'], 6379)
+                (os.getenv('CHANNEL_LAYER_HOST'), 6379)
             ],
         },
     },
@@ -179,13 +183,13 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
-        'PASSWORD': os.environ['DB_PASSWORD'],
-        'HOST': os.environ['DB_HOST'],
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT', '5432'),
         'TEST': {
-            'NAME': 'test_{}'.format(os.environ['DB_NAME'])
+            'NAME': 'test_{}'.format(os.getenv('DB_NAME'))
         },
     },
 }
@@ -352,11 +356,11 @@ REST_FRAMEWORK = {
 
 DEFAULT_FROM_EMAIL = 'oilandropeteam@gmail.com'
 EMAIL_SUBJECT_PREFIX = '[Oil & Rope] '
-EMAIL_HOST = os.environ['EMAIL_HOST']
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT', '25')
-EMAIL_USE_TLS = to_bool(os.getenv('EMAIL_USE_TLS', True))
+EMAIL_USE_TLS = to_bool(os.getenv('EMAIL_USE_TLS', 'True'))
 
 # CORS System
 # https://github.com/adamchainz/django-cors-headers#configuration
@@ -420,7 +424,7 @@ BOT_INVITATION = os.getenv(
     'BOT_INVITATION',
     'https://discordapp.com/oauth2/authorize?client_id=474894488591007745&permissions=201337920&scope=bot'
 )
-BOT_TOKEN = os.environ['BOT_TOKEN']
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 BOT_COMMAND_PREFIX = os.getenv('BOT_COMMAND_PREFIX', '..')
 BOT_DESCRIPTION = os.getenv('BOT_DESCRIPTION', 'Oil & Rope Bot: Managing sessions was never this easy!')
 

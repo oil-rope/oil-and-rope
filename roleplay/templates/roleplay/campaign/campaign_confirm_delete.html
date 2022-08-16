@@ -1,0 +1,58 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load string_utils %}
+
+{% block title %}{% blocktranslate with name=object.name %}Delete {{ name }}{% endblocktranslate %}{% endblock title %}
+
+{% block breadcrumb %}
+  {# NOTE: Translations that are 'supossed' to be on the go should be declared first #}
+  {# NOTE: Is should add a 'as' in order to NOT render on template #}
+  {% translate "campaign delete" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='campaigns=roleplay:campaign:list-private,campaign delete' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row">
+      <div class="col-12">
+        <div class="card p-md-5">
+          <div class="card-body">
+            <p class="text-end">
+              <button class="btn text-danger" onclick="{{ JAVASCRIPT.GO_BACK }}">
+                {{ ICONS.CROSS_THIN|safe }}
+              </button>
+            </p>
+            <h4 class="card-title text-center">
+              <span class="display-4 text-danger">
+                {{ ICONS.CROSS_THIN|safe }}
+              </span>
+              <br>
+              {% translate "are you sure traveller?"|capfirstletter %}
+            </h4>
+            <p class="card-text text-center">
+              {% translate "do you really want to erase this campaign?"|capfirstletter %}
+              <br>
+              {% translate "this action cannot be undone."|capfirst %}
+            </p>
+          </div>
+          <div class="card-body mt-xl-5">
+            <form
+              class="d-flex justify-content-around"
+              action="{% url 'roleplay:place:delete' object.pk %}"
+              method="POST"
+            >
+              {% csrf_token %}
+              <input
+                type="button"
+                onclick="{{ JAVASCRIPT.GO_BACK }}"
+                value="{% translate 'cancel'|capfirst %}"
+                class="col-5 col-xl-4 btn btn-dark"
+              >
+              <input type="submit" value="{% translate 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}

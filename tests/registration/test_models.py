@@ -1,3 +1,5 @@
+import unittest
+
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
@@ -6,9 +8,10 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
-from roleplay.enums import SiteTypes
-from tests import fake
-from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
+
+from .. import fake
+from ..bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
+from ..utils import check_litecord_connection
 
 Place = apps.get_model(constants.ROLEPLAY_PLACE)
 Race = apps.get_model(constants.ROLEPLAY_RACE)
@@ -32,20 +35,10 @@ class TestUser(TestCase):
 
         self.assertEqual(expected_result, result)
 
-    def test_gm_sessions_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        world = baker.make(Place, site_type=SiteTypes.WORLD)
-        sessions = baker.make(_model=Session, _quantity=iterations, world=world)
-        [s.add_game_masters(self.instance) for s in sessions]
-
-        result = self.instance.gm_sessions.count()
-        expected_result = iterations
-
-        self.assertEqual(expected_result, result)
-
     def test_discord_user_none_when_discord_id_not_set_ok(self):
         self.assertIsNone(self.instance.discord_user)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
     def test_discord_user_with_discord_id_ok(self):
         self.instance.discord_id = USER_WITH_SAME_SERVER

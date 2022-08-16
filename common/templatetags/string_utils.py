@@ -1,5 +1,5 @@
 from django import template
-from django.shortcuts import reverse
+from django.shortcuts import resolve_url
 from django.template.defaultfilters import capfirst, stringfilter
 from django.urls.exceptions import NoReverseMatch
 
@@ -20,15 +20,16 @@ def generate_breadcrumbs(text):
     dictionaries `[{name: url}, {name: url}, ...]`.
     """
 
-    entries = text.split(',')
+    entries = [t.strip() for t in text.split(',')]
     values = {}
     for entry in entries:
-        entry = entry.split('=')
-        breadcrumb = entry[0]
+        if '=' not in entry:
+            values.update({entry: '#no-url'})
+            continue
+        breadcrumb, url = entry.split('=')
         try:
-            url = entry[1]
-            url = reverse(url)
-        except (NoReverseMatch, IndexError):
+            url = resolve_url(url)
+        except NoReverseMatch:
             url = '#no-url'
         values.update({breadcrumb: url})
 

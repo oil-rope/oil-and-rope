@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 
+from common.enums import AvailableIcons
 from common.forms import layout as common_layout
 from common.templatetags.string_utils import capfirstletter as cfl
 
@@ -30,7 +31,7 @@ class LoginFormLayout(layout.Layout):
                 layout.Div(css_class='my-2'),
                 common_layout.Link(
                     content=_('login with %(social_media)s').capitalize() % {'social_media': 'Google'},
-                    icon='ic-google',
+                    icon=AvailableIcons.GOOGLE,
                     url=reverse('google_login'),
                     css_class='btn-lg bg-light col-11 col-md-8 col-lg-6 col-xl-7',
                 ),

@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from model_bakery import baker
 
-from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer, SessionSerializer
+from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
 from common.constants import models
 from tests import fake
 
@@ -131,36 +131,3 @@ class TestRaceSerializer(TestCase):
 
         self.assertIsInstance(owners, list)
         self.assertListEqual([user.pk], owners)
-
-
-class TestSessionSerializer(TestCase):
-    model = Session
-    serializer = SessionSerializer
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.world = baker.make_recipe('roleplay.world')
-
-    def test_empty_data_ok(self):
-        qs = self.model.objects.all()
-        serialized_qs = self.serializer(qs, many=True)
-        serialized_result = serialized_qs.data
-
-        self.assertListEqual([], serialized_result)
-
-    def test_serializer_with_data_ok(self):
-        baker.make(_model=self.model, _quantity=fake.pyint(min_value=1, max_value=10), world=self.world)
-        baker.make_recipe('roleplay.session', _quantity=fake.pyint(min_value=1, max_value=10))
-        qs = self.model.objects.all()
-        serialized_qs = self.serializer(qs, many=True)
-        serialized_result = serialized_qs.data
-
-        self.assertEqual(qs.count(), len(serialized_result))
-
-    def test_serializer_object_ok(self):
-        expected_name = fake.word()
-        obj = baker.make(self.model, name=expected_name, world=self.world)
-        serialized_qs = self.serializer(obj)
-        serialized_result = serialized_qs.data
-
-        self.assertEqual(expected_name, serialized_result['name'])

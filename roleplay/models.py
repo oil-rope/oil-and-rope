@@ -1,5 +1,6 @@
 from ckeditor.fields import RichTextField
 from django.apps import apps
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 from django.shortcuts import resolve_url
@@ -7,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+from bot.models import Channel
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from common.validators import validate_file_size
@@ -118,114 +120,6 @@ class Place(MPTTModel, TracingMixin):
 
     def get_absolute_url(self):
         return resolve_url('roleplay:place:detail', pk=self.pk)
-
-    def get_houses(self):
-        houses = self.get_descendants().filter(site_type=SiteTypes.HOUSE)
-        houses = list(houses)
-        return houses
-    houses = cached_property(get_houses, name='houses')
-
-    def get_towns(self):
-        towns = self.get_descendants().filter(site_type=SiteTypes.TOWN)
-        towns = list(towns)
-        return towns
-    towns = cached_property(get_towns, name='towns')
-
-    def get_villages(self):
-        villages = self.get_descendants().filter(site_type=SiteTypes.VILLAGE)
-        villages = list(villages)
-        return villages
-    villages = cached_property(get_villages, name='villages')
-
-    def get_cities(self):
-        cities = self.get_descendants().filter(site_type=SiteTypes.CITY)
-        cities = list(cities)
-        return cities
-    cities = cached_property(get_cities, name='cities')
-
-    def get_metropolis(self):
-        metropolis = self.get_descendants().filter(site_type=SiteTypes.METROPOLIS)
-        metropolis = list(metropolis)
-        return metropolis
-    metropolis = cached_property(get_metropolis, name='metropolis')
-
-    def get_forests(self):
-        forests = self.get_descendants().filter(site_type=SiteTypes.FOREST)
-        forests = list(forests)
-        return forests
-    forests = cached_property(get_forests, name='forests')
-
-    def get_hills(self):
-        hills = self.get_descendants().filter(site_type=SiteTypes.HILLS)
-        hills = list(hills)
-        return hills
-    hills = cached_property(get_hills, name='hills')
-
-    def get_mountains(self):
-        mountains = self.get_descendants().filter(site_type=SiteTypes.MOUNTAINS)
-        mountains = list(mountains)
-        return mountains
-    mountains = cached_property(get_mountains, name='mountains')
-
-    def get_mines(self):
-        mines = self.get_descendants().filter(site_type=SiteTypes.MINES)
-        mines = list(mines)
-        return mines
-    mines = cached_property(get_mines, name='mines')
-
-    def get_rivers(self):
-        rivers = self.get_descendants().filter(site_type=SiteTypes.RIVER)
-        rivers = list(rivers)
-        return rivers
-    rivers = cached_property(get_rivers, name='rivers')
-
-    def get_seas(self):
-        seas = self.get_descendants().filter(site_type=SiteTypes.SEA)
-        seas = list(seas)
-        return seas
-    seas = cached_property(get_seas, name='seas')
-
-    def get_deserts(self):
-        deserts = self.get_descendants().filter(site_type=SiteTypes.DESERT)
-        deserts = list(deserts)
-        return deserts
-    deserts = cached_property(get_deserts, name='deserts')
-
-    def get_tundras(self):
-        tundras = self.get_descendants().filter(site_type=SiteTypes.TUNDRA)
-        tundras = list(tundras)
-        return tundras
-    tundras = cached_property(get_tundras, name='tundras')
-
-    def get_unusual(self):
-        unusual = self.get_descendants().filter(site_type=SiteTypes.UNUSUAL)
-        unusual = list(unusual)
-        return unusual
-    unusual = cached_property(get_unusual, name='unusual')
-
-    def get_islands(self):
-        islands = self.get_descendants().filter(site_type=SiteTypes.ISLAND)
-        islands = list(islands)
-        return islands
-    islands = cached_property(get_islands, name='islands')
-
-    def get_countries(self):
-        countries = self.get_descendants().filter(site_type=SiteTypes.COUNTRY)
-        countries = list(countries)
-        return countries
-    countries = cached_property(get_countries, name='countries')
-
-    def get_continents(self):
-        continents = self.get_descendants().filter(site_type=SiteTypes.CONTINENT)
-        continents = list(continents)
-        return continents
-    continents = cached_property(get_continents, name='continents')
-
-    def get_worlds(self):
-        worlds = self.get_descendants().filter(site_type=SiteTypes.WORLD)
-        worlds = list(worlds)
-        return worlds
-    worlds = cached_property(get_worlds, name='worlds')
 
     @property
     def is_house(self):
@@ -372,11 +266,10 @@ class Race(TracingMixin):
         through=constants.ROLEPLAY_RACE_USER,
     )
 
-    def get_owners(self):
+    @property
+    def owners(self):
         qs = self.users.filter(m2m_race_set__is_owner=True)
         return qs
-
-    owners = cached_property(func=get_owners, name='owners')
 
     def add_owners(self, *users):
         # Getting RaceUser model
@@ -424,120 +317,246 @@ class RaceUser(TracingMixin):
         return f'{self.user.username} <-> {self.race.name}'
 
 
+# TODO: When Character Model is set we should add PCs and NPCs as part of campaign
+class Campaign(TracingMixin):
+    """
+    This model manages campaign for roleplay sessions.
+    A campaign is a set up for a game. This will have sessions related which will be the sessions themselves.
+    A campaign can be public in order for everyone to see it or private in order to be only visible to the persons
+    in users.
+
+    Parameters
+    ----------
+    id: :class:`int`
+        Identifier of the object.
+    name: :class:`str`
+        Name of the campaign.
+    description: Optional[:class:`str`]
+        Description of the campaign.
+    gm_info: Optional[:class:`str`]
+        Information specific to the game master.
+    summary: Optional[:class:`str`]
+        A one line description of the campaign.
+    system: :class:`int`
+        System used.
+    cover_image: Optional[:class:`str`]
+        Path to the cover image of the campaign.
+    owner: :class:`~registration.models.User`
+        Owner of the campaign.
+        This is used in order to have track of the person who created the campaign.
+        This user can and can be not a player of the campaign.
+    is_public: Optional[:class:`bool`]
+        Declares if the campaign is public or not.
+    players: List[:class:`~registration.models.User`]
+        List of players that are part of the campaign.
+    place: :class:`~roleplay.models.Place`
+        World where the campaign is happening.
+    start_date: Optional[:class:`datetime.date`]
+        Date when the campaign starts.
+    end_date: Optional[:class:`datetime.date`]
+        Date when the campaign ends.
+    discord_channel_id: Optional[:class:`str`]
+        The discord channel ID where the campaign is happening.
+        This will be used to send messages to the discord channel.
+    chat: :class:`~chat.models.Chat`
+        Chat used by the campaign.
+    """
+
+    objects = managers.CampaignManager()
+
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True, null=False, blank=False)
+    name = models.CharField(verbose_name=_('name'), max_length=50)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    gm_info = models.TextField(
+        verbose_name=_('game master information'), help_text=_('information specific to the game master.'),
+        null=False, blank=True,
+    )
+    summary = models.CharField(verbose_name=_('summary'), max_length=254, null=False, blank=True)
+    system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
+    cover_image = models.ImageField(
+        verbose_name=_('cover image'), upload_to=default_upload_to, validators=[validate_file_size], null=False,
+        blank=True,
+    )
+    owner = models.ForeignKey(
+        verbose_name=_('owner'), to=constants.REGISTRATION_USER, related_name='campaign_owned_set',
+        on_delete=models.CASCADE, db_index=True,
+    )
+    is_public = models.BooleanField(
+        verbose_name=_('public'), help_text=_('can this campaign be accessed by anyone?'), default=False,
+    )
+    users = models.ManyToManyField(
+        to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='campaign_set',
+        through=constants.ROLEPLAY_PLAYER_IN_CAMPAIGN, through_fields=('campaign', 'user'),
+    )
+    place = models.ForeignKey(
+        verbose_name=_('world'), to=constants.ROLEPLAY_PLACE, related_name='campaign_set', on_delete=models.CASCADE,
+        db_index=True, null=False, blank=False, limit_choices_to={'site_type': SiteTypes.WORLD},
+    )
+    start_date = models.DateField(verbose_name=_('start date'), null=True, blank=True)
+    end_date = models.DateField(verbose_name=_('end date'), null=True, blank=True)
+    discord_channel_id = models.CharField(
+        verbose_name=_('identifier for discord channel'), max_length=254, null=False, blank=True,
+    )
+    chat = models.OneToOneField(
+        to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
+        related_name='campaign_set', db_index=True, blank=False, null=False,
+    )
+    votes = GenericRelation(
+        verbose_name=_('votes'), to=constants.COMMON_VOTE, related_query_name='campaign_set',
+        content_type_field='content_type', object_id_field='object_id',
+    )
+
+    def get_game_masters(self):
+        """
+        Returns the list of game masters.
+        """
+
+        gms = self.users.filter(player_in_campaign_set__is_game_master=True)
+        return list(gms)
+    game_masters = cached_property(get_game_masters)
+
+    @property
+    def discord_channel(self):
+        if self.discord_channel_id:
+            return Channel(id=self.discord_channel_id)
+        return None
+
+    class Meta:
+        verbose_name = _('campaign')
+        verbose_name_plural = _('campaigns')
+        ordering = ['-entry_created_at', 'name']
+
+    def vote(self, user, vote):
+        """
+        Votes for the campaign.
+
+        Parameters
+        ----------
+        user: :class:`~registration.models.User`
+            User that is voting.
+        vote: :class:`bool`
+            Declares if vote is positive or negative.
+        """
+
+        return self.votes.create(user=user, is_positive=vote)
+
+    def add_game_masters(self, *users):
+        """
+        Adds given users as game masters.
+        """
+
+        PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
+        objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
+        return objs
+
+    def get_absolute_url(self):
+        return resolve_url('roleplay:campaign:detail', pk=self.pk)
+
+    def clean(self):
+        """
+        Validates the campaign.
+        """
+
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            raise ValidationError(_('start date must be before end date.').capitalize())
+
+    def __str__(self):
+        return f'{self.name} [{self.pk}]'
+
+
+class PlayerInCampaign(TracingMixin):
+    """
+    This models manages the 'M2M through' for :class:`~roleplay.models.Campaign`.
+
+    Parameters
+    ---------
+    id: :class:`int`
+        The identifier of the object.
+    campaign: :class:`~roleplay.models.Campaign`
+        The related campaign.
+    user: :class:`~registration.models.User`
+        The related user.
+    """
+
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, null=False, blank=False, db_index=True)
+    user = models.ForeignKey(
+        verbose_name=_('user'), to=constants.REGISTRATION_USER, on_delete=models.CASCADE, to_field='id',
+        related_name='player_in_campaign_set', db_index=True, null=False, blank=False,
+    )
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, on_delete=models.CASCADE, to_field='id',
+        related_name='player_in_campaign_set', db_index=True, null=False, blank=False,
+    )
+    is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
+
+    class Meta:
+        verbose_name = _('player in campaign')
+        verbose_name_plural = _('players in campaign')
+        ordering = ['-entry_created_at', 'user__username']
+        unique_together = [
+            ('user', 'campaign'),
+        ]
+
+    def __str__(self):
+        str_model = _('%(player)s in campaign %(campaign)s (Game Master: %(is_game_master)s)') % {
+            'player': self.user.username, 'campaign': self.campaign.name, 'is_game_master': self.is_game_master,
+        }
+        return str_model
+
+
 class Session(TracingMixin):
     """
     This model manages sessions playing by the users.
 
     Parameters
     ----------
-    name: :class:`str`
+    campaign: :class:`~roleplay.models.Campaign`
+        The related campaign.
+    name: `str`
         Name of the session.
-    plot: :class:`str`
+    description: Optional[`str`]
+        Description of the session.
+    plot: `str`
         Plot of the session.
-    players: List[:class:`~registration.models.User`]
-        Players in session.
-    chat: :class:`~chat.model.Chat`
-        Chat used for this session.
-    next_game: :class:`datetime.datetime`
+    gm_info: Optional[`str`]
+        Information specific to the game master.
+    next_game: Optional[datetime.datetime]
         Next session's date.
-    system: :class:`int`
-        System used.
-    world: :class:`~roleplay.models.Place`
-        The world where this session is played.
-
-    Attributes
-    ----------
-    game_masters: List[:class:`~registration.models.User`]
-        Game masters of this session.
+    image: Optional[`str`]
+        Cover image for this session.
     """
 
+    objects = managers.SessionManager()
+
     id = models.AutoField(verbose_name=_('identifier'), primary_key=True, blank=False, null=False, db_index=True)
-    name = models.CharField(verbose_name=_('name'), max_length=100)
-    plot = models.TextField(verbose_name=_('plot'), null=False, blank=True)
-    players = models.ManyToManyField(
-        to=constants.REGISTRATION_USER, verbose_name=_('players'), related_name='session_set',
-        related_query_name='session', through=constants.ROLEPLAY_PLAYER_IN_SESSION, through_fields=('session', 'player')
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, on_delete=models.CASCADE, to_field='id',
+        related_name='session_set', db_index=True, null=False, blank=False,
     )
-    chat = models.OneToOneField(
-        to=constants.CHAT, verbose_name=_('chat'), on_delete=models.CASCADE,
-        related_name='session', related_query_name='session', db_index=True, blank=False, null=False,
+    name = models.CharField(verbose_name=_('title'), max_length=100, null=False, blank=False)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    plot = models.CharField(
+        verbose_name=_('plot'), max_length=254, help_text=_('one line summary.'), null=False, blank=True,
+    )
+    gm_info = models.TextField(
+        verbose_name=_('game master info'), help_text=_('information specific to the game master.'),
+        null=False, blank=True,
     )
     next_game = models.DateTimeField(
         verbose_name=_('next session'), auto_now=False, auto_now_add=False, null=True, blank=True,
     )
-    system = models.PositiveSmallIntegerField(verbose_name=_('system'), choices=RoleplaySystems.choices)
-    world = models.ForeignKey(
-        to=constants.ROLEPLAY_PLACE, verbose_name=_('world'), on_delete=models.CASCADE,
-        related_name='session_set', related_query_name='session', db_index=True,
-        limit_choices_to={'site_type': SiteTypes.WORLD}, blank=False, null=False,
-    )
     image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
+        verbose_name=_('cover'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True,
     )
 
     class Meta:
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
-        ordering = ['-entry_created_at', 'name']
-
-    def add_game_masters(self, *users):
-        PlayerInSession = apps.get_model(constants.ROLEPLAY_PLAYER_IN_SESSION)
-        entries_to_create = [PlayerInSession(player=user, session=self, is_game_master=True) for user in users]
-        objs = PlayerInSession.objects.bulk_create(entries_to_create)
-        return objs
-
-    @property
-    def game_masters(self):
-        gms = self.players.filter(
-            player_in_session_set__is_game_master=True
-        )
-        return gms
-
-    def clean(self):
-        # Don't allow non Worlds to be world
-        try:
-            world = self.world
-        except Session.world.RelatedObjectDoesNotExist:
-            msg = _('session hasn\'t any world.').capitalize()
-            raise ValidationError({'world': msg})
-        if world:
-            if world.site_type != SiteTypes.WORLD:
-                msg = _('world must be a world.').capitalize()
-                raise ValidationError({'world': msg})
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+        ordering = ['-next_game', 'name', '-entry_updated_at']
 
     def get_absolute_url(self):
         return resolve_url('roleplay:session:detail', pk=self.pk)
 
     def __str__(self):
-        system = RoleplaySystems(self.system)
-        return f'{self.name} [{system.label.title()}]'
-
-
-class PlayerInSession(TracingMixin):
-    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True, db_index=True)
-    session = models.ForeignKey(
-        to=constants.ROLEPLAY_SESSION, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
-        db_index=True, verbose_name=_('session'),
-    )
-    player = models.ForeignKey(
-        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='player_in_session_set', to_field='id',
-        db_index=True, verbose_name=_('player')
-    )
-    is_game_master = models.BooleanField(verbose_name=_('game master'), default=False)
-
-    class Meta:
-        verbose_name = _('player in session')
-        verbose_name_plural = _('players in session')
-        unique_together = [
-            ['session', 'player']
-        ]
-
-    def __str__(self):
-        str_model = _('%(player)s in %(session)s (Game Master: %(is_game_master)s)') % {
-            'player': self.player, 'session': self.session, 'is_game_master': self.is_game_master
-        }
-        return str_model
+        return f'{self.name} [{self.campaign.get_system_display()}]'

@@ -23,13 +23,16 @@
   <!-- Oil & Rope Styles -->
   <!-- With Fonts -->
   <!-- With Icons -->
-  <link rel="stylesheet" href="https://cdn.oilandrope-project.com/v2.0.0/css/oilandrope.css">
+  <link rel="stylesheet" href="https://cdn.oilandrope-project.com/v2/css/oilandrope.css">
   <!-- Extra Styles -->
   {% block css %}{% endblock css %}
   <!-- CKEditor Styles -->
   <style>
     .django-ckeditor-widget {
       width: 100%;
+    }
+    .asteriskField {
+      color: var(--bs-danger);
     }
   </style>
 
@@ -78,6 +81,12 @@
       $('.alert.alert-dismissible.timed').alert('close');
     }, dismissibleSeconds * 1000);
   });
+</script>
+
+<!-- Web permissions -->
+{# NOTE: Since we're gonna use them a lot #}
+<script>
+  Notification.requestPermission();
 </script>
 
 <!-- JavaScript -->

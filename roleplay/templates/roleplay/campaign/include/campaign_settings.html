@@ -1,0 +1,218 @@
+{% load i18n %}
+{% load static %}
+<section class="row justify-content-center">
+  <h3 class="text-center">
+    {% translate "general settings"|capfirst %}
+    {% if user in object.game_masters %}
+      <a
+        href="{% url 'roleplay:campaign:edit' object.pk %}"
+        class="btn btn-primary btn-sm"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{% translate "edit campaign"|capfirst %}"
+      >
+        {{ ICONS.EDIT|safe }}
+        {% translate "edit"|capfirst %}
+      </a>
+    {% endif %}
+  </h3>
+  <div class="row mt-3 mt-xl-4">
+    <div class="col">
+      <h5 class="text-end">{% translate "name"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.name }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "short description"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.summary %}
+          {{ object.summary }}
+        {% else %}
+          {% translate "no summary provided yet."|capfirst %}
+        {% endif %}
+        </p>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "description"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.description %}
+          {{ object.description }}
+        {% else %}
+          {% translate "no description provided yet."|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "system"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.get_system_display }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "type"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.is_public %}
+          {% translate "public"|capfirst %}
+        {% else %}
+          {% translate "private"|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "discord channel"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.discord_channel %}
+          <a
+            href="https://discord.com/channels/{{ object.discord_channel.guild_id }}/{{ object.discord_channel.id }}"
+            target="_blank"
+          >
+            {{ object.discord_channel.name }}
+          </a>
+        {% else %}
+          {% translate "not connected."|capfirst %}
+          <br />
+          <small class="text-muted">
+            {% blocktranslate with command='linkchannel' trimmed %}
+              You can set it up with our bot using '{{ BOT_COMMAND_PREFIX }}{{ command }}' command.
+            {% endblocktranslate %}
+          </small>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "start date"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.start_date %}
+          {{ object.start_date }}
+        {% else %}
+          {% translate "not set."|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "end date"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>
+        {% if object.end_date %}
+          {{ object.end_date }}
+        {% else %}
+          {% translate "not set."|capfirst %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h5 class="text-end">{% translate "votes"|capfirst %}</h5>
+    </div>
+    <div class="col">
+      <p>{{ object.total_votes }}</p>
+    </div>
+  </div>
+</section>
+
+<hr>
+<section class="row justify-content-center">
+  <h3 class="text-center">
+    {% translate "players"|capfirst %}
+    {% if user in object.game_masters %}
+      <a
+        href="{% url 'roleplay:campaign:edit' object.pk %}"
+        class="btn btn-primary btn-sm fw-bold"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{% translate "To invite more players got to 'Edit' and then 'Invite players'." %}"
+      >
+        {{ ICONS.PLUS|safe }}
+        {% translate "add"|capfirst %}
+      </a>
+    {% endif %}
+  </h3>
+  <div class="row justify-content-around rounded bg-dark bg-opacity-10">
+    <h5 class="text-center">
+      {% blocktranslate count players=object.users.count trimmed %}
+        {{ players }} player
+      {% plural %}
+        {{ players }} players
+      {% endblocktranslate %}
+    </h5>
+    {% for player in object.users.all %}
+      <div class="col">
+        {% if player.profile.image %}
+          <img
+            src="{{ player.profile.image.url }}"
+            alt="{% translate "avatar"|capfirst %}"
+            class="rounded-circle"
+            width="75"
+            height="75"
+          >
+        {% else %}
+          <img
+          src="{% static 'img/default_user.png' %}"
+          alt="{% translate "avatar"|capfirst %}"
+          class="rounded-circle"
+          width="75"
+          height="75"
+          >
+        {% endif %}
+        <p>
+          {{ player.username }}
+        </p>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>
+          {% translate "no players."|capfirst %}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% if request.user == campaign.owner %}
+  <hr class="text-danger">
+  <section class="row justify-content-around">
+    <h3 class="text-center text-danger fw-light">
+      {% translate "danger zone"|capfirst %}
+    </h3>
+    <div class="col">
+      <div class="row justify-content-around mt-1">
+        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
+          <a
+            href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+            class="btn btn-danger w-100"
+          >
+            {{ ICONS.TRASH|safe }}
+            {% translate "delete"|capfirst %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}

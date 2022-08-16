@@ -1,36 +1,32 @@
-name: (Prod) Django Checker
+name: Oil & Rope CI
 
-on:
-  push:
-    branches:
-      - master
-      - develop
-      - release/*
-  pull_request:
-    branches:
-      - master
-      - develop
+on: [push]
+
+env:
+  CONTEXT: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
 
 jobs:
-  python:
+  python-with-postgres:
     name: Python with PostgreSQL & Redis
     runs-on: ubuntu-latest
     env:
       # NOTE: This is needed for coverage on HTML
       DEBUG_TEMPLATE: True
       DJANGO_SETTINGS_MODULE: oilandrope.settings
-      DB_NAME: oilandrope
-      DB_USER: postgres
+      DB_USER: oilandrope
       DB_PASSWORD: p4ssw0rd@
+      DB_NAME: oilandrope_db
+      DB_HOST: localhost
+      DB_PORT: 5432
 
     # Set up Postgres and Redis
     services:
       postgres:
         image: postgres:14
         env:
+          POSTGRES_USER: oilandrope
           POSTGRES_PASSWORD: p4ssw0rd@
-          POSTGRES_USER: postgres
-          POSTGRES_DB: oilandrope
+          POSTGRES_DB: oilandrope_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -47,50 +43,74 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
+
+      - name: Cache Poetry cache
+        uses: actions/cache@v3
+        id: cache-poetry
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install poetry
+        run: |
+          pip install poetry
 
       - name: Install dependencies
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
         run: |
-          sudo apt update
-          sudo apt install -y firefox-geckodriver
-          python -m pip install --upgrade pip poetry
-          poetry export --dev --without-hashes -f requirements.txt -o /tmp/requirements.txt
-          pip install -r /tmp/requirements.txt
+          poetry install
 
       - name: Lint with flake8
         run: |
-          pip install flake8
-          flake8 --config=setup.cfg
+          poetry run flake8 --config=setup.cfg
 
       - name: Check iSort
         run: |
-          pip install -U isort
-          isort . --check --diff
+          poetry run isort . --check --diff
 
+      # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
+      # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
+        env:
+          DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
         run: |
-          cp .env.example .env
-          coverage run manage.py test
-          coverage xml
+          poetry run coverage run ./manage.py test -- --no-cov
+          poetry run coverage report
 
       - name: Django Check
         run: |
-          python manage.py migrate
-          python manage.py check
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
 
-      - name: Updating Codecov (coverage)
-        if: ${{ success() }}
-        uses: codecov/codecov-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          file: ./coverage.xml
-          verbose: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Since the format `developmentType/Code` is invalid we need to replace it
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]${{ github.ref_name }}" | sed -e 's/\//-/g'
+        id: extra_branch_name
+
+      - name: Build & Push Image
+        if: ${{ success() }}
+        uses: docker/build-push-action@v3
+        env:
+          DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
+          TAG: ${{ steps.extra_branch_name.outputs.branch }}
+          EXTRA_TAG: ${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
+        with:
+          push: true
+          tags: oilandrope/core:${{ env.TAG }}${{ env.EXTRA_TAG }}
+          file: ${{ env.DOCKERFILE }}

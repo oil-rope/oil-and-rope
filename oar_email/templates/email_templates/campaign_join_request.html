@@ -1,0 +1,29 @@
+{% extends 'email_templates/email_layout.html' %}
+{% load i18n %}
+
+{% block content %}
+  <main class="container pb-3">
+    <h1 class="text-center">
+      {% blocktranslate with username=user.username trimmed %}
+        User {{ username }} wants to join your adventure!
+      {% endblocktranslate %}
+    </h1>
+    <div class="row">
+      <div class="col">
+        <p class="text-center">
+          {% blocktranslate with username=user.username email=user.email trimmed %}
+            {{ username }} has sent you a request to join your adventure. To accept their request go to the edit page of
+            the campaign then 'Invite players' and add the following email address: {{ email }}.
+          {% endblocktranslate %}
+        </p>
+      </div>
+      <div class="w-100"></div>
+      <div class="col">
+        {% url 'roleplay:campaign:edit' object.pk as campaign_detail_url %}
+        <a href="{{ protocol }}:{{ domain }}{{ campaign_detail_url }}" class="btn btn-primary">
+          {% translate "go to campagin"|capfirst %}
+        </a>
+      </div>
+    </div>
+  </main>
+{% endblock content %}

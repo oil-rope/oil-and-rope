@@ -1,5 +1,4 @@
 {% load i18n %}
-
 {% with page_kwarg=page_kwarg|default:'page' %}
   <nav aria-label="{% blocktranslate with model=paginator.queryset %}pagination for {{ model }}{% endblocktranslate %}">
     <ul class="pagination justify-content-{{ align|default:'end' }}">

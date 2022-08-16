@@ -32,33 +32,8 @@
       <!-- Navbar Menu -->
       <div class="collapse navbar-collapse" id="navbarOilAndRope">
         <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-          {% comment %}
-            NOTE: DynamicMenu is unstable and must be disabled for now.
-            Since theres only one menu available this can be setted manually.
-          {% endcomment %}
-          {% comment %} {% include 'core/includes/recursive_menu.html' %} {% endcomment %}
-          <li class="nav-item">
-            {% url 'roleplay:world:list' as world_list %}
-            <a
-              href="{{ world_list }}"
-              class="nav-link text-uppercase {% if actual_path|startswith:world_list %} active{% endif %}"
-              {% if actual_path|startswith:world_list %}aria-current="page"{% endif %}
-            >
-              <i class="ic-world"></i>
-              {% translate "worlds" %}
-            </a>
-          </li>
-          <li class="nav-item">
-            {% url 'roleplay:session:list' as session_list %}
-            <a
-              href="{{ session_list }}"
-              class="nav-link text-uppercase {% if actual_path|startswith:session_list %} active{% endif %}"
-              {% if actual_path|startswith:session_list %}aria-current="page"{% endif %}
-            >
-              <i class="ic-dice"></i>
-              {% translate "sessions" %}
-            </a>
-          </li>
+          {% include 'core/includes/menus/worldbuilding_menu.html' %}
+          {% include 'core/includes/menus/roleplay_menu.html' %}
         </ul>
 
         <!-- Login and Register -->
