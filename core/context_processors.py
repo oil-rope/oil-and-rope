@@ -50,5 +50,6 @@ def handy_settings(request):
         'BOT_INVITATION': settings.BOT_INVITATION,
         'ICONS': {icon.name: icon.value for icon in AvailableIcons},
         'JAVASCRIPT': {js.name: js.value for js in JavaScriptActions},
+        'CUSTOMS_STATIC_URL': settings.CUSTOMS_STATIC_URL,
     }
     return content
