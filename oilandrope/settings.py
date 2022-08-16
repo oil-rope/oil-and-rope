@@ -280,6 +280,10 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 STATIC_ROOT = os.getenv('STATIC_ROOT', BASE_DIR / 'static/')
 STATIC_URL = os.getenv('STATIC_URL', '/static/')
 
+# Since Oil & Rope uses custom styles, JavaScript and more we need to declare them
+
+CUSTOMS_STATIC_URL = os.getenv('CUSTOMS_STATIC_URL', 'https://cdn.oilandrope-project.com/v2')
+
 # Login System
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth
 
