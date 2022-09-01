@@ -43,7 +43,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.9', '3.10']
 
     steps:
       - uses: actions/checkout@v3
@@ -83,7 +83,7 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
         run: |
-          poetry run coverage run ./manage.py test -- --no-cov
+          poetry run coverage run ./manage.py test
           poetry run coverage report
 
       - name: Django Check
