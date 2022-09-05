@@ -15,5 +15,9 @@ echo -e "${CYAN}Running migrations...${END}"
 poetry run ./manage.py migrate && echo -e "${GREEN}Database up to date!${END}" || \
 echo -e "${RED}Couldn't update database. Can the project access?${END}"
 
+echo -e "${CYAN}Generating translations...${END}"
+poetry run ./manage.py compilemessages --locale=es --use-fuzzy && echo -e "${GREEN}Translations generated!" || \
+echo -e "${RED}Couldn't generate translations${END}"
+
 echo -e "${CYAN}Starting project...${END}"
 poetry run gunicorn --config=python:oilandrope.gunicorn_conf
