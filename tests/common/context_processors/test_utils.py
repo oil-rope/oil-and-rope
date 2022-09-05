@@ -12,12 +12,12 @@ class TestUtilsContextProcessor(TestCase):
 
     def test_requests_utils(self):
         ctx = requests_utils(self.get_request)
+        scheme = 'http'
         host = 'testserver'
         port = '80'
-        uri = 'http://testserver'
-        current_uri = self.get_request.build_absolute_uri()
+        uri = 'http://testserver/'
 
+        self.assertEqual(ctx['scheme'], scheme)
         self.assertEqual(ctx['host'], host)
         self.assertEqual(ctx['port'], port)
         self.assertEqual(ctx['uri'], uri)
-        self.assertEqual(ctx['current_uri'], current_uri)

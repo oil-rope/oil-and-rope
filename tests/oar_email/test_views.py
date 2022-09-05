@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import resolve_url
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from model_bakery import baker
 
 
@@ -10,6 +10,7 @@ class TestEmailView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = resolve_url(cls.resolver, mail_template='email_layout.html')
+        cls.staff_user = baker.make_recipe('registration.staff_user')
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
@@ -22,16 +23,24 @@ class TestEmailView(TestCase):
         self.client.force_login(baker.make_recipe('registration.user'))
         response = self.client.get(self.url)
 
-        self.assertNotEqual(200, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_staff_access_ok(self):
-        self.client.force_login(baker.make_recipe('registration.staff_user'))
-        response = self.client.get(self.url)
+        self.client.force_login(self.staff_user)
+        with override_settings(DEBUG=True):
+            response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
 
+    def test_staff_access_debug_false_ko(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
     def test_with_json_ok(self):
-        self.client.force_login(baker.make_recipe('registration.staff_user'))
-        response = self.client.get(self.url, data={'object': '{"name": "Test"}'})
+        self.client.force_login(self.staff_user)
+        with override_settings(DEBUG=True):
+            response = self.client.get(self.url, data={'object': '{"name": "Test"}'})
 
         self.assertEqual(200, response.status_code)

@@ -1,4 +1,8 @@
+from typing import Union
+
 from django.conf import settings
+from django.core.handlers.asgi import ASGIRequest
+from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import HttpRequest
 from django.utils.translation import get_language_from_request
 
@@ -6,7 +10,7 @@ from common.enums import AvailableIcons, JavaScriptActions
 from registration.models import Profile
 
 
-def language(request: HttpRequest):
+def language(request: Union[HttpRequest, WSGIRequest, ASGIRequest]):
     """
     Sets language depending on the profile.
     """

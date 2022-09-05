@@ -13,11 +13,11 @@ class EmailView(LoginRequiredMixin, TemplateView):
     """
 
     def dispatch(self, request, *args, **kwargs):
-        if not settings.DEBUG:
-            raise PermissionDenied
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
         if not request.user.is_staff:
+            raise PermissionDenied
+        if not settings.DEBUG:
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
