@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
@@ -7,9 +9,14 @@ from common.constants import models
 from .common import WebSocketMessageSerializer
 from .registration import SimpleUserSerializer
 
-User = get_user_model()
-ChatMessage = apps.get_model(models.CHAT_MESSAGE)
-Chat = apps.get_model(models.CHAT)
+if TYPE_CHECKING:
+    from chat.models import Chat as ChatModel
+    from chat.models import ChatMessage as ChatMessageModel
+    from registration.models import User as UserModel
+
+User: 'UserModel' = get_user_model()
+ChatMessage: 'ChatMessageModel' = apps.get_model(models.CHAT_MESSAGE)
+Chat: 'ChatModel' = apps.get_model(models.CHAT)
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
