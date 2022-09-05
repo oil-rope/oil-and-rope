@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
@@ -12,6 +13,8 @@ class EmailView(LoginRequiredMixin, TemplateView):
     """
 
     def dispatch(self, request, *args, **kwargs):
+        if not settings.DEBUG:
+            raise PermissionDenied
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
         if not request.user.is_staff:
@@ -32,6 +35,5 @@ class EmailView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({'protocol': self.request.scheme, 'domain': self.request.headers.get('Host', 'localhost')})
         context.update(self.parse_context())
         return context

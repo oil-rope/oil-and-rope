@@ -1,12 +1,15 @@
-def requests_utils(request):
+from django.http.request import HttpRequest
+
+
+def requests_utils(request: HttpRequest):
+    scheme = request.scheme or 'https'
     host = request.get_host()
     port = request.get_port()
-    uri = '{}'.format(host)
-    current_uri = request.build_absolute_uri()
-    uri = 'https://{}'.format(uri) if request.is_secure() else 'http://{}'.format(uri)
+    uri = request.build_absolute_uri()
+
     return {
+        'scheme': scheme,
         'host': host,
         'port': port,
         'uri': uri,
-        'current_uri': current_uri,
     }
