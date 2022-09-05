@@ -63,7 +63,9 @@ class TestSignUpForm(TestCase):
             'password1': password,
             'password2': password,
         }
-        self.request = RequestFactory().get('/')
+
+        request = self.client.get('/').wsgi_request
+        self.request = request
 
     def test_form_ok(self):
         form = forms.SignUpForm(self.request, data=self.data_ok)
