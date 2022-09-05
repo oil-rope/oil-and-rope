@@ -409,6 +409,11 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Configuration for Django Allauth
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

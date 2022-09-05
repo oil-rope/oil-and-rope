@@ -50,3 +50,5 @@ SHELL_PLUS_IMPORTS = [
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
 
 SHOW_COLLAPSED = True
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
