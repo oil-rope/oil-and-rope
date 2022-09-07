@@ -1,0 +1,26 @@
+[run]
+branch = True
+dynamic_context = test_function
+source =
+    api/
+    bot/
+    chat/
+    common/
+    core/
+    dynamic_menu/
+    frontend/
+    oar_email/
+    oilandrope/
+    registration/
+    roleplay/
+plugins =
+    django_coverage_plugin
+
+[report]
+fail_under = 95
+precision = 2
+show_missing = True
+skip_empty = True
+
+[django_coverage_plugin]
+template_extensions = html, txt
