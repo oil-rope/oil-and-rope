@@ -1,4 +1,7 @@
+from typing import Optional
+
 from django.conf import settings
+from requests.models import Response
 
 from bot.enums import ChannelTypes, MessageTypes
 from bot.exceptions import HelpfulError
@@ -10,8 +13,8 @@ class ApiMixin:
     This class loads content from `response` into class attributes.
     """
 
-    def __init__(self, url=None, *, response=None):
-        self.url = self.get_url(url)
+    def __init__(self, url: Optional[str] = None, *, response: Optional[Response] = None):
+        self.url = url
 
         if not self.url:
             raise HelpfulError('URL cannot be None.', 'Please declare a url or overwrite `get_url` method.')
@@ -29,9 +32,6 @@ class ApiMixin:
         # Turning ID into int again
         # This will about some parsing issues
         self.id = int(self.id)
-
-    def get_url(self, url=None):
-        return url
 
 
 class User(ApiMixin):

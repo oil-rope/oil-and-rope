@@ -88,6 +88,8 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false  # CI can continue without Codecov
+          verbose: true
 
       - name: Django Check
         run: |

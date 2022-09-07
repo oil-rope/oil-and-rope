@@ -17,7 +17,7 @@ from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from roleplay.models import Place as PlaceModel
     from roleplay.models import Session as SessionModel
 

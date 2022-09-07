@@ -1,18 +1,13 @@
 [run]
 branch = True
 dynamic_context = test_function
-source =
-    api/
-    bot/
-    chat/
-    common/
-    core/
-    dynamic_menu/
-    frontend/
-    oar_email/
-    oilandrope/
-    registration/
-    roleplay/
+omit =
+    manage.py
+    oilandrope/**
+    **/migrations/**
+    tests/**
+    bot/management/commands/runbot.py
+source = .
 plugins =
     django_coverage_plugin
 

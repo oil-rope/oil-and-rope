@@ -9,7 +9,7 @@ from common.constants import models
 from .common import WebSocketMessageSerializer
 from .registration import SimpleUserSerializer
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from chat.models import Chat as ChatModel
     from chat.models import ChatMessage as ChatMessageModel
     from registration.models import User as UserModel
