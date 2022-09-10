@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest import mock
 
 import pytest
 from django.conf import settings
@@ -10,6 +11,8 @@ from faker import Faker
 from bot import embeds, models
 from bot.exceptions import DiscordApiException, HelpfulError
 from bot.utils import discord_api_get
+from tests import fake
+from tests.mocks.discord import user_response
 
 from ..utils import check_litecord_connection
 from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
@@ -17,10 +20,26 @@ from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_
 
 
 class TestApiMixin(TestCase):
-
     def test_raises_error_with_empty_url_ko(self):
         with self.assertRaises(HelpfulError):
             models.ApiMixin()
+
+    def test_uses_response_if_given_ok(self):
+        url = f'https://{fake.domain_name()}'
+        fake_id = fake.random_number()
+        response = user_response(id=fake_id)
+        model_instance = models.ApiMixin(url=url, response=response)
+
+        self.assertEqual(fake_id, model_instance.id)
+
+    @mock.patch('bot.models.discord_api_get')
+    def test_calls_discord_api_request_if_response_is_not_given_ok(self, mocker: mock.MagicMock):
+        url = f'https://{fake.domain_name()}'
+        fake_id = fake.random_number()
+        mocker.return_value = user_response(id=fake_id)
+        model_instance = models.ApiMixin(url=url)
+
+        self.assertEqual(fake_id, model_instance.id)
 
 
 class TestEmbed(TestCase):

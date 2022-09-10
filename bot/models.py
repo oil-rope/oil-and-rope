@@ -19,10 +19,10 @@ class ApiMixin:
         if not self.url:
             raise HelpfulError('URL cannot be None.', 'Please declare a url or overwrite `get_url` method.')
 
-        if response:
-            self.response = response
-        else:
+        if response is None:
             self.response = discord_api_get(self.url)
+        else:
+            self.response = response
         self.json = self.response.json()
 
         # Magic attributes
