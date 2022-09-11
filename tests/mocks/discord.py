@@ -1,4 +1,5 @@
 import copy
+import datetime
 import json
 
 from requests.models import Response
@@ -88,7 +89,7 @@ def create_dm_response(**defaults) -> Response:
     Parameters
     ----------
     defaults:
-        Values to be updated on the bot.
+        Values to be updated on the DM.
     """
 
     user = user_response().json()
@@ -118,5 +119,42 @@ def create_dm_to_user_unavailable_response() -> Response:
         'message': 'Cannot send messages to this user',
         'code': 50007,
     }).encode(encoding='utf-8')
+
+    return response
+
+
+def create_message(**defaults) -> Response:
+    """
+    Response returned when creating a message.
+
+    Parameters
+    ----------
+    defaults:
+        Values to be updated on the message.
+    """
+
+    msg = {
+        'id': f'{fake.random_number(digits=19)}',
+        'type': 0,  # Default type is 0
+        'content': fake.sentence(),
+        'channel_id': f'{fake.random_number(digits=18)}',
+        'author': current_bot_response().json(),
+        'attachments': [],
+        'embeds': [],
+        'mentions': [],
+        'mention_roles': [],
+        'pinned': False,
+        'mention_everyone': False,
+        'tts': False,
+        'timestamp': datetime.datetime.now().isoformat(),
+        'edited_timestamp': None,
+        'flags': 1 << fake.pyint(min_value=0, max_value=8),
+        'components': [],
+        'referenced_messaged': None,
+    }
+    msg.update(defaults)
+
+    response = copy.deepcopy(_base_response)
+    response._content = json.dumps(msg).encode(encoding='utf-8')
 
     return response

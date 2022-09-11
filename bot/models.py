@@ -7,6 +7,8 @@ from bot.enums import ChannelTypes, MessageTypes
 from bot.exceptions import HelpfulError
 from bot.utils import discord_api_get, discord_api_patch, discord_api_post
 
+from .embeds import Embed
+
 
 class ApiMixin:
     """
@@ -70,7 +72,7 @@ class User(ApiMixin):
         return f'{settings.DISCORD_API_URL}/users'
 
     def get_url(self):
-        return f'{self.base_url}{self.id}'
+        return f'{self.base_url}/{self.id}'
 
     def create_dm(self):
         """
@@ -94,8 +96,8 @@ class User(ApiMixin):
         """
 
         dm = self.create_dm()
-        response = dm.send_message(content, embed=embed)
-        return response
+        msg = dm.send_message(content, embed=embed)
+        return msg
 
     def __str__(self):
         return self.__repr__()
@@ -155,9 +157,9 @@ class Channel(ApiMixin):
         return f'{settings.DISCORD_API_URL}/channels'
 
     def get_url(self):
-        return f'{self.base_url}{self.id}'
+        return f'{self.base_url}/{self.id}'
 
-    def send_message(self, content, embed=None):
+    def send_message(self, content: str, embed: Optional[Embed] = None):
         url = f'{self.url}/messages'
         data = {
             'content': content
@@ -196,18 +198,55 @@ class Message(ApiMixin):
         Response attached to this message.
     """
 
-    def __init__(self, channel, id, *, embed=None, response=None):
+    channel_id: str
+    author: Union[dict, User]
+    content: str
+    timestamp: str
+    edited_timestamp: Optional[str]
+    tts: bool
+    mention_everyone: bool
+    mentions: list[Union[dict, User]]
+    mention_roles: list[str]
+    mention_channels: Optional[list[dict]] = None
+    attachments: Optional[list[dict]] = None
+    embeds: Optional[list[dict]] = None
+    reactions: Optional[list[dict]] = None
+    nonce: Optional[Union[str, int]] = None
+    pinned: bool
+    webhook_id: Optional[str] = None
+    type: int
+    activity: Optional[dict] = None
+    application: Optional[dict] = None
+    application_id: Optional[str] = None
+    message_reference: Optional[dict] = None
+    flags: Optional[int] = None
+    referenced_message: Optional[dict] = None
+    interaction: Optional[dict] = None
+    thread: Optional[Union[dict, Channel]] = None
+    components: Optional[list[dict]] = None
+    sticker_items: Optional[list[dict]] = None
+    stickers: Optional[list[dict]] = None
+    position: Optional[int] = None
+
+    def __init__(
+        self,
+        channel: Union[Channel, str],
+        id: str,
+        *,
+        embed: Optional[Embed] = None,
+        response: Optional[Response] = None,
+    ):
         self.base_url = self.get_base_url()
         if isinstance(channel, Channel):
             self.channel = channel
         else:
             self.channel = Channel(channel)
-        self.base_url = f'{self.base_url}{self.channel.id}/messages'
+        self.base_url = f'{self.base_url}/{self.channel.id}/messages'
         self.id = id
         self.embed = embed
 
         super().__init__(self.get_url(), response=response)
-        self.type = MessageTypes(self.type)
+        self.channel_type = MessageTypes(self.type)
 
     def edit(self, content):
         """
@@ -224,13 +263,13 @@ class Message(ApiMixin):
 
     @classmethod
     def get_base_url(cls):
-        return f'{settings.DISCORD_API_URL}channels/'
+        return f'{settings.DISCORD_API_URL}/channels'
 
-    def get_url(self, url=None):
+    def get_url(self):
         return f'{self.base_url}/{self.id}'
 
     def __str__(self):
-        return f'({self.id}): {self.content}'
+        return f'Message [{self.channel_type}] ({self.id}): {self.content}'
 
     def __repr__(self):
         return self.__str__()

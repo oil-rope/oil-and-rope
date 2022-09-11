@@ -9,8 +9,8 @@ from faker import Faker
 from bot import embeds, models
 from bot.exceptions import DiscordApiException, HelpfulError
 from tests import fake
-from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, current_bot_response,
-                                 user_response)
+from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, create_message,
+                                 current_bot_response, user_response)
 
 from ..utils import check_litecord_connection
 from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
@@ -106,6 +106,9 @@ class TestUser(TestCase):
     def setUp(self) -> None:
         self.identifier = f'{fake.random_number(digits=18)}'
         self.user_response = user_response(id=self.identifier)
+        with mock.patch('bot.models.discord_api_get') as mocker_get:
+            mocker_get.return_value = self.user_response
+            self.user = self.api_class(self.identifier)
 
     @mock.patch('bot.models.discord_api_get')
     def test_from_bot_ok(self, mocker: mock.MagicMock):
@@ -115,40 +118,41 @@ class TestUser(TestCase):
 
         self.assertEqual(bot.id, response.json()['id'])
 
-    @mock.patch('bot.models.discord_api_get')
-    def test_create_dm_ko(self, mocker_get: mock.MagicMock):
-        mocker_get.return_value = self.user_response
-
-        user = self.api_class(id=self.identifier)
-
+    @mock.patch('bot.utils.discord_api_request')
+    def test_create_dm_ko(self, mocker_request: mock.MagicMock):
+        mocker_request.return_value = create_dm_to_user_unavailable_response()
         # A bot cannot create a message with itself
-        with mock.patch('bot.utils.discord_api_request') as mocker_invalid_request:
-            mocker_invalid_request.return_value = create_dm_to_user_unavailable_response()
-            with self.assertRaises(DiscordApiException):
-                user.create_dm()
+        with self.assertRaises(DiscordApiException):
+            self.user.create_dm()
 
     @mock.patch('bot.models.discord_api_post')
-    @mock.patch('bot.models.discord_api_get')
-    def test_create_dm_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
-        mocker_get.return_value = self.user_response
+    def test_create_dm_ok(self, mocker_post: mock.MagicMock):
         mocker_post.return_value = create_dm_response(recipients=[self.user_response.json()])
 
-        user = self.api_class(id=self.identifier)
-        dm = user.create_dm()
+        dm = self.user.create_dm()
 
         self.assertTrue(isinstance(dm, models.Channel))
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_send_message_ok(self):
-        user = self.api_class(USER_WITH_SAME_SERVER)
-        msg = user.send_message(self.faker.word())
+    @mock.patch('bot.models.discord_api_post')
+    @mock.patch('bot.models.discord_api_get')
+    def test_send_message_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
+        dm_response = create_dm_response(recipients=[self.user_response.json()])
+        mocker_get.return_value = dm_response
+        mocker_post.return_value = dm_response
+
+        with mock.patch('bot.models.Channel.send_message') as mocker_msg:
+            channel_id = dm_response.json()['id']
+            msg_response = create_message(channel_id=channel_id)
+            mocker_msg.return_value = models.Message(channel_id, msg_response.json()['id'], response=msg_response)
+
+            msg = self.user.send_message(fake.word())
 
         self.assertTrue(isinstance(msg, models.Message))
 
     @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_send_message_with_embed_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
-        msg = user.send_message(self.faker.word(), embed=self.embed)
+        msg = user.send_message(fake.word(), embed=self.embed)
 
         self.assertTrue(isinstance(msg, models.Message))
         self.assertEqual(self.embed, msg.embed)
