@@ -430,7 +430,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Discord
 
-DISCORD_API_URL = 'https://discord.com/api/'
+DISCORD_API_URL = 'https://discord.com/api/v10'
 
 # Bot Settings
 

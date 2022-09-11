@@ -39,10 +39,10 @@ def discord_api_post(url, data=None):
 
     response = discord_api_request(url=url, method=HttpMethods.POST, data=data)
 
-    if response.status_code not in NO_ERROR_STATUS:
-        raise DiscordApiException(response)
+    if 200 <= response.status_code <= 299:  # Handle for OK status codes
+        return response
 
-    return response
+    raise DiscordApiException(response)
 
 
 def discord_api_get(url):
@@ -52,10 +52,9 @@ def discord_api_get(url):
 
     response = discord_api_request(url=url, method=HttpMethods.GET)
 
-    if response.status_code not in NO_ERROR_STATUS:
-        raise DiscordApiException(response)
-
-    return response
+    if 200 <= response.status_code <= 299:  # Handle for OK status codes
+        return response
+    raise DiscordApiException(response)
 
 
 def discord_api_patch(url, data=None):
@@ -65,7 +64,6 @@ def discord_api_patch(url, data=None):
 
     response = discord_api_request(url=url, method=HttpMethods.PATCH, data=data)
 
-    if response.status_code not in NO_ERROR_STATUS:
-        raise DiscordApiException(response)
-
-    return response
+    if 200 <= response.status_code <= 299:  # Handle for OK status codes
+        return response
+    raise DiscordApiException(response)

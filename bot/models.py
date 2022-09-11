@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from django.conf import settings
 from requests.models import Response
@@ -12,6 +12,8 @@ class ApiMixin:
     """
     This class loads content from `response` into class attributes.
     """
+
+    id: str
 
     def __init__(self, url: Optional[str] = None, *, response: Optional[Response] = None):
         self.url = url
@@ -29,33 +31,45 @@ class ApiMixin:
         for key, value in self.json.items():
             setattr(self, key, value)
 
-        # Turning ID into int again
-        # This will about some parsing issues
-        self.id = int(self.id)
-
 
 class User(ApiMixin):
     """
     Represents a Discord User.
+    For more information see https://discord.com/developers/docs/resources/user#user-object-user-structure.
     """
 
-    def __init__(self, id, *, response=None):
+    username: str
+    discriminator: str
+    avatar: Optional[str]
+    bot: Optional[bool] = None
+    system: Optional[bool] = None
+    mfa_enabled: Optional[bool] = None
+    banner: Optional[str] = None
+    accent_color: Optional[int] = None
+    locale: Optional[str] = None
+    verified: Optional[bool] = None
+    email: Optional[str] = None
+    flags: Optional[int] = None
+    premium_type: Optional[int] = None
+    public_flags: Optional[int] = None
+
+    def __init__(self, id: str, *, response: Optional[Response] = None):
         self.id = id
         self.base_url = self.get_base_url()
-        super().__init__(self.get_url(), response=response)
+        super().__init__(url=self.get_url(), response=response)
 
     @classmethod
     def from_bot(cls):
-        url = f'{cls.get_base_url()}@me'
+        url = f'{cls.get_base_url()}/@me'
         response = discord_api_get(url)
         response_json = response.json()
         return cls(response_json['id'], response=response)
 
     @classmethod
     def get_base_url(cls):
-        return f'{settings.DISCORD_API_URL}users/'
+        return f'{settings.DISCORD_API_URL}/users'
 
-    def get_url(self, url=None):
+    def get_url(self):
         return f'{self.base_url}{self.id}'
 
     def create_dm(self):
@@ -63,7 +77,7 @@ class User(ApiMixin):
         Creates a DM with this User.
         """
 
-        url = f'{self.base_url}@me/channels'
+        url = f'{self.base_url}/@me/channels'
         data = {
             'recipient_id': self.id
         }
@@ -84,29 +98,63 @@ class User(ApiMixin):
         return response
 
     def __str__(self):
-        return f'{self.username} ({self.id})'
+        return self.__repr__()
 
     def __repr__(self):
-        return self.__str__()
+        return f'{self.username} ({self.id})'
 
 
 class Channel(ApiMixin):
     """
     Represents a Discord Channel.
+    For more information see https://discord.com/developers/docs/resources/channel#channel-object-channel-structure.
     """
 
-    def __init__(self, id, *, response=None):
+    type: int
+    guild_id: Optional[int] = None
+    position: Optional[int] = None
+    permission_overwrites: Optional[list] = None
+    name: Optional[str] = None
+    topic: Optional[str] = None
+    nsfw: Optional[bool] = None
+    last_message_id: Optional[str] = None
+    bitrate: Optional[int] = None
+    user_limit: Optional[int] = None
+    rate_limit_per_user: Optional[int] = None
+    # TODO In order for this to properly transform in user we need parse once received
+    recipients: Optional[list[Union[dict, User]]] = None
+    icon: Optional[str] = None
+    owner_id: Optional[str] = None
+    application_id: Optional[str] = None
+    parent_id: Optional[str] = None
+    last_pin_timestamp: Optional[str] = None
+    rtc_region: Optional[str] = None
+    video_quality_mode: Optional[int] = None
+    message_count: Optional[int] = None
+    member_count: Optional[int] = None
+    thread_metadata: Optional[dict] = None
+    member: Optional[dict] = None
+    default_auto_archive_duration: Optional[int] = None
+    permissions: Optional[str] = None
+    flags: Optional[int] = None
+    total_message_sent: Optional[int] = None
+    available_tags: Optional[list[dict]] = None
+    applied_tags: Optional[list[str]] = None
+    default_reaction_emoji: Optional[dict] = None
+    default_thread_rate_limit_per_user: Optional[int] = None
+
+    def __init__(self, id: str, *, response: Optional[Response] = None):
         self.id = id
         self.base_url = self.get_base_url()
 
         super().__init__(self.get_url(), response=response)
-        self.type = ChannelTypes(self.type)
+        self.channel_type = ChannelTypes(self.type)
 
     @classmethod
     def get_base_url(cls):
-        return f'{settings.DISCORD_API_URL}channels/'
+        return f'{settings.DISCORD_API_URL}/channels'
 
-    def get_url(self, url=None):
+    def get_url(self):
         return f'{self.base_url}{self.id}'
 
     def send_message(self, content, embed=None):
@@ -126,9 +174,9 @@ class Channel(ApiMixin):
         return msg
 
     def __str__(self):
-        if hasattr(self, 'name'):
+        if self.name:
             return f'Channel {self.name} ({self.id})'
-        return f'Channel {self.type.name} ({self.id})'
+        return f'Channel {self.channel_type.name} ({self.id})'
 
     def __repr__(self):
         return self.__str__()

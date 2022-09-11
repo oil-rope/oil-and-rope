@@ -2,17 +2,15 @@ import json
 import unittest
 from unittest import mock
 
-import pytest
-from django.conf import settings
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from faker import Faker
 
 from bot import embeds, models
 from bot.exceptions import DiscordApiException, HelpfulError
-from bot.utils import discord_api_get
 from tests import fake
-from tests.mocks.discord import user_response
+from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, current_bot_response,
+                                 user_response)
 
 from ..utils import check_litecord_connection
 from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
@@ -102,47 +100,52 @@ class TestEmbedFooter(TestCase):
         self.assertEqual(expected, result)
 
 
-@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestUser(TestCase):
     api_class = models.User
 
-    def setUp(self):
-        # We attack Bot's ID
-        url = f'{settings.DISCORD_API_URL}users/@me'
-        response = discord_api_get(url)
-        self.id = response.json()['id']
-        self.id = int(self.id)
+    def setUp(self) -> None:
+        self.identifier = f'{fake.random_number(digits=18)}'
+        self.user_response = user_response(id=self.identifier)
 
-        self.faker = Faker()
-        self.embed = embeds.Embed(title=self.faker.word(), description=self.faker.paragraph(),
-                                  url=self.faker.url(), color=self.faker.pyint(max_value=10))
+    @mock.patch('bot.models.discord_api_get')
+    def test_from_bot_ok(self, mocker: mock.MagicMock):
+        response = current_bot_response()
+        mocker.return_value = response
+        bot = self.api_class.from_bot()
 
-    def test_from_bot_ok(self):
-        user = self.api_class.from_bot()
+        self.assertEqual(bot.id, response.json()['id'])
 
-        self.assertEqual(user.id, self.id)
+    @mock.patch('bot.models.discord_api_get')
+    def test_create_dm_ko(self, mocker_get: mock.MagicMock):
+        mocker_get.return_value = self.user_response
 
-    @pytest.mark.skip('Skipping for now since litecord allows this')
-    def test_create_dm_ko(self):
-        user = self.api_class(self.id)
+        user = self.api_class(id=self.identifier)
 
         # A bot cannot create a message with itself
-        with self.assertRaises(DiscordApiException):
-            user.create_dm()
+        with mock.patch('bot.utils.discord_api_request') as mocker_invalid_request:
+            mocker_invalid_request.return_value = create_dm_to_user_unavailable_response()
+            with self.assertRaises(DiscordApiException):
+                user.create_dm()
 
-    def test_create_dm_ok(self):
-        user = self.api_class(USER_WITH_SAME_SERVER)
+    @mock.patch('bot.models.discord_api_post')
+    @mock.patch('bot.models.discord_api_get')
+    def test_create_dm_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
+        mocker_get.return_value = self.user_response
+        mocker_post.return_value = create_dm_response(recipients=[self.user_response.json()])
+
+        user = self.api_class(id=self.identifier)
         dm = user.create_dm()
 
         self.assertTrue(isinstance(dm, models.Channel))
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_send_message_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
         msg = user.send_message(self.faker.word())
 
         self.assertTrue(isinstance(msg, models.Message))
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_send_message_with_embed_ok(self):
         user = self.api_class(USER_WITH_SAME_SERVER)
         msg = user.send_message(self.faker.word(), embed=self.embed)
@@ -150,12 +153,14 @@ class TestUser(TestCase):
         self.assertTrue(isinstance(msg, models.Message))
         self.assertEqual(self.embed, msg.embed)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_send_message_ko(self):
         user = self.api_class(USER_WITH_DIFFERENT_SERVER)
 
         with self.assertRaises(DiscordApiException):
             user.send_message(self.faker.word())
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_str_ok(self):
         user = self.api_class(self.id)
         expected = f'{user.username} ({user.id})'
@@ -194,7 +199,7 @@ class TestChannel(TestCase):
         self.assertEqual(text, msg.content)
 
     def test_str_without_name_ok(self):
-        expected = f'Channel {self.channel.type.name} ({self.channel.id})'
+        expected = f'Channel {self.channel.channel_type.name} ({self.channel.id})'
         result = repr(self.channel)
 
         self.assertEqual(expected, result)
