@@ -2,6 +2,9 @@ name: Oil & Rope CI
 
 on: [push]
 
+env:
+  CONTEXT: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+
 jobs:
   python-with-postgres:
     name: Python with PostgreSQL & Redis
@@ -112,7 +115,7 @@ jobs:
         if: ${{ success() }}
         uses: docker/build-push-action@v3
         env:
-          DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile
+          DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
           TAG: ${{ steps.extra_branch_name.outputs.branch }}
           EXTRA_TAG: ${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
         with:
