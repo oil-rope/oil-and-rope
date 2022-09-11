@@ -1,12 +1,11 @@
-import json
 import unittest
 from unittest import mock
 
 from django.test import TestCase, override_settings
-from django.utils import timezone
 from faker import Faker
 
 from bot import embeds, models
+from bot.enums import EmbedTypes
 from bot.exceptions import DiscordApiException, HelpfulError
 from tests import fake
 from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, create_message,
@@ -40,75 +39,16 @@ class TestApiMixin(TestCase):
         self.assertEqual(fake_id, model_instance.id)
 
 
-class TestEmbed(TestCase):
-
-    def setUp(self):
-        self.faker = Faker()
-        self.title = self.faker.word()
-        self.description = self.faker.paragraph()
-        self.url = self.faker.url()
-        self.timestamp = timezone.now()
-        self.color = self.faker.pyint(max_value=10)
-
-    def test_to_json(self):
-        embed = embeds.Embed(title=self.title, description=self.description, url=self.url,
-                             timestamp=self.timestamp, color=self.color)
-        data = {
-            'title': embed.title,
-            'type': embed.embed_type.value,
-            'description': embed.description,
-            'url': embed.url,
-            'timestamp': str(embed.timestamp),
-            'color': embed.color
-        }
-        expected = json.dumps(data)
-        result = embed.to_json()
-
-        self.assertEqual(expected, result)
-
-    def test_with_footer(self):
-        footer = embeds.EmbedFooter(text=self.faker.word(), icon_url=self.faker.url())
-        embed = embeds.Embed(title=self.title, description=self.description, url=self.url,
-                             timestamp=self.timestamp, color=self.color, footer=footer)
-
-        self.assertTrue(isinstance(embed.footer, embeds.EmbedFooter))
-        self.assertEqual(footer, embed.footer)
-
-        data = embed.data
-        self.assertEqual(footer.data, data['footer'])
-
-
-class TestEmbedFooter(TestCase):
-
-    def setUp(self):
-        self.faker = Faker()
-
-        self.text = self.faker.word()
-        self.icon_url = self.faker.url()
-        self.proxy_icon_url = self.faker.url()
-
-    def test_to_json(self):
-        footer = embeds.EmbedFooter(text=self.text, icon_url=self.icon_url, proxy_icon_url=self.proxy_icon_url)
-        data = {
-            'text': self.text,
-            'icon_url': self.icon_url,
-            'proxy_icon_url': self.proxy_icon_url
-        }
-        expected = json.dumps(data)
-        result = footer.to_json()
-
-        self.assertEqual(expected, result)
-
-
 class TestUser(TestCase):
     api_class = models.User
 
-    def setUp(self) -> None:
-        self.identifier = f'{fake.random_number(digits=18)}'
-        self.user_response = user_response(id=self.identifier)
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.identifier = f'{fake.random_number(digits=18)}'
+        cls.user_response = user_response(id=cls.identifier)
         with mock.patch('bot.models.discord_api_get') as mocker_get:
-            mocker_get.return_value = self.user_response
-            self.user = self.api_class(self.identifier)
+            mocker_get.return_value = cls.user_response
+            cls.user = cls.api_class(cls.identifier)
 
     @mock.patch('bot.models.discord_api_get')
     def test_from_bot_ok(self, mocker: mock.MagicMock):
@@ -149,13 +89,23 @@ class TestUser(TestCase):
 
         self.assertTrue(isinstance(msg, models.Message))
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_send_message_with_embed_ok(self):
-        user = self.api_class(USER_WITH_SAME_SERVER)
-        msg = user.send_message(fake.word(), embed=self.embed)
+    @mock.patch('bot.models.discord_api_post')
+    @mock.patch('bot.models.discord_api_get')
+    def test_send_message_with_embed_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
+        dm_response = create_dm_response(recipients=[self.user_response.json()])
+        mocker_get.return_value = dm_response
+        mocker_post.return_value = dm_response
+
+        embed = embeds.Embed(
+            title=fake.sentence(),
+            description=fake.sentence(),
+            type=EmbedTypes.RICH,
+        )
+        msg_text = fake.word()
+        msg = self.user.send_message(msg_text, embed=embed)
 
         self.assertTrue(isinstance(msg, models.Message))
-        self.assertEqual(self.embed, msg.embed)
+        self.assertEqual(embed, msg.embed)
 
     @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_send_message_ko(self):
@@ -163,14 +113,6 @@ class TestUser(TestCase):
 
         with self.assertRaises(DiscordApiException):
             user.send_message(self.faker.word())
-
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_str_ok(self):
-        user = self.api_class(self.id)
-        expected = f'{user.username} ({user.id})'
-        result = repr(user)
-
-        self.assertEqual(expected, result)
 
 
 @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')

@@ -90,7 +90,7 @@ class User(ApiMixin):
         # Creating object from response should be faster
         return Channel(channel_id, response=response)
 
-    def send_message(self, content, embed=None):
+    def send_message(self, content, embed: Optional[Embed] = None):
         """
         Sends a message to this user.
         """
@@ -166,7 +166,7 @@ class Channel(ApiMixin):
         }
 
         if embed:
-            data['embed'] = embed.data
+            data['embed'] = embed.dict()
 
         response = discord_api_post(url, data)
         msg_id = response.json()['id']
