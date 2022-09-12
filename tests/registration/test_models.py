@@ -9,7 +9,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 
-from .. import fake
+from tests.utils import fake
 from ..bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 from ..utils import check_litecord_connection
 

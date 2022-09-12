@@ -4,16 +4,14 @@ from unittest import mock
 from django.test import TestCase, override_settings
 from faker import Faker
 
-from bot import embeds, models
-from bot.enums import EmbedTypes
+from bot import models
 from bot.exceptions import DiscordApiException, HelpfulError
-from tests import fake
+from tests.utils import fake
 from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, create_message,
                                  current_bot_response, user_response)
 
 from ..utils import check_litecord_connection
-from .helpers.constants import (CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_DIFFERENT_SERVER,
-                                USER_WITH_SAME_SERVER)
+from .helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
 
 
 class TestApiMixin(TestCase):
@@ -59,14 +57,14 @@ class TestUser(TestCase):
         self.assertEqual(bot.id, response.json()['id'])
 
     @mock.patch('bot.utils.discord_api_request')
-    def test_create_dm_ko(self, mocker_request: mock.MagicMock):
+    def test_create_dm_to_bot_ko(self, mocker_request: mock.MagicMock):
         mocker_request.return_value = create_dm_to_user_unavailable_response()
         # A bot cannot create a message with itself
         with self.assertRaises(DiscordApiException):
             self.user.create_dm()
 
     @mock.patch('bot.models.discord_api_post')
-    def test_create_dm_ok(self, mocker_post: mock.MagicMock):
+    def test_create_dm_to_user_in_same_server_ok(self, mocker_post: mock.MagicMock):
         mocker_post.return_value = create_dm_response(recipients=[self.user_response.json()])
 
         dm = self.user.create_dm()
@@ -75,7 +73,7 @@ class TestUser(TestCase):
 
     @mock.patch('bot.models.discord_api_post')
     @mock.patch('bot.models.discord_api_get')
-    def test_send_message_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
+    def test_send_message_to_user_in_same_server_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
         dm_response = create_dm_response(recipients=[self.user_response.json()])
         mocker_get.return_value = dm_response
         mocker_post.return_value = dm_response
@@ -89,30 +87,10 @@ class TestUser(TestCase):
 
         self.assertTrue(isinstance(msg, models.Message))
 
-    @mock.patch('bot.models.discord_api_post')
-    @mock.patch('bot.models.discord_api_get')
-    def test_send_message_with_embed_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
-        dm_response = create_dm_response(recipients=[self.user_response.json()])
-        mocker_get.return_value = dm_response
-        mocker_post.return_value = dm_response
-
-        embed = embeds.Embed(
-            title=fake.sentence(),
-            description=fake.sentence(),
-            type=EmbedTypes.RICH,
-        )
-        msg_text = fake.word()
-        msg = self.user.send_message(msg_text, embed=embed)
-
-        self.assertTrue(isinstance(msg, models.Message))
-        self.assertEqual(embed, msg.embed)
-
     @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_send_message_ko(self):
-        user = self.api_class(USER_WITH_DIFFERENT_SERVER)
-
+    def test_send_message_to_user_in_different_server_ko(self):
         with self.assertRaises(DiscordApiException):
-            user.send_message(self.faker.word())
+            self.user.send_message(fake.word())
 
 
 @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')

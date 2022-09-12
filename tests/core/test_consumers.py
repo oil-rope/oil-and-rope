@@ -3,7 +3,7 @@ from channels.testing import WebsocketCommunicator
 
 from api.serializers.common import WebSocketMessageSerializer
 from core.consumers import HandlerJsonWebsocketConsumer
-from tests import fake
+from tests.utils import fake
 
 
 class TestTypedConsumerMixin:

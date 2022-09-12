@@ -4,10 +4,11 @@ from django.conf import settings
 from django.db import migrations
 
 from common.constants import models as constants
-from tests import fake
+from common.utils import create_faker
 
 
 def create_bot_user(apps, schema_editor):
+    fake = create_faker()
     User = apps.get_model(constants.REGISTRATION_USER)
     if not User.objects.filter(email=settings.DEFAULT_FROM_EMAIL).exists():
         User.objects.create_user(

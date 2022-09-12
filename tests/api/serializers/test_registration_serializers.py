@@ -6,7 +6,7 @@ from model_bakery import baker
 
 from api.serializers.registration import BotSerializer, ProfileSerializer, UserSerializer
 from common.constants import models
-from tests import fake
+from tests.utils import fake
 
 User = get_user_model()
 Profile = apps.get_model(models.REGISTRATION_PROFILE)

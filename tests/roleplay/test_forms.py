@@ -10,7 +10,7 @@ from model_bakery import baker
 from PIL import Image
 
 from roleplay import enums, forms, models
-from tests import fake
+from tests.utils import fake
 
 
 class TestPlaceForm(TestCase):

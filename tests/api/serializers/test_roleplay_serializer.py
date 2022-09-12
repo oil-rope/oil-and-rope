@@ -5,7 +5,7 @@ from model_bakery import baker
 
 from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
 from common.constants import models
-from tests import fake
+from tests.utils import fake
 
 Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
 Place = apps.get_model(models.ROLEPLAY_PLACE)

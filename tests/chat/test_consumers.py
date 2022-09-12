@@ -8,7 +8,7 @@ from model_bakery import baker
 
 from chat.consumers import ChatConsumer
 from common.tools.sync import async_manager_func
-from tests import fake
+from tests.utils import fake
 
 User = get_user_model()
 

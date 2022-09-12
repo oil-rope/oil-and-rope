@@ -5,14 +5,15 @@ from unittest import mock
 
 import requests
 from model_bakery import baker
+from common.utils.faker import create_faker
 
 import roleplay.models
 from roleplay.enums import SiteTypes
 from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN
 
-from . import fake
-
 LOGGER = logging.getLogger(__name__)
+
+fake = create_faker()
 
 
 def check_litecord_connection() -> bool:

@@ -5,7 +5,7 @@ from model_bakery import baker
 from api.serializers.chat import (ChatMessageSerializer, ChatSerializer, NestedChatMessageSerializer,
                                   NestedChatSerializer)
 from common.constants import models
-from tests import fake
+from tests.utils import fake
 
 Chat = apps.get_model(models.CHAT)
 ChatMessage = apps.get_model(models.CHAT_MESSAGE)

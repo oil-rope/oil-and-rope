@@ -4,7 +4,7 @@ import json
 
 from requests.models import Response
 
-from tests import fake
+from tests.utils import fake
 
 _base_response = Response()
 _base_response.headers.update({
@@ -156,5 +156,20 @@ def create_message(**defaults) -> Response:
 
     response = copy.deepcopy(_base_response)
     response._content = json.dumps(msg).encode(encoding='utf-8')
+
+    return response
+
+
+def create_message_to_unreachable_user_response() -> Response:
+    """
+    Mock response for creating a message to unreachable user.
+    """
+
+    response = copy.deepcopy(_base_response)
+    response.status_code = 403
+    response._content = json.dumps({
+        'message': 'Cannot send messages to this user',
+        'code': 50007,
+    }).encode(encoding='utf-8')
 
     return response

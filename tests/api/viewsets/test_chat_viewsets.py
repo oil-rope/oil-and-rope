@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase
 
 from api.serializers.registration import SimpleUserSerializer
 from common.constants import models
-from tests import fake
+from tests.utils import fake
 
 Chat = apps.get_model(models.CHAT)
 ChatMessage = apps.get_model(models.CHAT_MESSAGE)
