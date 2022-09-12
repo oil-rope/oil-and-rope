@@ -6,9 +6,9 @@ from faker import Faker
 
 from bot import models
 from bot.exceptions import DiscordApiException, HelpfulError
-from tests.utils import fake
 from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, create_message,
                                  current_bot_response, user_response)
+from tests.utils import fake
 
 from ..utils import check_litecord_connection
 from .helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER

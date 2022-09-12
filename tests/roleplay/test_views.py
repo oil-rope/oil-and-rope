@@ -21,8 +21,8 @@ from common import tools
 from common.constants import models as constants
 from roleplay import enums, models, views
 from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
-
 from tests.utils import fake
+
 from ..utils import check_litecord_connection, generate_place
 
 ContentType = apps.get_model(constants.CONTENT_TYPE)

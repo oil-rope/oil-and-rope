@@ -6,7 +6,6 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, SiteTypes
-
 from tests.utils import fake
 
 Campaign = apps.get_model(constants.ROLEPLAY_CAMPAIGN)

@@ -8,7 +8,6 @@ from django.test import TestCase
 from model_bakery import baker
 
 from common.constants import models
-
 from tests.utils import fake
 
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
