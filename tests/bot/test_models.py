@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -5,9 +6,10 @@ from django.test import TestCase, override_settings
 from faker import Faker
 
 from bot import models
+from bot.embeds import Embed
 from bot.exceptions import DiscordApiException, HelpfulError
-from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailable_response, create_message,
-                                 current_bot_response, user_response)
+from tests.mocks.discord import (channel_response, create_dm_response, create_dm_to_user_unavailable_response,
+                                 create_message, current_bot_response, user_response)
 from tests.utils import fake
 
 from ..utils import check_litecord_connection
@@ -85,10 +87,10 @@ class TestUser(TestCase):
         self.assertTrue(isinstance(msg, models.Message))
 
     def test_str_ok(self):
-        expected_msg = f'{self.user.username} ({self.user.id})'
+        expected_str = f'{self.user.username} ({self.user.id})'
 
         # NOTE: We use `repr` since it shares method with `__str__`
-        self.assertEqual(expected_msg, repr(self.user))
+        self.assertEqual(expected_str, repr(self.user))
 
 
 class TestChannel(TestCase):
@@ -96,42 +98,37 @@ class TestChannel(TestCase):
 
     def setUp(self):
         self.identifier = f'{fake.random_number(digits=18)}'
-        user_res = user_response()
-        with patch('bot.models.discord_api_get') as mock_user_response:
-            mock_user_response.return_value = user_res
-            self.user = models.User(self.identifier)
-
-        with patch('bot.models.discord_api_get') as mock_channel_response:
-            mock_channel_response.return_value = create_dm_response(id=self.identifier, recipients=[user_res.json()])
-            self.dm = self.api_class(id=self.identifier)
+        self.channel = self.api_class(id=self.identifier, response=channel_response(id=self.identifier))
 
     def test_send_message_ok(self):
         text = fake.paragraph()
 
         with patch('bot.models.discord_api_post') as mock_send_message:
             mock_send_message.return_value = create_message(content=text)
-            msg = self.dm.send_message(text)
+            msg = self.channel.send_message(text)
 
         self.assertTrue(isinstance(msg, models.Message))
         self.assertEqual(text, msg.content)
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_str_without_name_ok(self):
-        expected = f'Channel {self.dm.channel_type.name} ({self.dm.id})'
-        result = repr(self.dm)
+    @patch('bot.models.discord_api_post')
+    def test_send_message_with_embed_ok(self, mocker_api_post: MagicMock):
+        text = fake.paragraph()
+        embed = Embed(title=fake.word(), description=fake.paragraph())
+        json_embed = json.loads(embed.json())
+        mocker_api_post.return_value = create_message(content=text, embeds=[json_embed])
 
-        self.assertEqual(expected, result)
+        msg = self.channel.send_message(content=text, embed=embed)
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_str_with_name_ok(self):
-        channel = self.api_class(CHANNEL)
-        expected = f'Channel {channel.name} ({channel.id})'
-        result = repr(channel)
+        self.assertTrue(isinstance(msg, models.Message))
+        self.assertDictEqual(json_embed, msg.embeds[0])
 
-        self.assertEqual(expected, result)
+    def test_str_ok(self):
+        expected_str = f'Channel [{self.channel.channel_type.name}] ({self.channel.id})'
+
+        # NOTE: We use `repr` since it shares method with `__str__`
+        self.assertEqual(expected_str, repr(self.channel))
 
 
-@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
 @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestMessage(TestCase):
     api_class = models.Message
@@ -142,17 +139,20 @@ class TestMessage(TestCase):
         self.text = self.faker.paragraph()
         self.message = self.channel.send_message(self.text)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_loads_ok(self):
         message_has_attrs = all([hasattr(self.message, attr)] for attr in self.message.json.keys())
 
         self.assertTrue(message_has_attrs)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_loads_from_given_channel_id_ok(self):
         message = self.api_class(self.channel.id, self.message.id)
         message_has_attrs = all([hasattr(message, attr)] for attr in message.json.keys())
 
         self.assertTrue(message_has_attrs)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_edit_ok(self):
         text = self.faker.paragraph()
         msg = self.message.edit(text)
@@ -161,6 +161,7 @@ class TestMessage(TestCase):
         # Check if message is the same
         self.assertEqual(self.message.id, msg.id)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_str_ok(self):
         expected = f'({self.message.id}): {self.message.content}'
         result = repr(self.message)

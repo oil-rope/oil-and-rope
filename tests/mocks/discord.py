@@ -82,6 +82,38 @@ def user_response(**defaults) -> Response:
     return response
 
 
+def channel_response(**defaults) -> Response:
+    """
+    Response returned when getting a channel.
+
+    Parameters
+    ----------
+    defaults:
+        Values to be updated on the channel.
+    """
+
+    channel = {
+        'id': f'{fake.random_number(digits=18)}',
+        'last_message_id': f'{fake.random_number(digits=18)}',
+        'type': 0,  # Type 0 represents guild text
+        'name': fake.word(),
+        'position': fake.random_number(digits=1),
+        'flags': 1 << fake.pyint(min_value=0, max_value=19),
+        'parent_id': f'{fake.random_number(digits=18)}',
+        'topic': None,  # This is related to threads
+        'guild_id': f'{fake.random_number(digits=18)}',
+        'permission_overwrites': [],
+        'rate_limit_per_user': fake.pyint(min_value=0, max_value=21600),
+        'nsfw': fake.pybool(),
+    }
+    channel.update(defaults)
+
+    response = copy.deepcopy(_base_response)
+    response._content = json.dumps(channel).encode(encoding='utf-8')
+
+    return response
+
+
 def create_dm_response(**defaults) -> Response:
     """
     Response returned when creating a DM to a user.

@@ -166,7 +166,7 @@ class Channel(ApiMixin):
         }
 
         if embed:
-            data['embed'] = embed.dict()
+            data['embeds'] = [embed.dict()]
 
         response = discord_api_post(url, data)
         msg_id = response.json()['id']
@@ -176,12 +176,10 @@ class Channel(ApiMixin):
         return msg
 
     def __str__(self):
-        if self.name:
-            return f'Channel {self.name} ({self.id})'
-        return f'Channel {self.channel_type.name} ({self.id})'
+        return f'Channel [{self.channel_type.name}] ({self.id})'
 
     def __repr__(self):
-        return self.__str__()
+        return str(self)
 
 
 class Message(ApiMixin):
