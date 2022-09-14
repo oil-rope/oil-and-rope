@@ -100,10 +100,10 @@ class User(ApiMixin):
         return msg
 
     def __str__(self):
-        return self.__repr__()
+        return f'{self.username} ({self.id})'
 
     def __repr__(self):
-        return f'{self.username} ({self.id})'
+        return str(self)
 
 
 class Channel(ApiMixin):
@@ -269,7 +269,7 @@ class Message(ApiMixin):
         return f'{self.base_url}/{self.id}'
 
     def __str__(self):
-        return f'Message [{self.channel_type}] ({self.id}): {self.content}'
+        return f'Message [{self.channel_type.name}] ({self.id}): {self.content}'
 
     def __repr__(self):
         return self.__str__()

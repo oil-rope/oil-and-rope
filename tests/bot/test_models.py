@@ -1,5 +1,5 @@
 import unittest
-from unittest import mock
+from unittest.mock import patch, MagicMock
 
 from django.test import TestCase, override_settings
 from faker import Faker
@@ -11,7 +11,7 @@ from tests.mocks.discord import (create_dm_response, create_dm_to_user_unavailab
 from tests.utils import fake
 
 from ..utils import check_litecord_connection
-from .helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
+from .helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 
 class TestApiMixin(TestCase):
@@ -27,8 +27,8 @@ class TestApiMixin(TestCase):
 
         self.assertEqual(fake_id, model_instance.id)
 
-    @mock.patch('bot.models.discord_api_get')
-    def test_calls_discord_api_request_if_response_is_not_given_ok(self, mocker: mock.MagicMock):
+    @patch('bot.models.discord_api_get')
+    def test_calls_discord_api_request_if_response_is_not_given_ok(self, mocker: MagicMock):
         url = f'https://{fake.domain_name()}'
         fake_id = fake.random_number()
         mocker.return_value = user_response(id=fake_id)
@@ -44,90 +44,85 @@ class TestUser(TestCase):
     def setUpTestData(cls) -> None:
         cls.identifier = f'{fake.random_number(digits=18)}'
         cls.user_response = user_response(id=cls.identifier)
-        with mock.patch('bot.models.discord_api_get') as mocker_get:
-            mocker_get.return_value = cls.user_response
+        with patch('bot.models.discord_api_get') as mocker_api_get:
+            mocker_api_get.return_value = cls.user_response
             cls.user = cls.api_class(cls.identifier)
 
-    @mock.patch('bot.models.discord_api_get')
-    def test_from_bot_ok(self, mocker: mock.MagicMock):
+    @patch('bot.models.discord_api_get')
+    def test_from_bot_ok(self, mocker: MagicMock):
         response = current_bot_response()
         mocker.return_value = response
         bot = self.api_class.from_bot()
 
         self.assertEqual(bot.id, response.json()['id'])
 
-    @mock.patch('bot.utils.discord_api_request')
-    def test_create_dm_to_bot_ko(self, mocker_request: mock.MagicMock):
-        mocker_request.return_value = create_dm_to_user_unavailable_response()
+    @patch('bot.utils.discord_api_post')
+    def test_create_dm_to_bot_ko(self, mocker_api_post: MagicMock):
+        mocker_api_post.return_value = create_dm_to_user_unavailable_response()
         # A bot cannot create a message with itself
         with self.assertRaises(DiscordApiException):
             self.user.create_dm()
 
-    @mock.patch('bot.models.discord_api_post')
-    def test_create_dm_to_user_in_same_server_ok(self, mocker_post: mock.MagicMock):
-        mocker_post.return_value = create_dm_response(recipients=[self.user_response.json()])
+    @patch('bot.models.discord_api_post')
+    def test_create_dm_to_user_in_same_server_ok(self, mocker_api_post: MagicMock):
+        mocker_api_post.return_value = create_dm_response(recipients=[self.user_response.json()])
 
         dm = self.user.create_dm()
 
         self.assertTrue(isinstance(dm, models.Channel))
 
-    @mock.patch('bot.models.discord_api_post')
-    @mock.patch('bot.models.discord_api_get')
-    def test_send_message_to_user_in_same_server_ok(self, mocker_get: mock.MagicMock, mocker_post: mock.MagicMock):
+    def test_send_message_to_user_in_same_server_ok(self):
         dm_response = create_dm_response(recipients=[self.user_response.json()])
-        mocker_get.return_value = dm_response
-        mocker_post.return_value = dm_response
-
-        with mock.patch('bot.models.Channel.send_message') as mocker_msg:
-            channel_id = dm_response.json()['id']
+        channel_id = dm_response.json()['id']
+        channel_mock = models.Channel(channel_id, response=dm_response)
+        with patch.object(models.User, 'create_dm', return_value=channel_mock):
             msg_response = create_message(channel_id=channel_id)
-            mocker_msg.return_value = models.Message(channel_id, msg_response.json()['id'], response=msg_response)
-
-            msg = self.user.send_message(fake.word())
+            msg_id = msg_response.json()['id']
+            msg_mock = models.Message(channel_mock, msg_id, response=msg_response)
+            with patch.object(models.Channel, 'send_message', return_value=msg_mock):
+                msg = self.user.send_message(fake.word())
 
         self.assertTrue(isinstance(msg, models.Message))
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_send_message_to_user_in_different_server_ko(self):
-        with self.assertRaises(DiscordApiException):
-            self.user.send_message(fake.word())
+    def test_str_ok(self):
+        expected_msg = f'{self.user.username} ({self.user.id})'
+
+        # NOTE: We use `repr` since it shares method with `__str__`
+        self.assertEqual(expected_msg, repr(self.user))
 
 
-@unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestChannel(TestCase):
     api_class = models.Channel
 
     def setUp(self):
-        self.faker = Faker()
+        self.identifier = f'{fake.random_number(digits=18)}'
+        user_res = user_response()
+        with patch('bot.models.discord_api_get') as mock_user_response:
+            mock_user_response.return_value = user_res
+            self.user = models.User(self.identifier)
 
-        user = models.User(USER_WITH_SAME_SERVER)
-        self.channel = user.create_dm()
-
-    def test_loads_ok(self):
-        channel_has_attrs = all([hasattr(self.channel, attr)] for attr in self.channel.json.keys())
-
-        self.assertTrue(channel_has_attrs)
-
-    def test_loads_from_response_ok(self):
-        channel = self.api_class(self.id, response=self.channel.response)
-        channel_has_attrs = all([hasattr(channel, attr)] for attr in channel.json.keys())
-
-        self.assertTrue(channel_has_attrs)
+        with patch('bot.models.discord_api_get') as mock_channel_response:
+            mock_channel_response.return_value = create_dm_response(id=self.identifier, recipients=[user_res.json()])
+            self.dm = self.api_class(id=self.identifier)
 
     def test_send_message_ok(self):
-        text = self.faker.paragraph()
-        msg = self.channel.send_message(text)
+        text = fake.paragraph()
+
+        with patch('bot.models.discord_api_post') as mock_send_message:
+            mock_send_message.return_value = create_message(content=text)
+            msg = self.dm.send_message(text)
 
         self.assertTrue(isinstance(msg, models.Message))
         self.assertEqual(text, msg.content)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_str_without_name_ok(self):
-        expected = f'Channel {self.channel.channel_type.name} ({self.channel.id})'
-        result = repr(self.channel)
+        expected = f'Channel {self.dm.channel_type.name} ({self.dm.id})'
+        result = repr(self.dm)
 
         self.assertEqual(expected, result)
 
+    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_str_with_name_ok(self):
         channel = self.api_class(CHANNEL)
         expected = f'Channel {channel.name} ({channel.id})'

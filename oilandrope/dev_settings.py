@@ -42,7 +42,7 @@ CHANNEL_LAYERS = {
 SHELL_PLUS_PRINT_SQL = True
 SHELL_PLUS_IMPORTS = [
     'from bot.enums import ChannelTypes, EmbedTypes, HttpMethods, MessageTypes',
-    'from bot.models import User as DiscordUser, Channel as DiscordChannel, Message as DiscordMessage',
+    'from bot.models import Channel as DiscordChannel, Message as DiscordMessage, User as DiscordUser',
     'from common.enums import AvailableIcons, JavaScriptActions, WebSocketCloseCodes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
