@@ -1,19 +1,14 @@
 import json
-import unittest
 from unittest.mock import MagicMock, patch
 
-from django.test import TestCase, override_settings
-from faker import Faker
+from django.test import TestCase
 
 from bot import models
 from bot.embeds import Embed
 from bot.exceptions import DiscordApiException, HelpfulError
 from tests.mocks.discord import (channel_response, create_dm_response, create_dm_to_user_unavailable_response,
-                                 create_message, current_bot_response, user_response)
+                                 create_message, current_bot_response, message_response, user_response)
 from tests.utils import fake
-
-from ..utils import check_litecord_connection
-from .helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
 
 
 class TestApiMixin(TestCase):
@@ -129,41 +124,41 @@ class TestChannel(TestCase):
         self.assertEqual(expected_str, repr(self.channel))
 
 
-@override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
 class TestMessage(TestCase):
     api_class = models.Message
 
     def setUp(self):
-        self.faker = Faker()
-        self.channel = models.Channel(CHANNEL)
-        self.text = self.faker.paragraph()
-        self.message = self.channel.send_message(self.text)
+        channel_id = f'{fake.random_number(digits=18)}'
+        self.channel = models.Channel(
+            channel_id,
+            response=channel_response(id=channel_id),
+        )
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_loads_ok(self):
-        message_has_attrs = all([hasattr(self.message, attr)] for attr in self.message.json.keys())
+        self.identifier = f'{fake.random_number(digits=18)}'
+        with patch('bot.models.discord_api_get') as mocker_api_get:
+            mocker_api_get.return_value = message_response(id=self.identifier, channel_id=channel_id)
+            self.message = models.Message(channel=self.channel, id=self.identifier)
 
-        self.assertTrue(message_has_attrs)
-
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_loads_from_given_channel_id_ok(self):
-        message = self.api_class(self.channel.id, self.message.id)
-        message_has_attrs = all([hasattr(message, attr)] for attr in message.json.keys())
+        with patch('bot.models.discord_api_get') as mocker_api_get:
+            chn_response = channel_response(id=self.channel.id)
+            mocker_api_get.return_value = chn_response
+            msg_response = message_response(id=self.identifier)
+            message = self.api_class(self.channel.id, self.identifier, response=msg_response)
 
-        self.assertTrue(message_has_attrs)
+        self.assertTrue(isinstance(message, models.Message))
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_edit_ok(self):
-        text = self.faker.paragraph()
+    @patch('bot.utils.discord_api_request')
+    def test_edit_ok(self, mocker_api_patch: MagicMock):
+        text = fake.paragraph()
+        mocker_api_patch.return_value = message_response(id=self.identifier, content=text)
         msg = self.message.edit(text)
 
         self.assertEqual(text, msg.content)
         # Check if message is the same
         self.assertEqual(self.message.id, msg.id)
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
     def test_str_ok(self):
-        expected = f'({self.message.id}): {self.message.content}'
-        result = repr(self.message)
+        expected_msg = f'Message [{self.message.msg_type.name}] ({self.message.id}): {self.message.content}'
 
-        self.assertEqual(expected, result)
+        self.assertEqual(expected_msg, repr(self.message))

@@ -114,6 +114,42 @@ def channel_response(**defaults) -> Response:
     return response
 
 
+def message_response(**defaults) -> Response:
+    """
+    Response returned when getting a message.
+
+    Parameters
+    ----------
+    defaults:
+        Values to be updated on the Message.
+    """
+
+    msg = {
+        'id': f'{fake.random_number(digits=18)}',
+        'type': fake.pyint(min_value=0, max_value=24),
+        'content': fake.paragraph(),
+        'channel_id': f'{fake.random_number(digits=18)}',
+        'author': user_response().json(),
+        'attachments': [],
+        'embeds': [],
+        'mentions': [],
+        'mention_roles': [],
+        'pinned': False,
+        'mention_everyone': False,
+        'tts': False,
+        'timestamp': datetime.datetime.now().isoformat(),
+        'edited_timestamp': None,
+        'flags': 1 << fake.pyint(min_value=0, max_value=19),
+        'components': [],
+    }
+    msg.update(defaults)
+
+    response = copy.deepcopy(_base_response)
+    response._content = json.dumps(msg).encode(encoding='utf-8')
+
+    return response
+
+
 def create_dm_response(**defaults) -> Response:
     """
     Response returned when creating a DM to a user.

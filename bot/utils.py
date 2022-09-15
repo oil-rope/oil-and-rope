@@ -19,10 +19,12 @@ def discord_api_request(url: str, method: str = HttpMethods.GET, data: Optional[
     """
 
     headers = {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': f'Bot {settings.BOT_TOKEN}'
     }
+
     if data:
+        headers['Content-Type'] = 'application/json'
         data = json.dumps(data)
 
     if method == HttpMethods.GET:

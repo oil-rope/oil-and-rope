@@ -185,15 +185,7 @@ class Channel(ApiMixin):
 class Message(ApiMixin):
     """
     Represents a Discord Message.
-
-    Parameters
-    ----------
-    channel: :class:`Channel` or :class:`str` or :class:`int`
-        Instance of channel or ID.
-    id: :class:`str` or :class:`int`
-        ID of the message.
-    response: :class:`requests.models.Response`
-        Response attached to this message.
+    For more information see https://discord.com/developers/docs/resources/channel#message-object-message-structure.
     """
 
     channel_id: str
@@ -244,7 +236,7 @@ class Message(ApiMixin):
         self.embed = embed
 
         super().__init__(self.get_url(), response=response)
-        self.channel_type = MessageTypes(self.type)
+        self.msg_type = MessageTypes(self.type)
 
     def edit(self, content):
         """
@@ -267,7 +259,7 @@ class Message(ApiMixin):
         return f'{self.base_url}/{self.id}'
 
     def __str__(self):
-        return f'Message [{self.channel_type.name}] ({self.id}): {self.content}'
+        return f'Message [{self.msg_type.name}] ({self.id}): {self.content}'
 
     def __repr__(self):
-        return self.__str__()
+        return str(self)
