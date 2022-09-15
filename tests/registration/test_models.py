@@ -1,17 +1,15 @@
-import unittest
+from unittest.mock import MagicMock, patch
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
+from tests.mocks import discord
 from tests.utils import fake
-
-from ..bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
-from ..utils import check_litecord_connection
 
 Place = apps.get_model(constants.ROLEPLAY_PLACE)
 Race = apps.get_model(constants.ROLEPLAY_RACE)
@@ -38,10 +36,12 @@ class TestUser(TestCase):
     def test_discord_user_none_when_discord_id_not_set_ok(self):
         self.assertIsNone(self.instance.discord_user)
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
-    def test_discord_user_with_discord_id_ok(self):
-        self.instance.discord_id = USER_WITH_SAME_SERVER
+    @patch('bot.utils.discord_api_request')
+    def test_discord_user_with_discord_id_ok(self, mocker_api_request: MagicMock):
+        discord_id = f'{fake.random_number(digits=18)}'
+        mocker_api_request.return_value = discord.user_response(id=discord_id)
+
+        self.instance.discord_id = discord_id
         self.instance.save(update_fields=['discord_id'])
         self.instance.refresh_from_db()
 
