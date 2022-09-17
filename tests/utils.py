@@ -3,12 +3,10 @@ import random
 from typing import TYPE_CHECKING
 from unittest import mock
 
-import requests
 from model_bakery import baker
 
 from common.utils.faker import create_faker
 from roleplay.enums import SiteTypes
-from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN
 
 if TYPE_CHECKING:
     from roleplay.models import Place
@@ -16,26 +14,6 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 fake = create_faker()
-
-
-def check_litecord_connection() -> bool:
-    """
-    Simple function to check if Litecord is working.
-    """
-
-    try:
-        # NOTE: Since API Info seems to be dropped we check on bot user
-        response = requests.get(
-            url=f'{LITECORD_API_URL}users/@me',
-            timeout=5,
-            headers={
-                'Authorization': f'Bot {LITECORD_TOKEN}',
-            }
-        )
-        return response.ok
-    except requests.exceptions.ConnectionError as ex:
-        LOGGER.exception(ex)
-        return False
 
 
 def generate_place(_quantity=1, with_user=False, **kwargs) -> list['Place']:
