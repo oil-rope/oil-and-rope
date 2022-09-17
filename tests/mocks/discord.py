@@ -1,6 +1,7 @@
 import copy
 import datetime
 import json
+import random
 
 from requests.models import Response
 
@@ -124,9 +125,12 @@ def message_response(**defaults) -> Response:
         Values to be updated on the Message.
     """
 
+    # Type Message 13 does not exist
+    msg_type = random.choice([t for t in range(0, 24) if t != 13])
+
     msg = {
         'id': f'{fake.random_number(digits=18)}',
-        'type': fake.pyint(min_value=0, max_value=24),
+        'type': msg_type,
         'content': fake.paragraph(),
         'channel_id': f'{fake.random_number(digits=18)}',
         'author': user_response().json(),
