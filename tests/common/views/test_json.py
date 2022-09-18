@@ -8,7 +8,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from common.views import json as views
-from tests import fake
+from tests.utils import fake
 
 Vote = apps.get_model(constants.COMMON_VOTE)
 

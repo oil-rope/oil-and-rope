@@ -2,9 +2,6 @@ import discord.ext.test as dpytest
 import pytest
 
 from bot.bot import OilAndRopeBot
-from common.utils.faker import create_faker
-
-fake = create_faker()
 
 
 @pytest.fixture(scope='function', autouse=False)

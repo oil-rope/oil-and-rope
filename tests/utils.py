@@ -1,42 +1,22 @@
 import logging
 import random
-from typing import List, Union
+from typing import TYPE_CHECKING
 from unittest import mock
 
-import requests
 from model_bakery import baker
 
-import roleplay.models
+from common.utils.faker import create_faker
 from roleplay.enums import SiteTypes
-from roleplay.models import Place
-from tests.bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN
 
-from . import fake
+if TYPE_CHECKING:
+    from roleplay.models import Place
 
 LOGGER = logging.getLogger(__name__)
 
-
-def check_litecord_connection() -> bool:
-    """
-    Simple function to check if Litecord is working.
-    """
-
-    try:
-        # NOTE: Since API Info seems to be dropped we check on bot user
-        response = requests.get(
-            url=f'{LITECORD_API_URL}users/@me',
-            timeout=5,
-            headers={
-                'Authorization': f'Bot {LITECORD_TOKEN}',
-            }
-        )
-        return response.ok
-    except requests.exceptions.ConnectionError as ex:
-        LOGGER.exception(ex)
-        return False
+fake = create_faker()
 
 
-def generate_place(_quantity: int = 1, **kwargs) -> Union[List[Place], Place]:
+def generate_place(_quantity=1, with_user=False, **kwargs) -> list['Place']:
     """
     Generates a list of Place objects with given kwargs.
 
@@ -46,7 +26,9 @@ def generate_place(_quantity: int = 1, **kwargs) -> Union[List[Place], Place]:
         Number of places to generate.
     """
 
-    places: List[Place] = []
+    import roleplay.models
+
+    places: list['Place'] = []
     owner = kwargs.get('owner')
     for _ in range(0, _quantity):
         owner = baker.make_recipe('registration.user') if not owner else owner

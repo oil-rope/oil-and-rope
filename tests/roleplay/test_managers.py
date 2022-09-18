@@ -1,14 +1,27 @@
 import functools
+from typing import TYPE_CHECKING
 
-from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
 from django.test import TestCase
 from model_bakery import baker
 
-from common.models import Vote
+from common.constants import models as constants
 from roleplay.enums import DomainTypes, SiteTypes
-from roleplay.models import Campaign, Domain, Place
-from tests import fake
-from tests.utils import generate_place
+from tests.utils import fake, generate_place
+
+if TYPE_CHECKING:
+    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
+
+    from common.models import Vote as VoteModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import Domain as DomainModel
+    from roleplay.models import Place as PlaceModel
+
+Campaign: 'CampaignModel' = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
+ContentType: 'ContentTypeModel' = apps.get_model(constants.CONTENT_TYPE)
+Domain: 'DomainModel' = apps.get_model(constants.ROLEPLAY_DOMAIN)
+Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
+Vote: 'VoteModel' = apps.get_model(constants.COMMON_VOTE)
 
 
 class TestDomainManager(TestCase):

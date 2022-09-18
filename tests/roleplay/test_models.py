@@ -4,26 +4,44 @@ import random
 import tempfile
 import unittest
 from datetime import timedelta
+from typing import TYPE_CHECKING
+from unittest.mock import MagicMock, patch
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
+from tests.mocks import discord
+from tests.utils import fake
 
-from .. import fake
-from ..bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
-from ..utils import check_litecord_connection, generate_place
+if TYPE_CHECKING:
+    from registration.models import User as UserModel
+    from roleplay.models import Domain as DomainModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import Race as RaceModel
+    from roleplay.models import RaceUser as RaceUserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
+    from roleplay.models import Session as SessionModel
 
-User = apps.get_model(constants.REGISTRATION_USER)
+from ..utils import generate_place
+
+Campaign: 'CampaignModel' = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
+Domain: 'DomainModel' = apps.get_model(constants.ROLEPLAY_DOMAIN)
+Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
+PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+Race: 'RaceModel' = apps.get_model(constants.ROLEPLAY_RACE)
+RaceUser: 'RaceUserModel' = apps.get_model(constants.ROLEPLAY_RACE_USER)
+Session: 'SessionModel' = apps.get_model(constants.ROLEPLAY_SESSION)
+User: 'UserModel' = apps.get_model(constants.REGISTRATION_USER)
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -238,11 +256,13 @@ class TestCampaign(TestCase):
     def test_discord_channel_empty_is_none(self):
         self.assertIsNone(self.instance.discord_channel)
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
-    def test_discord_channel_ok(self):
-        self.instance.discord_channel_id = CHANNEL
+    @patch('bot.utils.discord_api_request')
+    def test_discord_channel_ok(self, mocker_api_request: MagicMock):
+        discord_id = f'{fake.random_number(digits=18)}'
+        mocker_api_request.return_value = discord.channel_response(id=discord_id)
+        self.instance.discord_channel_id = discord_id
         self.instance.save()
+
         self.assertIsNotNone(self.instance.discord_channel)
 
     def test_vote_ok(self):

@@ -7,7 +7,7 @@ from model_bakery import baker
 from rest_framework.authtoken.models import Token
 
 from chat.consumers import ChatConsumer
-from tests import fake
+from tests.utils import fake
 
 User = get_user_model()
 

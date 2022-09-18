@@ -83,8 +83,16 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
         run: |
-          poetry run coverage run ./manage.py test -- --no-cov
-          poetry run coverage report
+          poetry run coverage run ./manage.py test
+          poetry run coverage report --skip-covered
+          poetry run coverage xml
+
+      - name: Update coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false  # CI can continue without Codecov
+          verbose: true
 
       - name: Django Check
         run: |

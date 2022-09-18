@@ -1,9 +1,18 @@
+from typing import TYPE_CHECKING
+
 from model_bakery import baker
 from rest_framework.status import HTTP_200_OK, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from rest_framework.test import APITestCase
 
-from chat.models import ChatMessage
-from tests import fake
+if TYPE_CHECKING:
+    from chat.models import ChatMessage as ChatMessageModel
+
+from django.apps import apps
+
+from common.constants import models
+from tests.utils import fake
+
+ChatMessage: 'ChatMessageModel' = apps.get_model(models.CHAT_MESSAGE)
 
 
 class TestChatViewSet(APITestCase):
@@ -53,7 +62,7 @@ class TestChatMessageViewSet(APITestCase):
         # Chat where user is member
         chat = baker.make_recipe('chat.chat')
         chat.users.add(cls.user)
-        cls.message: ChatMessage = baker.make_recipe('chat.message', chat=chat, author=cls.user)
+        cls.message: 'ChatMessageModel' = baker.make_recipe('chat.message', chat=chat, author=cls.user)
 
         cls.url = f'/api/chat/{chat.pk}/messages/'
 
@@ -72,7 +81,7 @@ class TestChatMessageViewSet(APITestCase):
         self.client.force_login(self.user)
         response = self.client.post(self.url, data={'message': fake.sentence()}, format='json')
         message = response.json()
-        message_instance: ChatMessage = ChatMessage.objects.get(pk=message['id'])
+        message_instance: 'ChatMessageModel' = ChatMessage.objects.get(pk=message['id'])
 
         self.assertEqual(message_instance.message, message['message'])
 
@@ -88,7 +97,7 @@ class TestChatMessageViewSet(APITestCase):
         self.assertEqual(self.message.message, message['message'])
 
     def test_partial_update_non_author_ko(self):
-        msg: ChatMessage = baker.make_recipe('chat.message')
+        msg: 'ChatMessageModel' = baker.make_recipe('chat.message')
 
         url = f'{self.url}{msg.id}/'
         self.client.force_login(self.user)

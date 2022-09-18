@@ -2,8 +2,7 @@ import os
 import random
 import tempfile
 import time
-import unittest
-from unittest import mock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.apps import apps
@@ -12,7 +11,7 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
 from django.shortcuts import resolve_url
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from model_bakery import baker
 from PIL import Image
@@ -20,10 +19,10 @@ from PIL import Image
 from common import tools
 from common.constants import models as constants
 from roleplay import enums, models, views
-from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
+from tests.mocks import discord
+from tests.utils import fake
 
-from .. import fake
-from ..utils import check_litecord_connection, generate_place
+from ..utils import generate_place
 
 ContentType = apps.get_model(constants.CONTENT_TYPE)
 Vote = apps.get_model(constants.COMMON_VOTE)
@@ -521,7 +520,7 @@ class TestCampaignJoinView(TestCase):
 
         self.assertRedirects(response, resolve_url(self.instance), target_status_code=302)
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_access_with_correct_token_and_existing_user_messages_ok(self, mock_messages):
         token = tools.get_token(self.user.email, self.signer)
         url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
@@ -536,7 +535,7 @@ class TestCampaignJoinView(TestCase):
 
         self.assertRedirects(response, resolve_url(settings.LOGIN_URL))
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_access_with_correct_token_and_non_existing_user_messages_ko(self, mock_messages):
         token = tools.get_token(fake.email(), self.signer)
         url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
@@ -881,7 +880,7 @@ class TestCampaignDetailView(TestCase):
 
         self.assertTemplateUsed(response, self.template)
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_request_join_ok(self, mocker):
         self.client.force_login(self.user)
         response = self.client.post(self.private_campaign_url)
@@ -955,15 +954,17 @@ class TestCampaignDetailView(TestCase):
         self.assertContains(response, user_with_profile_image.profile.image.url)
 
     @pytest.mark.coverage
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord seems to be unreachable.')
-    def test_campaign_with_discord_channel_ok(self):
+    @patch('bot.utils.discord_api_request')
+    def test_campaign_with_discord_channel_ok(self, mocker_api_request: MagicMock):
+        discord_channel_id = f'{fake.random_number(digits=18)}'
+        mocker_api_request.return_value = discord.channel_response(id=discord_channel_id)
+
         self.client.force_login(self.user)
-        self.private_campaign.discord_channel_id = CHANNEL
+        self.private_campaign.discord_channel_id = discord_channel_id
         self.private_campaign.save(update_fields=['discord_channel_id'])
         response = self.client.get(self.private_campaign_url)
-        GUILD_ID = self.private_campaign.discord_channel.guild_id
-        discord_channel_url = f'https://discord.com/channels/{GUILD_ID}/{CHANNEL}'
+        discord_guild_id = self.private_campaign.discord_channel.guild_id
+        discord_channel_url = f'https://discord.com/channels/{discord_guild_id}/{discord_channel_id}'
 
         self.assertContains(response, discord_channel_url)
 
@@ -1011,7 +1012,7 @@ class TestCampaignDeleteView(TestCase):
 
         self.assertFalse(models.Campaign.objects.filter(pk=self.campaign.pk).exists())
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_success_message_sent_ok(self, mocker):
         self.client.force_login(self.user)
         response = self.client.post(self.url)
@@ -1210,7 +1211,7 @@ class TestSessionDeleteView(TestCase):
 
         self.assertRedirects(response, resolve_url('roleplay:session:list'))
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_access_game_master_session_deleted_message_ok(self, mock_messages):
         self.client.force_login(self.user_in_game_masters)
         response = self.client.post(self.url)
@@ -1276,7 +1277,7 @@ class TestSessionUpdateView(TestCase):
 
         self.assertEqual(name, self.session.name)
 
-    @mock.patch('roleplay.views.messages')
+    @patch('roleplay.views.messages')
     def test_access_game_master_session_updated_message_ok(self, mock_messages):
         data = {
             'name': fake.sentence(),

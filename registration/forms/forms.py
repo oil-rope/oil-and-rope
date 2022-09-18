@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 from smtplib import SMTPException
+from typing import TYPE_CHECKING
 
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -9,19 +10,20 @@ from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from bot.exceptions import DiscordApiException
-from bot.models import User
+from bot.models import User as DiscordUser
 from common.forms.widgets import DateWidget
-from common.utils.auth import generate_token
+from oar_email.utils import send_confirmation_email
 
 from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLayout, SetPasswordFormLayout,
                      SignUpFormLayout, UserFormLayout)
 
 LOGGER = logging.getLogger(__name__)
+
+if TYPE_CHECKING:  # pragma: no cover
+    from registration.models import User
 
 
 class LoginForm(auth_forms.AuthenticationForm):
@@ -84,31 +86,12 @@ class SignUpForm(auth_forms.UserCreationForm):
                 }
                 raise ValidationError(msg)
             try:
-                User(data)
+                DiscordUser(data)
             except DiscordApiException:
                 msg = _('seems like your user couldn\'t be found, do you have any server in common with our bot?')
                 raise ValidationError(msg.capitalize())
 
         return data
-
-    def _send_email_confirmation(self, user):
-        """
-        Sends a confirmation email to the user.
-        """
-
-        html_msg = render_to_string('email_templates/confirm_email.html', {
-            # We declare localhost as default for tests purposes
-            'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
-            'token': generate_token(user),
-            'object': user
-        })
-
-        title = 'Oil & Rope'
-        subject = _('welcome to %(title)s!') % {'title': title}
-        send_mail(
-            subject=str(subject).capitalize(), message='', from_email=None,
-            recipient_list=[user.email], html_message=html_msg,
-        )
 
     def save(self, commit=True):
         """
@@ -120,14 +103,14 @@ class SignUpForm(auth_forms.UserCreationForm):
             The user created.
         """
 
-        instance = super().save(commit=False)
+        instance: 'User' = super().save(commit=False)
         # Set active to False until user activates email
         instance.is_active = False
         instance.discord_id = self.cleaned_data.get('discord_id', '')
         if commit:
             instance.save()
             try:
-                self._send_email_confirmation(instance)
+                send_confirmation_email(self.request, instance)
             # NOTE: ConnectionError is when SMTP server is unreachable, SMTPException is for credentials, bad format...
             except (ConnectionError, SMTPException) as ex:
                 LOGGER.exception(ex)

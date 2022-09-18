@@ -1,5 +1,7 @@
 from json import JSONDecodeError
 
+from requests.models import Response
+
 from core.exceptions import OilAndRopeException
 
 """
@@ -64,7 +66,7 @@ class DiscordApiException(HelpfulError):
     Handles error to give a possible solution.
     """
 
-    def __init__(self, response):
+    def __init__(self, response: Response):
         self.response = response
         self.handle_error_code(self.response)
         super().__init__(issue=self.issue, solution=self.solution, preface=self.preface, footnote=self.footnote)

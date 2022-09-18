@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
+if TYPE_CHECKING:  # pragma: no cover
+    from registration.models import User
 
-def generate_token(user) -> str:
+
+def generate_token(user: 'User') -> str:
     """
     Generates a token associated with a user.
 

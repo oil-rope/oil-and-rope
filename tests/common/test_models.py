@@ -8,8 +8,7 @@ from django.test import TestCase
 from model_bakery import baker
 
 from common.constants import models
-
-from .. import fake
+from tests.utils import fake
 
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 Track = apps.get_model(models.COMMON_TRACK)
