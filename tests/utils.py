@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 from unittest import mock
 
 from model_bakery import baker
@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 fake = create_faker()
 
 
-def generate_place(_quantity=1, with_user=False, **kwargs) -> list['Place']:
+def generate_place(_quantity=1, **kwargs) -> Union[list['Place'], 'Place']:
     """
     Generates a list of Place objects with given kwargs.
 

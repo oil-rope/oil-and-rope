@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from unittest.mock import MagicMock, patch
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
@@ -7,6 +8,7 @@ from model_bakery import baker
 
 from api.serializers.roleplay import CampaignSerializer, DomainSerializer, PlaceNestedSerializer, RaceSerializer
 from common.constants import models
+from tests.mocks import discord
 from tests.utils import fake
 
 if TYPE_CHECKING:
@@ -146,11 +148,21 @@ class TestRaceSerializer(TestCase):
 class TestCampaignSerializer(TestCase):
     serializer_class = CampaignSerializer
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.instance: 'CampaignModel' = baker.make_recipe('roleplay.campaign')
+    def setUp(self):
+        self.instance: 'CampaignModel' = baker.make_recipe('roleplay.campaign')
 
     def test_get_discord_channel_with_empty_discord_channel_id_ok(self):
         serializer = self.serializer_class(self.instance)
 
         self.assertIsNone(serializer.data['discord_channel'])
+
+    @patch('bot.utils.discord_api_request')
+    def test_get_discord_channel_with_discord_id_ok(self, mocker: MagicMock):
+        channel_id = f'{fake.random_number(digits=18)}'
+        self.instance.discord_channel_id = channel_id
+        self.instance.save(update_fields=['discord_channel_id'])
+        mocker.return_value = discord.channel_response(id=channel_id)
+
+        serializer = self.serializer_class(self.instance)
+
+        self.assertIsNotNone(serializer.data['discord_channel'])
