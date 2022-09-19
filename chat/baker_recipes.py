@@ -1,5 +1,5 @@
 from django.apps import apps
-from model_bakery.recipe import Recipe, foreign_key, related
+from model_bakery.recipe import Recipe, foreign_key
 
 from common.constants import models
 from common.utils import create_faker
@@ -13,7 +13,6 @@ ChatMessage = apps.get_model(models.CHAT_MESSAGE)
 chat = Recipe(
     Chat,
     name=fake.word,
-    users=related(user),
 )
 
 message = Recipe(

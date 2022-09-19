@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load string_utils %}
+<li class="nav-item">
+  {% url 'core:index' as index_url %}
+  <a
+    href="{% url 'core:index' %}"
+    class="nav-link text-uppercase{% if actual_path|startswith:index_url %} active{% endif %}"
+  >
+    {% translate "about" %}
+  </a>
+</li>

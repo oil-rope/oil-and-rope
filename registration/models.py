@@ -56,7 +56,7 @@ class User(AbstractUser):
     def accessible_places(self):
         Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
         community_places = Place.objects.community_places()
-        private_places = Place.objects.user_places(self)
+        private_places = Place.objects.filter(is_public=False, owner=self)
         return community_places | private_places
 
     def get_absolute_url(self):

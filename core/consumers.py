@@ -1,10 +1,14 @@
 import json
+from typing import Optional, Union
 
 from asgiref.sync import sync_to_async
+from channels.auth import login
+from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.utils.translation import gettext_lazy as _
 
 from common.enums import WebSocketCloseCodes
+from registration.models import User
 
 
 class TypedConsumerMixin:
@@ -83,3 +87,25 @@ class HandlerJsonWebsocketConsumer(TypedConsumerMixin, AsyncJsonWebsocketConsume
     async def receive_json(self, content, **kwargs):
         # NOTE: We don't call `super().receive_json` because it's just a pass function.
         await self.handler(content, **kwargs)
+
+
+class TokenAuthenticationMixin:
+    authentication_backend: str = 'django.contrib.auth.backends.ModelBackend'
+
+    @database_sync_to_async
+    def get_user(self, token: str) -> Optional[User]:
+        user = User.objects.filter(auth_token__key=token)
+        if user.exists():
+            return user.first()
+        return None
+
+    async def authenticate(self, text_data: Optional[Union[str, bytes]]) -> Optional[User]:
+        json_data = json.loads(text_data)
+        if 'token' not in json_data:
+            return None
+        # Authenticating by given token
+        user: User = await self.get_user(json_data['token'])
+        if user:
+            await login(self.scope, user, backend=self.authentication_backend)
+            await database_sync_to_async(self.scope['session'].save)()
+        return user

@@ -3,7 +3,7 @@ from model_bakery import baker
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from oilandrope import __version__
+from api import get_version
 
 
 class TestApiVersionView(APITestCase):
@@ -36,7 +36,7 @@ class TestApiVersionView(APITestCase):
     def test_expected_version_ok(self):
         response = self.client.get(self.url)
 
-        self.assertEqual(__version__, response.json()['version'])
+        self.assertEqual(get_version(), response.json()['version'])
 
 
 class TestURLResolverViewSet(APITestCase):
@@ -95,9 +95,9 @@ class TestURLResolverViewSet(APITestCase):
         place = baker.make_recipe('roleplay.place')
         data = {
             'resolver': 'roleplay:place:detail',
-            'pk': place.pk,
+            'params': {'pk': place.pk},
         }
-        response = self.client.post(self.url, data)
+        response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
@@ -148,7 +148,8 @@ class TestRollView(APITestCase):
         self.client.force_login(self.user)
         response = self.client.post(self.url)
 
-        self.assertListEqual(['\'roll\' field is required.'], response.json())
+        self.assertIn('roll', response.json())
+        self.assertEqual(['This field is required.'], response.json()['roll'])
 
     def test_user_logged_post_method_with_invalid_data_ko(self):
         self.client.force_login(self.user)

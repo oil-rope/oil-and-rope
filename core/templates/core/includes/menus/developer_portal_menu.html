@@ -1,0 +1,26 @@
+{% load i18n %}
+<li class="nav-item dropdown">
+  <a
+    class="nav-link dropdown-toggle text-uppercase"
+    href="#"
+    id="developerPortalDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    {{ ICONS.CODE_SLASH|safe }}
+    {% translate "developer portal" %}
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="developerPortalDropdown">
+    <li>
+      <a
+        href="{% url 'api:swagger' %}"
+        class="dropdown-item"
+      >
+        {{ ICONS.FILE_EARMARK_CODE|safe }}
+        {% blocktranslate with object_to_document='API' trimmed %}
+          {{ object_to_document }} Documentation
+        {% endblocktranslate %}
+      </a>
+  </ul>
+</li>

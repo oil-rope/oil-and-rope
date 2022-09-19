@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
     token = serializers.SerializerMethodField()
 
-    def get_token(self, obj):
+    def get_token(self, obj) -> str:
         try:
             token_obj = Token.objects.get(user=obj)
         except Token.DoesNotExist:
@@ -69,10 +69,10 @@ class BotSerializer(serializers.ModelSerializer):
     command_prefix = serializers.SerializerMethodField(method_name='get_command_prefix')
     description = serializers.SerializerMethodField(method_name='get_description')
 
-    def get_command_prefix(self, obj):
+    def get_command_prefix(self, _) -> str:
         return settings.BOT_COMMAND_PREFIX
 
-    def get_description(self, obj):
+    def get_description(self, _) -> str:
         return settings.BOT_DESCRIPTION
 
     class Meta:

@@ -84,6 +84,8 @@ INSTALLED_APPS = [
     'django_filters',
     # django-prometheus (https://github.com/korfuri/django-prometheus#quickstart)
     'django_prometheus',
+    # drf_spectacular (https://drf-spectacular.readthedocs.io/)
+    'drf_spectacular',
     # DjangoMptt (https://django-mptt.readthedocs.io/)
     'mptt',
     # API RestFramework (https://www.django-rest-framework.org/)
@@ -356,8 +358,26 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Versioning configuration
+    # https://www.django-rest-framework.org/api-guide/versioning/#configuring-the-versioning-scheme
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': '1',
+    'ALLOWED_VERSIONS': ['1'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
+    'PAGE_SIZE': 30,
+}
+
+# Settings for drf_spectacular
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Oil & Rope API',
+    'DESCRIPTION': 'Online roleplay easy and intuitive. Now API!',
+    'VERSION': REST_FRAMEWORK['DEFAULT_VERSION'],
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_PUBLIC': True,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
 }
 
 # Email System
@@ -389,7 +409,7 @@ CORS_ALLOW_METHODS = [
 
 # https://github.com/adamchainz/django-cors-headers#cors_urls_regex
 
-CORS_URLS_REGEX = r'^/(en|es)/api/.*$'
+CORS_URLS_REGEX = r'^/api/.*$'
 
 # https://github.com/adamchainz/django-cors-headers#cors_allow_headers
 

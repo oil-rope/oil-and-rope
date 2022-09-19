@@ -1,26 +1,24 @@
 import logging
 
 from channels.db import database_sync_to_async
-from django.apps import apps
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from api.serializers.chat import NestedChatMessageSerializer, WebSocketChatSerializer
-from common.constants import models as constants
+from api.serializers.chat import ChatMessageSerializer, WebSocketChatSerializer
+from chat.models import ChatMessage
 from common.enums import WebSocketCloseCodes
-from core.consumers import HandlerJsonWebsocketConsumer
+from core.consumers import HandlerJsonWebsocketConsumer, TokenAuthenticationMixin
+from core.exceptions import OilAndRopeException
+from registration.models import User
 from roleplay.utils.dice import roll_dice
 
 LOGGER = logging.getLogger(__name__)
 
-ChatMessage = apps.get_model(constants.CHAT_MESSAGE)
-User = apps.get_model(constants.REGISTRATION_USER)
 
-
-class ChatConsumer(HandlerJsonWebsocketConsumer):
-    user = None
+class ChatConsumer(TokenAuthenticationMixin, HandlerJsonWebsocketConsumer):
     chat_group_name = None
     serializer_class = WebSocketChatSerializer
+    user = None
 
     async def disconnect(self, code):
         if self.chat_group_name:
@@ -28,7 +26,8 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
         await super().disconnect(code)
 
     async def receive(self, text_data=None, bytes_data=None, **kwargs):
-        self.user = self.scope['user']
+        await self.authenticate(text_data)
+        self.user: User = self.scope['user']
         if not self.user.is_authenticated:
             msg = _('user not authenticated.').capitalize()
             await super().send_json({
@@ -49,17 +48,23 @@ class ChatConsumer(HandlerJsonWebsocketConsumer):
     @database_sync_to_async
     def register_roll_message(self, chat_id: int, message: str) -> tuple[ChatMessage, dict]:
         bot = User.objects.get(email=settings.DEFAULT_FROM_EMAIL)
-        result, roll = roll_dice(message)
-        message = result
-        return ChatMessage.objects.create(
-            author_id=bot.pk,
-            chat_id=chat_id,
-            message=result,
-        ), roll
+        try:
+            result, roll = roll_dice(message)
+        except OilAndRopeException as ex:
+            # NOTE: If roll fails, we send message to chat with error message
+            result = ex.message
+            roll = {}
+        finally:
+            message = result
+            return ChatMessage.objects.create(
+                author_id=bot.id,
+                chat_id=chat_id,
+                message=result,
+            ), dict(roll)
 
     @database_sync_to_async
     def get_serialized_message(self, message: ChatMessage) -> dict:
-        serialized_message = NestedChatMessageSerializer(message)
+        serialized_message = ChatMessageSerializer(message)
         return serialized_message.data
 
     async def setup_channel_layer(self, content):
