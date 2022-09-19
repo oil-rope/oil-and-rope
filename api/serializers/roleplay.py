@@ -7,7 +7,7 @@ from rest_framework import serializers
 from common.constants import models
 from roleplay.managers import PlaceQuerySet
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from roleplay.models import Campaign as CampaignModel
     from roleplay.models import Domain as DomainModel
     from roleplay.models import Place as PlaceModel

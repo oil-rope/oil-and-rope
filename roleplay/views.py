@@ -1,4 +1,5 @@
 import logging
+from typing import TYPE_CHECKING
 
 from django.apps import apps
 from django.conf import settings
@@ -22,18 +23,31 @@ from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
 from roleplay.managers import PlaceQuerySet
-from roleplay.models import Campaign, Place, PlayerInCampaign, Session
 
 from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
 from .mixins import UserInAllWithRelatedNameMixin
 from .utils.invitations import send_campaign_invitations
 
+if TYPE_CHECKING:  # pragma: no cover
+    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
+
+    from common.models import Vote as VoteModel
+    from registration.models import User as UserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
+    from roleplay.models import Session as SessionModel
+
 LOGGER = logging.getLogger(__name__)
 
-ContentType = apps.get_model(models.CONTENT_TYPE)
-User = get_user_model()
-Vote = apps.get_model(models.COMMON_VOTE)
+Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
+ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
+Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
+PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
+User: 'UserModel' = get_user_model()
+Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -198,7 +212,7 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def get_form(self, form_class=None):
-        form = super().get_form(form_class)
+        form: forms.WorldForm = super().get_form(form_class)
         form.helper.form_action = resolve_url('roleplay:world:create')
         # NOTE: Since user is gotten from '?user' QueryParam, `form_action` must replicate this behavior
         if form.public:
@@ -213,6 +227,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        self.object: 'PlaceModel'
         kwargs.update({
             'owner': self.object.owner,
             'submit_text': _('update').capitalize()

@@ -2,11 +2,13 @@ import os
 import random
 import tempfile
 import time
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
@@ -17,19 +19,34 @@ from model_bakery import baker
 from PIL import Image
 
 from common import tools
-from common.constants import models as constants
-from roleplay import enums, models, views
+from common.constants import models
+from roleplay import enums, views
 from tests.mocks import discord
 from tests.utils import fake
 
 from ..utils import generate_place
 
-ContentType = apps.get_model(constants.CONTENT_TYPE)
-Vote = apps.get_model(constants.COMMON_VOTE)
+if TYPE_CHECKING:  # pragma: no cover
+    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
+
+    from common.models import Vote as VoteModel
+    from registration.models import User as UserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
+    from roleplay.models import Session as SessionModel
+
+Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
+ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
+Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
+PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
+User: 'UserModel' = get_user_model()
+Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class TestPlaceCreateView(TestCase):
-    model = models.Place
+    model = Place
     resolver = 'roleplay:place:create'
 
     @classmethod
@@ -146,7 +163,7 @@ class TestPlaceCreateView(TestCase):
 
 
 class TestPlaceUpdateView(TestCase):
-    model = models.Place
+    model = Place
     resolver = 'roleplay:place:edit'
 
     @classmethod
@@ -222,7 +239,7 @@ class TestPlaceUpdateView(TestCase):
 
 
 class TestPlaceDetailView(TestCase):
-    model = models.Place
+    model = Place
     resolver = 'roleplay:place:detail'
 
     @classmethod
@@ -285,7 +302,7 @@ class TestPlaceDetailView(TestCase):
 class TestPlaceDeleteView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.model = models.Place
+        cls.model = Place
 
     def setUp(self):
         self.user = baker.make_recipe('registration.user')
@@ -345,7 +362,7 @@ class TestPlaceDeleteView(TestCase):
 
 
 class TestWorldListView(TestCase):
-    model = models.Place
+    model = Place
     resolver = 'roleplay:world:list'
     view = views.WorldListView
 
@@ -434,8 +451,151 @@ class TestWorldListView(TestCase):
         self.assertEqual(200, response.status_code)
 
 
+class TestWorldCreateView(TestCase):
+    model = Place
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:world:create'
+    template = 'roleplay/world/world_create.html'
+    url = resolve_url(resolver)
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        with open(cls.tmp_file.name, 'rb') as img_content:
+            cls.image = SimpleUploadedFile(
+                name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
+            )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
+        cls.tmp_file.close()
+        os.unlink(cls.tmp_file.name)
+
+    def setUp(self) -> None:
+        self.data = {
+            'name': fake.sentence(nb_words=3),
+            'description': fake.paragraph(),
+            'image': self.image,
+        }
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = '{login_url}?next={url}'.format(login_url=self.login_url, url=self.url)
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_authenticated_ok(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_authenticated_template_is_ok(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_authenticated_with_user_in_kwargs_ok(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(f'{self.url}?user')
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_authenticated_create_world_without_name_ko(self):
+        self.client.force_login(self.user)
+        data_without_name = self.data.copy()
+        del data_without_name['name']
+
+        response = self.client.post(self.url, data=data_without_name)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+
+    def test_access_authenticated_create_world_without_description_ok(self):
+        self.client.force_login(self.user)
+        data_without_description = self.data.copy()
+        del data_without_description['description']
+
+        self.client.post(self.url, data=data_without_description, follow=True)
+
+        self.assertTrue(len(self.user.accessible_places()) == 1)
+
+    def test_access_authenticated_create_world_without_image_ok(self):
+        self.client.force_login(self.user)
+        data_without_image = self.data.copy()
+        del data_without_image['image']
+
+        self.client.post(self.url, data=data_without_image, follow=True)
+
+        self.assertTrue(len(self.user.accessible_places()) == 1)
+
+
+class TestWorldUpdateView(TestCase):
+    model = Place
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:world:edit'
+    template = 'roleplay/place/place_update.html'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        with open(cls.tmp_file.name, 'rb') as img_content:
+            cls.image = SimpleUploadedFile(
+                name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
+            )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
+        cls.tmp_file.close()
+        os.unlink(cls.tmp_file.name)
+
+    def setUp(self) -> None:
+        self.world = generate_place(owner=self.user)
+        self.url = resolve_url(self.resolver, pk=self.world.pk)
+        self.data = {
+            'name': fake.sentence(nb_words=3),
+            'description': fake.paragraph(),
+            'image': self.image,
+        }
+
+    def test_access_anonymous_user_ko(self):
+        response = self.client.get(self.url)
+        expected_url = '{login_url}?next={url}'.format(login_url=self.login_url, url=self.url)
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_template_used_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+
 class TestCampaignCreateView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:create'
     template = 'roleplay/campaign/campaign_create.html'
@@ -473,7 +633,7 @@ class TestCampaignCreateView(TestCase):
 
     def test_non_existent_world_ko(self):
         self.client.force_login(self.user)
-        non_existent_pk = models.Place.objects.last().pk + 1
+        non_existent_pk = Place.objects.last().pk + 1
         url = reverse('roleplay:campaign:create', kwargs={'world_pk': non_existent_pk})
         response = self.client.get(url)
 
@@ -482,7 +642,7 @@ class TestCampaignCreateView(TestCase):
     def test_creates_campaign_ok(self):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.data_ok)
-        campaign = models.Campaign.objects.get(owner__pk=self.user.pk)
+        campaign = Campaign.objects.get(owner__pk=self.user.pk)
 
         self.assertEqual(self.data_ok['name'], campaign.name)
         self.assertEqual(self.data_ok['system'], campaign.system)
@@ -504,7 +664,7 @@ class TestCampaignCreateView(TestCase):
 
 
 class TestCampaignJoinView(TestCase):
-    model = models.Campaign
+    model = Campaign
     resolver = 'roleplay:campaign:join'
 
     @classmethod
@@ -571,7 +731,7 @@ class TestCampaignJoinView(TestCase):
 
 
 class TestCampaignListView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:list'
     template = 'roleplay/campaign/campaign_list.html'
@@ -668,7 +828,7 @@ class TestCampaignListView(TestCase):
 
 
 class TestCampaignUserListView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:list-private'
     template = 'roleplay/campaign/campaign_private_list.html'
@@ -733,7 +893,7 @@ class TestCampaignUserListView(TestCase):
 
 
 class TestCampaignUpdateView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:edit'
     template = 'roleplay/campaign/campaign_update.html'
@@ -825,7 +985,7 @@ class TestCampaignUpdateView(TestCase):
 
 
 class TestCampaignDetailView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:detail'
     template = 'roleplay/campaign/campaign_detail.html'
@@ -970,7 +1130,7 @@ class TestCampaignDetailView(TestCase):
 
 
 class TestCampaignDeleteView(TestCase):
-    model = models.Campaign
+    model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
     resolver = 'roleplay:campaign:delete'
     template = 'roleplay/campaign/campaign_confirm_delete.html'
@@ -1010,7 +1170,7 @@ class TestCampaignDeleteView(TestCase):
         self.client.force_login(self.user)
         self.client.post(self.url)
 
-        self.assertFalse(models.Campaign.objects.filter(pk=self.campaign.pk).exists())
+        self.assertFalse(Campaign.objects.filter(pk=self.campaign.pk).exists())
 
     @patch('roleplay.views.messages')
     def test_success_message_sent_ok(self, mocker):
@@ -1025,7 +1185,7 @@ class TestCampaignDeleteView(TestCase):
 
 class TestSessionCreateView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Session
+    model = Session
     resolver = 'roleplay:session:create'
     template = 'roleplay/session/session_create.html'
     view = views.SessionCreateView
@@ -1098,7 +1258,7 @@ class TestSessionCreateView(TestCase):
 
 class TestSessionDetailView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Session
+    model = Session
     resolver = 'roleplay:session:detail'
     template = 'roleplay/session/session_detail.html'
     view = views.SessionDetailView
@@ -1159,7 +1319,7 @@ class TestSessionDetailView(TestCase):
 
 class TestSessionDeleteView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Session
+    model = Session
     resolver = 'roleplay:session:delete'
     template = 'roleplay/session/session_confirm_delete.html'
     view = views.SessionDeleteView
@@ -1224,7 +1384,7 @@ class TestSessionDeleteView(TestCase):
 
 class TestSessionUpdateView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Session
+    model = Session
     resolver = 'roleplay:session:edit'
     template = 'roleplay/session/session_update.html'
     view = views.SessionUpdateView
@@ -1296,7 +1456,7 @@ class TestSessionUpdateView(TestCase):
 
 class TestSessionListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Session
+    model = Session
     resolver = 'roleplay:session:list'
     template = 'roleplay/session/session_list.html'
     view = views.SessionListView
