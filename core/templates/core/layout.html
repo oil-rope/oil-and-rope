@@ -21,9 +21,12 @@
   <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
 
   <!-- Oil & Rope Styles -->
-  <!-- With Fonts -->
-  <!-- With Icons -->
-  <link rel="stylesheet" href="{{ CUSTOMS_STATIC_URL|add:'/css/oilandrope.css' }}">
+  {# For error pages the context_processors are not loaded so we need a callback #}
+  {% if CUSTOMS_STATIC_URL %}
+    <link rel="stylesheet" href="{{ CUSTOMS_STATIC_URL|add:'/css/oilandrope.css' }}">
+  {% else %}
+    <link rel="stylesheet" href="https://cdn.oilandrope-project.com/css/oilandrope.css">
+  {% endif %}
   <!-- Extra Styles -->
   {% block css %}{% endblock css %}
   <!-- CKEditor Styles -->
@@ -42,7 +45,6 @@
 
 <body>
 {% language lan %}
-
   <div class="navigator sticky-top">
     {% include 'core/includes/menu.html' %}
     {% block breadcrumb %}{% endblock breadcrumb %}
