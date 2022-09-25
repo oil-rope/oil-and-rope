@@ -10,7 +10,7 @@ from django.views.generic import View
 
 from common.constants import models as constants
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from django.contrib.contenttypes.models import ContentType as ContentTypeModel
 
     from common.models import Vote as VoteModel

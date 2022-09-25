@@ -9,7 +9,7 @@ from common.context_processors.utils import requests_utils
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.utils.auth import generate_token
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from registration.models import User
 
 

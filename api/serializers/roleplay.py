@@ -1,22 +1,11 @@
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import Dict, List, Optional
 
-from django.apps import apps
 from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
 
-from common.constants import models
 from roleplay.managers import PlaceQuerySet
-
-if TYPE_CHECKING:  # pragma: no cover
-    from roleplay.models import Campaign as CampaignModel
-    from roleplay.models import Domain as DomainModel
-    from roleplay.models import Place as PlaceModel
-    from roleplay.models import Race as RaceModel
-
-Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-Domain: 'DomainModel' = apps.get_model(models.ROLEPLAY_DOMAIN)
-Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
-Race: 'RaceModel' = apps.get_model(models.ROLEPLAY_RACE)
+# NOTE: Since Schema needs to access models we need to import them instead of dynamically calling from `apps.get_model`
+from roleplay.models import Campaign, Domain, Place, Race
 
 
 class DomainSerializer(serializers.ModelSerializer):
@@ -88,7 +77,7 @@ class PlaceNestedSerializer(serializers.ModelSerializer):
 class CampaignSerializer(serializers.ModelSerializer):
     discord_channel = serializers.SerializerMethodField()
 
-    def get_discord_channel(self, obj: 'CampaignModel') -> Optional[str]:
+    def get_discord_channel(self, obj: Campaign) -> Optional[str]:
         discord_channel = obj.discord_channel
         if discord_channel is not None:
             return discord_channel.get_url()

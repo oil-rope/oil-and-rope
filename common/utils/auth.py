@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from registration.models import User
 
 

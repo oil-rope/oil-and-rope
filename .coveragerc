@@ -12,6 +12,11 @@ plugins =
     django_coverage_plugin
 
 [report]
+exclude_lines =
+    # Re-enabling the standard pragma
+    pragma: no cover
+
+    if TYPE_CHECKING:
 fail_under = 95
 precision = 2
 show_missing = True

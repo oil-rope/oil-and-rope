@@ -22,7 +22,7 @@ from .layout import (LoginFormLayout, PasswordResetFormLayout, ResendEmailFormLa
 
 LOGGER = logging.getLogger(__name__)
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from registration.models import User
 
 

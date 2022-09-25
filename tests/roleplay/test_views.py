@@ -26,7 +26,7 @@ from tests.utils import fake
 
 from ..utils import generate_place
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from django.contrib.contenttypes.models import ContentType as ContentTypeModel
 
     from common.models import Vote as VoteModel

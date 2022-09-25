@@ -1,13 +1,8 @@
-from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from common.constants import models
-
-Profile = apps.get_model(models.REGISTRATION_PROFILE)
-User = get_user_model()
+from registration.models import Profile, User
 
 
 class ProfileSerializer(serializers.ModelSerializer):

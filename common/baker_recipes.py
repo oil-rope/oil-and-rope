@@ -7,7 +7,7 @@ from common.constants import models
 from common.utils import create_faker
 from registration.baker_recipes import user
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from django.contrib.contenttypes.models import ContentType as ContentTypeModel
 
     from common.models import Vote as VoteModel
