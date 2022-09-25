@@ -169,3 +169,46 @@ class TestRollView(APITestCase):
         response = self.client.post(self.url, data=data)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+
+class TestAPIDoc(APITestCase):
+    redoc_docs_url = resolve_url('api:redoc')
+    schema_docs_url = resolve_url('api:schema')
+    swagger_docs_url = resolve_url('api:swagger')
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = baker.make_recipe('registration.user')
+
+    def test_anonymous_access_schema_docs_ok(self):
+        response = self.client.get(self.schema_docs_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_access_schema_docs_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.schema_docs_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_anonymous_access_swagger_docs_ok(self):
+        response = self.client.get(self.swagger_docs_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_access_swagger_docs_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.swagger_docs_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_anonymous_access_redoc_docs_ok(self):
+        response = self.client.get(self.redoc_docs_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_authenticated_access_redoc_docs_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.swagger_docs_url)
+
+        self.assertEqual(200, response.status_code)
