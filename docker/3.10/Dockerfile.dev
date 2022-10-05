@@ -17,7 +17,8 @@ COPY . /app/
 COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 
 # In order to always have Gunicorn against 0.0.0.0:8000 we set the following environment variables
-ENV GUNICORN_WSGI_MODULE="oilandrope.wsgi" \
+ENV GUNICORN_WSGI_MODULE="oilandrope.asgi" \
+GUNICORN_WORKER_CLASS="uvicorn.workers.UvicornWorker" \
 GUNICORN_DAEMON="False" \
 GUNICORN_ACCESS_LOGFILE="-" \
 GUNICORN_ERROR_LOGFILE="-" \

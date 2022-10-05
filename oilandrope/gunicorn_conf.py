@@ -21,6 +21,8 @@ daemon = bool(to_bool(os.environ['GUNICORN_DAEMON']))
 reload = True
 debug = bool(to_bool(os.environ['DEBUG']))
 
+worker_class = os.environ['GUNICORN_WORKER_CLASS']
+
 if 'GUNICORN_WORKERS' in os.environ:
     workers = int(os.environ['GUNICORN_WORKERS'])
 else:
