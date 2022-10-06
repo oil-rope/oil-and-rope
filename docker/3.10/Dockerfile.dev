@@ -4,6 +4,7 @@ RUN apt-get update
 RUN apt-get install -y gcc
 RUN apt-get install -y libpq-dev
 RUN apt-get install -y gettext
+RUN apt-get install -y vim
 RUN pip install poetry
 
 WORKDIR /app/

@@ -112,7 +112,7 @@ class TestChatConsumer(TransactionTestCase):
         })
         response = await consumer.receive_json_from()
 
-        self.assertEqual('send_message', response['type'])
+        self.assertEqual('group_send_message', response['type'])
         self.assertEqual(message, response['content']['message'])
 
         await consumer.disconnect()
@@ -153,7 +153,7 @@ class TestChatConsumer(TransactionTestCase):
         })
         response = await consumer.receive_json_from()
 
-        self.assertEqual('send_message', response['type'])
+        self.assertEqual('group_send_message', response['type'])
         self.assertIn('1d20', response['roll'])
 
         await consumer.disconnect()
@@ -177,7 +177,7 @@ class TestChatConsumer(TransactionTestCase):
         })
         response = await consumer.receive_json_from()
 
-        self.assertEqual('send_message', response['type'])
+        self.assertEqual('group_send_message', response['type'])
         self.assertEqual('Dice roll `xdy` syntax is incorrect.', response['content']['message'])
         self.assertDictEqual({}, response['roll'])
 

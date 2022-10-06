@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from channels.db import database_sync_to_async
 from django.conf import settings
@@ -19,6 +20,9 @@ class ChatConsumer(TokenAuthenticationMixin, HandlerJsonWebsocketConsumer):
     chat_group_name = None
     serializer_class = WebSocketChatSerializer
     user = None
+
+    async def connect(self):
+        return await super().connect()
 
     async def disconnect(self, code):
         if self.chat_group_name:
@@ -93,9 +97,10 @@ class ChatConsumer(TokenAuthenticationMixin, HandlerJsonWebsocketConsumer):
             },
         )
 
-    async def send_message(self, content):
+    async def send_message(self, content: dict[str, Any]):
         chat_id = content['chat']
         msg_text = content['message']
+
         message = await self.register_message(self.user.id, chat_id, msg_text)
         serialized_message = await self.get_serialized_message(message)
 
@@ -108,5 +113,4 @@ class ChatConsumer(TokenAuthenticationMixin, HandlerJsonWebsocketConsumer):
         )
 
     async def group_send_message(self, content):
-        content['type'] = 'send_message'
         return await self.send_json(content)
