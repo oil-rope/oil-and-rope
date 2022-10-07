@@ -226,11 +226,13 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
         self.object: 'PlaceModel'
+
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'owner': self.object.owner,
-            'submit_text': _('update').capitalize()
+            'submit_text': _('update').capitalize(),
+            'public': self.object.is_public
         })
 
         return kwargs
