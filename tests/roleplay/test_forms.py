@@ -10,7 +10,7 @@ from model_bakery import baker
 from PIL import Image
 
 from roleplay import enums, forms, models
-from tests import fake
+from tests.utils import fake
 
 
 class TestPlaceForm(TestCase):
@@ -72,13 +72,12 @@ class TestPlaceForm(TestCase):
         form = self.form_class(data=data_without_parent_site)
         self.assertFalse(form.is_valid())
 
-    def test_place_and_parent_has_same_owner_and_user_ok(self):
+    def test_place_and_parent_has_same_owner_ok(self):
         form = self.form_class(data=self.data_ok, files=self.files)
         form.is_valid()
         place = form.save()
 
         self.assertEqual(place.owner, self.parent_site.owner)
-        self.assertEqual(place.user, self.parent_site.user)
 
 
 class TestWorldForm(TestCase):
@@ -143,7 +142,6 @@ class TestWorldForm(TestCase):
         self.assertEqual(self.data_ok['description'], instance.description)
         self.assertEqual(enums.SiteTypes.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
-        self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
 
         os.unlink(instance.image.path)
@@ -158,7 +156,6 @@ class TestWorldForm(TestCase):
         self.assertEqual(self.data_ok['name'], instance.name)
         self.assertEqual(enums.SiteTypes.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
-        self.assertIsNone(instance.user)
         self.assertIsNotNone(instance.image)
 
         os.unlink(instance.image.path)
@@ -172,21 +169,6 @@ class TestWorldForm(TestCase):
         self.assertEqual(self.data_ok['description'], instance.description)
         self.assertEqual(enums.SiteTypes.WORLD, instance.site_type)
         self.assertEqual(instance.owner, self.user)
-        self.assertIsNone(instance.user)
-
-    def test_save_user_world_ok(self):
-        form = self.form_class(owner=self.user, user=self.user, data=self.data_ok, files=self.files_ok)
-        instance = form.save()
-
-        self.assertTrue(self.model.objects.filter(pk=instance.pk))
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertEqual(enums.SiteTypes.WORLD, instance.site_type)
-        self.assertEqual(instance.owner, self.user)
-        self.assertEqual(self.user, instance.user)
-        self.assertIsNotNone(instance.image)
-
-        os.unlink(instance.image.path)
 
 
 class TestCampaignForm(TestCase):

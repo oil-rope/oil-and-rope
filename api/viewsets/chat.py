@@ -1,92 +1,89 @@
-from django.apps import apps
-from django.contrib.auth import get_user_model
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
+from django.db.models import QuerySet
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from rest_framework import mixins, status, viewsets
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from common.constants import models
+from chat.models import Chat, ChatMessage
 
-from ..serializers.chat import ChatMessageSerializer, ChatSerializer, NestedChatMessageSerializer, NestedChatSerializer
-
-Chat = apps.get_model(models.CHAT)
-ChatMessage = apps.get_model(models.CHAT_MESSAGE)
-User = get_user_model()
+from ..serializers.chat import (ChatMessageCreateRequestSerializer, ChatMessageSerializer,
+                                ChatMessageUpdateRequestSerializer, ChatSerializer)
 
 
+@extend_schema_view(
+    list=extend_schema(summary='List chats', description='List all chats user is member of.'),
+    retrieve=extend_schema(summary='Get chat', description='Retrieve chat by given ID if user is member of it.')
+)
 class ChatViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet for :class:`~chat.models.Chat`.
-    """
-
-    queryset = None
+    queryset = Chat.objects.all()
     serializer_class = ChatSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         user = self.request.user
-        qs = Chat.objects.filter(
+        qs = super().get_queryset().filter(
             users__in=[user],
         )
-        if not user.is_staff:
-            return qs
-        if self.action == 'list':
-            return qs
-        return Chat.objects.all()
-
-    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
-    def list_all(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    @action(methods=['get'], detail=True, url_name='detail-nested', url_path='nested')
-    def nested_retrieve(self, request, *args, **kwargs):
-        self.serializer_class = NestedChatSerializer
-        return self.retrieve(request, *args, **kwargs)
+        return qs
 
 
-class ChatMessageViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for :class:`~chat.models.ChatMessage`.
-    """
+@extend_schema(parameters=[
+    OpenApiParameter(
+        name='chat_pk', type=int, location=OpenApiParameter.PATH,
+        description='A unique integer value identifying this chat.',
+    ),
+])
+@extend_schema_view(
+    list=extend_schema(summary='List messages', description='Retrieve messages for given chat ID.'),
+    retrieve=extend_schema(summary='Get message', description='Get message in given chat ID by given ID.'),
+)
+class ChatMessageViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+    queryset = ChatMessage.objects.all()
+    serializer_class = ChatMessageSerializer
 
-    queryset = None
-    serializer_class = NestedChatMessageSerializer
-
-    def get_permissions(self):
-        if self.action == 'update':
-            self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
-
-    def get_queryset(self):
-        user = self.request.user
-        qs = ChatMessage.objects.filter(
-            author=user,
+    def get_queryset(self) -> QuerySet:
+        qs = super().get_queryset().filter(
+            chat__id=self.kwargs['chat_pk'],
+            chat__users__in=[self.request.user],
         )
-        if not user.is_staff:
-            return qs
-        if self.action == 'list':
-            return qs
-        return ChatMessage.objects.all()
+        # User can only edit their own messages
+        if self.action == 'partial_update':
+            qs = qs.filter(author=self.request.user)
+        return qs
 
-    def create(self, request, *args, **kwargs):
-        self.serializer_class = ChatMessageSerializer
-        return super().create(request, *args, **kwargs)
+    @extend_schema(
+        summary='Create message',
+        request=ChatMessageCreateRequestSerializer,
+    )
+    def create(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Create message for given chat ID.
+        Message will be created for current user.
+        """
 
-    def perform_create(self, serializer):
-        if self.request.user.is_staff:
-            return serializer.save()
-        # Regular user should not be able to set other author than themself
-        return serializer.save(author=self.request.user)
+        # NOTE: We rewrite the create method to make sure that chat is valid and author is current user.
+        serializer = ChatMessageCreateRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        obj = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        new_msg_serializer = self.get_serializer(instance=obj)
+        return Response(new_msg_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def perform_update(self, serializer):
-        if self.request.user.is_staff:
-            return serializer.save()
-        instance = self.get_object()
-        # Regular user should not be able to change chat
-        return serializer.save(chat=instance.chat)
+    @extend_schema(
+        summary='Update message',
+        request=ChatMessageUpdateRequestSerializer,
+    )
+    def partial_update(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Update content of given message.
+        """
 
-    def update(self, request, *args, **kwargs):
-        self.serializer_class = ChatMessageSerializer
-        return super().update(request, *args, **kwargs)
+        data_serializer = ChatMessageUpdateRequestSerializer(data=request.data)
+        data_serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(instance=self.get_object(), data=data_serializer.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data)
 
-    @action(methods=['get'], detail=False, url_path='all', permission_classes=[IsAdminUser])
-    def list_all(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def perform_create(self, serializer) -> ChatMessage:
+        # Regular user should not be able to set other author than themselves
+        return serializer.save(author=self.request.user, chat_id=self.kwargs['chat_pk'])

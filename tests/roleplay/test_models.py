@@ -4,31 +4,44 @@ import random
 import tempfile
 import unittest
 from datetime import timedelta
+from typing import TYPE_CHECKING
+from unittest.mock import MagicMock, patch
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-from tests import fake
-from tests.bot.helpers.constants import CHANNEL, LITECORD_API_URL, LITECORD_TOKEN
-from tests.utils import generate_place
+from tests.mocks import discord
+from tests.utils import fake
 
-Campaign = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
-PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Domain = apps.get_model(constants.ROLEPLAY_DOMAIN)
-Place = apps.get_model(constants.ROLEPLAY_PLACE)
-Race = apps.get_model(constants.ROLEPLAY_RACE)
-RaceUser = apps.get_model(constants.ROLEPLAY_RACE_USER)
-Session = apps.get_model(constants.ROLEPLAY_SESSION)
-User = apps.get_model(constants.REGISTRATION_USER)
+if TYPE_CHECKING:
+    from registration.models import User as UserModel
+    from roleplay.models import Domain as DomainModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import Race as RaceModel
+    from roleplay.models import RaceUser as RaceUserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
+    from roleplay.models import Session as SessionModel
+
+from ..utils import generate_place
+
+Campaign: 'CampaignModel' = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
+Domain: 'DomainModel' = apps.get_model(constants.ROLEPLAY_DOMAIN)
+Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
+PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+Race: 'RaceModel' = apps.get_model(constants.ROLEPLAY_RACE)
+RaceUser: 'RaceUserModel' = apps.get_model(constants.ROLEPLAY_RACE_USER)
+Session: 'SessionModel' = apps.get_model(constants.ROLEPLAY_SESSION)
+User: 'UserModel' = apps.get_model(constants.REGISTRATION_USER)
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -96,18 +109,15 @@ class TestDomain(TestCase):
 
 
 class TestPlace(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = Place
-        cls.enum = SiteTypes
+    model = Place
 
     def test_str_ok(self):
-        place = baker.make(self.model)
+        place = generate_place()
         self.assertEqual(str(place), place.name)
 
     def test_ok(self):
         entries = fake.pyint(min_value=1, max_value=100)
-        baker.make(self.model, entries)
+        generate_place(entries)
         self.assertEqual(entries, self.model.objects.count())
 
     @freeze_time('2020-01-01')
@@ -117,7 +127,7 @@ class TestPlace(TestCase):
         with open(tmpfile.name, 'rb') as image_data:
             image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
 
-        place = baker.make(self.model)
+        place = generate_place()
         place.image = image
         place.save()
         expected_path = '/media/roleplay/place/2020/01/01/{}/{}'.format(place.pk, image.name)
@@ -143,7 +153,7 @@ class TestPlace(TestCase):
 
         parent = None
         for image in images:
-            place = self.model.objects.create(name=fake.country(), parent_site=parent)
+            place = generate_place(name=fake.country(), parent_site=parent)
             place.image = image
             place.save()
             parent = place
@@ -158,116 +168,19 @@ class TestPlace(TestCase):
     def test_max_name_length_ko(self):
         name = fake.password(length=101)
         with self.assertRaises(DataError) as ex:
-            self.model.objects.create(name=name)
+            generate_place(name=name)
         self.assertRegex(str(ex.exception), r'.*value too long.*')
 
     def test_name_none_ko(self):
         with self.assertRaises(IntegrityError) as ex:
-            self.model.objects.create(name=None)
+            generate_place(name=None)
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
-
-    def test_is_house_ok(self):
-        place = baker.make(self.model, site_type=self.enum.HOUSE)
-        self.assertTrue(place.is_house)
-
-    def test_is_town_ok(self):
-        place = baker.make(self.model, site_type=self.enum.TOWN)
-        self.assertTrue(place.is_town)
-
-    def test_is_village_ok(self):
-        place = baker.make(self.model, site_type=self.enum.VILLAGE)
-        self.assertTrue(place.is_village)
-
-    def test_is_city_ok(self):
-        place = baker.make(self.model, site_type=self.enum.CITY)
-        self.assertTrue(place.is_city)
-
-    def test_is_metropolis_ok(self):
-        place = baker.make(self.model, site_type=self.enum.METROPOLIS)
-        self.assertTrue(place.is_metropolis)
-
-    def test_is_forest_ok(self):
-        place = baker.make(self.model, site_type=self.enum.FOREST)
-        self.assertTrue(place.is_forest)
-
-    def test_is_hills_ok(self):
-        place = baker.make(self.model, site_type=self.enum.HILLS)
-        self.assertTrue(place.is_hills)
-
-    def test_is_mountains_ok(self):
-        place = baker.make(self.model, site_type=self.enum.MOUNTAINS)
-        self.assertTrue(place.is_mountains)
-
-    def test_is_mines_ok(self):
-        place = baker.make(self.model, site_type=self.enum.MINES)
-        self.assertTrue(place.is_mines)
-
-    def test_is_river_ok(self):
-        place = baker.make(self.model, site_type=self.enum.RIVER)
-        self.assertTrue(place.is_river)
-
-    def test_is_sea_ok(self):
-        place = baker.make(self.model, site_type=self.enum.SEA)
-        self.assertTrue(place.is_sea)
-
-    def test_is_desert_ok(self):
-        place = baker.make(self.model, site_type=self.enum.DESERT)
-        self.assertTrue(place.is_desert)
-
-    def test_is_tundra_ok(self):
-        place = baker.make(self.model, site_type=self.enum.TUNDRA)
-        self.assertTrue(place.is_tundra)
-
-    def test_is_unusual_ok(self):
-        place = baker.make(self.model, site_type=self.enum.UNUSUAL)
-        self.assertTrue(place.is_unusual)
-
-    def test_is_island_ok(self):
-        place = baker.make(self.model, site_type=self.enum.ISLAND)
-        self.assertTrue(place.is_island)
-
-    def test_is_country_ok(self):
-        place = baker.make(self.model, site_type=self.enum.COUNTRY)
-        self.assertTrue(place.is_country)
-
-    def test_is_continent_ok(self):
-        place = baker.make(self.model, site_type=self.enum.CONTINENT)
-        self.assertTrue(place.is_continent)
-
-    def test_is_world_ok(self):
-        place = baker.make(self.model, site_type=self.enum.WORLD)
-        self.assertTrue(place.is_world)
 
     def test_resolve_icon(self):
         for site_type in self.model.ICON_RESOLVERS.keys():
-            obj = self.model.objects.create(name=fake.country(), site_type=site_type)
+            obj = generate_place(name=fake.country(), site_type=site_type)
             expected_url = '<i class="{}"></i>'.format(self.model.ICON_RESOLVERS.get(site_type, ''))
             self.assertEqual(expected_url, obj.resolve_icon())
-
-    def test_user_but_no_owner_save_ko(self):
-        user = baker.make(User)
-        with self.assertRaises(IntegrityError) as ex:
-            self.model.objects.create(
-                name=fake.city(),
-                user=user
-            )
-        self.assertEqual(str(ex.exception), 'a private world must have owner.')
-
-    def test_user_but_no_owner_clean_ko(self):
-        user = baker.make(User)
-        world = self.model.objects.create(
-            name=fake.city(),
-            user=user,
-            owner=user
-        )
-        world.owner = None
-
-        with self.assertRaises(ValidationError) as ex:
-            world.clean()
-        ex = ex.exception
-        self.assertIn('user', ex.error_dict)
-        message = ex.error_dict['user'][0].message
-        self.assertEqual(message, 'a private world must have owner.')
 
 
 class TestRace(TestCase):
@@ -343,10 +256,13 @@ class TestCampaign(TestCase):
     def test_discord_channel_empty_is_none(self):
         self.assertIsNone(self.instance.discord_channel)
 
-    @override_settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN)
-    def test_discord_channel_ok(self):
-        self.instance.discord_channel_id = CHANNEL
+    @patch('bot.utils.discord_api_request')
+    def test_discord_channel_ok(self, mocker_api_request: MagicMock):
+        discord_id = f'{fake.random_number(digits=18)}'
+        mocker_api_request.return_value = discord.channel_response(id=discord_id)
+        self.instance.discord_channel_id = discord_id
         self.instance.save()
+
         self.assertIsNotNone(self.instance.discord_channel)
 
     def test_vote_ok(self):

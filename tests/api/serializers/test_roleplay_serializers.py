@@ -1,17 +1,29 @@
+from typing import TYPE_CHECKING
+from unittest.mock import MagicMock, patch
+
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from model_bakery import baker
 
-from api.serializers.roleplay import DomainSerializer, PlaceSerializer, RaceSerializer
+from api.serializers.roleplay import CampaignSerializer, DomainSerializer, PlaceNestedSerializer, RaceSerializer
 from common.constants import models
-from tests import fake
+from tests.mocks import discord
+from tests.utils import fake
 
-Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-Race = apps.get_model(models.ROLEPLAY_RACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
-User = get_user_model()
+if TYPE_CHECKING:
+    from registration.models import User as UserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import Domain as DomainModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import Race as RaceModel
+    from roleplay.models import Session as SessionModel
+
+Domain: 'DomainModel' = apps.get_model(models.ROLEPLAY_DOMAIN)
+Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
+Race: 'RaceModel' = apps.get_model(models.ROLEPLAY_RACE)
+Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
+User: 'UserModel' = get_user_model()
 
 
 class TestDomainSerializer(TestCase):
@@ -48,7 +60,7 @@ class TestPlaceSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = Place
-        cls.serializer = PlaceSerializer
+        cls.serializer = PlaceNestedSerializer
 
     def test_empty_data_ok(self):
         qs = self.model.objects.all()
@@ -131,3 +143,26 @@ class TestRaceSerializer(TestCase):
 
         self.assertIsInstance(owners, list)
         self.assertListEqual([user.pk], owners)
+
+
+class TestCampaignSerializer(TestCase):
+    serializer_class = CampaignSerializer
+
+    def setUp(self):
+        self.instance: 'CampaignModel' = baker.make_recipe('roleplay.campaign')
+
+    def test_get_discord_channel_with_empty_discord_channel_id_ok(self):
+        serializer = self.serializer_class(self.instance)
+
+        self.assertIsNone(serializer.data['discord_channel'])
+
+    @patch('bot.utils.discord_api_request')
+    def test_get_discord_channel_with_discord_id_ok(self, mocker: MagicMock):
+        channel_id = f'{fake.random_number(digits=18)}'
+        self.instance.discord_channel_id = channel_id
+        self.instance.save(update_fields=['discord_channel_id'])
+        mocker.return_value = discord.channel_response(id=channel_id)
+
+        serializer = self.serializer_class(self.instance)
+
+        self.assertIsNotNone(serializer.data['discord_channel'])

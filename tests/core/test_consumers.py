@@ -3,7 +3,7 @@ from channels.testing import WebsocketCommunicator
 
 from api.serializers.common import WebSocketMessageSerializer
 from core.consumers import HandlerJsonWebsocketConsumer
-from tests import fake
+from tests.utils import fake
 
 
 class TestTypedConsumerMixin:
@@ -75,18 +75,3 @@ class TestHandlerJsonWebsocketConsumer:
         response = await communicator.receive_json_from()
 
         assert response == {'content': {'message': message}}
-
-
-@pytest.mark.asyncio
-async def test_websocket_handler_not_given_serializer_class_ko():
-    class ConsumerClass(HandlerJsonWebsocketConsumer):
-        pass
-
-    communicator = WebsocketCommunicator(ConsumerClass.as_asgi(), '/ws/test/')
-    data = {
-        'type': fake.word()
-    }
-    await communicator.send_json_to(data)
-
-    with pytest.raises(NotImplementedError):
-        await communicator.receive_json_from()

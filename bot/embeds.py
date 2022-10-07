@@ -1,106 +1,110 @@
-import json
+from datetime import datetime
+from typing import Optional
 
 from django.utils import timezone
+from pydantic import BaseModel, Field
 
 from bot.enums import EmbedTypes
 
 
-class Embed:
+class Embed(BaseModel):
     """
     An Embed object for Discord.
-
-    Parameters
-    ----------
-    title: :class:`str`
-        String	title of embed.
-    type: :class:`EmbedTypes`
-        Type of embed.
-    description: :class:`str`
-        String	description of embed.
-    url: :class:`str`
-        String	url of embed.
-    timestamp: :clas:`datetime`
-        ISO8601 timestamp timestamp of embed content.
-    color: :class:`int`
-        Integer	color code of the embed.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object.
     """
 
-    def __init__(self, title='', embed_type=EmbedTypes.RICH, description='', url='', timestamp=timezone.now(),
-                 color=0, footer=None):
-        self.title = title
-        self.embed_type = embed_type
-        self.description = description
-        self.url = url
-        self.timestamp = timestamp
-        self.color = color
-        self.footer = footer
-
-    @property
-    def data(self):
-        """
-        Transform this object into dictionary.
-        """
-
-        data = {
-            'title': self.title,
-            'type': self.embed_type.value,
-            'description': self.description,
-            'url': self.url,
-            'timestamp': str(self.timestamp),
-            'color': self.color
-        }
-
-        if self.footer:
-            data['footer'] = self.footer.data
-
-        return data
-
-    def to_json(self):
-        """
-        Transform this object into a Discord-like embed object.
-        """
-
-        data = self.data
-        return json.dumps(data)
+    title: Optional[str] = Field(default=None, max_length=256)
+    type: Optional[EmbedTypes] = None
+    description: Optional[str] = Field(default=None, max_length=4096)
+    url: Optional[str] = None
+    timestamp: Optional[datetime] = Field(default_factory=timezone.now)
+    color: Optional[int] = None
+    footer: Optional['EmbedFooter'] = None
+    image: Optional['EmbedImage'] = None
+    thumbnail: Optional['EmbedThumbnail'] = None
+    video: Optional['EmbedVideo'] = None
+    provider: Optional['EmbedProvider'] = None
+    author: Optional['EmbedAuthor'] = None
+    fields: Optional[list['EmbedField']] = None
 
 
-class EmbedFooter:
+class EmbedFooter(BaseModel):
     """
-    Object that translate into Discor-like object EmbedFooter.
-
-    Parameters
-    ----------
-    text: :class:`str`
-        String footer text.
-    icon_url: :class:`str`
-        String url of footer icon (only supports http(s) and attachments).
-    proxy_icon_url: :class:`str`
-        String a proxied url of footer icon.
+    Object that translate into Discord-like object EmbedFooter.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure.
     """
 
-    def __init__(self, text='', icon_url='', proxy_icon_url=''):
-        self.text = text
-        self.icon_url = icon_url
-        self.proxy_icon_url = proxy_icon_url
+    text: str = Field(max_length=2048)
+    icon_url: Optional[str] = None
+    proxy_icon_url: Optional[str] = None
 
-    @property
-    def data(self):
-        """
-        Transform this object into dictionary.
-        """
 
-        data = {
-            'text': self.text,
-            'icon_url': self.icon_url,
-            'proxy_icon_url': self.proxy_icon_url,
-        }
+class EmbedImage(BaseModel):
+    """
+    An Embed Image object from Discord.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure.
+    """
 
-        return data
+    url: str
+    proxy_url: Optional[str] = None
+    height: Optional[int] = None
+    width: Optional[int] = None
 
-    def to_json(self):
-        """
-        Transform this object into a Discord-like embed object.
-        """
 
-        data = self.data
-        return json.dumps(data)
+class EmbedThumbnail(BaseModel):
+    """
+    An Embed Thumbnail object from Discord.
+    For more information see
+    https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure.
+    """
+
+    url: str
+    proxy_url: Optional[str] = None
+    height: Optional[int] = None
+    width: Optional[int] = None
+
+
+class EmbedVideo(BaseModel):
+    """
+    An Embed Video object from Discord.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure.
+    """
+
+    url: str
+    proxy_url: Optional[str] = None
+    height: Optional[int] = None
+    width: Optional[int] = None
+
+
+class EmbedProvider(BaseModel):
+    """
+    An Embed Provider object from Discord.
+    For more information see
+    https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure.
+    """
+
+    name: Optional[str] = None
+    url: Optional[str] = None
+
+
+class EmbedAuthor(BaseModel):
+    """
+    An Embed Author object from Discord.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure.
+    """
+
+    name: str = Field(max_length=256)
+    url: Optional[str] = None
+    icon_url: Optional[str] = None
+    proxy_icon_url: Optional[str] = None
+
+
+class EmbedField(BaseModel):
+    """
+    An Embed Field object from Discord.
+    For more information see https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure.
+    """
+
+    name: str = Field(max_length=256)
+    value: str = Field(max_length=1024)
+    inline: Optional[bool] = None

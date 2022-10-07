@@ -54,21 +54,6 @@ SessionManager = models.Manager.from_queryset(SessionQuerySet)
 
 
 class PlaceQuerySet(TreeQuerySet):
-    def user_places(self, user):
-        """
-        :param user: Either a user ID or User instance.
-        :return: All the places related to that user.
-        """
-
-        return super().filter(user=user)
-
-    def own_places(self, user):
-        """
-        Return places where user is owner.
-        """
-
-        return super().filter(owner=user)
-
     def community_places(self):
         """
         Union places without user (community).
@@ -76,7 +61,7 @@ class PlaceQuerySet(TreeQuerySet):
         :return: A QuerySet with all community_places.
         """
 
-        return super().filter(user__isnull=True)
+        return super().filter(is_public=True)
 
     def worlds(self):
         return super().filter(site_type=SiteTypes.WORLD)

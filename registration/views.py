@@ -1,6 +1,6 @@
 import logging
 import random
-from smtplib import SMTPAuthenticationError, SMTPException
+from smtplib import SMTPException
 
 from crispy_forms import layout
 from django.conf import settings
@@ -11,13 +11,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponseForbidden
 from django.shortcuts import resolve_url
-from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView, TemplateView, UpdateView
 from rest_framework.authtoken.models import Token
 
 from common.templatetags.string_utils import capfirstletter as cfl
+from oar_email.utils import send_confirmation_email
 
 from . import forms, models
 from .mixins import RedirectAuthenticatedUserMixin
@@ -190,28 +190,10 @@ class ResendConfirmationEmailView(RedirectAuthenticatedUserMixin, FormView):
         token = token.make_token(user)
         return token
 
-    def send_email(self, user):
-        """
-        Resends a confirmation email to the user.
-        """
-
-        msg_html = render_to_string('email_templates/confirm_email.html', {
-            # We declare localhost as default for tests purposes
-            'domain': self.request.META.get('HTTP_HOST', 'http://localhost'),
-            'token': self.generate_token(user),
-            'object': user
-        })
-
-        try:
-            msg = cfl(_('welcome to %(title)s!')) % {'title': 'Oil & Rope'}
-            user.email_user(msg, '', html_message=msg_html)
-        except SMTPAuthenticationError:  # pragma: no cover
-            LOGGER.exception('Unable to logging email server with given credentials.')
-
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
         user = self.get_user(cleaned_data['email'])
-        self.send_email(user)
+        send_confirmation_email(self.request, user)
         messages.success(self.request, cfl(_('your confirmation email has been sent!')))
         return super().form_valid(form)
 

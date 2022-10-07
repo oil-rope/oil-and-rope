@@ -1,22 +1,13 @@
-from django.apps import apps
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from common.constants import models
+from chat.models import Chat, ChatMessage
 
 from .common import WebSocketMessageSerializer
 from .registration import SimpleUserSerializer
 
-User = get_user_model()
-ChatMessage = apps.get_model(models.CHAT_MESSAGE)
-Chat = apps.get_model(models.CHAT)
-
 
 class ChatMessageSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault(),
-    )
+    author = author = SimpleUserSerializer(many=False, read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         model = ChatMessage
@@ -25,12 +16,14 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         )
 
 
-class NestedChatMessageSerializer(ChatMessageSerializer):
-    """
-    More handy serializer for `JSON` instances. Not able to be writable.
-    """
+class ChatMessageCreateRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatMessage
+        fields = ('message',)
 
-    author = SimpleUserSerializer(many=False, read_only=True, default=serializers.CurrentUserDefault())
+
+class ChatMessageUpdateRequestSerializer(ChatMessageCreateRequestSerializer):
+    pass
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -41,14 +34,10 @@ class ChatSerializer(serializers.ModelSerializer):
         )
 
 
-class NestedChatSerializer(ChatSerializer):
-    chat_message_set = NestedChatMessageSerializer(many=True, read_only=True)
-
-
 class WebSocketChatSerializer(WebSocketMessageSerializer):
     chat = serializers.PrimaryKeyRelatedField(
         queryset=Chat.objects.all(),
         required=True,
     )
     message = serializers.CharField(max_length=255, required=False)
-    content = NestedChatMessageSerializer(many=False, read_only=True)
+    content = ChatMessageSerializer(many=False, read_only=True)

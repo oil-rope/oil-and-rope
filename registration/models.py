@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from dateutil.relativedelta import relativedelta
 from django.apps import apps
 from django.conf import settings
@@ -14,6 +16,10 @@ from bot.models import User as DiscordUser
 from common.constants import models as constants
 from common.files.upload import default_upload_to
 from core.models import TracingMixin
+
+if TYPE_CHECKING:
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import Session as SessionModel
 
 
 class User(AbstractUser):
@@ -38,7 +44,7 @@ class User(AbstractUser):
 
     @property
     def sessions(self):
-        Session = apps.get_model(constants.ROLEPLAY_SESSION)
+        Session: 'SessionModel' = apps.get_model(constants.ROLEPLAY_SESSION)
         sessions = Session.objects.filter(campaign__users__in=[self])
         return sessions
 
@@ -48,9 +54,9 @@ class User(AbstractUser):
         verbose_name_plural = _('users')
 
     def accessible_places(self):
-        Place = apps.get_model(constants.ROLEPLAY_PLACE)
+        Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
         community_places = Place.objects.community_places()
-        private_places = Place.objects.user_places(self)
+        private_places = Place.objects.filter(is_public=False, owner=self)
         return community_places | private_places
 
     def get_absolute_url(self):
@@ -100,8 +106,8 @@ class Profile(TracingMixin):
 
     @property
     def age(self):
-        rdelta = relativedelta(timezone.datetime.today().date(), self.birthday)
-        return rdelta.years
+        r_delta = relativedelta(timezone.datetime.today().date(), self.birthday)
+        return r_delta.years
 
     # Metadata
     class Meta:

@@ -1,4 +1,5 @@
 from distutils.util import strtobool as to_bool
+from typing import TYPE_CHECKING
 
 from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,8 +10,13 @@ from django.views.generic import View
 
 from common.constants import models as constants
 
-ContentType = apps.get_model(constants.CONTENT_TYPE)
-Vote = apps.get_model(constants.COMMON_VOTE)
+if TYPE_CHECKING:
+    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
+
+    from common.models import Vote as VoteModel
+
+ContentType: 'ContentTypeModel' = apps.get_model(constants.CONTENT_TYPE)
+Vote: 'VoteModel' = apps.get_model(constants.COMMON_VOTE)
 
 
 class ResolverView(View):
@@ -56,6 +62,7 @@ class VoteView(LoginRequiredMixin, View):
 
     def get_vote(self):
         self.object = self.get_object()
+        obj: 'VoteModel'
         obj, created = Vote.objects.get_or_create(
             user=self.request.user,
             content_type=self.get_content_type(),

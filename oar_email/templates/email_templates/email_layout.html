@@ -29,7 +29,7 @@
 
     {# NOTE: On the other hand, if links are allowed styles should come from CDN #}
     <!-- Styles imported -->
-    <link rel="stylesheet" href="https://cdn.oilandrope-project.com/v2.0.0/css/oilandrope.css">
+    <link rel="stylesheet" href="{{ CUSTOMS_STATIC_URL|add:'/css/oilandrope.css' }}">
     {% block style %}
     {% endblock style %}
 

@@ -1,9 +1,8 @@
-from ..viewsets.registration import BotViewSet, ProfileViewSet, UserViewSet
-from .routers import OilAndRopeDefaultRouter
+from django.urls import path
 
-router = OilAndRopeDefaultRouter()
-router.register(prefix=r'user', viewset=UserViewSet, basename='user')
-router.register(prefix=r'profile', viewset=ProfileViewSet, basename='profile')
-router.register(prefix=r'bot', viewset=BotViewSet, basename='bot')
+from ..viewsets.registration import BotViewSet, UserViewSet
 
-urls = router.urls
+urls = [
+    path('user/', UserViewSet.as_view(), name='user'),
+    path('bot/', BotViewSet.as_view(), name='bot'),
+]

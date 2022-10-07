@@ -1,8 +1,10 @@
+from typing import Optional
+
 from ckeditor.fields import RichTextField
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, models
+from django.db import models
 from django.shortcuts import resolve_url
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -76,13 +78,15 @@ class Place(MPTTModel, TracingMixin):
         Path to the image.
     parent_site: :class:`int`
        If the place is child of another Place, this is where it can be settled.
-    user: :class:`registration.User`
-        Declares this maps belongs to a user.
     owner: :class:`registration.User`
         The person who created this map.
+    is_public: :class:`bool`
+        Declares if Place is public.
     """
 
     ICON_RESOLVERS = ICON_RESOLVERS
+
+    objects = managers.PlaceManager()
 
     name = models.CharField(verbose_name=_('name'), max_length=100, null=False, blank=False)
     description = RichTextField(verbose_name=_('description'), null=False, blank=True)
@@ -96,16 +100,11 @@ class Place(MPTTModel, TracingMixin):
         to='self', verbose_name=_('parent site'), on_delete=models.CASCADE, null=True, blank=True,
         related_name='children_sites', db_index=True
     )
-    user = models.ForeignKey(
-        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='places', verbose_name=_('user'),
-        blank=True, null=True, db_index=True
-    )
     owner = models.ForeignKey(
-        to=constants.REGISTRATION_USER, on_delete=models.SET_NULL, related_name='places_owned', verbose_name=_('owner'),
-        blank=True, null=True, db_index=True
+        to=constants.REGISTRATION_USER, on_delete=models.CASCADE, related_name='place_set', verbose_name=_('owner'),
+        db_index=True,
     )
-
-    objects = managers.PlaceManager()
+    is_public = models.BooleanField(verbose_name=_('public'), default=False)
 
     @cached_property
     def images(self):
@@ -200,17 +199,6 @@ class Place(MPTTModel, TracingMixin):
         verbose_name = _('place')
         verbose_name_plural = _('places')
         ordering = ['name', '-entry_created_at', '-entry_updated_at']
-
-    def clean(self):
-        if self.user and not self.owner:
-            raise ValidationError({
-                'user': _('a private world must have owner') + '.'
-            })
-
-    def save(self, *args, **kwargs):
-        if self.user and not self.owner:
-            raise IntegrityError(_('a private world must have owner') + '.')
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -350,7 +338,7 @@ class Campaign(TracingMixin):
         This user can and can be not a player of the campaign.
     is_public: Optional[:class:`bool`]
         Declares if the campaign is public or not.
-    players: List[:class:`~registration.models.User`]
+    users: List[:class:`~registration.models.User`]
         List of players that are part of the campaign.
     place: :class:`~roleplay.models.Place`
         World where the campaign is happening.
@@ -419,7 +407,7 @@ class Campaign(TracingMixin):
     game_masters = cached_property(get_game_masters)
 
     @property
-    def discord_channel(self):
+    def discord_channel(self) -> Optional[Channel]:
         if self.discord_channel_id:
             return Channel(id=self.discord_channel_id)
         return None

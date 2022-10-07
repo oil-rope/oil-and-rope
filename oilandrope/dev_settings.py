@@ -2,9 +2,15 @@ from .settings import *
 
 # Dummy KEY needed by python
 SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
-
 DEBUG = True
 ALLOWED_HOSTS = []
+CSRF_COOKIE_DOMAIN = None
+CSRF_TRUSTED_ORIGINS = []
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_SECURE = False
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 # NOTE: Needed for `debug_toolbar`
 INTERNAL_IPS = [
@@ -42,6 +48,7 @@ CHANNEL_LAYERS = {
 SHELL_PLUS_PRINT_SQL = True
 SHELL_PLUS_IMPORTS = [
     'from bot.enums import ChannelTypes, EmbedTypes, HttpMethods, MessageTypes',
+    'from bot.models import Channel as DiscordChannel, Message as DiscordMessage, User as DiscordUser',
     'from common.enums import AvailableIcons, JavaScriptActions, WebSocketCloseCodes',
     'from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes',
 ]
@@ -50,3 +57,5 @@ SHELL_PLUS_IMPORTS = [
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
 
 SHOW_COLLAPSED = True
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'

@@ -1,4 +1,5 @@
 import logging
+from typing import TYPE_CHECKING
 
 from django.apps import apps
 from django.conf import settings
@@ -22,22 +23,34 @@ from common.mixins import OwnerRequiredMixin
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from roleplay.managers import PlaceQuerySet
 
 from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
 from .mixins import UserInAllWithRelatedNameMixin
 from .utils.invitations import send_campaign_invitations
 
+if TYPE_CHECKING:
+    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
+
+    from common.models import Vote as VoteModel
+    from registration.models import User as UserModel
+    from roleplay.models import Campaign as CampaignModel
+    from roleplay.models import Place as PlaceModel
+    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
+    from roleplay.models import Race as RaceModel
+    from roleplay.models import Session as SessionModel
+
 LOGGER = logging.getLogger(__name__)
 
-ContentType = apps.get_model(models.CONTENT_TYPE)
-Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-PlayerInCampaign = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Race = apps.get_model(models.ROLEPLAY_RACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
-User = get_user_model()
-Vote = apps.get_model(models.COMMON_VOTE)
+Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
+ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
+Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
+PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+Race: 'RaceModel' = apps.get_model
+Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
+User: 'UserModel' = get_user_model()
+Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -94,14 +107,13 @@ class PlaceDetailView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        user = request.user
 
         # Community world
-        if not self.object.user or not self.object.owner:
+        if self.object.is_public:
             return response
 
         # Private world
-        if user == self.object.user:
+        if not self.object.is_public and self.object.owner == request.user:
             return response
 
         return HttpResponseForbidden()
@@ -121,15 +133,20 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
     queryset = Place.objects.filter(site_type=enums.SiteTypes.WORLD)
     template_name = 'roleplay/world/world_list.html'
 
-    def get_user_worlds(self):
+    def get_queryset(self) -> PlaceQuerySet:
+        return super().get_queryset().filter(site_type=enums.SiteTypes.WORLD)
+
+    def get_private_worlds(self):
         user = self.request.user
-        return self.model.objects.user_places(user=user.id).filter(site_type=self.enum.WORLD)
+        qs = self.get_queryset()
+        return qs.filter(owner=user, is_public=False)
 
     def get_community_worlds(self):
-        return self.model.objects.community_places().filter(site_type=self.enum.WORLD)
+        qs = self.get_queryset()
+        return qs.community_places()
 
     def paginate_user_worlds(self, page_size):
-        queryset = self.get_user_worlds()
+        queryset = self.get_private_worlds()
         page_kwarg = self.user_worlds_page_kwarg
         return self.paginate_queryset_by_page_kwarg(queryset, page_size, page_kwarg)
 
@@ -144,7 +161,7 @@ class WorldListView(LoginRequiredMixin, MultiplePaginatorListView):
         queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
 
-        user_worlds = self.get_user_worlds()
+        user_worlds = self.get_private_worlds()
         context['user_worlds'] = user_worlds
 
         community_worlds = self.get_community_worlds()
@@ -193,15 +210,15 @@ class WorldCreateView(LoginRequiredMixin, CreateView):
         })
         if 'user' in self.request.GET:
             kwargs.update({
-                'user': user
+                'public': False
             })
         return kwargs
 
     def get_form(self, form_class=None):
-        form = super().get_form(form_class)
+        form: forms.WorldForm = super().get_form(form_class)
         form.helper.form_action = resolve_url('roleplay:world:create')
         # NOTE: Since user is gotten from '?user' QueryParam, `form_action` must replicate this behavior
-        if form.user:
+        if form.public:
             form.helper.form_action = f'{form.helper.form_action}?user'
         return form
 
@@ -213,6 +230,7 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        self.object: 'PlaceModel'
         kwargs.update({
             'owner': self.object.owner,
             'submit_text': _('update').capitalize()

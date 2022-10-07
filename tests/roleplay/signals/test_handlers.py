@@ -6,7 +6,7 @@ from model_bakery import baker
 
 from common.constants import models
 from roleplay.enums import RoleplaySystems
-from tests import fake
+from tests.utils import fake
 
 Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
 

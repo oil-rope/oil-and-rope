@@ -64,6 +64,9 @@ class AvailableIcons(models.TextChoices):
     THUMBS_DOWN_FILL = '<i class="bi bi-hand-thumbs-down-fill"></i>', _('thumbs down fill')
     INFO = '<i class="bi bi-info"></i>', _('info')
     INFO_LG = '<i class="bi bi-info-lg"></i>', _('info lg')
+    CODE_SLASH = '<i class="bi bi-code-slash"></i>', _('code slash')
+    FILE_EARMARK_CODE = '<i class="bi bi-file-earmark-code"></i>', _('file earmark code')
+    BOX_ARROW_UP_RIGHT = '<i class="bi bi-box-arrow-up-right"></i>', _('box arrow up right')
 
     @classmethod
     def choices_with_empty(cls):

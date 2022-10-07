@@ -1,8 +1,8 @@
 import os
 import random
 import tempfile
-import unittest
 from smtplib import SMTPException
+from unittest.mock import MagicMock, patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -14,9 +14,7 @@ from PIL import Image
 
 from common.utils import create_faker
 from registration import forms
-
-from ..bot.helpers.constants import LITECORD_API_URL, LITECORD_TOKEN, USER_WITH_SAME_SERVER
-from ..utils import check_litecord_connection
+from tests.mocks import discord
 
 fake = create_faker()
 
@@ -63,20 +61,23 @@ class TestSignUpForm(TestCase):
             'password1': password,
             'password2': password,
         }
-        self.request = RequestFactory().get('/')
+
+        request = self.client.get('/').wsgi_request
+        self.request = request
 
     def test_form_ok(self):
         form = forms.SignUpForm(self.request, data=self.data_ok)
         self.assertTrue(form.is_valid(), 'Form is invalid.')
 
-    @unittest.skipIf(not check_litecord_connection(), 'Litecord is unreachable.')
-    def test_discord_id_exists_ok(self):
+    @patch('bot.utils.discord_api_request')
+    def test_discord_id_exists_ok(self, mocker_discord_request: MagicMock):
+        discord_id = f'{fake.random_number(digits=18)}'
+        mocker_discord_request.return_value = discord.user_response(id=discord_id)
         data = self.data_ok.copy()
-        data['discord_id'] = USER_WITH_SAME_SERVER
+        data['discord_id'] = discord_id
 
-        with self.settings(DISCORD_API_URL=LITECORD_API_URL, BOT_TOKEN=LITECORD_TOKEN):
-            form = forms.SignUpForm(self.request, data=data)
-            self.assertTrue(form.is_valid())
+        form = forms.SignUpForm(self.request, data=data)
+        self.assertTrue(form.is_valid())
 
     def test_discord_id_is_discriminator_ko(self):
         data = self.data_ok.copy()
