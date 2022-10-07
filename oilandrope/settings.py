@@ -44,6 +44,11 @@ else:
 
 CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
 
+# Cookie secure should be always True on production
+# https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-cookie-secure
+
+CSRF_COOKIE_SECURE = to_bool(os.getenv('CSRF_COOKIE_SECURE', 'True'))
+
 # Defines Admins
 # https://docs.djangoproject.com/en/stable/ref/settings/#admins
 
@@ -276,14 +281,19 @@ LOCALE_PATHS = [
 
 SESSION_COOKIE_AGE = 172800
 
-# Session accessible from JavaScript
+# Cookie for Session shouldn't be accessible from JavaScript
 # https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-httponly
 
-SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-samesite
 
 SESSION_COOKIE_SAMESITE = 'Lax'
+
+# Cookie for session should be always secure on production
+# https://docs.djangoproject.com/en/4.1/ref/settings/#session-cookie-secure
+
+SESSION_COOKIE_SECURE = to_bool(os.getenv('SESSION_COOKIE_SECURE', 'True'))
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-domain
 

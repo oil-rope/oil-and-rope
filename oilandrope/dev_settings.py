@@ -2,9 +2,15 @@ from .settings import *
 
 # Dummy KEY needed by python
 SECRET_KEY = 'de68z30c(3nbj*k4=lumea8hztcy_6%d0epx^w$jc&s)wygezo'
-
 DEBUG = True
 ALLOWED_HOSTS = []
+CSRF_COOKIE_DOMAIN = None
+CSRF_TRUSTED_ORIGINS = []
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_SECURE = False
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 
 # NOTE: Needed for `debug_toolbar`
 INTERNAL_IPS = [
