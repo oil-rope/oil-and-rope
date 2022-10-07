@@ -210,6 +210,8 @@ class Race(TracingMixin):
 
     Parameters
     ----------
+    id: :class:`int`
+        The identifier of the race.
     name: :class:`str`
         Name of the race.
     description: :class:`str`
@@ -234,6 +236,7 @@ class Race(TracingMixin):
         Users that have this race.
     """
 
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
     name = models.CharField(verbose_name=_('name'), max_length=50)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     strength = models.SmallIntegerField(verbose_name=_('strength'), default=0)
