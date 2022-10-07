@@ -567,7 +567,7 @@ class TestWorldUpdateView(TestCase):
         os.unlink(cls.tmp_file.name)
 
     def setUp(self) -> None:
-        self.world = generate_place(owner=self.user)
+        self.world: 'PlaceModel' = generate_place(owner=self.user)
         self.url = resolve_url(self.resolver, pk=self.world.pk)
         self.data = {
             'name': fake.sentence(nb_words=3),
@@ -592,6 +592,35 @@ class TestWorldUpdateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
+
+    def test_private_world_remains_private_after_update_ok(self):
+        """
+        This tests comes from the bug that happened twice about Worlds becoming `public` when performing update.
+        It's more defensive programming than a functional test itself.
+        """
+
+        self.world.is_public = False
+        self.world.save(update_fields=['is_public'])
+
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data)
+        self.world.refresh_from_db()
+
+        self.assertFalse(self.world.is_public)
+
+    def test_public_world_remains_public_after_update_ok(self):
+        """
+        This test is the counter-part to `test_private_world_remains_private_after_update_ok`.
+        """
+
+        self.world.is_public = True
+        self.world.save(update_fields=['is_public'])
+
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data)
+        self.world.refresh_from_db()
+
+        self.assertTrue(self.world.is_public)
 
 
 class TestCampaignCreateView(TestCase):
