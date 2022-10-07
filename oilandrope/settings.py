@@ -45,9 +45,13 @@ else:
 CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
 
 # Cookie secure should be always True on production
-# https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-cookie-secure
+# https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-secure
 
 CSRF_COOKIE_SECURE = to_bool(os.getenv('CSRF_COOKIE_SECURE', 'True'))
+
+# https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-domain
+
+CSRF_COOKIE_DOMAIN = os.getenv('CSRF_COOKIE_DOMAIN', '.oilandrope-project.com')
 
 # Defines Admins
 # https://docs.djangoproject.com/en/stable/ref/settings/#admins
@@ -291,17 +295,13 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Cookie for session should be always secure on production
-# https://docs.djangoproject.com/en/4.1/ref/settings/#session-cookie-secure
+# https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-secure
 
 SESSION_COOKIE_SECURE = to_bool(os.getenv('SESSION_COOKIE_SECURE', 'True'))
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-domain
 
-SESSION_COOKIE_DOMAIN_ENVIRON = os.getenv('SESSION_COOKIE_DOMAIN')
-if SESSION_COOKIE_DOMAIN_ENVIRON:
-    SESSION_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN_ENVIRON
-else:
-    SESSION_COOKIE_DOMAIN = ALLOWED_HOSTS
+SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN', '.oilandrope-project.com')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/stable/howto/static-files/
