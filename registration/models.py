@@ -29,6 +29,10 @@ class User(AbstractUser):
         verbose_name=_('discord identifier'), max_length=100, null=False, blank=True,
     )
 
+    @classmethod
+    def get_bot(cls):
+        return cls.objects.get(username='Oil & Rope Bot')
+
     @property
     def discord_user(self):
         if not self.discord_id:
@@ -48,11 +52,6 @@ class User(AbstractUser):
         sessions = Session.objects.filter(campaign__users__in=[self])
         return sessions
 
-    class Meta:
-        db_table = 'auth_user'
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-
     def accessible_places(self):
         Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
         community_places = Place.objects.community_places()
@@ -61,6 +60,11 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return resolve_url('registration:user:edit', pk=self.pk)
+
+    class Meta:
+        db_table = 'auth_user'
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
 
 
 class Profile(TracingMixin):
