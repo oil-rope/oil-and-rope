@@ -2,13 +2,11 @@ import os
 import random
 import tempfile
 import time
-from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
@@ -19,30 +17,14 @@ from model_bakery import baker
 from PIL import Image
 
 from common import tools
-from common.constants import models
+from common.models import Vote
+from registration.models import User
 from roleplay import enums, views
+from roleplay.models import Campaign, Place, Session
 from tests.mocks import discord
 from tests.utils import fake
 
 from ..utils import generate_place
-
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
-
-    from common.models import Vote as VoteModel
-    from registration.models import User as UserModel
-    from roleplay.models import Campaign as CampaignModel
-    from roleplay.models import Place as PlaceModel
-    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
-    from roleplay.models import Session as SessionModel
-
-Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
-Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
-PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
-User: 'UserModel' = get_user_model()
-Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class TestPlaceCreateView(TestCase):
@@ -460,7 +442,7 @@ class TestWorldCreateView(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+        cls.user: User = baker.make_recipe('registration.user')
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -548,7 +530,7 @@ class TestWorldUpdateView(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+        cls.user: User = baker.make_recipe('registration.user')
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -567,7 +549,7 @@ class TestWorldUpdateView(TestCase):
         os.unlink(cls.tmp_file.name)
 
     def setUp(self) -> None:
-        self.world: 'PlaceModel' = generate_place(owner=self.user)
+        self.world: Place = generate_place(owner=self.user)
         self.url = resolve_url(self.resolver, pk=self.world.pk)
         self.data = {
             'name': fake.sentence(nb_words=3),
@@ -678,6 +660,21 @@ class TestCampaignCreateView(TestCase):
         self.assertEqual(self.user, campaign.owner)
         self.assertEqual(self.world, campaign.place)
 
+    def test_game_master_is_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data_ok)
+        campaign = Campaign.objects.get(owner__pk=self.user.pk)
+
+        self.assertIn(self.user, campaign.chat.users.all())
+
+    def test_bot_is_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data_ok)
+        campaign = Campaign.objects.get(owner__pk=self.user.pk)
+        bot = User.get_bot()
+
+        self.assertIn(bot, campaign.chat.users.all())
+
     def test_email_invitations_are_sent_ok(self):
         data = self.data_ok.copy()
         n_emails = 3
@@ -698,8 +695,8 @@ class TestCampaignJoinView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make_recipe('registration.user')
-        cls.instance = baker.make_recipe('roleplay.campaign')
+        cls.user: User = baker.make_recipe('registration.user')
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
         cls.signer = TimestampSigner()
 
     def test_access_with_correct_token_and_existing_user_ok(self):
@@ -757,6 +754,14 @@ class TestCampaignJoinView(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
+
+    def test_users_are_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        self.client.get(url)
+
+        self.assertIn(self.user, self.instance.chat.users.all())
 
 
 class TestCampaignListView(TestCase):
