@@ -796,12 +796,6 @@ class TestCampaignLeaveView(TestCase):
 
         self.assertRedirects(response=response, expected_url=expected_url)
 
-    def test_user_is_removed_from_campaign_ok(self):
-        self.client.force_login(self.user)
-        self.client.get(self.url)
-
-        self.assertNotIn(self.user, self.instance.users.all())
-
     @patch('roleplay.views.messages')
     def test_user_gets_success_message_ok(self, mock_messages: MagicMock):
         self.client.force_login(self.user)
@@ -811,6 +805,18 @@ class TestCampaignLeaveView(TestCase):
             response.wsgi_request,
             'You have left the campaign.'
         )
+
+    def test_user_is_removed_from_campaign_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.user, self.instance.users.all())
+
+    def test_user_is_removed_from_campaign_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.user, self.instance.chat.users.all())
 
 
 class TestCampaignListView(TestCase):
