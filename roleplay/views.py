@@ -1,10 +1,12 @@
 import logging
+from typing import Any, Optional
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.signing import BadSignature, TimestampSigner
+from django.db import models
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
@@ -303,6 +305,32 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
         instance.users.add(user)
         messages.success(self.request, _('you have joined the campaign.').capitalize())
         return resolve_url(instance)
+
+
+class CampaignLeaveView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    """
+    This view will remove the logged user from players in campaign.
+    """
+
+    model = Campaign
+    url: Optional[str] = reverse_lazy('roleplay:campaign:list')
+
+    def get_queryset(self) -> models.query.QuerySet[Any]:
+        qs: models.query.QuerySet[Campaign] = super().get_queryset()
+        qs = qs.filter(
+            users=self.request.user,
+        )
+        return qs
+
+    def remove_user_from_campaign(self):
+        obj: Campaign = self.get_object()
+        obj.users.remove(self.request.user)
+        return
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any) -> Optional[str]:
+        self.remove_user_from_campaign()
+        messages.success(self.request, _('you have left the campaign.').capitalize())
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class CampaignComplexQuerySetMixin:

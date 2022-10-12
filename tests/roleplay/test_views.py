@@ -764,6 +764,55 @@ class TestCampaignJoinView(TestCase):
         self.assertIn(self.user, self.instance.chat.users.all())
 
 
+class TestCampaignLeaveView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:leave'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
+        cls.url = resolve_url(cls.resolver, pk=cls.instance.pk)
+
+    def setUp(self) -> None:
+        self.user: User = baker.make_recipe('registration.user')
+        self.instance.users.add(self.user)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_user_not_in_campaign_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_user_in_campaign_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        expected_url = resolve_url('roleplay:campaign:list')
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    def test_user_is_removed_from_campaign_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.user, self.instance.users.all())
+
+    @patch('roleplay.views.messages')
+    def test_user_gets_success_message_ok(self, mock_messages: MagicMock):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'You have left the campaign.'
+        )
+
+
 class TestCampaignListView(TestCase):
     model = Campaign
     login_url = resolve_url(settings.LOGIN_URL)
