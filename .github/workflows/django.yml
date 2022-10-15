@@ -79,7 +79,7 @@ jobs:
 
       - name: Check translations
         run: |
-          apt-get install gettext
+          sudo apt-get install gettext
           poetry run ./manage.py makemessages -l es
           git diff --exit-code
 
