@@ -42,7 +42,7 @@ class ApiVersionView(GenericAPIView):
                 'version': get_version(),
                 'powered_by': drf_title,
                 'drf_version': drf_version,
-                'using_version': request.version or _('not versioning supported').capitalize(),
+                'using_version': request.version or _('versioning is not supported').capitalize(),
             }
         )
         serializer.is_valid(raise_exception=True)
