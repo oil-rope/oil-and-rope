@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Type
 
 from django.conf import settings
 from django.contrib import messages
@@ -23,7 +23,7 @@ from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
 from registration.models import User
-from roleplay.managers import PlaceQuerySet
+from roleplay.managers import CampaignQuerySet, PlaceQuerySet
 from roleplay.models import Campaign, Place, PlayerInCampaign, Session
 
 from . import enums, filters, forms
@@ -312,11 +312,11 @@ class CampaignLeaveView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
     This view will remove the logged user from players in campaign.
     """
 
-    model = Campaign
+    model: Type[models.Model] = Campaign
     url: Optional[str] = reverse_lazy('roleplay:campaign:list')
 
     def get_queryset(self) -> models.query.QuerySet[Any]:
-        qs: models.query.QuerySet[Campaign] = super().get_queryset()
+        qs: CampaignQuerySet = super().get_queryset()
         qs = qs.filter(
             users=self.request.user,
         )
@@ -331,6 +331,32 @@ class CampaignLeaveView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
         self.remove_user_from_campaign()
         messages.success(self.request, _('you have left the campaign.').capitalize())
         return super().get_redirect_url(*args, **kwargs)
+
+
+class CampaignRemovePlayerView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    model: Type[models.Model] = Campaign
+
+    def get_queryset(self) -> models.query.QuerySet[Any]:
+        qs: CampaignQuerySet = super().get_queryset().filter(
+            users=self.request.user.pk,
+            player_in_campaign_set__is_game_master=True,
+        )
+
+        return qs
+
+    def get_user(self):
+        user = User.objects.get(pk=self.kwargs['user_pk'])
+        return user
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any) -> Optional[str]:
+        self.object: Campaign = self.get_object()
+        user = self.get_user()
+        self.object.users.remove(user)
+        messages.success(
+            request=self.request,
+            message=_('you have removed %(user)s from campaign.').capitalize() % {'user': user.username}
+        )
+        return resolve_url(self.object)
 
 
 class CampaignComplexQuerySetMixin:
