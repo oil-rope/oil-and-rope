@@ -1150,10 +1150,10 @@ class TestCampaignDetailView(TestCase):
         cls.world = generate_place(site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.private_campaign = baker.make_recipe('roleplay.private_campaign', place=self.world)
+        self.private_campaign: Campaign = baker.make_recipe('roleplay.private_campaign', place=self.world)
         self.private_campaign.users.add(self.user)
         self.private_campaign_url = resolve_url(self.private_campaign)
-        self.public_campaign = baker.make_recipe('roleplay.public_campaign', place=self.world)
+        self.public_campaign: Campaign = baker.make_recipe('roleplay.public_campaign', place=self.world)
         self.public_campaign_url = resolve_url(self.public_campaign)
 
     def test_access_anonymous_ko(self):
@@ -1287,6 +1287,22 @@ class TestCampaignDetailView(TestCase):
         response = self.client.get(self.private_campaign_url)
 
         self.assertContains(response=response, text='Leave')
+
+    def test_player_dont_see_create_session_button_in_campaign_with_sessions_ok(self):
+        baker.make_recipe('roleplay.session', campaign=self.private_campaign)
+        self.client.force_login(self.user)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertNotContains(response=response, text='Create session')
+
+    def test_game_master_sees_create_session_button_in_campaign_with_sessions_ok(self):
+        baker.make_recipe('roleplay.session', campaign=self.private_campaign)
+        gm = baker.make_recipe('registration.user')
+        self.private_campaign.add_game_masters(gm)
+        self.client.force_login(gm)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response=response, text='Create session')
 
 
 class TestCampaignDeleteView(TestCase):

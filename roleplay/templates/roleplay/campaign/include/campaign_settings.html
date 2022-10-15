@@ -214,34 +214,34 @@
   </div>
 </section>
 
-<hr class="text-danger">
-<section class="row justify-content-around px-2">
-  <h3 class="text-center text-danger fw-light mb-4">
-    {% translate "danger zone"|capfirst %}
-  </h3>
-  {% if request.user in campaign.users.all %}
-    <a
-      href="{% url 'roleplay:campaign:leave' campaign.pk %}"
-      class="col mb-3 col-md-4 col-lg-3 btn btn-danger"
-      title="{% translate "leave this campaign"|capfirst %}"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-    >
-      <i class="bi-box-arrow-left"></i>
-      {% translate "leave"|capfirst %}
-    </a>
-  {% endif %}
-  <div class="w-100"></div>
-  {% if request.user == campaign.owner %}
-    <a
-      href="{% url 'roleplay:campaign:delete' campaign.pk %}"
-      class="col col-md-4 col-lg-3 btn btn-danger"
-      title="{% translate "delete this campaign"|capfirst %}"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-    >
-      {{ ICONS.TRASH|safe }}
-      {% translate "delete"|capfirst %}
-    </a>
-  {% endif %}
-</section>
+{% if request.user in campaign.users.all %}
+  <hr class="text-danger">
+  <section class="row justify-content-around px-2">
+    <h3 class="text-center text-danger fw-light mb-4">
+      {% translate "danger zone"|capfirst %}
+    </h3>
+      <a
+        href="{% url 'roleplay:campaign:leave' campaign.pk %}"
+        class="col mb-3 col-md-4 col-lg-3 btn btn-danger"
+        title="{% translate "leave this campaign"|capfirst %}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+      >
+        <i class="bi-box-arrow-left"></i>
+        {% translate "leave"|capfirst %}
+      </a>
+      <div class="w-100"></div>
+      {% if request.user == campaign.owner %}
+      <a
+        href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+        class="col col-md-4 col-lg-3 btn btn-danger"
+        title="{% translate "delete this campaign"|capfirst %}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        >
+        {{ ICONS.TRASH|safe }}
+        {% translate "delete"|capfirst %}
+      </a>
+    {% endif %}
+  </section>
+{% endif %}
