@@ -77,6 +77,16 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
+      - name: Check translations
+        run: |
+          poetry run ./manage.py makemessages -l es
+          git diff --exit-code
+
+      - name: Django Check
+        run: |
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
+
       # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
       # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
@@ -93,11 +103,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # CI can continue without Codecov
           verbose: true
-
-      - name: Django Check
-        run: |
-          poetry run ./manage.py migrate
-          poetry run ./manage.py check
 
   build-and-push:
     name: Build Images and Push
