@@ -32,15 +32,17 @@
                 <i class="ic ic-quill"></i>
                 {{ session.name }}
               </a>
-              <div class="my-2"></div>
-              <a
-                class="small link-info text-decoration-none"
-                href="{{ TABLETOP_URL }}/campaign/{{ session.campaign.pk }}"
-                target="_blank"
-              >
-                <i class="ic ic-dice"></i>
-                {% translate "start game"|title %}
-              </a>
+              {% if request.user in session.campaign.users.all %}
+                <div class="my-2"></div>
+                <a
+                  class="small link-info text-decoration-none"
+                  href="{{ TABLETOP_URL }}/campaign/{{ session.campaign.pk }}"
+                  target="_blank"
+                >
+                  <i class="ic ic-dice"></i>
+                  {% translate "start game"|title %}
+                </a>
+              {% endif %}
             </h4>
             <small class="text-muted">
               [{{ session.campaign.get_system_display }}]
