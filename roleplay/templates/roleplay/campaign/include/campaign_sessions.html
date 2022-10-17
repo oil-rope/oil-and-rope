@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<section class="row justify-content-around">
+<section class="row row-cols-1 justify-content-around">
 
   {% if campaign.session_set.exists and request.user in campaign.game_masters %}
     <div class="col col-md-8 col-lg-4 col-xl-auto">

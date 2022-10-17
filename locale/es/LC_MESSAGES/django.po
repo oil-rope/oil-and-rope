@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-15 23:18+0000\n"
+"POT-Creation-Date: 2022-10-17 09:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2547,11 +2547,26 @@ msgstr "portada de la sesión"
 msgid "start game"
 msgstr "empezar partida"
 
-#: roleplay/templates/roleplay/session/include/session_card.html:86
+#: roleplay/templates/roleplay/session/include/session_card.html:55
 #, fuzzy
-#| msgid "learn more"
-msgid "and more..."
-msgstr "y más..."
+#| msgid "No description provided"
+msgid "Plot not provided..."
+msgstr "No se ha dado ningún argumento..."
+
+#: roleplay/templates/roleplay/session/include/session_card.html:86
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "              %(player_count)s player\n"
+#| "            "
+#| msgid_plural ""
+#| "\n"
+#| "              %(player_count)s players\n"
+#| "            "
+msgid "and %(players_count)s more player..."
+msgid_plural "and %(players_count)s more players..."
+msgstr[0] "y %(player_count)s jugador más..."
+msgstr[1] "y %(player_count)s jugadores más..."
 
 #: roleplay/templates/roleplay/session/session_confirm_delete.html:9
 #, fuzzy
@@ -2831,6 +2846,11 @@ msgstr "sesión borrada."
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "learn more"
+#~ msgid "and more..."
+#~ msgstr "y más..."
 
 #~ msgid "'roll' field is required."
 #~ msgstr "el campo 'roll' es requerido."
