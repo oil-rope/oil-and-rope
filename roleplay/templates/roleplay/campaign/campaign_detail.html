@@ -55,9 +55,9 @@
         </form>
       {% endif %}
     </header>
-    <hr>
-    <nav class="mt-5">
-      <div class="nav nav-tabs" id="campaignNavbar" roel="tablist">
+    <hr class="mb-5" />
+    <nav>
+      <div class="nav nav-tabs" id="campaignNavbar" role="tablist">
         <button
           class="nav-link text-uppercase active"
           id="nav-home-tab"
@@ -137,18 +137,18 @@
           {% translate "settings" %}
       </button>
       </div>
-      <div class="tab-content pt-3" id="campaignNavContent">
-        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-          {% include 'roleplay/campaign/include/campaign_home.html' %}
-        </div>
-        <div class="tab-pane" id="nav-sessions" role="tabpanel" aria-labelledby="nav-sessions-tab">
-          {% include 'roleplay/campaign/include/campaign_sessions.html' %}
-        </div>
-        <div class="tab-pane" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
-          {% include 'roleplay/campaign/include/campaign_settings.html' %}
-        </div>
-      </div>
     </nav>
+    <div class="tab-content pt-3" id="campaignNavContent">
+      <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+        {% include 'roleplay/campaign/include/campaign_home.html' %}
+      </div>
+      <div class="tab-pane" id="nav-sessions" role="tabpanel" aria-labelledby="nav-sessions-tab">
+        {% include 'roleplay/campaign/include/campaign_sessions.html' %}
+      </div>
+      <div class="tab-pane" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">
+        {% include 'roleplay/campaign/include/campaign_settings.html' %}
+      </div>
+    </div>
   </main>
 {% endblock body_content %}
 
