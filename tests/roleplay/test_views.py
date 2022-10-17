@@ -1705,8 +1705,22 @@ class TestSessionListView(TestCase):
         )
         session.campaign.users.add(self.user, *baker.make_recipe('registration.user', _quantity=3))
         response = self.client.get(self.url)
+        expected_in_html = 'and 1 more player...'
 
-        self.assertInHTML('and more...', response.rendered_content)
+        self.assertContains(response=response, text=expected_in_html)
+
+    def test_access_session_list_with_more_than_four_players_ok(self):
+        self.client.force_login(self.user)
+
+        session = baker.make_recipe(
+            'roleplay.session',
+            campaign=baker.make_recipe('roleplay.campaign')
+        )
+        session.campaign.users.add(self.user, *baker.make_recipe('registration.user', _quantity=4))
+        response = self.client.get(self.url)
+        expected_in_html = 'and 2 more players...'
+
+        self.assertContains(response=response, text=expected_in_html)
 
     def test_query_performance_ok(self):
         rq = RequestFactory().get(self.url)
