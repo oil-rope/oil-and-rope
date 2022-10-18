@@ -4,7 +4,6 @@
     class="nav-link dropdown-toggle text-uppercase"
     href="#"
     id="developerPortalDropdown"
-    target="_blank"
     role="button"
     data-bs-toggle="dropdown"
     aria-expanded="false"
@@ -17,6 +16,7 @@
       <a
         href="{% url 'api:swagger' %}"
         class="dropdown-item"
+        target="_blank"
       >
         {{ ICONS.FILE_EARMARK_CODE|safe }}
         {% blocktranslate with object_to_document='API' trimmed %}
