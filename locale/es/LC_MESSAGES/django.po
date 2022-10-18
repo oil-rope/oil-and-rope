@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-18 14:39+0000\n"
+"POT-Creation-Date: 2022-10-18 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -935,7 +935,7 @@ msgstr "¡nos vemos!"
 msgid "logout"
 msgstr "salir"
 
-#: core/templates/core/includes/menus/developer_portal_menu.html:13
+#: core/templates/core/includes/menus/developer_portal_menu.html:12
 msgid "developer portal"
 msgstr "portal de desarrollador"
 
