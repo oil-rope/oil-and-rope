@@ -82,6 +82,7 @@ jobs:
           sudo apt-get install gettext
           poetry run ./manage.py makemessages -l es
           git diff --exit-code
+          poetry run ./manage.py compilemessages -l es
 
       - name: Django Check
         run: |

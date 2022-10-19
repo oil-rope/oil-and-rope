@@ -2428,12 +2428,8 @@ msgstr "geografía"
 #| "Used in %(campaigns)s campaigns.\n"
 msgid "Used in %(campaigns)s campaign."
 msgid_plural "Used in %(campaigns)s campaigns."
-msgstr[0] ""
-"\n"
-"Usado en %(campaigns)s campaña.\n"
-msgstr[1] ""
-"\n"
-"Usado en %(campaigns)s campañas.\n"
+msgstr[0] "Usado en %(campaigns)s campaña."
+msgstr[1] "Usado en %(campaigns)s campañas."
 
 #: roleplay/templates/roleplay/place/place_confirm_delete.html:9
 #, fuzzy
@@ -2565,8 +2561,8 @@ msgstr "No se ha dado ningún argumento..."
 #| "            "
 msgid "and %(players_count)s more player..."
 msgid_plural "and %(players_count)s more players..."
-msgstr[0] "y %(player_count)s jugador más..."
-msgstr[1] "y %(player_count)s jugadores más..."
+msgstr[0] "y %(players_count)s jugador más..."
+msgstr[1] "y %(players_count)s jugadores más..."
 
 #: roleplay/templates/roleplay/session/session_confirm_delete.html:9
 #, fuzzy
