@@ -20,4 +20,9 @@ python ./manage.py compilemessages --locale=es --use-fuzzy && echo -e "${GREEN}T
 echo -e "${RED}Couldn't generate translations${END}"
 
 echo -e "${CYAN}Starting project...${END}"
-python -m daphne --bind=${GUNICORN_IP} --port=${GUNICORN_PORT} ${GUNICORN_WSGI_MODULE}:application
+python -m daphne \
+--bind=${GUNICORN_IP} \
+--port=${GUNICORN_PORT} \
+--access-log - \
+--verbosity=3 \
+${GUNICORN_WSGI_MODULE}:application
