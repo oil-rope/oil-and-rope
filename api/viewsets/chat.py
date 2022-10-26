@@ -41,10 +41,11 @@ class ChatMessageViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet)
     serializer_class = ChatMessageSerializer
 
     def get_queryset(self) -> QuerySet:
-        qs = super().get_queryset().filter(
+        qs: QuerySet = super().get_queryset().filter(
             chat__id=self.kwargs['chat_pk'],
             chat__users__in=[self.request.user],
         )
+        qs = qs.order_by('-entry_created_at')
         # User can only edit their own messages
         if self.action == 'partial_update':
             qs = qs.filter(author=self.request.user)

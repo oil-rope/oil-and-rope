@@ -2,13 +2,11 @@ import os
 import random
 import tempfile
 import time
-from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import TimestampSigner
@@ -18,31 +16,16 @@ from django.urls import reverse
 from model_bakery import baker
 from PIL import Image
 
+from chat.models import Chat
 from common import tools
-from common.constants import models
+from common.models import Vote
+from registration.models import User
 from roleplay import enums, views
+from roleplay.models import Campaign, Place, Session
 from tests.mocks import discord
 from tests.utils import fake
 
 from ..utils import generate_place
-
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
-
-    from common.models import Vote as VoteModel
-    from registration.models import User as UserModel
-    from roleplay.models import Campaign as CampaignModel
-    from roleplay.models import Place as PlaceModel
-    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
-    from roleplay.models import Session as SessionModel
-
-Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
-Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
-PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
-User: 'UserModel' = get_user_model()
-Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class TestPlaceCreateView(TestCase):
@@ -460,7 +443,7 @@ class TestWorldCreateView(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+        cls.user: User = baker.make_recipe('registration.user')
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -548,7 +531,7 @@ class TestWorldUpdateView(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user: 'UserModel' = baker.make_recipe('registration.user')
+        cls.user: User = baker.make_recipe('registration.user')
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -567,7 +550,7 @@ class TestWorldUpdateView(TestCase):
         os.unlink(cls.tmp_file.name)
 
     def setUp(self) -> None:
-        self.world = generate_place(owner=self.user)
+        self.world: Place = generate_place(owner=self.user)
         self.url = resolve_url(self.resolver, pk=self.world.pk)
         self.data = {
             'name': fake.sentence(nb_words=3),
@@ -592,6 +575,35 @@ class TestWorldUpdateView(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
+
+    def test_private_world_remains_private_after_update_ok(self):
+        """
+        This tests comes from the bug that happened twice about Worlds becoming `public` when performing update.
+        It's more defensive programming than a functional test itself.
+        """
+
+        self.world.is_public = False
+        self.world.save(update_fields=['is_public'])
+
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data)
+        self.world.refresh_from_db()
+
+        self.assertFalse(self.world.is_public)
+
+    def test_public_world_remains_public_after_update_ok(self):
+        """
+        This test is the counter-part to `test_private_world_remains_private_after_update_ok`.
+        """
+
+        self.world.is_public = True
+        self.world.save(update_fields=['is_public'])
+
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data)
+        self.world.refresh_from_db()
+
+        self.assertTrue(self.world.is_public)
 
 
 class TestCampaignCreateView(TestCase):
@@ -649,6 +661,21 @@ class TestCampaignCreateView(TestCase):
         self.assertEqual(self.user, campaign.owner)
         self.assertEqual(self.world, campaign.place)
 
+    def test_game_master_is_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data_ok)
+        campaign = Campaign.objects.get(owner__pk=self.user.pk)
+
+        self.assertIn(self.user, campaign.chat.users.all())
+
+    def test_bot_is_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(path=self.url, data=self.data_ok)
+        campaign = Campaign.objects.get(owner__pk=self.user.pk)
+        bot = User.get_bot()
+
+        self.assertIn(bot, campaign.chat.users.all())
+
     def test_email_invitations_are_sent_ok(self):
         data = self.data_ok.copy()
         n_emails = 3
@@ -669,8 +696,8 @@ class TestCampaignJoinView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = baker.make_recipe('registration.user')
-        cls.instance = baker.make_recipe('roleplay.campaign')
+        cls.user: User = baker.make_recipe('registration.user')
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
         cls.signer = TimestampSigner()
 
     def test_access_with_correct_token_and_existing_user_ok(self):
@@ -728,6 +755,133 @@ class TestCampaignJoinView(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(404, response.status_code)
+
+    def test_users_are_added_to_chat_ok(self):
+        self.client.force_login(self.user)
+        token = tools.get_token(fake.email(), self.signer)
+        url = resolve_url(self.resolver, pk=self.instance.pk, token=token)
+        self.client.get(url)
+
+        self.assertIn(self.user, self.instance.chat.users.all())
+
+
+class TestCampaignLeaveView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:leave'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
+        cls.url = resolve_url(cls.resolver, pk=cls.instance.pk)
+
+    def setUp(self) -> None:
+        self.user: User = baker.make_recipe('registration.user')
+        self.instance.users.add(self.user)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_user_not_in_campaign_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_user_in_campaign_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        expected_url = resolve_url('roleplay:campaign:list')
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    @patch('roleplay.views.messages')
+    def test_user_gets_success_message_ok(self, mock_messages: MagicMock):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        mock_messages.success.assert_called_once_with(
+            response.wsgi_request,
+            'You have left the campaign.'
+        )
+
+    def test_user_is_removed_from_campaign_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.user, self.instance.users.all())
+
+    def test_user_is_removed_from_campaign_chat_ok(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.user, self.instance.chat.users.all())
+
+
+class TestCampaignRemovePlayerView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:campaign:remove-player'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.game_master: User = baker.make_recipe('registration.user')
+        cls.instance: Campaign = baker.make_recipe('roleplay.campaign')
+        cls.instance.add_game_masters(cls.game_master)
+
+    def setUp(self) -> None:
+        self.player: User = baker.make_recipe('registration.user')
+        self.instance.users.add(self.player)
+        self.url = resolve_url(self.resolver, pk=self.instance.pk, user_pk=self.player.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_user_not_in_campaign_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_player_is_not_game_master_ko(self):
+        self.client.force_login(self.player)
+        response = self.client.get(self.url)
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_player_is_game_master_ok(self):
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url)
+        expected_url = resolve_url(self.instance)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    @patch('roleplay.views.messages')
+    def test_user_gets_success_message_ok(self, mock_messages: MagicMock):
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url)
+
+        mock_messages.success.assert_called_once_with(
+            request=response.wsgi_request,
+            message=f'You have removed {self.player.username} from campaign.',
+        )
+
+    def test_player_is_removed_from_campaign_ok(self):
+        self.client.force_login(self.game_master)
+        self.client.get(self.url)
+
+        self.assertNotIn(self.player, self.instance.users.all())
+
+    def test_player_is_removed_from_campaign_chat_ok(self):
+        self.client.force_login(self.game_master)
+        self.client.get(self.url)
+        chat: Chat = self.instance.chat
+
+        self.assertNotIn(self.player, chat.users.all())
 
 
 class TestCampaignListView(TestCase):
@@ -996,10 +1150,10 @@ class TestCampaignDetailView(TestCase):
         cls.world = generate_place(site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.private_campaign = baker.make_recipe('roleplay.private_campaign', place=self.world)
+        self.private_campaign: Campaign = baker.make_recipe('roleplay.private_campaign', place=self.world)
         self.private_campaign.users.add(self.user)
         self.private_campaign_url = resolve_url(self.private_campaign)
-        self.public_campaign = baker.make_recipe('roleplay.public_campaign', place=self.world)
+        self.public_campaign: Campaign = baker.make_recipe('roleplay.public_campaign', place=self.world)
         self.public_campaign_url = resolve_url(self.public_campaign)
 
     def test_access_anonymous_ko(self):
@@ -1127,6 +1281,28 @@ class TestCampaignDetailView(TestCase):
         discord_channel_url = f'https://discord.com/channels/{discord_guild_id}/{discord_channel_id}'
 
         self.assertContains(response, discord_channel_url)
+
+    def test_user_sees_leave_button_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response=response, text='Leave')
+
+    def test_player_dont_see_create_session_button_in_campaign_with_sessions_ok(self):
+        baker.make_recipe('roleplay.session', campaign=self.private_campaign)
+        self.client.force_login(self.user)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertNotContains(response=response, text='Create session')
+
+    def test_game_master_sees_create_session_button_in_campaign_with_sessions_ok(self):
+        baker.make_recipe('roleplay.session', campaign=self.private_campaign)
+        gm = baker.make_recipe('registration.user')
+        self.private_campaign.add_game_masters(gm)
+        self.client.force_login(gm)
+        response = self.client.get(self.private_campaign_url)
+
+        self.assertContains(response=response, text='Create session')
 
 
 class TestCampaignDeleteView(TestCase):
@@ -1529,8 +1705,22 @@ class TestSessionListView(TestCase):
         )
         session.campaign.users.add(self.user, *baker.make_recipe('registration.user', _quantity=3))
         response = self.client.get(self.url)
+        expected_in_html = 'and 1 more player...'
 
-        self.assertInHTML('and more...', response.rendered_content)
+        self.assertContains(response=response, text=expected_in_html)
+
+    def test_access_session_list_with_more_than_four_players_ok(self):
+        self.client.force_login(self.user)
+
+        session = baker.make_recipe(
+            'roleplay.session',
+            campaign=baker.make_recipe('roleplay.campaign')
+        )
+        session.campaign.users.add(self.user, *baker.make_recipe('registration.user', _quantity=4))
+        response = self.client.get(self.url)
+        expected_in_html = 'and 2 more players...'
+
+        self.assertContains(response=response, text=expected_in_html)
 
     def test_query_performance_ok(self):
         rq = RequestFactory().get(self.url)

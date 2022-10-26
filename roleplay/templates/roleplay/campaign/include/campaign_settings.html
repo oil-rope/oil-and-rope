@@ -183,6 +183,25 @@
         {% endif %}
         <p>
           {{ player.username }}
+          {% if player in campaign.game_masters  %}
+            <i
+              class="bi-brush-fill"
+              title="{% translate "game master"|title %}"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+            ></i>
+          {% endif %}
+          {% if request.user in campaign.game_masters and request.user.pk != player.pk %}
+            <a
+                href="{% url 'roleplay:campaign:remove-player' pk=campaign.pk user_pk=player.pk %}"
+                class="btn btn-sm btn-danger"
+                title="{% translate "remove user"|capfirst %}"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+            >
+              {{ ICONS.TRASH|safe }}
+            </a>
+          {% endif %}
         </p>
       </div>
     {% empty %}
@@ -195,24 +214,34 @@
   </div>
 </section>
 
-{% if request.user == campaign.owner %}
+{% if request.user in campaign.users.all %}
   <hr class="text-danger">
-  <section class="row justify-content-around">
-    <h3 class="text-center text-danger fw-light">
+  <section class="row justify-content-around px-2">
+    <h3 class="text-center text-danger fw-light mb-4">
       {% translate "danger zone"|capfirst %}
     </h3>
-    <div class="col">
-      <div class="row justify-content-around mt-1">
-        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
-          <a
-            href="{% url 'roleplay:campaign:delete' campaign.pk %}"
-            class="btn btn-danger w-100"
-          >
-            {{ ICONS.TRASH|safe }}
-            {% translate "delete"|capfirst %}
-          </a>
-        </div>
-      </div>
-    </div>
+      <a
+        href="{% url 'roleplay:campaign:leave' campaign.pk %}"
+        class="col mb-3 col-md-4 col-lg-3 btn btn-danger"
+        title="{% translate "leave this campaign"|capfirst %}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+      >
+        <i class="bi-box-arrow-left"></i>
+        {% translate "leave"|capfirst %}
+      </a>
+      <div class="w-100"></div>
+      {% if request.user == campaign.owner %}
+      <a
+        href="{% url 'roleplay:campaign:delete' campaign.pk %}"
+        class="col col-md-4 col-lg-3 btn btn-danger"
+        title="{% translate "delete this campaign"|capfirst %}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        >
+        {{ ICONS.TRASH|safe }}
+        {% translate "delete"|capfirst %}
+      </a>
+    {% endif %}
   </section>
 {% endif %}

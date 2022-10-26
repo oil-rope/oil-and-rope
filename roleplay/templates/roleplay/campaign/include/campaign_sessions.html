@@ -1,7 +1,8 @@
 {% load i18n %}
 
-<section class="row justify-content-around">
-  {% if object.session_set.exists %}
+<section class="row row-cols-1 justify-content-around">
+
+  {% if campaign.session_set.exists and request.user in campaign.game_masters %}
     <div class="col col-md-8 col-lg-4 col-xl-auto">
       <a
         href="{% url 'roleplay:session:create' campaign.pk %}"
@@ -15,12 +16,12 @@
     </div>
   {% endif %}
   <div class="w-100 my-2"></div>
-  {% for session in object.session_set.all %}
-    {% include 'roleplay/session/include/session_card.html' with session=session only %}
+  {% for session in campaign.session_set.all %}
+    {% include 'roleplay/session/include/session_card.html' with session=session request=request only %}
   {% empty %}
     <div class="col">
-      {% if user in object.game_masters %}
-        {% include 'roleplay/session/include/prepare_first_session_card.html' with campaign=object %}
+      {% if user in campaign.game_masters %}
+        {% include 'roleplay/session/include/prepare_first_session_card.html' with campaign=campaign %}
       {% else %}
         <h5 class="text-center">
           {% translate "no sessions yet."|capfirst %}

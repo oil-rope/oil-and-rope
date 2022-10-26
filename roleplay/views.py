@@ -1,13 +1,13 @@
 import logging
-from typing import TYPE_CHECKING
+from typing import Any, Optional, Type
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
+from django.db import models
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
@@ -18,39 +18,21 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, R
 from django.views.generic.detail import SingleObjectMixin
 from django_filters.views import FilterView
 
-from common.constants import models
 from common.mixins import OwnerRequiredMixin
+from common.models import Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
-from roleplay.managers import PlaceQuerySet
+from registration.models import User
+from roleplay.managers import CampaignQuerySet, PlaceQuerySet
+from roleplay.models import Campaign, Place, PlayerInCampaign, Race, Session
 
 from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
 from .mixins import UserInAllWithRelatedNameMixin
 from .utils.invitations import send_campaign_invitations
 
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
-
-    from common.models import Vote as VoteModel
-    from registration.models import User as UserModel
-    from roleplay.models import Campaign as CampaignModel
-    from roleplay.models import Place as PlaceModel
-    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
-    from roleplay.models import Race as RaceModel
-    from roleplay.models import Session as SessionModel
-
 LOGGER = logging.getLogger(__name__)
-
-Campaign: 'CampaignModel' = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
-Place: 'PlaceModel' = apps.get_model(models.ROLEPLAY_PLACE)
-PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(models.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Race: 'RaceModel' = apps.get_model
-Session: 'SessionModel' = apps.get_model(models.ROLEPLAY_SESSION)
-User: 'UserModel' = get_user_model()
-Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
 
 
 class PlaceCreateView(LoginRequiredMixin, OwnerRequiredMixin, CreateView):
@@ -229,11 +211,13 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     template_name = 'roleplay/place/place_update.html'
 
     def get_form_kwargs(self):
+        self.object: Place
+
         kwargs = super().get_form_kwargs()
-        self.object: 'PlaceModel'
         kwargs.update({
             'owner': self.object.owner,
-            'submit_text': _('update').capitalize()
+            'submit_text': _('update').capitalize(),
+            'public': self.object.is_public
         })
 
         return kwargs
@@ -247,6 +231,7 @@ class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.CampaignForm
+    object: Campaign
     model = Campaign
     template_name = 'roleplay/campaign/campaign_create.html'
 
@@ -282,6 +267,7 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
         emails = form.cleaned_data['email_invitations']
         send_campaign_invitations(self.object, self.request, emails)
         self.object.add_game_masters(self.request.user)
+        self.object.chat.users.add(User.get_bot(), self.request.user)
         return response
 
     def get_success_url(self):
@@ -300,7 +286,7 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
             signer = self.get_signer_instance()
             return signer.unsign(self.kwargs['token'], max_age=settings.PASSWORD_RESET_TIMEOUT)
         except BadSignature:
-            raise Http404()
+            raise Http404
 
     def get_user(self):
         try:
@@ -312,14 +298,66 @@ class CampaignJoinView(SingleObjectMixin, RedirectView):
             return None
 
     def get_redirect_url(self, *args, **kwargs):
-        instance = self.get_object()
+        instance: Campaign = self.get_object()
         user = self.get_user()
         if not user:
             messages.warning(self.request, _('you need an account to join this campaign.').capitalize())
             return resolve_url(settings.LOGIN_URL)
-        instance.users.add(self.get_user())
+        instance.users.add(user)
         messages.success(self.request, _('you have joined the campaign.').capitalize())
         return resolve_url(instance)
+
+
+class CampaignLeaveView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    """
+    This view will remove the logged user from players in campaign.
+    """
+
+    model: Type[models.Model] = Campaign
+    url: Optional[str] = reverse_lazy('roleplay:campaign:list')
+
+    def get_queryset(self) -> models.query.QuerySet[Any]:
+        qs: CampaignQuerySet = super().get_queryset()
+        qs = qs.filter(
+            users=self.request.user,
+        )
+        return qs
+
+    def remove_user_from_campaign(self):
+        obj: Campaign = self.get_object()
+        obj.users.remove(self.request.user)
+        return
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any) -> Optional[str]:
+        self.remove_user_from_campaign()
+        messages.success(self.request, _('you have left the campaign.').capitalize())
+        return super().get_redirect_url(*args, **kwargs)
+
+
+class CampaignRemovePlayerView(LoginRequiredMixin, SingleObjectMixin, RedirectView):
+    model: Type[models.Model] = Campaign
+
+    def get_queryset(self) -> models.query.QuerySet[Any]:
+        qs: CampaignQuerySet = super().get_queryset().filter(
+            users=self.request.user.pk,
+            player_in_campaign_set__is_game_master=True,
+        )
+
+        return qs
+
+    def get_user(self):
+        user = User.objects.get(pk=self.kwargs['user_pk'])
+        return user
+
+    def get_redirect_url(self, *args: Any, **kwargs: Any) -> Optional[str]:
+        self.object: Campaign = self.get_object()
+        user = self.get_user()
+        self.object.users.remove(user)
+        messages.success(
+            request=self.request,
+            message=_('you have removed %(user)s from campaign.').capitalize() % {'user': user.username}
+        )
+        return resolve_url(self.object)
 
 
 class CampaignComplexQuerySetMixin:

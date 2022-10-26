@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-<div class="d-flex col col-md-10 col-lg-8 col-xl-7">
+<div class="d-flex col">
   <div class="card mb-3">
     <div class="h-100 row flex-column flex-md-row g-0">
       <div class="col">
@@ -32,15 +32,17 @@
                 <i class="ic ic-quill"></i>
                 {{ session.name }}
               </a>
-              <div class="my-2"></div>
-              <a
-                class="small link-info text-decoration-none"
-                href="{{ TABLETOP_URL }}/campaign/{{ session.campaign.pk }}"
-                target="_blank"
-              >
-                <i class="ic ic-dice"></i>
-                {% translate "start game"|title %}
-              </a>
+              {% if request.user in session.campaign.users.all %}
+                <div class="my-2"></div>
+                <a
+                  class="small link-info text-decoration-none"
+                  href="{{ TABLETOP_URL }}/campaign/{{ session.campaign.pk }}"
+                  target="_blank"
+                >
+                  <i class="ic ic-dice"></i>
+                  {% translate "start game"|title %}
+                </a>
+              {% endif %}
             </h4>
             <small class="text-muted">
               [{{ session.campaign.get_system_display }}]
@@ -48,7 +50,7 @@
           </div>
           <hr>
           <p class="card-text">
-            {{ session.plot|truncatechars:200 }}
+            {{ session.plot|truncatechars:200|default:_('Plot not provided...') }}
           </p>
         </div>
         <div class="card-footer">
@@ -79,7 +81,11 @@
             {% endfor %}
             {% if session.campaign.users.count > 3 %}
               <h5 class="text-muted text-center">
-                {% translate "and more..." %}
+                {% blocktranslate count players_count=session.campaign.users.count|add:-3 trimmed %}
+                  and {{ players_count }} more player...
+                {% plural %}
+                  and {{ players_count }} more players...
+                {% endblocktranslate %}
               </h5>
             {% endif %}
           </div>

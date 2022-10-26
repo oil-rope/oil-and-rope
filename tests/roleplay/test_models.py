@@ -4,10 +4,8 @@ import random
 import tempfile
 import unittest
 from datetime import timedelta
-from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
-from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
@@ -19,29 +17,11 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
+from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
 from tests.mocks import discord
 from tests.utils import fake
 
-if TYPE_CHECKING:
-    from registration.models import User as UserModel
-    from roleplay.models import Domain as DomainModel
-    from roleplay.models import Place as PlaceModel
-    from roleplay.models import Race as RaceModel
-    from roleplay.models import RaceUser as RaceUserModel
-    from roleplay.models import Campaign as CampaignModel
-    from roleplay.models import PlayerInCampaign as PlayerInCampaignModel
-    from roleplay.models import Session as SessionModel
-
 from ..utils import generate_place
-
-Campaign: 'CampaignModel' = apps.get_model(constants.ROLEPLAY_CAMPAIGN)
-Domain: 'DomainModel' = apps.get_model(constants.ROLEPLAY_DOMAIN)
-Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
-PlayerInCampaign: 'PlayerInCampaignModel' = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-Race: 'RaceModel' = apps.get_model(constants.ROLEPLAY_RACE)
-RaceUser: 'RaceUserModel' = apps.get_model(constants.ROLEPLAY_RACE_USER)
-Session: 'SessionModel' = apps.get_model(constants.ROLEPLAY_SESSION)
-User: 'UserModel' = apps.get_model(constants.REGISTRATION_USER)
 
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
@@ -237,7 +217,7 @@ class TestCampaign(TestCase):
 
     def setUp(self):
         self.name = fake.sentence(nb_words=3)
-        self.instance = self.model.objects.create(
+        self.instance: Campaign = self.model.objects.create(
             name=self.name, chat=self.chat, system=random.choice(RoleplaySystems.values), place=self.world,
             owner=self.owner,
         )
@@ -279,6 +259,23 @@ class TestCampaign(TestCase):
             self.instance.clean()
         ex = ex.exception
         self.assertEqual('Start date must be before end date.', ex.message)
+
+    def test_players_are_added_to_chat_ok(self):
+        user_list = [user for user in baker.make_recipe('registration.user', 3)]
+        self.instance.users.add(*user_list)
+        chat = self.instance.chat
+
+        for user in user_list:
+            self.assertIn(user, chat.users.all())
+
+    def test_players_are_removed_from_chat_ok(self):
+        user_list = [user for user in baker.make_recipe('registration.user', 3)]
+        self.instance.users.add(*user_list)
+        chat = self.instance.chat
+        user_to_remove = random.choice(user_list)
+        self.instance.users.remove(user_to_remove)
+
+        self.assertNotIn(user_to_remove, chat.users.all())
 
 
 class TestPlayerInCampaign(TestCase):

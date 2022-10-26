@@ -7,15 +7,11 @@ RUN apt-get install -y gettext
 RUN apt-get install -y vim
 RUN pip install poetry
 
-WORKDIR /app/
-
 # We first install in orde to cache
-COPY ./pyproject.toml .
-COPY ./poetry.lock .
-RUN poetry install --no-dev
-
-COPY . /app/
-COPY ./docker/docker-entrypoint.sh /usr/local/bin/
+COPY ./pyproject.toml /tmp/
+COPY ./poetry.lock /tmp/
+RUN cd /tmp/ && poetry export -o /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 # In order to always have Gunicorn against 0.0.0.0:8000 we set the following environment variables
 ENV GUNICORN_WSGI_MODULE="oilandrope.asgi" \
@@ -30,6 +26,10 @@ DJANGO_SETTINGS_MODULE="oilandrope.settings" \
 DEBUG="False" \
 DEBUG_TEMPLATE="False"
 
+COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 EXPOSE 8000
+
+COPY . /app/
+WORKDIR /app/

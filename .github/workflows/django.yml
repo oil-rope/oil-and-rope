@@ -77,6 +77,18 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
+      - name: Check translations
+        run: |
+          sudo apt-get install gettext
+          poetry run ./manage.py makemessages -l es
+          git diff --exit-code
+          poetry run ./manage.py compilemessages -l es
+
+      - name: Django Check
+        run: |
+          poetry run ./manage.py migrate
+          poetry run ./manage.py check
+
       # Since `poetry run ./manage.py` does not cover all files (maybe because there are *pre-pytest* reached) we user
       # `coverage run` in order to get a full coverage (difference is almost 10%)
       - name: Pytest
@@ -94,20 +106,10 @@ jobs:
           fail_ci_if_error: false # CI can continue without Codecov
           verbose: true
 
-      - name: Django Check
-        run: |
-          poetry run ./manage.py migrate
-          poetry run ./manage.py check
-
   build-and-push:
     name: Build Images and Push
     runs-on: ubuntu-latest
     needs: testing-and-linter
-
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ["3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v3
@@ -128,10 +130,12 @@ jobs:
         if: ${{ success() }}
         uses: docker/build-push-action@v3
         env:
-          DOCKERFILE: docker/${{ matrix.python-version }}/Dockerfile.${{ env.CONTEXT }}
+          DOCKERFILE: docker/3.9/Dockerfile.${{ env.CONTEXT }}
           TAG: ${{ steps.extra_branch_name.outputs.branch }}
-          EXTRA_TAG: ${{ matrix.python-version != '3.9' && format('-{0}', matrix.python-version) || '' }}
         with:
+          context: .
           push: true
-          tags: oilandrope/core:${{ env.TAG }}${{ env.EXTRA_TAG }}
+          tags: oilandrope/core:${{ env.TAG }}
           file: ${{ env.DOCKERFILE }}
+          cache-from: type=registry,ref=oilandrope/core:${{ env.TAG }}
+          cache-to: type=inline

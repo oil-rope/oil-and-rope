@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Type
 
 from ckeditor.fields import RichTextField
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import m2m_changed
 from django.shortcuts import resolve_url
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -19,6 +20,9 @@ from roleplay.enums import RoleplaySystems
 
 from . import managers
 from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
+
+if TYPE_CHECKING:
+    from chat.models import Chat
 
 
 class Domain(TracingMixin):
@@ -439,7 +443,7 @@ class Campaign(TracingMixin):
         Adds given users as game masters.
         """
 
-        PlayerInCampaign = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        PlayerInCampaign: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
         entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
         objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
         return objs
@@ -457,6 +461,29 @@ class Campaign(TracingMixin):
 
     def __str__(self):
         return f'{self.name} [{self.pk}]'
+
+
+def sync_campaign_related_users_to_chat(
+    sender: Type['PlayerInCampaign'],
+    instance: Campaign,
+    action: str,
+    pk_set: set[str],
+    **kwargs
+):
+    """
+    This signal will synchronize players of campaign with users in chat so they are added or remove from campaign's
+    chat.
+    """
+
+    chat: 'Chat' = instance.chat
+
+    if action in ('post_add', ):
+        chat.users.add(*pk_set)
+    if action in ('post_remove', ):
+        chat.users.remove(*pk_set)
+
+
+m2m_changed.connect(sync_campaign_related_users_to_chat, sender=Campaign.users.through)
 
 
 class PlayerInCampaign(TracingMixin):
