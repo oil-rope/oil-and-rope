@@ -21,7 +21,7 @@ from common import tools
 from common.models import Vote
 from registration.models import User
 from roleplay import enums, views
-from roleplay.models import Campaign, Place, Session
+from roleplay.models import Campaign, Place, Race, Session
 from tests.mocks import discord
 from tests.utils import fake
 
@@ -1735,7 +1735,7 @@ class TestSessionListView(TestCase):
 
 class TestRaceCreateView(TestCase):
     login_url = reverse('registration:auth:login')
-    model = models.Race
+    model = Race
     resolver = 'roleplay:race:create'
     template = 'roleplay/race/race_create.html'
     view = views.RaceCreateView
@@ -1743,7 +1743,7 @@ class TestRaceCreateView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
-        cls.race = baker.make(models.Race)
+        cls.race = baker.make(Race)
 
     def setUp(self):
         self.users = baker.make('registration.user')
@@ -1778,7 +1778,7 @@ class TestRaceCreateView(TestCase):
 
 
 class TestRaceDetailView(TestCase):
-    model = models.Race
+    model = Race
     resolver = 'roleplay:place:detail'
     template = 'roleplay/race/race_detail.html'
 
@@ -1810,7 +1810,7 @@ class TestRaceDetailView(TestCase):
 
 
 class TestRaceUpdateView(TestCase):
-    model = models.Race
+    model = Race
     resolver = 'roleplay:place:edit'
     template = 'roleplay/race/race_update.html'
 
@@ -1897,7 +1897,7 @@ class TestRaceUpdateView(TestCase):
 
 class TestRaceListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Race
+    model = Race
     resolver = 'roleplay:race:list'
     template = 'roleplay/race/race_list.html'
     view = views.RaceListView
@@ -1947,7 +1947,7 @@ class TestRaceListView(TestCase):
 
 class TestRaceDeleteView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = models.Race
+    model = Race
     resolver = 'roleplay:race:delete'
     template = 'roleplay/race/race_confirm_delete.html'
     view = views.RaceDeleteView
