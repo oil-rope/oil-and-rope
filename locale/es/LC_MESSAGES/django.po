@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-02 12:03+0000\n"
+"POT-Creation-Date: 2022-11-02 12:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -893,7 +893,7 @@ msgid "create your account"
 msgstr "crea tu cuenta"
 
 #: core/templates/core/includes/menu.html:81 registration/forms/forms.py:206
-#: registration/models.py:108 registration/views.py:292
+#: registration/models.py:108 registration/views.py:295
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:170
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:178
 #: roleplay/templates/roleplay/session/include/session_card.html:65
@@ -1503,70 +1503,70 @@ msgstr "¡tu mundo espera!"
 msgid "resend confirmation email"
 msgstr "reenviar email de confirmación"
 
-#: registration/views.py:42
+#: registration/views.py:43
 #, fuzzy
 #| msgid "Seems like this user is inactive"
 msgid "seems like this user is inactive."
 msgstr "parece que este usuario está inactivo"
 
-#: registration/views.py:43
+#: registration/views.py:44
 #, fuzzy
 #| msgid "Have you confirmed your email?"
 msgid "have you confirmed your email?"
 msgstr "¿has confirmado tu email?"
 
-#: registration/views.py:73
+#: registration/views.py:74
 #, fuzzy
 #| msgid "User created"
 msgid "user created!"
 msgstr "¡usuario creado!"
 
-#: registration/views.py:74
+#: registration/views.py:75
 #, fuzzy
 #| msgid "Please confirm your email"
 msgid "please confirm your email."
 msgstr "por favor confirma tu email."
 
-#: registration/views.py:92
+#: registration/views.py:93
 msgid "seems like we are experimenting issues with our mail automatization."
 msgstr ""
 "parece ser que estamos experimentandos problemas con el sistema de emails."
 
-#: registration/views.py:93
+#: registration/views.py:94
 msgid "please try later."
 msgstr "por favor pruebe más tarde."
 
-#: registration/views.py:156
+#: registration/views.py:157
 #, fuzzy
 #| msgid "Your email has been confirmed"
 msgid "your email has been confirmed!"
 msgstr "¡tu email ha sido confirmado!"
 
-#: registration/views.py:197
+#: registration/views.py:198
 #, fuzzy
 #| msgid "Your confirmation email has been sent"
 msgid "your confirmation email has been sent!"
 msgstr "¡tu email de confirmación ha sido enviado!"
 
-#: registration/views.py:210
+#: registration/views.py:211
 #, fuzzy
 #| msgid "Password reset"
 msgid "password reset"
 msgstr "restaurar contraseña"
 
-#: registration/views.py:219
+#: registration/views.py:222
 #, fuzzy
 #| msgid "Email for password reset request sent!"
 msgid "email for password reset request sent!"
 msgstr "¡se ha enviado un email con la petición de restauración de contraseña!"
 
-#: registration/views.py:234 registration/views.py:244
+#: registration/views.py:237 registration/views.py:247
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "password changed successfully!"
 msgstr "¡contraseña cambiada correctamente!"
 
-#: registration/views.py:304
+#: registration/views.py:307
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "user updated successfully!"
