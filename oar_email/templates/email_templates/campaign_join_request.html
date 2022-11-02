@@ -18,11 +18,26 @@
         </p>
       </div>
       <div class="w-100"></div>
-      <div class="col">
+      <div class="col text-center">
         {% url 'roleplay:campaign:edit' object.pk as campaign_detail_url %}
-        <a href="{{ protocol }}:{{ domain }}{{ campaign_detail_url }}" class="btn btn-primary">
+        <a
+          href="{{ scheme }}://{{ host }}{{ campaign_detail_url }}"
+          class="btn btn-primary"
+          target="_blank"
+        >
           {% translate "go to campagin"|capfirst %}
         </a>
+      </div>
+    </div>
+    <div class="row mt-1 mt-md-3">
+      <div class="col">
+        <small class="d-block text-muted text-center">
+          {% translate "if you can't click on the link here's raw"|capfirst %}
+          <br />
+          <code>
+            {{ scheme }}://{{ host }}{{ campaign_detail_url }}
+          </code>
+        </small>
       </div>
     </div>
   </main>

@@ -25,7 +25,7 @@
           <i class="ic ic-arrow-right"></i>
           {% url 'roleplay:place:detail' object.place.pk as place_link %}
           <a
-            href="{{ protocol }}:{{ domain }}{{ place_link }}"
+            href="{{ scheme }}://{{ host }}{{ place_link }}"
             target="_blank"
           >
             {{ object.place.name }}
@@ -41,11 +41,22 @@
     <div class="row justify-content-around mt-md-4">
       {% url "roleplay:campaign:join" pk=object.pk token=token as join_url %}
       <a
-        href="{{ protocol }}:{{ domain }}{{ join_url }}"
+        href="{{ scheme }}://{{ host }}{{ join_url }}"
         class="btn btn-lg btn-primary col-11 col-md-6 col-lg-4 col-xl-2"
       >
         {% translate "join now!"|capfirstletter %}
       </a>
+    </div>
+    <div class="row mt-1 mt-md-3">
+      <div class="col">
+        <small class="d-block text-muted text-center">
+          {% translate "if you can't click on the link here's raw"|capfirst %}
+          <br />
+          <code>
+            {{ scheme }}://{{ host }}{{ join_url }}
+          </code>
+        </small>
+      </div>
     </div>
   </main>
 {% endblock content %}
