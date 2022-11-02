@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-18 14:59+0000\n"
+"POT-Creation-Date: 2022-11-02 12:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1053,11 +1053,18 @@ msgstr ""
 "aceptar su solicitud vaya a la página de edición de la campaña y luego "
 "'Invitar jugadores' y agregue el siguiente email: %(email)s."
 
-#: oar_email/templates/email_templates/campaign_join_request.html:24
+#: oar_email/templates/email_templates/campaign_join_request.html:28
 #, fuzzy
 #| msgid "Create campaign"
 msgid "go to campagin"
 msgstr "ir a la campaña"
+
+#: oar_email/templates/email_templates/campaign_join_request.html:35
+#: oar_email/templates/email_templates/confirm_email.html:32
+#: oar_email/templates/email_templates/invitation_email.html:53
+#: oar_email/templates/email_templates/password_reset_email.html:32
+msgid "if you can't click on the link here's raw"
+msgstr "si no puede entrar al enlace, aquí lo tiene plano"
 
 #: oar_email/templates/email_templates/confirm_email.html:5
 #, fuzzy
@@ -1083,15 +1090,11 @@ msgstr ""
 "antes de empezar, por favor asegúrese de activar su cuenta accediendo al "
 "link de debajo."
 
-#: oar_email/templates/email_templates/confirm_email.html:25
+#: oar_email/templates/email_templates/confirm_email.html:26
 #, fuzzy
 #| msgid "Activate account"
 msgid "activate account"
 msgstr "activar cuenta"
-
-#: oar_email/templates/email_templates/confirm_email.html:31
-msgid "if you can't click on the link here's raw"
-msgstr "si no puede entrar al enlace, aquí lo tiene plano"
 
 #: oar_email/templates/email_templates/invitation_email.html:5
 #, fuzzy
