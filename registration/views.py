@@ -15,8 +15,8 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView, TemplateView, UpdateView
 from rest_framework.authtoken.models import Token
-from common.context_processors.utils import requests_utils
 
+from common.context_processors.utils import requests_utils
 from common.templatetags.string_utils import capfirstletter as cfl
 from oar_email.utils import send_confirmation_email
 
