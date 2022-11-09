@@ -3,6 +3,8 @@ import threading
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
+from common.context_processors.utils import requests_utils
+
 
 class HtmlThreadMail:
     def __init__(self, template_name, request=None, context=None, subject='', from_email=None, to=None, bcc=None):
@@ -26,10 +28,7 @@ class HtmlThreadMail:
             'domain': 'oilandrope-project.com',
         }
         if self.request:
-            context.update({
-                'protocol': self.request.scheme,
-                'domain': self.request.headers.get('HOST', 'oilandrope-project.com'),
-            })
+            context.update(requests_utils(self.request))
         if self.context:
             context.update(self.context)
         return context

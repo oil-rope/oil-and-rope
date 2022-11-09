@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, FormView, RedirectView, TemplateView, UpdateView
 from rest_framework.authtoken.models import Token
 
+from common.context_processors.utils import requests_utils
 from common.templatetags.string_utils import capfirstletter as cfl
 from oar_email.utils import send_confirmation_email
 
@@ -215,6 +216,8 @@ class ResetPasswordView(RedirectAuthenticatedUserMixin, auth_views.PasswordReset
     template_name = 'registration/password_reset.html'
 
     def form_valid(self, form):
+        # NOTE: We need to declare it manually since it doesn't use our own email system
+        self.extra_email_context.update(requests_utils(self.request))
         response = super().form_valid(form)
         msg = cfl(_('email for password reset request sent!'))
         messages.success(self.request, msg)
