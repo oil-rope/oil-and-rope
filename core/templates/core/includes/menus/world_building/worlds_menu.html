@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load string_utils %}
+{% url 'roleplay:world:list' as world_list_url %}
+<li>
+  <a
+    href="{{ world_list_url }}"
+    class="dropdown-item{% if actual_path|startswith:world_list_url %} active{% endif %}"
+    {% if actual_path|startswith:world_list_url %}aria-current="true"{% endif %}
+  >
+    {{ ICONS.WORLD|safe }}
+    {% translate "worlds"|title %}
+  </a>
+</li>

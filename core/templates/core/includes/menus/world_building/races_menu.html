@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load string_utils %}
+{% url 'roleplay:race:list' as race_list_url %}
+<li>
+  <a
+    href="{{ race_list_url }}"
+    class="dropdown-item{% if actual_path|startswith:race_list_url %} active{% endif %}"
+    {% if actual_path|startswith:race_list_url %}aria-current="true"{% endif %}
+  >
+    {{ ICONS.USERS|safe }}
+    {% translate "races"|title %}
+  </a>
+</li>

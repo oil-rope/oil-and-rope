@@ -13,26 +13,7 @@
     {% translate "world building" %}
   </a>
   <ul class="dropdown-menu" aria-labelledby="worldbuildingDropdown">
-    <li>
-      {% url 'roleplay:world:list' as world_list_url %}
-      <a
-        href="{{ world_list_url }}"
-        class="dropdown-item{% if actual_path|startswith:world_list_url %} active{% endif %}"
-        {% if actual_path|startswith:world_list_url %} aria-current="true"{% endif %}
-      >
-        {{ ICONS.WORLD|safe }}
-        {% translate "worlds"|title %}
-      </a>
-    </li>
-    <li>
-      {% url 'roleplay:race:list' as race_list_url %}
-      <a
-        href="{{ race_list_url }}"
-        class="dropdown-item{% if actual_path|startswith:race_list_url %} active{% endif %}"
-      >
-        <i class="ic ic-users"></i>
-        {% trans "races"|title %}
-      </a>
-    </li>
+    {% include 'core/includes/menus/world_building/worlds_menu.html' %}
+    {% include 'core/includes/menus/world_building/races_menu.html' %}
   </ul>
 </li>
