@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load static %}
 {% load i18n %}
 {% load string_utils %}
 
@@ -9,30 +10,70 @@
 {% endblock breadcrumb %}
 
 {% block body_content %}
-  <div class="container">
-      <h2 class="display-5 text-center">
-        {% translate 'races'|capfirst %}
-      </h2>
-      <div class="row justify-content-center">
-          <a
-        title="{% translate 'create new race'|capfirst %}" href="{% url 'roleplay:race:create' %}?user"
-        href="{% url 'roleplay:race:create' %}"
-       class="col col-lg-4 btn btn-lg btn-dark"
-      >
-        <i class="ic-plus"></i>
-        {% translate "add"|capfirst %}
-      </a>
-      <div class="w-100 py-2"></div>
-      {% if is_paginated %}
-        {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
-      {% endif %}
-      <div class="row justify-content-around pb-5">
-        {% for race in page_obj %}
-          <div
-            class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
-            {% include 'roleplay/include/race_card.html' with race=race user=request.user only %}
-          </div>
-        {% endfor %}
+  <h1 class="display-5 text-center">
+    {% translate 'races'|capfirst %}
+  </h1>
+
+  <main class="container">
+    {% if object_list %}
+      <div class="row justify-content-center mb-3">
+        <div class="col col-lg-8 col-xxl-7">
+          {% include 'common/include/filter_accordion.html' with filter=filter only %}
+        </div>
       </div>
-  </div>
+    {% endif %}
+
+    {% for object in object_list %}
+      {{ race }}
+      {% comment %} <div
+        class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
+        {% include 'roleplay/include/race_card.html' with race=object user=request.user only %}
+      </div> {% endcomment %}
+    {% empty %}
+      <h2 class="text-center mb-4">
+        {% translate "seems like you haven't create any race yet."|capfirst %}
+        <br>
+        <small class="text-muted fw-light">
+          {% translate "but you can create one!"|capfirstletter %}
+        </small>
+      </h2>
+
+      <div class="d-flex flex-columns justify-content-center align-items-stretch gap-3">
+        {% url 'roleplay:race:create-for-world' as race_create_for_world_url %}
+        <a
+          href="{{ race_create_for_world_url }}"
+          class="btn btn-secondary"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
+        >
+          {{ ICONS.WORLD|safe }}
+          {% translate "create race for world"|capfirst %}
+        </a>
+
+        {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
+        <a
+          href="{{ race_create_for_campaign_url }}"
+          class="btn btn-secondary"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="{% translate "create a race for an specific campaign whhere you are game master."|capfirst %}"
+        >
+          {{ ICONS.QUILL|safe }}
+          {% translate "create race for campaign"|capfirst %}
+        </a>
+      </div>
+    {% endfor %}
+
+    {% if is_paginated %}
+      {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
+    {% endif %}
+  </main>
 {% endblock body_content %}
+
+{% block javascript %}
+  <script type="module">
+    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    setUpTooltip();
+  </script>
+{% endblock javascript %}

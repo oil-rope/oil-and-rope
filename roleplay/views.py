@@ -734,11 +734,12 @@ class RaceUpdateView(LoginRequiredMixin, UpdateView, UserPassesTestMixin):
         return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
 
 
-class RaceListView(LoginRequiredMixin, ListView):
+class RaceListView(LoginRequiredMixin, FilterView):
     """
     this view deletes a race
     """
 
+    filterset_class = filters.RaceFilter
     model = Race
     template_name = 'roleplay/race/race_list.html'
     paginate_by = 10

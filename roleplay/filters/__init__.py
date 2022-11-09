@@ -1,5 +1,5 @@
-from .filters import CampaignFilter, SessionFilter
+from .filters import CampaignFilter, RaceFilter, SessionFilter
 
 __all__ = [
-    'CampaignFilter', 'SessionFilter',
+    'CampaignFilter', 'RaceFilter', 'SessionFilter',
 ]

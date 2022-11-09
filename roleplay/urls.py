@@ -38,9 +38,10 @@ SESSION_PATTERNS = [
 ]
 
 RACE_PATTERNS = [
-    path('', views.RaceListView.as_view(), name='list'),
+    path('@me/', views.RaceListView.as_view(), name='list'),
     path('<int:pk>/', views.RaceDetailView.as_view(), name='detail'),
-    path('create/', views.RaceCreateView.as_view(), name='create'),
+    path('create/place/', views.RaceCreateView.as_view(), name='create-for-world'),
+    path('create/campaign/', views.RaceCreateView.as_view(), name='create-for-campaign'),
     path('edit/<int:pk>/', views.RaceUpdateView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.RaceDeleteView.as_view(), name='delete'),
 ]

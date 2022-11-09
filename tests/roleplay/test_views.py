@@ -1904,19 +1904,15 @@ class TestRaceListView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.url = resolve_url('roleplay:race:list')
 
-        cls.users = baker.make_recipe('registration.user')
+    def setUp(self) -> None:
+        self.race_without_optional: Race = baker.make_recipe('roleplay.race_without_optional')
+        self.race: Race = baker.make_recipe('roleplay.race')
 
-        cls.race_without_optional = baker.make_recipe('roleplay.race_without_optional')
-        cls.race = baker.make_recipe('roleplay.race')
-
-        cls.race.users.add(cls.users)
-        cls.owner = cls.users
-
-        cls.race_without_optional.users.add(cls.users)
-        cls.owner = cls.users
-
-        cls.url = reverse('roleplay:race:list')
+        self.race.users.add(self.user)
+        self.race_without_optional.users.add(self.user)
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.url)
@@ -1925,13 +1921,13 @@ class TestRaceListView(TestCase):
         self.assertRedirects(response, expected_url)
 
     def test_access_with_user_ok(self):
-        self.client.force_login(self.users)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
 
     def test_access_templated_used_is_correct_ok(self):
-        self.client.force_login(self.users)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
@@ -1939,10 +1935,44 @@ class TestRaceListView(TestCase):
     def test_template_paginator_ok(self):
         baker.make_recipe('roleplay.race', self.view.paginate_by)
 
-        self.client.force_login(self.users)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, self.template)
+
+    def test_advanced_search_is_displayed_if_there_are_any_races_ok(self):
+        baker.make_recipe('roleplay.race', 3)
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Advanced Search')
+
+    def test_advanced_search_is_not_displayed_if_there_is_no_race_ok(self):
+        self.race.delete()
+        self.race_without_optional.delete()
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, 'Advanced Search')
+
+    def test_create_for_buttons_are_displayed_if_there_is_no_race_ok(self):
+        self.race.delete()
+        self.race_without_optional.delete()
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Create race for world')
+        self.assertContains(response, 'Create race for campaign')
+
+    def test_create_for_buttons_are_not_displayed_if_there_is_any_race_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, 'Create race for world')
+        self.assertNotContains(response, 'Create race for campaign')
 
 
 class TestRaceDeleteView(TestCase):
