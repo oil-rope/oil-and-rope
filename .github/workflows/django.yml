@@ -1,9 +1,10 @@
 name: Oil & Rope CI
 
-on: [push]
+on:
+  push
 
 env:
-  CONTEXT: ${{ github.ref_name == 'master' && 'prod' || 'dev' }}
+  CONTEXT: ${{ contains(github.event.ref, 'tag') && 'prod' || github.ref_name == 'master' && 'prod' || 'dev' }}
 
 jobs:
   testing-and-linter:
