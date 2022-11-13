@@ -10,6 +10,7 @@ REGISTRATION_PROFILE = 'registration.Profile'
 
 # Common
 COMMON_TRACK = 'common.Track'
+COMMON_IMAGE = 'common.Image'
 COMMON_VOTE = 'common.Vote'
 
 # Bot

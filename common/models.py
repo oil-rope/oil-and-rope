@@ -50,6 +50,53 @@ class Track(TracingMixin):
         return f'{self.name} ({file.name})'
 
 
+class Image(TracingMixin):
+    """
+    This model handles images associated to various models such a places, races, campaigns, sessions...
+    Is created in order to tackle multiple image support.
+
+    Parameters
+    ----------
+    id: :class:`~uuid.UUID`
+        The unique identifier for the image.
+    image: :class:`~django.db.models.fields.files.ImageField`
+        The actual image uploaded.
+    owner: :class:`~registration.models.User`
+        The user that uploaded the image.
+    content_type: :class:`~django.contrib.contenttypes.models.ContentType`
+        Relation to the model this image is associated to.
+    object_id: :class:`int`
+        Identifier of the instance this image is associated to.
+    content_object: :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+        The actual object this image is associated to.
+    """
+
+    id = models.UUIDField(verbose_name=_('identifier'), primary_key=True, default=uuid.uuid4, editable=False)
+    image = models.ImageField(
+        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], max_length=255,
+    )
+    owner = models.ForeignKey(
+        verbose_name=_('owner'), to=constants.REGISTRATION_USER, db_index=True, to_field='id', related_name='image_set',
+        on_delete=models.CASCADE, null=False, blank=False,
+    )
+    content_type = models.ForeignKey(
+        verbose_name=_('model associated'), to=constants.CONTENT_TYPE, on_delete=models.CASCADE,
+        related_name='image_set', db_index=True, null=False, blank=False,
+    )
+    object_id = models.PositiveBigIntegerField(
+        verbose_name=_('object identifier'), db_index=True, null=False, blank=False
+    )
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        verbose_name = _('image')
+        verbose_name_plural = _('images')
+        ordering = ['-entry_created_at', '-entry_updated_at']
+        indexes = [
+            models.Index(fields=['owner', 'content_type', 'object_id']),
+        ]
+
+
 class Vote(TracingMixin):
     """
     This model will handle voting on either a :class:`~roleplay.model.Campaign`, :class:`~roleplay.models.Place` or
@@ -83,7 +130,7 @@ class Vote(TracingMixin):
     )
     content_type = models.ForeignKey(
         verbose_name=_('model associated'), to=constants.CONTENT_TYPE, on_delete=models.CASCADE,
-        related_name='content_type', db_index=True, null=False, blank=False,
+        related_name='vote_set', db_index=True, null=False, blank=False,
         limit_choices_to={'model__in': VOTABLE_MODELS, 'app_label__in': VOTABLE_APP_LABELS},
     )
     object_id = models.PositiveBigIntegerField(
