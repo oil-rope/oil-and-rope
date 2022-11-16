@@ -65,7 +65,7 @@ class Image(TracingMixin):
         The user that uploaded the image.
     content_type: :class:`~django.contrib.contenttypes.models.ContentType`
         Relation to the model this image is associated to.
-    object_id: :class:`int`
+    object_id: :class:`str`
         Identifier of the instance this image is associated to.
     content_object: :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
         The actual object this image is associated to.
@@ -83,8 +83,8 @@ class Image(TracingMixin):
         verbose_name=_('model associated'), to=constants.CONTENT_TYPE, on_delete=models.CASCADE,
         related_name='image_set', db_index=True, null=False, blank=False,
     )
-    object_id = models.PositiveBigIntegerField(
-        verbose_name=_('object identifier'), db_index=True, null=False, blank=False
+    object_id = models.CharField(
+        verbose_name=_('object identifier'), db_index=True, null=False, blank=False, max_length=255,
     )
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -92,8 +92,10 @@ class Image(TracingMixin):
         verbose_name = _('image')
         verbose_name_plural = _('images')
         ordering = ['-entry_created_at', '-entry_updated_at']
+        # Indexes are not automatically created for Generic Foreign keys
+        # https://docs.djangoproject.com/en/4.1/ref/contrib/contenttypes/#django.contrib.contenttypes.fields.GenericForeignKey
         indexes = [
-            models.Index(fields=['owner', 'content_type', 'object_id']),
+            models.Index(fields=['content_type', 'object_id']),
         ]
 
 

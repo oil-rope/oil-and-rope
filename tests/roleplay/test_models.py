@@ -17,7 +17,7 @@ from model_bakery import baker
 
 from common.constants import models as constants
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
+from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, Session
 from tests.mocks import discord
 from tests.utils import fake
 
@@ -167,7 +167,6 @@ class TestRace(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.model = Race
-        cls.m2m_model = RaceUser
 
     def test_create_ok(self):
         instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
@@ -185,22 +184,6 @@ class TestRace(TestCase):
     def test_str_ok(self):
         instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
         expected = f'{instance.name} [{instance.pk}]'
-
-        self.assertEqual(expected, str(instance))
-
-
-class TestRaceUser(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = RaceUser
-
-    def setUp(self):
-        self.user = baker.make(constants.REGISTRATION_USER)
-        self.race = baker.make(constants.ROLEPLAY_RACE)
-
-    def test_str_ok(self):
-        instance = self.model.objects.create(user=self.user, race=self.race)
-        expected = f'{instance.user.username} <-> {instance.race.name}'
 
         self.assertEqual(expected, str(instance))
 

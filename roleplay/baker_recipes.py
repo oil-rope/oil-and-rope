@@ -83,7 +83,6 @@ race = Recipe(
     intelligence=fake.random_int(min=-5, max=5),
     affected_by_armor=True,
     wisdom=fake.random_int(min=-5, max=5),
-    image=fake.image_url(),
 )
 
 race_without_optional = race.extend(

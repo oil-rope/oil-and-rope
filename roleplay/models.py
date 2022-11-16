@@ -234,10 +234,10 @@ class Race(TracingMixin):
         Modifier for charisma.
     affected_by_armor: :class:`boolean`
         Declares if this race is affected by any penalty that armor can give.
-    image: :class:`file`
+    images: :class:`list[django.core.files.uploadedfile.UploadedFile]`
         Image for the race.
-    users: :class:`User`
-        Users that have this race.
+    owner: :class:`User`
+        User that created.
     """
 
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
@@ -253,27 +253,22 @@ class Race(TracingMixin):
         verbose_name=_('affected by armor'), default=True,
         help_text=_('declares if this race is affected by armor penalties')
     )
-    image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True
+    images = GenericRelation(
+        verbose_name=_('images'), to=constants.COMMON_IMAGE, related_query_name='race_set',
+        content_type_field='content_type', object_id_field='object_id',
     )
-    users = models.ManyToManyField(
-        verbose_name=_('users'), to=constants.REGISTRATION_USER, related_name='race_set', db_index=True,
-        through=constants.ROLEPLAY_RACE_USER,
+    owner = models.ForeignKey(
+        verbose_name=_('owner'), to=constants.REGISTRATION_USER, to_field='id', related_name='race_set', db_index=True,
+        null=False, blank=False, on_delete=models.CASCADE,
     )
-
-    @property
-    def owners(self):
-        qs = self.users.filter(m2m_race_set__is_owner=True)
-        return qs
-
-    def add_owners(self, *users):
-        # Getting RaceUser model
-        model = apps.get_model(constants.ROLEPLAY_RACE_USER)
-        new_entries = []
-        for user in users:
-            entry = model(user=user, race=self, is_owner=True)
-            new_entries.append(entry.save())
-        return model.objects.filter(pk__in=new_entries)
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, to_field='id', related_name='race_set',
+        db_index=True, null=True, blank=False, on_delete=models.CASCADE,
+    )
+    place = models.ForeignKey(
+        verbose_name=_('place'), to=constants.ROLEPLAY_PLACE, to_field='id', related_name='race_set', db_index=True,
+        null=True, blank=False, on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = _('race')
@@ -285,34 +280,6 @@ class Race(TracingMixin):
 
     def __str__(self):
         return f'{self.name} [{self.pk}]'
-
-
-class RaceUser(TracingMixin):
-    """
-    This class manage M2M for :class:`Race` and :class:`User`.
-
-    Parameters
-    ----------
-    user: :class:`User`
-        Related user.
-    race: :class:`Race`
-        Related race.
-    is_owner: :class:`boolean`
-        Declares if the related user is owner.
-    """
-
-    user = models.ForeignKey(
-        verbose_name=_('user'), to=constants.REGISTRATION_USER, related_name='m2m_race_set', on_delete=models.CASCADE,
-        db_index=True
-    )
-    race = models.ForeignKey(
-        verbose_name=_('race'), to=constants.ROLEPLAY_RACE, related_name='m2m_race_set', on_delete=models.CASCADE,
-        db_index=True
-    )
-    is_owner = models.BooleanField(verbose_name=_('ownership'), default=False)
-
-    def __str__(self):
-        return f'{self.user.username} <-> {self.race.name}'
 
 
 # TODO: When Character Model is set we should add PCs and NPCs as part of campaign

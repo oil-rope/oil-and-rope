@@ -23,16 +23,6 @@ class TestUser(TestCase):
     def setUp(self):
         self.instance = baker.make_recipe('registration.user')
 
-    def test_owned_races_ok(self):
-        iterations = fake.pyint(min_value=1, max_value=10)
-        races = baker.make(Race, iterations)
-        [r.add_owners(self.instance) for r in races]
-
-        result = self.instance.owned_races.count()
-        expected_result = iterations
-
-        self.assertEqual(expected_result, result)
-
     def test_discord_user_none_when_discord_id_not_set_ok(self):
         self.assertIsNone(self.instance.discord_user)
 
