@@ -19,6 +19,13 @@ echo -e "${CYAN}Generating translations...${END}"
 python ./manage.py compilemessages --locale=es --use-fuzzy && echo -e "${GREEN}Translations generated!" || \
 echo -e "${RED}Couldn't generate translations${END}"
 
+if [[ -v ADMIN_PASSWORD ]]; then
+  echo -e "${CYAN}Creating admin user with given password...${END}"
+  python ./manage.py shell -c \
+  'from registration.models import User;import os;User.objects.create_superuser("admin", "admin@gmail.com", os.getenv("ADMIN_PASSWORD"))' && \
+  echo -e "${GREEN}Created superuser with username 'admin'!${END}" || echo -e "${RED}Couldn't create admin user${END}"
+fi
+
 echo -e "${CYAN}Starting project...${END}"
 python -m daphne \
 --bind=${GUNICORN_IP} \
