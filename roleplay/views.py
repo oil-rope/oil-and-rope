@@ -742,7 +742,7 @@ class RaceListView(LoginRequiredMixin, FilterView):
     filterset_class = filters.RaceFilter
     model = Race
     template_name = 'roleplay/race/race_list.html'
-    paginate_by = 10
+    paginate_by = 12
     queryset = Race.objects.all()
 
 

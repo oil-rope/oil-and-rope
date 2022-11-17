@@ -2,6 +2,7 @@ import os
 import random
 import tempfile
 import time
+import unittest
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -1733,6 +1734,7 @@ class TestSessionListView(TestCase):
             self.view.as_view()(rq)
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceCreateView(TestCase):
     login_url = reverse('registration:auth:login')
     model = Race
@@ -1777,6 +1779,7 @@ class TestRaceCreateView(TestCase):
         self.assertEqual(self.data_ok['description'], instance.description)
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceDetailView(TestCase):
     model = Race
     resolver = 'roleplay:place:detail'
@@ -1809,6 +1812,7 @@ class TestRaceDetailView(TestCase):
         self.assertTemplateUsed(response, self.template)
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceUpdateView(TestCase):
     model = Race
     resolver = 'roleplay:place:edit'
@@ -1895,6 +1899,7 @@ class TestRaceUpdateView(TestCase):
         self.assertEqual(self.race.name, new_name)
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = Race
@@ -1975,6 +1980,7 @@ class TestRaceListView(TestCase):
         self.assertNotContains(response, 'Create race for campaign')
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceDeleteView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = Race

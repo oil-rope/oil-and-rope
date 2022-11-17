@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
+from registration.models import User
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
 from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, Session
 from tests.mocks import discord
@@ -166,26 +167,15 @@ class TestPlace(TestCase):
 class TestRace(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.model = Race
+        cls.user: User = baker.make_recipe('registration.user')
 
-    def test_create_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        self.model.objects.get(pk=instance.pk)
-
-    def test_create_with_owner_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        users = baker.make(constants.REGISTRATION_USER, 3)
-        instance.add_owners(*users)
-
-        owners = instance.owners
-        result = all(user in owners for user in users)
-        self.assertTrue(result)
-
-    def test_str_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        expected = f'{instance.name} [{instance.pk}]'
-
-        self.assertEqual(expected, str(instance))
+    def test_create_without_optional_ok(self):
+        instance = Race.objects.create(
+            name=fake.word(),
+            description='',
+            owner_id=self.user.pk,
+        )
+        Race.objects.get(pk=instance.pk)
 
 
 class TestCampaign(TestCase):

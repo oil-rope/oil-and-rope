@@ -68,11 +68,17 @@ MANAGERS = ADMINS
 
 # Application definition
 INSTALLED_APPS = [
+    # https://docs.djangoproject.com/en/stable/ref/contrib/admin/
     'django.contrib.admin',
+    # https://docs.djangoproject.com/en/stable/topics/auth/
     'django.contrib.auth',
+    # https://docs.djangoproject.com/en/stable/ref/contrib/contenttypes/
     'django.contrib.contenttypes',
+    # https://docs.djangoproject.com/en/stable/topics/http/sessions/
     'django.contrib.sessions',
+    # https://docs.djangoproject.com/en/stable/ref/contrib/messages/
     'django.contrib.messages',
+    # https://docs.djangoproject.com/en/stable/ref/contrib/staticfiles/
     'django.contrib.staticfiles',
     # The “sites” framework (https://docs.djangoproject.com/en/stable/ref/contrib/sites/)
     'django.contrib.sites',
@@ -154,7 +160,6 @@ MESSAGE_TAGS = {
 SITE_ID = 1
 
 ROOT_URLCONF = 'oilandrope.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -166,10 +171,14 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                # https://docs.djangoproject.com/en/stable/ref/templates/api/#django-contrib-auth-context-processors-auth
                 'django.contrib.auth.context_processors.auth',
+                # https://docs.djangoproject.com/en/stable/ref/templates/api/#django-template-context-processors-i18n
+                'django.template.context_processors.i18n',
+                # https://docs.djangoproject.com/en/stable/ref/templates/api/#django-contrib-messages-context-processors-messages
                 'django.contrib.messages.context_processors.messages',
+                # https://docs.djangoproject.com/en/stable/ref/templates/api/#django-template-context-processors-request
+                'django.template.context_processors.request',
                 'common.context_processors.utils.requests_utils',
                 'core.context_processors.language',
                 'core.context_processors.handy_settings',
@@ -178,6 +187,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'oilandrope.wsgi.application'
 

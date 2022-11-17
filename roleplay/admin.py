@@ -1,6 +1,7 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
+from common.admin import ImageTabularInline
 from core.admin import make_private, make_public
 
 from . import models
@@ -76,39 +77,55 @@ class CampaignAdmin(admin.ModelAdmin):
         queryset.delete()
 
 
-class RaceInline(admin.TabularInline):
-    model = models.RaceUser
-
-
 @admin.register(models.Race)
 class RaceAdmin(admin.ModelAdmin):
+    date_hierarchy = 'entry_created_at'
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name',
+                'description',
+                'owner',
+                ('campaign', 'place',),
+                ('entry_created_at', 'entry_updated_at'),
+            ),
+        }),
+        ('Stats', {
+            'classes': ('collapse', ),
+            'fields': (
+                'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'affected_by_armor',
+            ),
+        }),
+    )
     list_display = (
+        '__str__',
         'id',
         'name',
-        'description',
-        'strength',
-        'dexterity',
-        'constitution',
-        'intelligence',
-        'wisdom',
-        'charisma',
-        'affected_by_armor',
-        'image',
+        'campaign',
+        'place',
         'entry_created_at',
         'entry_updated_at',
     )
-
-    inlines = [
-        RaceInline
-    ]
-
+    list_display_links = (
+        '__str__',
+        'id',
+        'name',
+    )
     list_filter = (
         'entry_created_at',
         'entry_updated_at',
         'affected_by_armor',
     )
-    raw_id_fields = ('users',)
-    search_fields = ('name',)
+    readonly_fields = ('entry_created_at', 'entry_updated_at',)
+    search_fields = (
+        'name__icontains',
+        'owner__username__icontains',
+        'campaign__name__icontains',
+        'place__name__icontains',
+    )
+    inlines = [
+        ImageTabularInline,
+    ]
 
 
 @admin.register(models.Session)
