@@ -169,13 +169,24 @@ class TestRace(TestCase):
     def setUpTestData(cls):
         cls.user: User = baker.make_recipe('registration.user')
 
+    def test_create_without_owner_ko(self):
+        with self.assertRaisesRegex(IntegrityError, expected_regex=r'NOT NULL constraint failed: .+'):
+            Race.objects.create(name=fake.word())
+
+    def test_clean_without_place_or_campaign_ko(self):
+        with self.assertRaises(ValidationError) as ex:
+            Race(owner_id=self.user.pk).clean()
+        error_msg = ex.exception.message
+
+        self.assertEqual(error_msg, 'Either a campaign or a place should be indicated.')
+
     def test_create_without_optional_ok(self):
         instance = Race.objects.create(
-            name=fake.word(),
-            description='',
             owner_id=self.user.pk,
         )
         Race.objects.get(pk=instance.pk)
+
+        self.assertTrue(True)
 
 
 class TestCampaign(TestCase):

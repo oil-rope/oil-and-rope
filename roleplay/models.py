@@ -241,17 +241,17 @@ class Race(TracingMixin):
     """
 
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
-    name = models.CharField(verbose_name=_('name'), max_length=50)
+    name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
-    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0)
-    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0)
-    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0)
-    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0)
-    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0)
-    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0)
+    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=False)
+    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=False)
+    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=False)
+    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=False)
+    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=False)
+    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=False)
     affected_by_armor = models.BooleanField(
         verbose_name=_('affected by armor'), default=True,
-        help_text=_('declares if this race is affected by armor penalties')
+        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=False,
     )
     images = GenericRelation(
         verbose_name=_('images'), to=constants.COMMON_IMAGE, related_query_name='race_set',
@@ -274,6 +274,10 @@ class Race(TracingMixin):
         verbose_name = _('race')
         verbose_name_plural = _('races')
         ordering = ['-entry_created_at', 'name']
+
+    def clean(self):
+        if not self.campaign and not self.place:
+            raise ValidationError(_('either a campaign or a place should be indicated.').capitalize())
 
     def get_absolute_url(self):
         return resolve_url('roleplay:race:detail', pk=self.pk)
