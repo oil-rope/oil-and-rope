@@ -98,7 +98,7 @@ jobs:
         # TODO: OAR-18 fix the `fail-under` to remove this bypass
         run: |
           poetry run coverage run ./manage.py test
-          poetry run coverage report --skip-covered
+          poetry run coverage report --skip-covered --fail-under=90
           poetry run coverage xml --fail-under=90
 
       - name: Update coverage
