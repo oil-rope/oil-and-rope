@@ -19,9 +19,10 @@ class TrackAdmin(TracingMixinAdmin):
 
 
 class ImageTabularInline(GenericTabularInline):
-    model = models.Image
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
+    extra = 1
+    model = models.Image
 
 
 @admin.register(models.Vote)

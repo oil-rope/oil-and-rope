@@ -90,7 +90,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         # NOTE: If SMTP is unreachable one of those exceptions will be raised
         except (ConnectionError, SMTPException):
             msg = '{} {}'.format(
-                _('seems like we are experimenting issues with our mail automatization.').capitalize(),
+                _('seems like we are experimenting issues with our mail automation.').capitalize(),
                 _('please try later.').capitalize(),
             )
             messages.error(self.request, msg)

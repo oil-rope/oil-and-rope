@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, verbose_name='description')),
                 ('description_en', models.TextField(blank=True, null=True, verbose_name='description')),
                 ('description_es', models.TextField(blank=True, null=True, verbose_name='description')),
-                ('system', models.SmallIntegerField(choices=[(0, 'Pathfinder 1e'), (1, 'Dungeons & Dragons 3.5')], db_index=True, verbose_name='name')),
+                ('system', models.SmallIntegerField(choices=[(0, 'Pathfinder 1e'), (1, 'Dungeons & Dragons 3.5')], db_index=True, verbose_name='system')),
             ],
             options={
                 'verbose_name': 'type of trait',
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('entry_created_at', models.DateTimeField(auto_now_add=True, verbose_name='entry created at')),
                 ('entry_updated_at', models.DateTimeField(auto_now=True, verbose_name='entry updated at')),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='identifier')),
-                ('name', models.CharField(blank=True, max_length=255, verbose_name='name')),
+                ('name', models.CharField(max_length=255, verbose_name='name')),
                 ('description', models.TextField(blank=True, verbose_name='description')),
                 ('object_id', models.CharField(db_index=True, max_length=255, verbose_name='object identifier')),
                 ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='trait_set', to='contenttypes.contenttype', verbose_name='model associated')),

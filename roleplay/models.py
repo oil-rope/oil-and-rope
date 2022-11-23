@@ -43,7 +43,7 @@ class TraitType(TracingMixin):
     name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     system = models.SmallIntegerField(
-        verbose_name=_('name'), choices=RoleplaySystems.choices, null=False, blank=False, db_index=True,
+        verbose_name=_('system'), choices=RoleplaySystems.choices, null=False, blank=False, db_index=True,
     )
 
     class Meta:
@@ -55,7 +55,7 @@ class TraitType(TracingMixin):
         ]
 
     def __str__(self):
-        return f'{self.name} ({self.description or _("no description provided").capitalize():.25}) [{self.id}]'
+        return f'{self.name} [{self.id}]'
 
 
 class Trait(TracingMixin):
@@ -85,7 +85,7 @@ class Trait(TracingMixin):
     """
 
     id = models.UUIDField(verbose_name=_('identifier'), primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(verbose_name=_('name'), null=False, blank=True, max_length=255)
+    name = models.CharField(verbose_name=_('name'), null=False, blank=False, max_length=255)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     type = models.ForeignKey(
         verbose_name=_('type'), to=constants.ROLEPLAY_TRAIT_TYPE, to_field='id', on_delete=models.CASCADE,

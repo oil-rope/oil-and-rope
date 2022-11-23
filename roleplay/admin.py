@@ -1,15 +1,30 @@
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 from mptt.admin import DraggableMPTTAdmin
 
 from common.admin import ImageTabularInline
 from core.admin import make_private, make_public
 
-from . import models
+from .models import Campaign, Domain, Place, PlayerInCampaign, Race, Session, Trait, TraitType
 
 
-@admin.register(models.Domain)
+class PlayerInCampaignInline(admin.TabularInline):
+    model = PlayerInCampaign
+    extra = 1
+
+
+class TraitTabularInline(GenericTabularInline):
+    ct_field = 'content_type'
+    ct_fk_field = 'object_id'
+    extra = 3
+    exclude = ('source', 'source_link', )
+    model = Trait
+
+
+@admin.register(Domain)
 class DomainAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     list_display = ('__str__', 'domain_type', 'entry_created_at', 'entry_updated_at')
@@ -19,7 +34,7 @@ class DomainAdmin(admin.ModelAdmin):
     search_fields = ['name__icontains']
 
 
-@admin.register(models.Place)
+@admin.register(Place)
 class PlaceAdmin(DraggableMPTTAdmin):
     date_hierarchy = 'entry_created_at'
     list_display = ('tree_actions', 'indented_title', '__str__', 'site_type', 'entry_created_at', 'entry_updated_at')
@@ -29,12 +44,7 @@ class PlaceAdmin(DraggableMPTTAdmin):
     search_fields = ['name__icontains']
 
 
-class PlayerInCampaignInline(admin.TabularInline):
-    model = models.PlayerInCampaign
-    extra = 1
-
-
-@admin.register(models.Campaign)
+@admin.register(Campaign)
 class CampaignAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     inlines = [PlayerInCampaignInline]
@@ -79,7 +89,7 @@ class CampaignAdmin(admin.ModelAdmin):
         queryset.delete()
 
 
-@admin.register(models.Race)
+@admin.register(Race)
 class RaceAdmin(admin.ModelAdmin):
     # Strongly related to `search_fields`
     # https://docs.djangoproject.com/en/4.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.autocomplete_fields
@@ -103,6 +113,7 @@ class RaceAdmin(admin.ModelAdmin):
         }),
     )
     inlines = [
+        TraitTabularInline,
         ImageTabularInline,
     ]
     list_display = (
@@ -127,7 +138,6 @@ class RaceAdmin(admin.ModelAdmin):
         ('place', admin.EmptyFieldListFilter, )
     )
     list_select_related = ('campaign', 'place', 'owner', )
-    radio_fields = {'owner': admin.VERTICAL}
     readonly_fields = ('entry_created_at', 'entry_updated_at', )
     save_as = True
     save_on_top = True
@@ -155,7 +165,7 @@ class RaceAdmin(admin.ModelAdmin):
         return form
 
 
-@admin.register(models.Session)
+@admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
     date_hierarchy = 'entry_created_at'
     fields = (
@@ -178,3 +188,72 @@ class SessionAdmin(admin.ModelAdmin):
     list_filter = ('next_game', 'entry_created_at', 'entry_updated_at')
     readonly_fields = ('entry_created_at', 'entry_updated_at')
     search_fields = ['name__icontains', 'campaign__place__name__icontains']
+
+
+@admin.register(Trait)
+class TraitAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('creator', 'type', )
+    date_hierarchy = 'entry_created_at'
+    fields = (
+        ('name', 'creator', 'type', ),
+        ('source', 'source_link', ),
+        'description',
+        ('content_type', 'object_id', ),
+    )
+    list_display = (
+        '__str__', 'id', 'name', 'creator', 'content_object_associated', 'entry_created_at', 'entry_updated_at',
+    )
+    list_display_links = ('__str__', 'id', 'name', )
+    list_filter = (
+        'entry_created_at',
+        'entry_updated_at',
+        ('source', admin.EmptyFieldListFilter),
+        ('source_link', admin.EmptyFieldListFilter),
+    )
+    list_select_related = ('creator', 'content_type', )
+    readonly_fields = ('entry_created_at', 'entry_updated_at',)
+    save_as = True
+    save_on_top = True
+    search_fields = (
+        'name__icontains',
+        'description__icontains',
+        'creator__username__icontains',
+        'source__icontains',
+        'source_link__icontains',
+    )
+    sortable_by = (
+        'id', 'name', 'creator', 'entry_created_at', 'entry_updated_at',
+    )
+
+    @admin.display(description='Entity with this trait')
+    def content_object_associated(self, obj: Trait):
+        return f'{obj.content_object} | {obj.content_type.name}'
+
+
+@admin.register(TraitType)
+class TraitTypeAdmin(TranslationAdmin):
+    date_hierarchy = 'entry_created_at'
+    fields = ('name', 'description', 'system', )
+    list_display = (
+        '__str__', 'id', 'name', 'description', 'system', 'entry_created_at', 'entry_updated_at',
+    )
+    list_display_links = ('__str__', 'id', )
+    list_editable = ('name', )
+    list_filter = (
+        'entry_created_at',
+        'entry_updated_at',
+        ('description', admin.EmptyFieldListFilter),
+        'system',
+    )
+    radio_fields = {'system': admin.HORIZONTAL}
+    readonly_fields = ('entry_created_at', 'entry_updated_at', )
+    save_as = True
+    save_on_top = True
+    search_fields = (
+        'name__icontains',
+        'description__icontains',
+        'system',
+    )
+    sortable_by = (
+        'id', 'name_es', 'name_en', 'system', 'entry_created_at', 'entry_updated_at',
+    )
