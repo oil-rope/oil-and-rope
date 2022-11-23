@@ -44,7 +44,7 @@ class TestTraitType(TestCase):
             name='Test TraitType', description='This is some description', system=RoleplaySystems.PATHFINDER_1,
         )
 
-        self.assertEqual(f'Test TraitType (This is some description) [{trait_type.id}]', str(trait_type))
+        self.assertEqual(f'Test TraitType [{trait_type.id}]', str(trait_type))
 
     def test_translation_ok(self):
         trait_type = TraitType.objects.get(name_en='Basic (Combat)')
