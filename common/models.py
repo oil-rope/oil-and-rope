@@ -86,7 +86,7 @@ class Image(TracingMixin):
     object_id = models.CharField(
         verbose_name=_('object identifier'), db_index=True, null=False, blank=False, max_length=255,
     )
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
 
     class Meta:
         verbose_name = _('image')

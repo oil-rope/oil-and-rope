@@ -1,5 +1,5 @@
 import django_filters as filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.forms.widgets import CheckboxInput
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -10,6 +10,7 @@ from common.forms.widgets import DateWidget
 from roleplay.models import Campaign, Race, Session
 
 from ..enums import RoleplaySystems
+from .enums import AbilitiesEnum
 
 
 class CampaignFilter(FilterCapitalizeMixin, filters.FilterSet):
@@ -58,10 +59,25 @@ class SessionFilter(FilterCapitalizeMixin, filters.FilterSet):
 
 
 class RaceFilter(FilterCapitalizeMixin, filters.FilterSet):
-    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
-    description = filters.CharFilter(field_name='description', lookup_expr='icontains')
+    name = filters.CharFilter(lookup_expr='icontains')
+    description = filters.CharFilter(lookup_expr='icontains')
+    campaign = filters.CharFilter(lookup_expr='name__icontains')
+    place = filters.CharFilter(lookup_expr='name__icontains')
+    ability_modifiers = filters.MultipleChoiceFilter(
+        field_name='ability_modifiers', method='get_ability_modifiers', label=_('ability modifiers'),
+        help_text=_('search for races that have ability modifiers'), choices=AbilitiesEnum.choices,
+    )
+
+    def get_ability_modifiers(self, queryset: QuerySet, field_name: str, values: list[str]):
+        if values:
+            for ability in values:
+                queryset = queryset.filter(~Q(**{ability: 0}))
+            return queryset
+        return queryset
 
     class Meta:
         model = Race
-        fields = ['name', 'description', 'affected_by_armor']
+        fields = [
+            'name', 'description', 'campaign', 'place', 'affected_by_armor',
+        ]
         form = BasicFilterForm

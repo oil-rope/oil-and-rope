@@ -15,26 +15,33 @@
   </h1>
 
   <main class="container">
-    {% if object_list %}
+    {% if object_list or filter.data %}
       <div class="row justify-content-center mb-3">
         <div class="col col-lg-8 col-xxl-7">
           {% include 'common/include/filter_accordion.html' with filter=filter only %}
         </div>
       </div>
     {% endif %}
-
     {% for object in object_list %}
-      {{ race }}
+      {{ object }}
       {% comment %} <div
         class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
         {% include 'roleplay/include/race_card.html' with race=object user=request.user only %}
       </div> {% endcomment %}
     {% empty %}
       <h2 class="text-center mb-4">
-        {% translate "seems like you haven't create any race yet."|capfirst %}
+        {% if filter.data %}
+          {% translate "there isn't any race with this characteristics."|capfirst %}
+        {% else %}
+          {% translate "seems like you haven't create any race yet."|capfirst %}
+        {% endif %}
         <br>
         <small class="text-muted fw-light">
-          {% translate "but you can create one!"|capfirstletter %}
+          {% if filter.data %}
+            {% translate "remove filter or create one."|capfirst %}
+          {% else %}
+            {% translate "but you can create one!"|capfirstletter %}
+          {% endif %}
         </small>
       </h2>
 

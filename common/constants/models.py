@@ -29,6 +29,8 @@ ROLEPLAY_PLACE = 'roleplay.Place'
 ROLEPLAY_RACE = 'roleplay.Race'
 ROLEPLAY_RACE_USER = 'roleplay.RaceUser'
 ROLEPLAY_SESSION = 'roleplay.Session'
+ROLEPLAY_TRAIT = 'roleplay.Trait'
+ROLEPLAY_TRAIT_TYPE = 'roleplay.TraitType'
 
 # Chat
 CHAT = 'chat.Chat'

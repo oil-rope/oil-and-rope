@@ -68,6 +68,9 @@ MANAGERS = ADMINS
 
 # Application definition
 INSTALLED_APPS = [
+    # https://django-modeltranslation.readthedocs.io/en/latest/
+    # Why on top? https://django-modeltranslation.readthedocs.io/en/latest/
+    'modeltranslation',
     # https://docs.djangoproject.com/en/stable/ref/contrib/admin/
     'django.contrib.admin',
     # https://docs.djangoproject.com/en/stable/topics/auth/

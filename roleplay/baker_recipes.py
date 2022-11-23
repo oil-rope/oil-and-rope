@@ -1,16 +1,19 @@
 import functools
 import random
 
-from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone as tz
+from model_bakery import baker
 from model_bakery.recipe import Recipe, foreign_key
 
-from common.constants import models
 from common.utils import create_faker
 from registration.baker_recipes import user
 
 from .enums import DomainTypes, RoleplaySystems, SiteTypes
+from .models import Campaign, Domain, Place, Race, Session, Trait, TraitType
 
+english_faker = create_faker(locales=['en'])
+spanish_faker = create_faker(locales=['es'])
 fake = create_faker()
 random_date_after_today = functools.partial(
     fake.date_time_between, tzinfo=tz.get_current_timezone(), start_date='now', end_date='+1y'
@@ -18,12 +21,6 @@ random_date_after_today = functools.partial(
 random_domain_type = functools.partial(random.choice, DomainTypes.values)
 random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
 random_site_type = functools.partial(random.choice, SiteTypes.values)
-
-Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-Domain = apps.get_model(models.ROLEPLAY_DOMAIN)
-Place = apps.get_model(models.ROLEPLAY_PLACE)
-Session = apps.get_model(models.ROLEPLAY_SESSION)
-Race = apps.get_model(models.ROLEPLAY_RACE)
 
 place = Recipe(
     Place,
@@ -89,4 +86,21 @@ race_without_optional = race.extend(
     description='',
     image='',
     affected_by_armor=False,
+)
+
+trait_type = Recipe(
+    TraitType,
+    name=english_faker.sentence(nb_words=3),
+    name_es=spanish_faker.sentence(nb_words=3),
+    description=english_faker.sentence(),
+    description_es=spanish_faker.sentence(),
+)
+
+trait = Recipe(
+    Trait,
+    name=fake.sentence(nb_words=3),
+    description=fake.sentence(),
+    type=foreign_key('roleplay.trait_type'),
+    content_type=lambda: ContentType.objects.get_for_model(Race),
+    object_id=lambda: baker.make_recipe('roleplay.race').id,
 )
