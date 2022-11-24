@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
@@ -743,7 +743,19 @@ class RaceListView(LoginRequiredMixin, FilterView):
     model = Race
     template_name = 'roleplay/race/race_list.html'
     paginate_by = 12
-    queryset = Race.objects.all()
+    queryset = Race.objects.select_related(
+        'owner',
+        'place',
+        'campaign',
+    ).prefetch_related(
+        'images',
+    ).all()
+
+    def get_queryset(self) -> QuerySet[Race]:
+        qs = super().get_queryset().filter(
+            owner=self.request.user,
+        )
+        return qs
 
 
 class RaceDeleteView(LoginRequiredMixin, DeleteView):

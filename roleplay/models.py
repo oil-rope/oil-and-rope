@@ -40,6 +40,7 @@ class TraitType(TracingMixin):
         Roleplay system associated.
     """
 
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
     name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
     system = models.SmallIntegerField(

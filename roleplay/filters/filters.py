@@ -69,10 +69,8 @@ class RaceFilter(FilterCapitalizeMixin, filters.FilterSet):
     )
 
     def get_ability_modifiers(self, queryset: QuerySet, field_name: str, values: list[str]):
-        if values:
-            for ability in values:
-                queryset = queryset.filter(~Q(**{ability: 0}))
-            return queryset
+        for ability in values:
+            queryset = queryset.filter(~Q(**{ability: 0}))
         return queryset
 
     class Meta:

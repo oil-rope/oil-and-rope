@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 fake = create_faker()
+english_faker = create_faker(locales=['en'])
+spanish_faker = create_faker(locales=['es'])
 
 
 def generate_place(_quantity=1, **kwargs) -> Union[list['Place'], 'Place']:

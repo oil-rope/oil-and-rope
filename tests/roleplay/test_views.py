@@ -1899,10 +1899,8 @@ class TestRaceUpdateView(TestCase):
         self.assertEqual(self.race.name, new_name)
 
 
-@unittest.skip('WIP: OAR-18')
 class TestRaceListView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
-    model = Race
     resolver = 'roleplay:race:list'
     template = 'roleplay/race/race_list.html'
     view = views.RaceListView
@@ -1910,74 +1908,159 @@ class TestRaceListView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = baker.make_recipe('registration.user')
-        cls.url = resolve_url('roleplay:race:list')
-
-    def setUp(self) -> None:
-        self.race_without_optional: Race = baker.make_recipe('roleplay.race_without_optional')
-        self.race: Race = baker.make_recipe('roleplay.race')
-
-        self.race.users.add(self.user)
-        self.race_without_optional.users.add(self.user)
+        cls.url = resolve_url(cls.resolver)
 
     def test_anonymous_access_ko(self):
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
         expected_url = f'{self.login_url}?next={self.url}'
 
         self.assertRedirects(response, expected_url)
 
-    def test_access_with_user_ok(self):
+    def test_access_logged_user_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
         self.assertEqual(200, response.status_code)
 
     def test_access_templated_used_is_correct_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertTemplateUsed(response, self.template)
+        self.assertTemplateUsed(response=response, template_name=self.template)
 
-    def test_template_paginator_ok(self):
-        baker.make_recipe('roleplay.race', self.view.paginate_by)
-
+    def test_access_without_races_and_see_buttons_ok(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertTemplateUsed(response, self.template)
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
+
+    def test_access_with_races_and_sees_them_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text=race.name)
+        self.assertContains(response=response, text=race.description)
+
+    def test_access_without_owned_races_and_does_not_see_others_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race')
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertNotContains(response=response, text=race.name)
+        self.assertNotContains(response=response, text=race.description)
 
     def test_advanced_search_is_displayed_if_there_are_any_races_ok(self):
-        baker.make_recipe('roleplay.race', 3)
+        baker.make_recipe('roleplay.race', owner=self.user)
 
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertContains(response, 'Advanced Search')
+        self.assertContains(response=response, text='Advanced Search')
 
     def test_advanced_search_is_not_displayed_if_there_is_no_race_ok(self):
-        self.race.delete()
-        self.race_without_optional.delete()
-
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertNotContains(response, 'Advanced Search')
+        self.assertNotContains(response=response, text='Advanced Search')
 
     def test_create_for_buttons_are_displayed_if_there_is_no_race_ok(self):
-        self.race.delete()
-        self.race_without_optional.delete()
-
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertContains(response, 'Create race for world')
-        self.assertContains(response, 'Create race for campaign')
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
 
     def test_create_for_buttons_are_not_displayed_if_there_is_any_race_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
-        response = self.client.get(self.url)
+        response = self.client.get(path=self.url)
 
-        self.assertNotContains(response, 'Create race for world')
-        self.assertNotContains(response, 'Create race for campaign')
+        self.assertNotContains(response=response, text='Create race for world')
+        self.assertNotContains(response=response, text='Create race for campaign')
+
+    def test_search_by_name_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'name': race.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_name_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'name': fake.word()})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_description_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'description': race.description})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_description_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'description': fake.word()})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_campaign_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'campaign': race.campaign.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_campaign_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'campaign': fake.word()})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_place_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'place': race.place.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_place_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'place': fake.word()})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_ability_modifiers_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user, strength=1)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'ability_modifiers': 'strength'})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_ability_modifiers_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race_without_modifiers', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'ability_modifiers': 'strength'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_races_paginated_ok(self):
+        baker.make_recipe('roleplay.race', self.view.paginate_by + 1, owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Next')
 
 
 @unittest.skip('WIP: OAR-18')

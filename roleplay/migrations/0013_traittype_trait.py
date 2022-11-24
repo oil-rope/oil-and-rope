@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TraitType',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(primary_key=True, serialize=False, verbose_name='identifier')),
                 ('entry_created_at', models.DateTimeField(auto_now_add=True, verbose_name='entry created at')),
                 ('entry_updated_at', models.DateTimeField(auto_now=True, verbose_name='entry updated at')),
                 ('name', models.CharField(max_length=50, verbose_name='name')),
