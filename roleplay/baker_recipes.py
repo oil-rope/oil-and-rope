@@ -15,15 +15,12 @@ from .models import Campaign, Domain, Place, Race, Session, Trait, TraitType
 random_date_after_today = functools.partial(
     fake.date_time_between, tzinfo=tz.get_current_timezone(), start_date='now', end_date='+1y'
 )
-random_domain_type = functools.partial(random.choice, DomainTypes.values)
-random_roleplay_system = functools.partial(random.choice, RoleplaySystems.values)
-random_site_type = functools.partial(random.choice, SiteTypes.values)
 
 place = Recipe(
     Place,
     name=fake.country,
     description=fake.paragraph,
-    site_type=random_site_type,
+    site_type=lambda: random.choice(SiteTypes.values),
     owner=foreign_key(user),
 )
 
@@ -39,13 +36,13 @@ domain = Recipe(
     Domain,
     name=fake.word,
     description=fake.paragraph,
-    domain_type=random_domain_type,
+    domain_type=lambda: random.choice(DomainTypes.values),
 )
 
 campaign = Recipe(
     Campaign,
-    name=functools.partial(fake.sentence, nb_words=3),
-    system=random_roleplay_system,
+    name=lambda: fake.sentence(nb_words=3),
+    system=lambda: random.choice(RoleplaySystems.values),
     is_public=fake.pybool,
 )
 
@@ -68,8 +65,8 @@ session = Recipe(
 
 race = Recipe(
     Race,
-    name=fake.word(),
-    description=fake.paragraph(),
+    name=fake.word,
+    description=fake.paragraph,
     strength=lambda: fake.random_int(min=-5, max=5),
     dexterity=lambda: fake.random_int(min=-5, max=5),
     constitution=lambda: fake.random_int(min=-5, max=5),
@@ -108,10 +105,10 @@ race_without_optional = race.extend(
 
 trait_type = Recipe(
     TraitType,
-    name=english_faker.sentence(nb_words=3),
-    name_es=spanish_faker.sentence(nb_words=3),
-    description=english_faker.sentence(),
-    description_es=spanish_faker.sentence(),
+    name=lambda: english_faker.sentence(nb_words=3),
+    name_es=lambda: spanish_faker.sentence(nb_words=3),
+    description=english_faker.sentence,
+    description_es=spanish_faker.sentence,
 )
 
 trait = Recipe(
