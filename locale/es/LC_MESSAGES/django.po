@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 20:12+0000\n"
+"POT-Creation-Date: 2022-11-25 10:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2541,9 +2541,9 @@ msgstr "raza sin imagen"
 
 #: roleplay/templates/roleplay/include/race_card.html:75
 #, fuzzy
-#| msgid "race"
-msgid "view race"
-msgstr "ver raza"
+#| msgid "Detail"
+msgid "details"
+msgstr "detalles"
 
 #: roleplay/templates/roleplay/include/world_card.html:24
 #, fuzzy
@@ -3030,6 +3030,11 @@ msgstr "sesión borrada."
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "race"
+#~ msgid "view race"
+#~ msgstr "ver raza"
 
 #, fuzzy
 #~| msgid "No description provided"

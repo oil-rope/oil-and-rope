@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-<div class="card">
+<div class="card h-100">
   <div class="card-body">
     <div
       id="race{{ race.pk }}ImagesCarousel"
@@ -58,7 +58,7 @@
     </h5>
     <p class="card-text">
       {% if race.description %}
-        {{ race.description }}
+        {{ race.description|truncatechars:100 }}
       {% else %}
         {% translate "no description provided yet."|capfirst %}
       {% endif %}
@@ -66,13 +66,13 @@
   </div>
 
   <div class="card-footer">
-    <div class="d-grid gap-2 d-lg-flex justify-content-lg-end">
+    <div class="d-grid gap-2 gap-md-3 gap-lg-2 gap-xl-1  d-md-flex justify-content-md-end">
       <a
         href="{% url 'roleplay:race:detail' pk=race.pk %}"
         class="btn btn-primary disabled"
       >
-        {{ ICONS.USER|safe }}
-        {% translate "view race"|capfirst %}
+        {{ ICONS.EYE|safe }}
+        {% translate "details"|capfirst %}
       </a>
       {% if race.owner == request.user %}
         <a

@@ -1946,7 +1946,7 @@ class TestRaceListView(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(path=self.url)
 
-        self.assertContains(response=response, text='View race', count=len(races))
+        self.assertContains(response=response, text='Details', count=len(races))
         # NOTE: We need +1 since its getting 'Edit'  from CKEditor
         self.assertContains(response=response, text='Edit', count=len(races) + 1)
         self.assertContains(response=response, text='Delete', count=len(races))
