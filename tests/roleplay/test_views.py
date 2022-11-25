@@ -15,11 +15,11 @@ from django.shortcuts import resolve_url
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from model_bakery import baker
-from PIL import Image
+from PIL import Image as PILImage
 
 from chat.models import Chat
 from common import tools
-from common.models import Vote
+from common.models import Image, Vote
 from registration.models import User
 from roleplay import enums, views
 from roleplay.models import Campaign, Place, Race, Session
@@ -46,7 +46,7 @@ class TestPlaceCreateView(TestCase):
 
     def setUp(self):
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
         with open(self.tmp_file.name, 'rb') as img_content:
             image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
 
@@ -170,7 +170,7 @@ class TestPlaceUpdateView(TestCase):
 
     def setUp(self):
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
         with open(self.tmp_file.name, 'rb') as img_content:
             image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
 
@@ -450,7 +450,7 @@ class TestWorldCreateView(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
         with open(cls.tmp_file.name, 'rb') as img_content:
             cls.image = SimpleUploadedFile(
                 name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
@@ -538,7 +538,7 @@ class TestWorldUpdateView(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
         with open(cls.tmp_file.name, 'rb') as img_content:
             cls.image = SimpleUploadedFile(
                 name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
@@ -1734,7 +1734,7 @@ class TestSessionListView(TestCase):
             self.view.as_view()(rq)
 
 
-@unittest.skip('WIP: OAR-18')
+@unittest.skip('WIP: OAR-113')
 class TestRaceCreateView(TestCase):
     login_url = reverse('registration:auth:login')
     model = Race
@@ -1779,7 +1779,7 @@ class TestRaceCreateView(TestCase):
         self.assertEqual(self.data_ok['description'], instance.description)
 
 
-@unittest.skip('WIP: OAR-18')
+@unittest.skip('WIP: OAR-115')
 class TestRaceDetailView(TestCase):
     model = Race
     resolver = 'roleplay:place:detail'
@@ -1841,9 +1841,7 @@ class TestRaceUpdateView(TestCase):
 
     def setUp(self):
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
-        with open(self.tmp_file.name, 'rb') as img_content:
-            image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
+        image = SimpleUploadedFile(name=self.tmp_file.name, content=b'', content_type='image/jpeg')
 
         self.data_ok = {
             'name': fake.word(),
@@ -1943,6 +1941,16 @@ class TestRaceListView(TestCase):
         self.assertContains(response=response, text=race.name)
         self.assertContains(response=response, text=race.description)
 
+    def test_access_with_races_and_race_actions_are_visible_ok(self):
+        races: list[Race] = baker.make_recipe('roleplay.race', 3, owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='View race', count=len(races))
+        # NOTE: We need +1 since its getting 'Edit'  from CKEditor
+        self.assertContains(response=response, text='Edit', count=len(races) + 1)
+        self.assertContains(response=response, text='Delete', count=len(races))
+
     def test_access_without_owned_races_and_does_not_see_others_races_ok(self):
         race: Race = baker.make_recipe('roleplay.race')
         self.client.force_login(self.user)
@@ -1980,6 +1988,24 @@ class TestRaceListView(TestCase):
         self.assertNotContains(response=response, text='Create race for world')
         self.assertNotContains(response=response, text='Create race for campaign')
 
+    def test_races_without_description_show_default_text_ok(self):
+        races: list[Race] = baker.make_recipe('roleplay.race', 2, owner=self.user, description='')
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='No description provided yet.', count=len(races))
+
+    def test_races_with_images_are_displayed_on_carousel_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        image = Image.objects.create(
+            image=SimpleUploadedFile(name='test.png', content=b'', content_type='image/jpeg'), owner=self.user,
+            content_type=ContentType.objects.get_for_model(Race), object_id=race.id,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text=image.image.url)
+
     def test_search_by_name_with_existent_races_ok(self):
         race: Race = baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
@@ -1990,7 +2016,7 @@ class TestRaceListView(TestCase):
     def test_search_by_name_with_non_existent_races_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
-        response = self.client.get(path=self.url, data={'name': fake.word()})
+        response = self.client.get(path=self.url, data={'name': 'lorem ipsum dolor'})
 
         self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
         self.assertContains(response=response, text='Remove filter or create one.')
@@ -2005,7 +2031,7 @@ class TestRaceListView(TestCase):
     def test_search_by_description_with_non_existent_races_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
-        response = self.client.get(path=self.url, data={'description': fake.word()})
+        response = self.client.get(path=self.url, data={'description': 'lorem ipsum dolor'})
 
         self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
         self.assertContains(response=response, text='Remove filter or create one.')
@@ -2020,7 +2046,7 @@ class TestRaceListView(TestCase):
     def test_search_by_campaign_with_non_existent_races_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
-        response = self.client.get(path=self.url, data={'campaign': fake.word()})
+        response = self.client.get(path=self.url, data={'campaign': 'lorem ipsum dolor'})
 
         self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
         self.assertContains(response=response, text='Remove filter or create one.')
@@ -2035,7 +2061,7 @@ class TestRaceListView(TestCase):
     def test_search_by_place_with_non_existent_races_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
-        response = self.client.get(path=self.url, data={'place': fake.word()})
+        response = self.client.get(path=self.url, data={'place': 'lorem ipsum dolor'})
 
         self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
         self.assertContains(response=response, text='Remove filter or create one.')
@@ -2063,7 +2089,7 @@ class TestRaceListView(TestCase):
         self.assertContains(response=response, text='Next')
 
 
-@unittest.skip('WIP: OAR-18')
+@unittest.skip('WIP: OAR-114')
 class TestRaceDeleteView(TestCase):
     login_url = resolve_url(settings.LOGIN_URL)
     model = Race
