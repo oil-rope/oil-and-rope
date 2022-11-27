@@ -95,7 +95,6 @@ jobs:
       - name: Pytest
         env:
           DJANGO_SETTINGS_MODULE: oilandrope.dev_settings
-        # TODO: OAR-18 fix the `fail-under` to remove this bypass
         run: |
           poetry run coverage run ./manage.py test
           poetry run coverage report --skip-covered

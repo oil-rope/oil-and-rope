@@ -52,10 +52,11 @@ urlpatterns += i18n_patterns(
     path('roleplay/', include('roleplay.urls')),
     # O&R Email
     path('email/', include('oar_email.urls')),
-    prefix_default_language=True,
+    prefix_default_language=False,
 )
 
 if settings.DEBUG:  # pragma: no cover
     import debug_toolbar
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))

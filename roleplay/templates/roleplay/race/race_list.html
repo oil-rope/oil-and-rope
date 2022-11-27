@@ -22,16 +22,21 @@
         </div>
       </div>
     {% endif %}
-    <div
-      class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-3 justify-content-md-center align-items-stretch mb-3"
-    >
-      {% for object in object_list %}
-        <div
-          class="col"
-        >
-          {% include 'roleplay/include/race_card.html' with race=object %}
-        </div>
-      {% empty %}
+
+    {% if object_list %}
+      <div
+        class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-3 justify-content-md-center align-items-stretch mb-3"
+      >
+        {% for object in object_list %}
+          <div
+            class="col"
+          >
+            {% include 'roleplay/include/race_card.html' with race=object %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="row">
         <h2 class="text-center mb-4">
           {% if filter.data %}
             {% translate "there isn't any race with this characteristics."|capfirst %}
@@ -73,8 +78,8 @@
             {% translate "create race for campaign"|capfirst %}
           </a>
         </div>
-      {% endfor %}
-    </div>
+      </div>
+    {% endif %}
 
     {% if is_paginated %}
       {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
@@ -84,7 +89,8 @@
 
 {% block javascript %}
   <script type="module">
-    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    import {setUpTooltip} from ''
+
     setUpTooltip();
   </script>
 {% endblock javascript %}

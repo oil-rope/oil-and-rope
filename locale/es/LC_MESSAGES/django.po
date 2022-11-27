@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-25 10:51+0000\n"
+"POT-Creation-Date: 2022-11-27 11:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2241,7 +2241,7 @@ msgid "seems like we don't have any campaign right now."
 msgstr "parece que no tenemos ninguna campaña en este momento."
 
 #: roleplay/templates/roleplay/campaign/campaign_list.html:34
-#: roleplay/templates/roleplay/race/race_list.html:46
+#: roleplay/templates/roleplay/race/race_list.html:51
 #, fuzzy
 #| msgid "Would you like to create one?"
 msgid "but you can create one!"
@@ -2676,37 +2676,37 @@ msgstr "crear raza"
 msgid "race detail"
 msgstr "detalle de la raza"
 
-#: roleplay/templates/roleplay/race/race_list.html:37
+#: roleplay/templates/roleplay/race/race_list.html:42
 msgid "there isn't any race with this characteristics."
 msgstr "no hay ninguna raza con estas características."
 
-#: roleplay/templates/roleplay/race/race_list.html:39
+#: roleplay/templates/roleplay/race/race_list.html:44
 #, fuzzy
 #| msgid "Seems like you haven't any world"
 msgid "seems like you haven't create any race yet."
 msgstr "parece que aún no has creado ninguna raza."
 
-#: roleplay/templates/roleplay/race/race_list.html:44
+#: roleplay/templates/roleplay/race/race_list.html:49
 msgid "remove filter or create one."
 msgstr "borra el filtro o crea una."
 
-#: roleplay/templates/roleplay/race/race_list.html:58
+#: roleplay/templates/roleplay/race/race_list.html:63
 msgid "create a race that exists within a world you are owner of."
 msgstr "crea una raza que exista en un mundo del que seas dueño."
 
-#: roleplay/templates/roleplay/race/race_list.html:61
+#: roleplay/templates/roleplay/race/race_list.html:66
 #, fuzzy
 #| msgid "Create your world"
 msgid "create race for world"
 msgstr "crear raza para un mundo"
 
-#: roleplay/templates/roleplay/race/race_list.html:70
+#: roleplay/templates/roleplay/race/race_list.html:75
 msgid "create a race for an specific campaign where you are game master."
 msgstr ""
 "crea una raza para una campaña en específico de la que seas maestro de "
 "partida."
 
-#: roleplay/templates/roleplay/race/race_list.html:73
+#: roleplay/templates/roleplay/race/race_list.html:78
 #, fuzzy
 #| msgid "Create campaign"
 msgid "create race for campaign"
