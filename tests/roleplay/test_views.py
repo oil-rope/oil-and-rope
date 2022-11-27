@@ -1939,7 +1939,6 @@ class TestRaceListView(TestCase):
         response = self.client.get(path=self.url)
 
         self.assertContains(response=response, text=race.name)
-        self.assertContains(response=response, text=race.description)
 
     def test_access_with_races_and_race_actions_are_visible_ok(self):
         races: list[Race] = baker.make_recipe('roleplay.race', 3, owner=self.user)
@@ -1957,7 +1956,6 @@ class TestRaceListView(TestCase):
         response = self.client.get(path=self.url)
 
         self.assertNotContains(response=response, text=race.name)
-        self.assertNotContains(response=response, text=race.description)
 
     def test_advanced_search_is_displayed_if_there_are_any_races_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
