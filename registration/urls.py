@@ -10,7 +10,7 @@ USER_PATTERNS = [
 ]
 
 AUTH_PATTERNS = [
-    path('login/', views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', views.SignUpView.as_view(), name='register'),
     path('activate/<token>/<int:pk>/', views.ActivateAccountView.as_view(), name='activate'),

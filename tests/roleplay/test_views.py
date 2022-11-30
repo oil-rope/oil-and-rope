@@ -1914,6 +1914,17 @@ class TestRaceListView(TestCase):
 
         self.assertRedirects(response, expected_url)
 
+    def test_login_and_redirects_ok(self):
+        user: User = baker.make_recipe('registration.user')
+        user.set_password('p4ssw0rd@')
+        user.save()
+        response = self.client.get(path=self.url)
+        redirect_response = self.client.post(
+            path=response.url, data={'username': user.username, 'password': 'p4ssw0rd@'},
+        )
+
+        self.assertRedirects(redirect_response, self.url)
+
     def test_access_logged_user_ok(self):
         self.client.force_login(self.user)
         response = self.client.get(path=self.url)

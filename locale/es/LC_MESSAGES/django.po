@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-27 11:53+0000\n"
+"POT-Creation-Date: 2022-11-30 18:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgstr "nombre"
 msgid "users"
 msgstr "usuarios"
 
-#: chat/models.py:29 registration/forms/forms.py:57 registration/models.py:29
+#: chat/models.py:29 registration/forms/forms.py:56 registration/models.py:29
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
@@ -916,8 +916,8 @@ msgstr "acceder"
 msgid "create your account"
 msgstr "crea tu cuenta"
 
-#: core/templates/core/includes/menu.html:81 registration/forms/forms.py:206
-#: registration/models.py:101 registration/views.py:295
+#: core/templates/core/includes/menu.html:81 registration/forms/forms.py:205
+#: registration/models.py:101 registration/views.py:296
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:170
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:178
 #: roleplay/templates/roleplay/session/include/session_card.html:65
@@ -1219,7 +1219,7 @@ msgstr "sistema de registro"
 msgid "username or email"
 msgstr "nombre de usuario o email"
 
-#: registration/forms/forms.py:60
+#: registration/forms/forms.py:59
 #, fuzzy
 #| msgid ""
 #| "If you have a Discord Account you want to link with just give us your ID!"
@@ -1229,16 +1229,16 @@ msgstr ""
 "si tienes una cuenta de Discord que quieras asociar con la web ¡tan solo "
 "danos el ID!"
 
-#: registration/forms/forms.py:83
+#: registration/forms/forms.py:82
 msgid "seems like that's your discord discriminator not your identifier."
 msgstr "parece que ese es tu discriminador de discord y no tu identificador."
 
-#: registration/forms/forms.py:84
+#: registration/forms/forms.py:83
 #, python-format
 msgid "right click on your user and then click on %(popup_msg)s."
 msgstr "click derecho sobre tu usuario y luego click sobre %(popup_msg)s."
 
-#: registration/forms/forms.py:91
+#: registration/forms/forms.py:90
 msgid ""
 "seems like your user couldn't be found, do you have any server in common "
 "with our bot?"
@@ -1246,62 +1246,62 @@ msgstr ""
 "parece ser que tu usuario no pudo ser encontrado, ¿tienes algún servidor en "
 "común con nuestro bot?"
 
-#: registration/forms/forms.py:126
+#: registration/forms/forms.py:125
 #, fuzzy
 #| msgid "We will send you an email to confirm your account"
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: registration/forms/forms.py:136 registration/models.py:26
+#: registration/forms/forms.py:135 registration/models.py:26
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
 msgstr "dirección de email"
 
-#: registration/forms/forms.py:137
+#: registration/forms/forms.py:136
 #, fuzzy
 #| msgid "Enter your email address and we'll resend you the confirmation email"
 msgid "enter your email address and we'll resend you the confirmation email."
 msgstr ""
 "introduce tu dirección de email y te reenviaremos el email de confirmación."
 
-#: registration/forms/forms.py:157 registration/forms/forms.py:180
+#: registration/forms/forms.py:156 registration/forms/forms.py:179
 #, fuzzy
 #| msgid "This email doesn't belong to a user"
 msgid "this email doesn't belong to a user."
 msgstr "este email no pertenece a ningún usuario."
 
-#: registration/forms/forms.py:169
+#: registration/forms/forms.py:168
 #, fuzzy
 #| msgid "We will send you a recovery link to this email"
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:197 registration/models.py:93
+#: registration/forms/forms.py:196 registration/models.py:93
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:198 registration/models.py:94
+#: registration/forms/forms.py:197 registration/models.py:94
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:203 registration/models.py:97
+#: registration/forms/forms.py:202 registration/models.py:97
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:205 registration/models.py:99
+#: registration/forms/forms.py:204 registration/models.py:99
 #, fuzzy
 #| msgid "Website"
 msgid "website"
 msgstr "sitio web"
 
-#: registration/forms/forms.py:224
+#: registration/forms/forms.py:223
 msgid "birthday cannot be set after today."
 msgstr "la fecha de nacimiento no puede ser después de hoy."
 
@@ -1541,70 +1541,70 @@ msgstr "¡tu mundo espera!"
 msgid "resend confirmation email"
 msgstr "reenviar email de confirmación"
 
-#: registration/views.py:43
+#: registration/views.py:44
 #, fuzzy
 #| msgid "Seems like this user is inactive"
 msgid "seems like this user is inactive."
 msgstr "parece que este usuario está inactivo"
 
-#: registration/views.py:44
+#: registration/views.py:45
 #, fuzzy
 #| msgid "Have you confirmed your email?"
 msgid "have you confirmed your email?"
 msgstr "¿has confirmado tu email?"
 
-#: registration/views.py:74
+#: registration/views.py:75
 #, fuzzy
 #| msgid "User created"
 msgid "user created!"
 msgstr "¡usuario creado!"
 
-#: registration/views.py:75
+#: registration/views.py:76
 #, fuzzy
 #| msgid "Please confirm your email"
 msgid "please confirm your email."
 msgstr "por favor confirma tu email."
 
-#: registration/views.py:93
+#: registration/views.py:94
 msgid "seems like we are experimenting issues with our mail automation."
 msgstr ""
 "parece ser que estamos experimentando problemas con el sistema de emails."
 
-#: registration/views.py:94
+#: registration/views.py:95
 msgid "please try later."
 msgstr "por favor pruebe más tarde."
 
-#: registration/views.py:157
+#: registration/views.py:158
 #, fuzzy
 #| msgid "Your email has been confirmed"
 msgid "your email has been confirmed!"
 msgstr "¡tu email ha sido confirmado!"
 
-#: registration/views.py:198
+#: registration/views.py:199
 #, fuzzy
 #| msgid "Your confirmation email has been sent"
 msgid "your confirmation email has been sent!"
 msgstr "¡tu email de confirmación ha sido enviado!"
 
-#: registration/views.py:211
+#: registration/views.py:212
 #, fuzzy
 #| msgid "Password reset"
 msgid "password reset"
 msgstr "restaurar contraseña"
 
-#: registration/views.py:222
+#: registration/views.py:223
 #, fuzzy
 #| msgid "Email for password reset request sent!"
 msgid "email for password reset request sent!"
 msgstr "¡se ha enviado un email con la petición de restauración de contraseña!"
 
-#: registration/views.py:237 registration/views.py:247
+#: registration/views.py:238 registration/views.py:248
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "password changed successfully!"
 msgstr "¡contraseña cambiada correctamente!"
 
-#: registration/views.py:307
+#: registration/views.py:308
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "user updated successfully!"

@@ -32,6 +32,7 @@ class LoginView(auth_views.LoginView):
     """
 
     authentication_form = forms.LoginForm
+    redirect_authenticated_user = True
 
     def form_invalid(self, form):
         response = super(LoginView, self).form_invalid(form)
