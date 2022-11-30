@@ -32,6 +32,7 @@ class LoginView(auth_views.LoginView):
     """
 
     authentication_form = forms.LoginForm
+    redirect_authenticated_user = True
 
     def form_invalid(self, form):
         response = super(LoginView, self).form_invalid(form)
@@ -90,7 +91,7 @@ class SignUpView(RedirectAuthenticatedUserMixin, CreateView):
         # NOTE: If SMTP is unreachable one of those exceptions will be raised
         except (ConnectionError, SMTPException):
             msg = '{} {}'.format(
-                _('seems like we are experimenting issues with our mail automatization.').capitalize(),
+                _('seems like we are experimenting issues with our mail automation.').capitalize(),
                 _('please try later.').capitalize(),
             )
             messages.error(self.request, msg)

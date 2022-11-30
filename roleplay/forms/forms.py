@@ -181,8 +181,6 @@ class RaceForm(forms.ModelForm):
             'wisdom',
             'charisma',
             'affected_by_armor',
-            'image',
-            'users'
         )
 
         model = models.Race

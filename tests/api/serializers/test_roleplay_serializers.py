@@ -1,3 +1,4 @@
+import unittest
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
@@ -96,6 +97,7 @@ class TestPlaceSerializer(TestCase):
         self.assertEqual(len(children_obj), len(serialized_result['children']))
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):

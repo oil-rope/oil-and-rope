@@ -35,6 +35,12 @@ INSTALLED_APPS.extend([
 
 MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
+# Because of default structure of TEMPLATES we'll assume the first one is the correct one
+# See `oilandrope.settings.TEMPLATES` for more information
+TEMPLATES[0]['OPTIONS']['context_processors'].extend([
+    'django.template.context_processors.debug',
+])
+
 
 # In Memory Channel Layer for testing
 # https://channels.readthedocs.io/en/stable/topics/channel_layers.html#in-memory-channel-layer

@@ -15,7 +15,7 @@
   </h1>
 
   <main class="container">
-    {% if object_list %}
+    {% if object_list or filter.data %}
       <div class="row justify-content-center mb-3">
         <div class="col col-lg-8 col-xxl-7">
           {% include 'common/include/filter_accordion.html' with filter=filter only %}
@@ -23,47 +23,63 @@
       </div>
     {% endif %}
 
-    {% for object in object_list %}
-      {{ race }}
-      {% comment %} <div
-        class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4 mt-5 mt-lg-4">
-        {% include 'roleplay/include/race_card.html' with race=object user=request.user only %}
-      </div> {% endcomment %}
-    {% empty %}
-      <h2 class="text-center mb-4">
-        {% translate "seems like you haven't create any race yet."|capfirst %}
-        <br>
-        <small class="text-muted fw-light">
-          {% translate "but you can create one!"|capfirstletter %}
-        </small>
-      </h2>
-
-      <div class="d-flex flex-columns justify-content-center align-items-stretch gap-3">
-        {% url 'roleplay:race:create-for-world' as race_create_for_world_url %}
-        <a
-          href="{{ race_create_for_world_url }}"
-          class="btn btn-secondary"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
-        >
-          {{ ICONS.WORLD|safe }}
-          {% translate "create race for world"|capfirst %}
-        </a>
-
-        {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
-        <a
-          href="{{ race_create_for_campaign_url }}"
-          class="btn btn-secondary"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          title="{% translate "create a race for an specific campaign whhere you are game master."|capfirst %}"
-        >
-          {{ ICONS.QUILL|safe }}
-          {% translate "create race for campaign"|capfirst %}
-        </a>
+    {% if object_list %}
+      <div
+        class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-3 justify-content-md-center align-items-stretch mb-3"
+      >
+        {% for object in object_list %}
+          <div
+            class="col"
+          >
+            {% include 'roleplay/include/race_card.html' with race=object %}
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
+    {% else %}
+      <div class="row">
+        <h2 class="text-center mb-4">
+          {% if filter.data %}
+            {% translate "there isn't any race with this characteristics."|capfirst %}
+          {% else %}
+            {% translate "seems like you haven't create any race yet."|capfirst %}
+          {% endif %}
+          <br>
+          <small class="text-muted fw-light">
+            {% if filter.data %}
+              {% translate "remove filter or create one."|capfirst %}
+            {% else %}
+              {% translate "but you can create one!"|capfirstletter %}
+            {% endif %}
+          </small>
+        </h2>
+
+        <div class="d-flex flex-columns justify-content-center align-items-stretch gap-3">
+          {% url 'roleplay:race:create-for-world' as race_create_for_world_url %}
+          <a
+            href="{{ race_create_for_world_url }}"
+            class="btn btn-secondary"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
+          >
+            {{ ICONS.WORLD|safe }}
+            {% translate "create race for world"|capfirst %}
+          </a>
+
+          {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
+          <a
+            href="{{ race_create_for_campaign_url }}"
+            class="btn btn-secondary"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="{% translate "create a race for an specific campaign where you are game master."|capfirst %}"
+          >
+            {{ ICONS.QUILL|safe }}
+            {% translate "create race for campaign"|capfirst %}
+          </a>
+        </div>
+      </div>
+    {% endif %}
 
     {% if is_paginated %}
       {% include 'common/include/paginator.html' with paginator=paginator page_obj=page_obj path=request.path align='center' only %}
@@ -73,7 +89,8 @@
 
 {% block javascript %}
   <script type="module">
-    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
+    import {setUpTooltip} from ''
+
     setUpTooltip();
   </script>
 {% endblock javascript %}

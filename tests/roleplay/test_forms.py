@@ -1,6 +1,7 @@
 import os
 import random
 import tempfile
+import unittest
 from datetime import timedelta
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -390,6 +391,7 @@ class TestSessionForm(TestCase):
         self.assertEqual(self.campaign, session.campaign)
 
 
+@unittest.skip('WIP: OAR-18')
 class TestRaceForm(TestCase):
     form_class = forms.RaceForm
     model = models.Race

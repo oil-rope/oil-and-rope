@@ -40,13 +40,6 @@ class User(AbstractUser):
         return DiscordUser(self.discord_id)
 
     @property
-    def owned_races(self):
-        races = self.race_set.filter(
-            m2m_race_set__is_owner=True
-        )
-        return races
-
-    @property
     def sessions(self):
         Session: 'SessionModel' = apps.get_model(constants.ROLEPLAY_SESSION)
         sessions = Session.objects.filter(campaign__users__in=[self])

@@ -3,60 +3,93 @@
 
 <div class="card h-100">
   <div class="card-body">
-    <h5 class="card-title text-center">{{ race.name }}</h5>
-    <hr class="w-80">
-    <div class="row">
-      {% if race.image %}
-      <div class="col">
-        <picture> 
-          <img height="250px" load="lazy" src="{{ race.image.url }}" alt="Race image">
-        </picture>
-      </div>
-      {%endif %}
-      <div class="col">
-        <p class="card-text text-justify">
-          {% if race.description %}
-            {{ race.description|truncatechars_html:250|safe }}
-          {% else %}
-            {% translate "no description provided..."|capfirst %}
-          {% endif %}
-        </p>
+    <div
+      id="race{{ race.pk }}ImagesCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-inner">
+        {% for image_obj in race.images.all %}
+          <div class="carousel-item{% if forloop.first %} active{% endif %}">
+            <img
+              class="d-block mx-auto"
+              src="{{ image_obj.image.url }}"
+              alt="{% translate "race image"|capfirst %}"
+              height="350"
+              width="auto"
+            />
+          </div>
+        {% empty %}
+          <div class="carousel-item active">
+            <img
+              class="d-block mx-auto"
+              src="{% static 'img/default_user.png' %}"
+              alt="{% translate "race without image"|capfirst %}"
+              height="350"
+              width="auto"
+            />
+          </div>
+        {% endfor %}
       </div>
     </div>
-  </div>
-  <div class="card-footer">
-    <div class="container">
-      <div class="row">
-        <a href="{% url 'roleplay:race:detail' race.pk %}" class="btn btn-secondary col me-1">
-          <i class="ic ic-world"></i>
-          {% translate "view details"|capfirst %}
-        </a>
-        {% if user in race.users.all %}
-        <div class="btn-group col-1 dropend align-self-end ms-auto">
-          <button
-            type="button"
-            class="btn"
-            data-bs-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <i class="ic ic-dots-horizontal-triple"></i>
-          </button>
-          <div class="dropdown-menu" aria-labelledby="race_{{ race.pk }}_actions">
-              <a href="{% url 'roleplay:race:edit' race.pk %}" class="dropdown-item">
-                <i class="ic ic-edit"></i>
-                {% translate "edit"|capfirst %}
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="{% url 'roleplay:race:delete' race.pk %}" class="dropdown-item">
-                <span class="ic-trash text-danger"></span>
-                {% translate "delete"|capfirst %} {% translate "race" %}
-              </a>
-          </div>
-        </div>
-        {% endif %}
+    {% if race.images.exists %}
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#race{{ race.pk }}ImagesCarousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% translate "previous"|capfirst %}</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#race{{ race.pk }}ImagesCarousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% translate "next"|capfirst %}</span>
+      </button>
+    {% endif %}
 
-      </div>
+    <h5 class="card-title">
+      {{ race.name }}
+    </h5>
+    <p class="card-text">
+      {% if race.description %}
+        {{ race.description|truncatechars:100 }}
+      {% else %}
+        {% translate "no description provided yet."|capfirst %}
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="card-footer">
+    <div class="d-grid gap-2 gap-md-3 gap-lg-2 gap-xl-1  d-md-flex justify-content-md-end">
+      <a
+        href="{% url 'roleplay:race:detail' pk=race.pk %}"
+        class="btn btn-primary disabled"
+      >
+        {{ ICONS.EYE|safe }}
+        {% translate "details"|capfirst %}
+      </a>
+      {% if race.owner == request.user %}
+        <a
+          href="{% url 'roleplay:race:edit' pk=race.pk %}"
+          class="btn btn-secondary disabled"
+        >
+          {{ ICONS.EDIT|safe }}
+          {% translate "edit"|capfirst %}
+        </a>
+        <a
+          href="{% url 'roleplay:race:delete' pk=race.pk %}"
+          class="btn btn-danger disabled"
+        >
+          {{ ICONS.TRASH|safe }}
+          {% translate "delete"|capfirst %}
+        </a>
+      {% endif %}
     </div>
   </div>
 </div>
