@@ -8,6 +8,14 @@
   {% translate "create"|capfirst %} {% translate "race"|capfirst %}
 {% endblock title %}
 
+{% block css %}
+  <style>
+    span.asteriskField {
+      display: none;
+    }
+  </style>
+{% endblock css %}
+
 {% block breadcrumb %}
   {% translate "create race" as breadcrumb_translation %}
   {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:create,create race' %}
@@ -21,6 +29,9 @@
 
     <form class="row justify-content-center g-3" method="post" enctype="multipart/form-data">
       {% crispy form %}
+      <p class="small text-muted">
+        {% translate "you can upload from none to three images."|capfirst %}
+      </p>
       {{ image_formset|crispy }}
       <div class="col-12">
         <button type="submit" class="btn btn-primary">
