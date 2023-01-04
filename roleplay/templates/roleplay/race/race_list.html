@@ -15,6 +15,32 @@
   </h1>
 
   <main class="container">
+    <div class="d-flex flex-row justify-content-center align-items-stretch gap-3 mb-3">
+      {% url 'roleplay:race:create-for-world' as race_create_for_world_url %}
+      <a
+        href="{{ race_create_for_world_url }}"
+        class="btn btn-secondary"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
+      >
+        {{ ICONS.WORLD|safe }}
+        {% translate "create race for world"|capfirst %}
+      </a>
+
+      {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
+      <a
+        href="{{ race_create_for_campaign_url }}"
+        class="btn btn-secondary disabled"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{% translate "create a race for an specific campaign where you are game master."|capfirst %}"
+      >
+        {{ ICONS.QUILL|safe }}
+        {% translate "create race for campaign"|capfirst %}
+      </a>
+    </div>
+
     {% if object_list or filter.data %}
       <div class="row justify-content-center mb-3">
         <div class="col col-lg-8 col-xxl-7">
@@ -52,32 +78,6 @@
             {% endif %}
           </small>
         </h2>
-
-        <div class="d-flex flex-columns justify-content-center align-items-stretch gap-3">
-          {% url 'roleplay:race:create-for-world' as race_create_for_world_url %}
-          <a
-            href="{{ race_create_for_world_url }}"
-            class="btn btn-secondary"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
-          >
-            {{ ICONS.WORLD|safe }}
-            {% translate "create race for world"|capfirst %}
-          </a>
-
-          {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
-          <a
-            href="{{ race_create_for_campaign_url }}"
-            class="btn btn-secondary"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="{% translate "create a race for an specific campaign where you are game master."|capfirst %}"
-          >
-            {{ ICONS.QUILL|safe }}
-            {% translate "create race for campaign"|capfirst %}
-          </a>
-        </div>
       </div>
     {% endif %}
 

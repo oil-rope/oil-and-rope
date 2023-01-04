@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -14,7 +15,8 @@ from common.forms.widgets import DateTimeWidget, DateWidget
 from registration.models import User
 
 from .. import enums, models
-from .layout import CampaignFormLayout, PlaceLayout, RaceFormLayout, SessionFormLayout, WorldFormLayout
+from .layout import (CampaignFormLayout, PlaceLayout, RaceFormLayout, RacePlaceFormLayout, SessionFormLayout,
+                     WorldFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -158,6 +160,36 @@ class SessionForm(FormCapitalizeMixin, forms.ModelForm):
         return super().save(commit)
 
 
+class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
+    instance: models.Race
+
+    def __init__(self, user: User, *args, **kwargs):
+        # User can only set races for places they own
+        place_field = self.base_fields['place']
+        place_field.queryset = user.place_set.all()
+        self.base_fields['place'] = place_field
+
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+        self.helper = FormHelper(self)
+        self.helper.form_action = 'POST'
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        self.helper.form_tag = False
+        self.helper.layout = RacePlaceFormLayout()
+
+    class Meta:
+        fields = (
+            'place', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
+            'charisma', 'affected_by_armor',
+        )
+        model = models.Race
+
+    def save(self, commit: bool = True) -> Any:
+        self.instance.owner = self.user
+        return super().save(commit)
+
+
 class RaceForm(forms.ModelForm):
 
     def __init__(self, user=None, submit_text=_('create'), *args, **kwargs):
@@ -166,8 +198,6 @@ class RaceForm(forms.ModelForm):
         # self.owner = owner
 
         self.helper = FormHelper(self)
-        self.helper.form_method = 'POST'
-        self.helper.include_media = True
         self.helper.layout = RaceFormLayout(submit_text=submit_text)
 
     class Meta:

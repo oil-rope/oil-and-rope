@@ -1,9 +1,11 @@
 import logging
 from typing import Any, Optional, Type
 
+from crispy_forms.templatetags.crispy_forms_filters import as_crispy_form
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
@@ -18,8 +20,9 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, R
 from django.views.generic.detail import SingleObjectMixin
 from django_filters.views import FilterView
 
+from common.forms import ImageForm
 from common.mixins import OwnerRequiredMixin
-from common.models import Vote
+from common.models import Image, Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
@@ -376,7 +379,7 @@ class CampaignComplexQuerySetMixin:
             last_session_date=Subquery(sessions_finished.values('next_game')[:1])
         )
 
-        # Adding if the user is GM so we avoid SQL queries
+        # Adding if the user is GM, so we avoid SQL queries
         self.queryset = self.queryset.annotate(
             user_is_game_master=Subquery(
                 PlayerInCampaign.objects.filter(
@@ -676,6 +679,40 @@ class SessionListView(LoginRequiredMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context['TABLETOP_URL'] = settings.TABLETOP_URL
         return context
+
+
+class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
+    form_class = forms.RacePlaceForm
+    model = Race
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.helper.form_tag = False
+        return form
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['image_formset'] = self.get_image_formset()
+        return context_data
+
+    def get_image_formset(self):
+        ImageFormSet = generic_inlineformset_factory(
+            model=Image, form=ImageForm, ct_field='content_type', fk_field='object_id', extra=3,
+        )
+        image_formset = ImageFormSet(form_kwargs={'owner': self.request.user})
+        return image_formset
+
+    def get_image_extra_form(self):
+        return as_crispy_form(self.get_image_formset())
 
 
 class RaceCreateView(LoginRequiredMixin, CreateView):
