@@ -388,6 +388,30 @@ class Race(TracingMixin):
     def get_absolute_url(self):
         return resolve_url('roleplay:race:detail', pk=self.pk)
 
+    @property
+    def abilities_display(self) -> Optional[str]:
+        """
+        We iter between the ability modifiers in order to return a human-friendly format to quickly see which abilities
+        modifies the race.
+        """
+
+        static_list_of_abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+        ability_modifiers = [ability for ability in static_list_of_abilities if getattr(self, ability) != 0]
+
+        if ability_modifiers:
+            abilities_display: list[str] = []
+            for ability in ability_modifiers:
+                ability_value = getattr(self, ability)
+                ability_name = self._meta.get_field(ability).verbose_name.capitalize()
+                # NOTE: We assume no ability will be more than 3 characters
+                ability_display = f'{getattr(self, ability)} {ability_name:.3}.'
+                if ability_value > 0:
+                    # We add a '+' to the display just for UX/UI
+                    ability_display = f'+{ability_display}'
+                abilities_display.append(ability_display)
+            return ', '.join(abilities_display)
+        return None
+
     def __str__(self):
         return f'{self.name} [{self.pk}]'
 

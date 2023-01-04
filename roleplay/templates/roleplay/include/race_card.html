@@ -55,6 +55,9 @@
 
     <h5 class="card-title">
       {{ race.name }}
+      {% if race.abilities_display %}
+        ({{ race.abilities_display }})
+      {% endif %}
     </h5>
     <p class="card-text">
       {% if race.description %}
