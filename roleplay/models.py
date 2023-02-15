@@ -544,9 +544,9 @@ class Campaign(TracingMixin):
         Adds given users as game masters.
         """
 
-        PlayerInCampaign: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-        entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
-        objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
+        PlayerInCampaignModel: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        entries_to_create = [PlayerInCampaignModel(user=user, campaign=self, is_game_master=True) for user in users]
+        objs = PlayerInCampaignModel.objects.bulk_create(entries_to_create)
         return objs
 
     def get_absolute_url(self):
