@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -162,15 +161,13 @@ class SessionForm(FormCapitalizeMixin, forms.ModelForm):
 
 class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
     instance: models.Race
+    place: models.Place
+    user: User
 
-    def __init__(self, user: User, *args, **kwargs):
-        # User can only set races for places they own
-        place_field = self.base_fields['place']
-        place_field.queryset = user.place_set.all()
-        self.base_fields['place'] = place_field
-
+    def __init__(self, user: User, place: models.Place, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.user = user
+        self.instance.owner = user
+        self.instance.place = place
 
         self.helper = FormHelper(self)
         self.helper.form_action = 'POST'
@@ -180,14 +177,10 @@ class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
 
     class Meta:
         fields = (
-            'place', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
+            'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
             'charisma', 'affected_by_armor',
         )
         model = models.Race
-
-    def save(self, commit: bool = True) -> Any:
-        self.instance.owner = self.user
-        return super().save(commit)
 
 
 class RaceForm(forms.ModelForm):

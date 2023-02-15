@@ -345,15 +345,15 @@ class Race(TracingMixin):
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
     name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
-    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=False)
-    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=False)
-    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=False)
-    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=False)
-    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=False)
-    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=False)
+    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=True)
+    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=True)
+    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=True)
+    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=True)
+    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=True)
+    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=True)
     affected_by_armor = models.BooleanField(
         verbose_name=_('affected by armor'), default=True,
-        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=False,
+        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=True,
     )
     traits = GenericRelation(
         verbose_name=_('traits'), to=constants.ROLEPLAY_TRAIT, related_name='race_set',
