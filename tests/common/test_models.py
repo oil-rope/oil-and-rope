@@ -69,6 +69,11 @@ class TestImage(TestCase):
 
         self.assertIn(self.instance, self.race.images.all())
 
+    def test_str_ok(self):
+        expected_str = f'{self.instance.image.name} [{self.user.username}] ({self.instance.pk})'
+
+        self.assertEqual(expected_str, str(self.instance))
+
 
 class TestVote(TestCase):
     model = Vote

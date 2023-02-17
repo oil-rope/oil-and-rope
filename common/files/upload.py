@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from common import models as common_models
+
 
 def default_upload_to(instance: models.Model, filename: str) -> str:
     """
@@ -12,7 +14,10 @@ def default_upload_to(instance: models.Model, filename: str) -> str:
     formatted_date = date.strftime('%Y/%m/%d')
     app = instance._meta.app_label
     model = instance._meta.model_name
-    identifier = instance.pk
+    if isinstance(instance, common_models.Image):
+        identifier = instance.owner.pk
+    else:
+        identifier = instance.pk
 
     if not identifier:
         if hasattr(instance, 'tree_id'):

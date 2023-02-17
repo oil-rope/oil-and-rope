@@ -18,9 +18,12 @@ class ImageForm(FormCapitalizeMixin, forms.ModelForm):
         The user owner of this image.
     """
 
+    helper: FormHelper
+    instance: Image
+
     def __init__(self, owner: User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.owner = owner
+        self.instance.owner = owner
 
         self.helper = FormHelper(self)
         self.helper.form_tag = False
@@ -28,7 +31,3 @@ class ImageForm(FormCapitalizeMixin, forms.ModelForm):
     class Meta:
         fields = ('image', )
         model = Image
-
-    def save(self, commit=True):
-        self.instance.owner = self.owner
-        return super().save(commit=commit)

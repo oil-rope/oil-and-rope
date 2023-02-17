@@ -98,6 +98,9 @@ class Image(TracingMixin):
             models.Index(fields=['content_type', 'object_id']),
         ]
 
+    def __str__(self) -> str:
+        return f'{self.image.name} [{self.owner.username}] ({self.id})'
+
 
 class Vote(TracingMixin):
     """

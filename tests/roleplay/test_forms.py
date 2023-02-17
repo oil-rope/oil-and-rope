@@ -444,7 +444,7 @@ class TestRacePlaceForm(TestCase):
 
         self.assertFalse(form.is_valid())
         self.assertIn('name', form.errors)
-        self.assertListEqual(form.errors['name'], ['This field is required.'])
+        self.assertFormError(form, 'name', ['This field is required.'])
 
     def test_form_data_only_required_ok(self):
         required_fields = ('name', )

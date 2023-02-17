@@ -5,7 +5,6 @@ import time
 import unittest
 from unittest.mock import MagicMock, patch
 
-import pytest
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -934,13 +933,11 @@ class TestCampaignListView(TestCase):
 
         self.assertIn(campaign, response.context['campaign_list'])
 
-    @pytest.mark.coverage
     def test_public_campaigns_with_pagination_ok(self):
         self.client.force_login(self.user)
         baker.make_recipe('roleplay.public_campaign', self.view.paginate_by)
         self.client.get(self.url)
 
-    @pytest.mark.coverage
     def test_campaign_with_user_voted_positive_ok(self):
         self.client.force_login(self.user)
         campaign = baker.make_recipe('roleplay.public_campaign')
@@ -955,7 +952,6 @@ class TestCampaignListView(TestCase):
 
         self.assertContains(response, 'btn btn-success disabled')
 
-    @pytest.mark.coverage
     def test_campaign_with_user_voted_negative_ok(self):
         self.client.force_login(self.user)
         campaign = baker.make_recipe('roleplay.public_campaign')
@@ -1038,7 +1034,6 @@ class TestCampaignUserListView(TestCase):
         with self.assertNumQueries(len(performed_queries)):
             self.view.as_view()(get_rq)
 
-    @pytest.mark.coverage
     def test_empty_campaigns_ok(self):
         self.model.objects.all().delete()
         self.client.force_login(self.user)
@@ -1215,7 +1210,6 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
 
-    @pytest.mark.coverage
     def test_campaign_with_image_and_other_fields_ok(self):
         # NOTE: start_date, end_date, summary
         self.client.force_login(self.user)
@@ -1229,7 +1223,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, self.private_campaign.cover_image.url)
 
-    @pytest.mark.coverage
     def test_campaign_with_complex_place_ok(self):
         self.client.force_login(self.user)
         place_with_child = generate_place(level=1, parent_site=self.world)
@@ -1238,7 +1231,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, place_with_child.name)
 
-    @pytest.mark.coverage
     def test_campaign_with_sessions_ok(self):
         self.client.force_login(self.user)
         session = baker.make_recipe('roleplay.session', campaign=self.private_campaign)
@@ -1246,7 +1238,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, session.name)
 
-    @pytest.mark.coverage
     def test_campaign_with_game_masters_ok(self):
         gm = baker.make_recipe('registration.user')
         self.client.force_login(gm)
@@ -1256,7 +1247,6 @@ class TestCampaignDetailView(TestCase):
         self.assertContains(response, 'General settings')
         self.assertContains(response, resolve_url('roleplay:campaign:edit', pk=self.private_campaign.pk))
 
-    @pytest.mark.coverage
     def test_campaign_with_player_with_profile_image_ok(self):
         self.client.force_login(self.user)
         user_with_profile_image = baker.make_recipe('registration.user')
@@ -1268,7 +1258,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, user_with_profile_image.profile.image.url)
 
-    @pytest.mark.coverage
     @patch('bot.utils.discord_api_request')
     def test_campaign_with_discord_channel_ok(self, mocker_api_request: MagicMock):
         discord_channel_id = f'{fake.random_number(digits=18)}'
