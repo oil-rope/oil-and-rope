@@ -1,4 +1,5 @@
 import logging
+from typing import Optional, cast
 
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -12,6 +13,7 @@ from common.files import utils
 from common.forms.mixins import FormCapitalizeMixin
 from common.forms.widgets import DateTimeWidget, DateWidget
 from registration.models import User
+from roleplay.managers import PlaceQuerySet
 
 from .. import enums, models
 from .layout import (CampaignFormLayout, PlaceLayout, RaceFormLayout, RacePlaceFormLayout, SessionFormLayout,
@@ -161,23 +163,28 @@ class SessionForm(FormCapitalizeMixin, forms.ModelForm):
 
 class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
     instance: models.Race
-    place: models.Place
     user: User
 
-    def __init__(self, user: User, place: models.Place, *args, **kwargs):
+    def __init__(self, user: User, place: Optional[models.Place], *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # User can only select place where they are owner
+        place_field = cast(forms.ModelChoiceField, self.fields['place'])
+        place_field.queryset = cast(PlaceQuerySet, user.place_set).all()
+        # If initial place if given let's set it
+        if place:
+            place_field.initial = place
+        self.fields['place'] = place_field
+
         self.instance.owner = user
-        self.instance.place = place
 
         self.helper = FormHelper(self)
         self.helper.form_action = 'POST'
-        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
-        self.helper.form_tag = False
         self.helper.layout = RacePlaceFormLayout()
 
     class Meta:
         fields = (
-            'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
+            'place', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
             'charisma', 'affected_by_armor',
         )
         model = models.Race

@@ -1723,6 +1723,93 @@ class TestSessionListView(TestCase):
             self.view.as_view()(rq)
 
 
+class TestRaceCreateForPlaceView(TestCase):
+    login_url = reverse('registration:auth:login')
+    model = Race
+    place: Place
+    resolver = 'roleplay:race:create-for-place'
+    template = 'roleplay/race/race_create.html'
+    user: User
+    view = views.RaceCreateView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.place = generate_place(owner=cls.user)
+
+    def setUp(self):
+        self.url = reverse(self.resolver)
+        self.url_with_place = reverse(self.resolver, kwargs={'pk': self.place.pk})
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'place': self.place.pk,
+            'race-image-INITIAL_FORMS': '0',
+            'race-image-TOTAL_FORMS': '0',
+        }
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_anonymous_access_url_with_place_ko(self):
+        response = self.client.get(self.url_with_place)
+        expected_url = f'{self.login_url}?next={self.url_with_place}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_url_with_place_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url_with_place)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_post_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+        redirect_url = reverse('roleplay:race:list')
+
+        self.assertRedirects(response, redirect_url)
+
+    def test_post_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+
+    def test_post_with_missing_mandatory_data_on_race_form_ko(self):
+        del self.valid_data['name']
+        del self.valid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+        self.assertFormError(response.context['form'], 'place', 'This field is required.')
+
+    def test_post_with_missing_mandatory_data_on_image_formset_ko(self):
+        del self.valid_data['race-image-TOTAL_FORMS']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormsetError(
+            response.context['formset'], form_index=None, field=None,
+            errors=(
+                'ManagementForm data is missing or has been tampered with. Missing fields: race-image-TOTAL_FORMS. '
+                'You may need to file a bug report if the issue persists.'
+            ),
+        )
+
+
 @unittest.skip('WIP: OAR-113')
 class TestRaceCreateView(TestCase):
     login_url = reverse('registration:auth:login')

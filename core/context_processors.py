@@ -7,6 +7,7 @@ from django.http.request import HttpRequest
 from django.utils.translation import get_language_from_request
 
 from common.enums import AvailableIcons, JavaScriptActions
+from common.files.utils import max_size_file_mb
 from registration.models import Profile
 
 
@@ -56,5 +57,6 @@ def handy_settings(request: HttpRequest):
         'ICONS': {icon.name: icon.value for icon in AvailableIcons},
         'JAVASCRIPT': {js.name: js.value for js in JavaScriptActions},
         'CUSTOMS_STATIC_URL': settings.CUSTOMS_STATIC_URL,
+        'MAX_FILE_SIZE_MB': max_size_file_mb(),
     }
     return content

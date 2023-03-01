@@ -1,17 +1,17 @@
 import logging
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, cast
 
-from crispy_forms.templatetags.crispy_forms_filters import as_crispy_form
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
+from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
 from django.db import models
 from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
-from django.http import Http404, HttpResponseForbidden
+from django.forms import BaseModelForm
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -683,36 +683,81 @@ class SessionListView(LoginRequiredMixin, FilterView):
 
 class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
     form_class = forms.RacePlaceForm
-    model = Race
+    object: Optional[Race]
+    model: Type[Race] = Race
     success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_create.html'
+
+    def get_place(self) -> Optional[Place]:
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.place_set.all(), pk=pk)
+        return obj
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
+            'place': self.get_place(),
         })
         return kwargs
 
     def get_form(self, form_class=None):
-        form = super().get_form(form_class=form_class)
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
         form.helper.form_tag = False
         return form
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['image_formset'] = self.get_image_formset()
+        if 'formset' not in kwargs:
+            context_data['formset'] = self.get_formset()
         return context_data
 
-    def get_image_formset(self):
-        ImageFormSet = generic_inlineformset_factory(
-            model=Image, form=ImageForm, ct_field='content_type', fk_field='object_id', extra=3,
-        )
-        image_formset = ImageFormSet(form_kwargs={'owner': self.request.user})
-        return image_formset
+    def form_invalid(
+            self,
+            form: BaseModelForm,
+            formset: Optional[BaseGenericInlineFormSet] = None,
+    ) -> HttpResponse:
+        if not formset:
+            formset = self.get_formset()
+        formset_non_form_errors = formset.non_form_errors()
+        if formset_non_form_errors:
+            for error in formset_non_form_errors:
+                messages.error(self.request, error)
+        return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
-    def get_image_extra_form(self):
-        return as_crispy_form(self.get_image_formset())
+    def form_valid(self, form: forms.RacePlaceForm) -> HttpResponse:
+        self.object = cast(Race, form.save(commit=False))
+        formset = self.get_formset()
+        if formset.is_valid():
+            self.object.save()
+            formset.save()
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form, formset)
+
+    def get_formset_kwargs(self):
+        kwargs = {
+            'form_kwargs': {'owner': self.request.user},
+            'prefix': 'race-image',
+        }
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+                'instance': self.object,
+            })
+        return kwargs
+
+    def get_formset(self) -> BaseGenericInlineFormSet:
+        ImageFormSet: BaseGenericInlineFormSet = generic_inlineformset_factory(
+            model=Image, form=ImageForm, ct_field='content_type', fk_field='object_id', extra=3, max_num=3,
+            validate_max=True,
+        )
+        image_formset = ImageFormSet(**self.get_formset_kwargs())
+        return image_formset
 
 
 class RaceCreateView(LoginRequiredMixin, CreateView):

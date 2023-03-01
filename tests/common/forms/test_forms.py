@@ -67,7 +67,7 @@ class TestImageFormAsGenericInlineFormSet(TestCase):
         cls.image_data = BytesIO()
         Image.new('RGB', (30, 60), color='red').save(cls.image_data, 'JPEG')
         cls.formset_class = generic_inlineformset_factory(
-            model=cls.model, form=cls.form_class, ct_field='content_type', fk_field='object_id', extra=3,
+            model=cls.model, form=cls.form_class, ct_field='content_type', fk_field='object_id', extra=2,
         )
         cls.formset_kwargs = {
             'form_kwargs': {'owner': cls.user},
@@ -76,6 +76,7 @@ class TestImageFormAsGenericInlineFormSet(TestCase):
             # We use prefix to declare what name is going to be use on render
             # https://docs.djangoproject.com/en/4.1/topics/forms/formsets/#customizing-a-formset-s-prefix
             'prefix': cls.formset_prefix,
+            'queryset': cls.related_object.images.all(),
         }
 
     def setUp(self) -> None:
@@ -117,5 +118,20 @@ class TestImageFormAsGenericInlineFormSet(TestCase):
 
         images = formset.save()
 
+        self.assertEqual(2, len(images))
         # Image order is backwards since it's ordered by new first contrary to what formset returns
         self.assertQuerysetEqual(images[::-1], self.related_object.images.all())
+
+    def test_existent_images_add_new_ones_ok(self):
+        baker.make_recipe('common.race_image', object_id=self.related_object.pk)
+
+        self.file_data[f'{self.formset_prefix}-1-image'] = self._generate_form_image()
+        self.valid_data[f'{self.formset_prefix}-TOTAL_FORMS'] = '2'
+        formset = self.formset_class(data=self.valid_data, files=self.file_data, **self.formset_kwargs)
+
+        self.assertTrue(formset.is_valid(), repr(formset.errors or formset.non_form_errors()))
+
+        images: list[common_models.Image] = formset.save()
+
+        self.assertEqual(2, len(images))
+        self.assertEqual(3, self.related_object.images.count())
