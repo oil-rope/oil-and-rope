@@ -414,6 +414,7 @@ class TestRacePlaceForm(TestCase):
             'wisdom': 0,
             'charisma': 0,
             'affected_by_armor': fake.pybool(),
+            'place': self.place,
         }
 
     def test_form_with_valid_data_is_valid_ok(self):
@@ -447,14 +448,14 @@ class TestRacePlaceForm(TestCase):
         self.assertFormError(form, 'name', ['This field is required.'])
 
     def test_form_data_only_required_ok(self):
-        required_fields = ('name', )
+        required_fields = ('name', 'place', )
         data = {field: self.valid_data[field] for field in required_fields}
         form = self.form_class(user=self.user, place=self.place, data=data)
 
         self.assertTrue(form.is_valid(), repr(form.errors))
 
     def test_form_data_only_required_creates_race_ok(self):
-        required_fields = ('name', )
+        required_fields = ('name', 'place', )
         data = {field: self.valid_data[field] for field in required_fields}
         form = self.form_class(user=self.user, place=self.place, data=data)
 

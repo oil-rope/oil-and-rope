@@ -2065,13 +2065,13 @@ class TestRaceListView(TestCase):
         self.assertContains(response=response, text='Create race for world')
         self.assertContains(response=response, text='Create race for campaign')
 
-    def test_create_for_buttons_are_not_displayed_if_there_is_any_race_ok(self):
+    def test_create_for_buttons_are_displayed_if_there_is_any_race_ok(self):
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
         response = self.client.get(path=self.url)
 
-        self.assertNotContains(response=response, text='Create race for world')
-        self.assertNotContains(response=response, text='Create race for campaign')
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
 
     def test_races_without_description_show_default_text_ok(self):
         races: list[Race] = baker.make_recipe('roleplay.race', 2, owner=self.user, description='')
