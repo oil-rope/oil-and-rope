@@ -30,9 +30,9 @@
     <form class="row justify-content-center g-3" method="post" enctype="multipart/form-data">
       {% crispy form %}
       <p class="small text-muted">
-        {% blocktrans %}
+        {% blocktranslate trimmed %}
           You can upload from none to three images (maximum size {{ MAX_FILE_SIZE_MB }}MB).
-        {% endblocktrans %}
+        {% endblocktranslate %}
       </p>
       {{ formset|crispy }}
 
