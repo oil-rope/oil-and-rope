@@ -1779,9 +1779,22 @@ class TestRaceCreateForPlaceView(TestCase):
 
         self.assertRedirects(response, redirect_url)
 
+    def test_post_url_with_place_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
+        redirect_url = reverse('roleplay:race:list')
+
+        self.assertRedirects(response, redirect_url)
+
     def test_post_with_valid_data_creates_race_ok(self):
         self.client.force_login(self.user)
         self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+
+    def test_post_url_with_place_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url_with_place, data=self.valid_data)
 
         self.assertEqual(1, self.user.race_set.count())
 
@@ -1791,6 +1804,16 @@ class TestRaceCreateForPlaceView(TestCase):
 
         self.client.force_login(self.user)
         response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+        self.assertFormError(response.context['form'], 'place', 'This field is required.')
+
+    def test_post_url_with_place_with_missing_mandatory_data_on_race_form_ko(self):
+        del self.valid_data['name']
+        del self.valid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
 
         self.assertFormError(response.context['form'], 'name', 'This field is required.')
         self.assertFormError(response.context['form'], 'place', 'This field is required.')
@@ -1808,6 +1831,106 @@ class TestRaceCreateForPlaceView(TestCase):
                 'You may need to file a bug report if the issue persists.'
             ),
         )
+
+    def test_post_url_with_place_with_missing_mandatory_data_on_image_formset_ko(self):
+        del self.valid_data['race-image-TOTAL_FORMS']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertFormsetError(
+            response.context['formset'], form_index=None, field=None,
+            errors=(
+                'ManagementForm data is missing or has been tampered with. Missing fields: race-image-TOTAL_FORMS. '
+                'You may need to file a bug report if the issue persists.'
+            ),
+        )
+
+    def test_post_with_image_creates_race_and_image_ok(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '2',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            )
+        })
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+        self.assertEqual(2, self.user.race_set.first().images.count())
+
+    def test_post_url_with_place_with_image_creates_race_and_image_ok(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '2',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            )
+        })
+        self.client.force_login(self.user)
+        self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+        self.assertEqual(2, self.user.race_set.first().images.count())
+
+    def test_post_with_more_than_max_images_does_not_create_race_nor_image_ko(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '4',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-2-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-3-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+        })
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data, follow=True)
+
+        self.assertFormsetError(
+            response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+        self.assertEqual(0, self.user.race_set.count())
+
+    def test_post_url_with_place_with_more_than_max_images_does_not_create_race_nor_image_ko(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '4',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-2-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-3-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+        })
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data, follow=True)
+
+        self.assertFormsetError(
+            response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+        self.assertEqual(0, self.user.race_set.count())
 
 
 @unittest.skip('WIP: OAR-113')
