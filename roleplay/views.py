@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Optional, Type, cast
 
+from crispy_forms.helper import FormHelper
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -711,34 +712,55 @@ class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        if 'formset' not in kwargs:
-            context_data['formset'] = self.get_formset()
+        if 'image_formset' not in kwargs:
+            context_data['image_formset'] = self.get_image_formset()
+        context_data['image_formset_helper'] = self.get_image_formset_helper()
         return context_data
 
     def form_invalid(
             self,
             form: BaseModelForm,
-            formset: Optional[BaseGenericInlineFormSet] = None,
+            image_formset: Optional[BaseGenericInlineFormSet] = None,
     ) -> HttpResponse:
-        if not formset:
-            formset = self.get_formset()
-        formset_non_form_errors = formset.non_form_errors()
+        if not image_formset:
+            image_formset = self.get_image_formset()
+        formset_non_form_errors = image_formset.non_form_errors()
         if formset_non_form_errors:
             for error in formset_non_form_errors:
                 messages.error(self.request, error)
-        return self.render_to_response(self.get_context_data(form=form, formset=formset))
+        return self.render_to_response(self.get_context_data(form=form, image_formset=image_formset))
 
     def form_valid(self, form: forms.RacePlaceForm) -> HttpResponse:
         self.object = cast(Race, form.save(commit=False))
-        formset = self.get_formset()
-        if formset.is_valid():
+        image_formset = self.get_image_formset()
+        if image_formset.is_valid():
             self.object.save()
-            formset.save()
-            return super().form_valid(form)
+            image_formset.save()
+            return super().form_valid(form=form)
         else:
-            return self.form_invalid(form, formset)
+            return self.form_invalid(form=form, image_formset=image_formset)
 
-    def get_formset_kwargs(self):
+    def get_image_formset_helper(self):
+        helper = FormHelper()
+        helper.template = 'bootstrap5/table_inline_formset.html'
+        helper.form_tag = False
+        return helper
+
+    def get_image_formset_factory_kwargs(self):
+        kwargs = {
+            'model': Image,
+            'form': ImageForm,
+            'ct_field': 'content_type',
+            'fk_field': 'object_id',
+            'extra': 3,
+            'can_delete': False,
+            'max_num': 3,
+            'validate_max': True,
+            'for_concrete_model': True,
+        }
+        return kwargs
+
+    def get_image_formset_kwargs(self):
         kwargs = {
             'form_kwargs': {'owner': self.request.user},
             'prefix': 'race-image',
@@ -751,12 +773,11 @@ class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
             })
         return kwargs
 
-    def get_formset(self) -> BaseGenericInlineFormSet:
-        ImageFormSet: BaseGenericInlineFormSet = generic_inlineformset_factory(
-            model=Image, form=ImageForm, ct_field='content_type', fk_field='object_id', extra=3, max_num=3,
-            validate_max=True,
+    def get_image_formset(self):
+        FormSet: Type[BaseGenericInlineFormSet] = generic_inlineformset_factory(
+            **self.get_image_formset_factory_kwargs()
         )
-        image_formset = ImageFormSet(**self.get_formset_kwargs())
+        image_formset = FormSet(**self.get_image_formset_kwargs())
         return image_formset
 
 

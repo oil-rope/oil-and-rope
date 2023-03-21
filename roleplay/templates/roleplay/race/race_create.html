@@ -10,7 +10,7 @@
 
 {% block css %}
   <style>
-    label[for*="image"] span.asteriskField {
+    [for*="image"] span.asteriskField {
       display: none;
     }
   </style>
@@ -29,12 +29,12 @@
 
     <form class="row justify-content-center g-3" method="post" enctype="multipart/form-data">
       {% crispy form %}
+      {% crispy image_formset image_formset_helper %}
       <p class="small text-muted">
         {% blocktranslate trimmed %}
           You can upload from none to three images (maximum size {{ MAX_FILE_SIZE_MB }}MB).
         {% endblocktranslate %}
       </p>
-      {{ formset|crispy }}
 
       <div class="col-12">
         <button type="submit" class="btn btn-primary">

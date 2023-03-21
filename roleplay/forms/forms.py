@@ -7,13 +7,13 @@ from django.apps import apps
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from mptt.forms import TreeNodeChoiceField
 
 from common.constants import models as constants
 from common.files import utils
 from common.forms.mixins import FormCapitalizeMixin
 from common.forms.widgets import DateTimeWidget, DateWidget
 from registration.models import User
-from roleplay.managers import PlaceQuerySet
 
 from .. import enums, models
 from .layout import (CampaignFormLayout, PlaceLayout, RaceFormLayout, RacePlaceFormLayout, SessionFormLayout,
@@ -162,6 +162,8 @@ class SessionForm(FormCapitalizeMixin, forms.ModelForm):
 
 
 class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
+    place = TreeNodeChoiceField(queryset=models.Place.objects.none())
+
     instance: models.Race
     user: User
 
@@ -169,8 +171,8 @@ class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # User can only select place where they are owner
-        place_field = cast(forms.ModelChoiceField, self.fields['place'])
-        place_field.queryset = cast(PlaceQuerySet, user.place_set).all()
+        place_field = cast(TreeNodeChoiceField, self.fields['place'])
+        place_field.queryset = user.place_set.all()
         # If initial place if given let's set it
         if place:
             place_field.initial = place
