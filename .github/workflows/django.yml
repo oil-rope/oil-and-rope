@@ -124,7 +124,7 @@ jobs:
       # Since the format `developmentType/Code` is invalid we need to replace it
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]${{ github.ref_name }}" | sed -e 's/\//-/g'
+        run: echo "branch=${{ github.ref_name }}" | sed -e 's/\//-/g' >> $GITHUB_OUTPUT
         id: extra_branch_name
 
       - name: Build & Push Image
