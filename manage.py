@@ -4,13 +4,14 @@ import os
 import sys
 from pathlib import Path
 
-from common.utils.env import load_env_file
+from common.utils.env import load_env_file, load_secrets
 
 
 def main():
     BASE_DIR = Path(__file__).resolve().parent
     ENV_FILE = BASE_DIR / '.env'
     load_env_file(ENV_FILE)
+    load_secrets()
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'oilandrope.settings')
     try:
