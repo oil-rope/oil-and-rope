@@ -1,6 +1,7 @@
 import logging
+import os
 import pathlib
-from typing import Union
+from typing import Optional, Union
 
 from dotenv import dotenv_values, load_dotenv
 
@@ -34,6 +35,15 @@ def check_env_file(env_file: pathlib.Path) -> None:
 def load_env_file(env_file: Union[pathlib.Path, str]) -> bool:
     """
     Looks for the given .env file and sets up Environment Variables.
+
+    Parameters
+    ----------
+    env_file: :class:`Union[pathlib.Path, str]`
+        The dotenv file from which to load environment variables.
+
+    Returns
+    -------
+    Same value as :method:`dotenv.load_dotenv`.
     """
 
     if isinstance(env_file, str):
@@ -45,3 +55,34 @@ def load_env_file(env_file: Union[pathlib.Path, str]) -> bool:
 
     check_env_file(env_file)
     return load_dotenv(env_file, override=False, verbose=True, encoding='utf-8')
+
+
+def load_secrets(
+    secret_env_variables: list[str] = [
+        'SECRET_KEY', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_HOST', 'EMAIL_HOST', 'EMAIL_HOST_USER',
+        'EMAIL_HOST_PASSWORD', 'BOT_TOKEN',
+    ],
+    extra_env_variables: list[str] = [],
+    encoding: Optional[str] = None
+):
+    """
+    Looks for specific environment variables and check if they are files. If this is true it will read the file value
+    and set it as the environment variable.
+
+    Parameters
+    ----------
+    secret_env_variables: :class:`list[str]`
+        List of environment variables to iterate and check for files.
+    extra_env_variables: :class:`list[str]`
+        Any extra environment variable to check besides the given ones in `secret_env_variables`.
+    encoding: :class:`Optional[str]`
+        Encoding used for reading the files.
+    """
+
+    env_variables = secret_env_variables + extra_env_variables
+    for env_var in env_variables:
+        if env_var not in os.environ:
+            continue
+        file = pathlib.Path(os.environ[env_var])
+        if file.exists() and file.is_file():
+            os.environ[env_var] = file.read_text(encoding=encoding)
