@@ -138,7 +138,7 @@ jobs:
           push: true
           tags: |
             oilandrope/core:${{ env.TAG }}
-            oilandrope/core:${{ env.GITHUB_SHA }}
+            oilandrope/core:$GITHUB_SHA
           file: ${{ env.DOCKERFILE }}
           cache-from: type=registry,ref=oilandrope/core:${{ env.TAG }}
           cache-to: type=inline
