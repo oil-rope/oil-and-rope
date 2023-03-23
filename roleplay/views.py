@@ -1,18 +1,15 @@
 import logging
-from typing import Any, Optional, Type, cast
+from typing import Any, Optional, Type
 
-from crispy_forms.helper import FormHelper
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.contenttypes.forms import BaseGenericInlineFormSet, generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
 from django.db import models
 from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
-from django.forms import BaseModelForm
-from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -21,12 +18,12 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, R
 from django.views.generic.detail import SingleObjectMixin
 from django_filters.views import FilterView
 
-from common.forms import ImageForm
 from common.mixins import OwnerRequiredMixin
-from common.models import Image, Vote
+from common.models import Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from common.views.mixins import ImageFormsetMixin
 from registration.models import User
 from roleplay.managers import CampaignQuerySet, PlaceQuerySet
 from roleplay.models import Campaign, Place, PlayerInCampaign, Race, Session
@@ -682,8 +679,9 @@ class SessionListView(LoginRequiredMixin, FilterView):
         return context
 
 
-class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
+class RaceCreateForPlaceView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
     form_class = forms.RacePlaceForm
+    image_formset_prefix = 'race-image'
     object: Optional[Race]
     model: Type[Race] = Race
     success_url = reverse_lazy('roleplay:race:list')
@@ -710,97 +708,35 @@ class RaceCreateForPlaceView(LoginRequiredMixin, CreateView):
         form.helper.form_tag = False
         return form
 
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        if 'image_formset' not in kwargs:
-            context_data['image_formset'] = self.get_image_formset()
-        context_data['image_formset_helper'] = self.get_image_formset_helper()
-        return context_data
 
-    def form_invalid(
-            self,
-            form: BaseModelForm,
-            image_formset: Optional[BaseGenericInlineFormSet] = None,
-    ) -> HttpResponse:
-        if not image_formset:
-            image_formset = self.get_image_formset()
-        formset_non_form_errors = image_formset.non_form_errors()
-        if formset_non_form_errors:
-            for error in formset_non_form_errors:
-                messages.error(self.request, error)
-        return self.render_to_response(self.get_context_data(form=form, image_formset=image_formset))
-
-    def form_valid(self, form: forms.RacePlaceForm) -> HttpResponse:
-        self.object = cast(Race, form.save(commit=False))
-        image_formset = self.get_image_formset()
-        if image_formset.is_valid():
-            self.object.save()
-            image_formset.save()
-            return super().form_valid(form=form)
-        else:
-            return self.form_invalid(form=form, image_formset=image_formset)
-
-    def get_image_formset_helper(self):
-        helper = FormHelper()
-        helper.template = 'bootstrap5/table_inline_formset.html'
-        helper.form_tag = False
-        return helper
-
-    def get_image_formset_factory_kwargs(self):
-        kwargs = {
-            'model': Image,
-            'form': ImageForm,
-            'ct_field': 'content_type',
-            'fk_field': 'object_id',
-            'extra': 3,
-            'can_delete': False,
-            'max_num': 3,
-            'validate_max': True,
-            'for_concrete_model': True,
-        }
-        return kwargs
-
-    def get_image_formset_kwargs(self):
-        kwargs = {
-            'form_kwargs': {'owner': self.request.user},
-            'prefix': 'race-image',
-        }
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-                'instance': self.object,
-            })
-        return kwargs
-
-    def get_image_formset(self):
-        FormSet: Type[BaseGenericInlineFormSet] = generic_inlineformset_factory(
-            **self.get_image_formset_factory_kwargs()
-        )
-        image_formset = FormSet(**self.get_image_formset_kwargs())
-        return image_formset
-
-
-class RaceCreateView(LoginRequiredMixin, CreateView):
-    """
-    This view creates a race
-    """
-
-    form_class = forms.RaceForm
+class RaceCreateForCampaignView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
+    form_class = forms.RaceCampaignForm
+    image_formset_prefix = 'race-image'
+    object: Optional[Race]
     model = Race
+    success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_create.html'
 
-    def get_success_url(self):
-        return resolve_url(self.object)
+    def get_campaign(self) -> Optional[Campaign]:
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.editable_campaigns(), pk=pk)
+        return obj
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
-            'submit_text': _('create').capitalize()
+            'campaign': self.get_campaign(),
         })
-
         return kwargs
+
+    def get_form(self, form_class=None):
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
 
 
 class RaceDetailView(LoginRequiredMixin, DetailView):

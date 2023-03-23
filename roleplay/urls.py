@@ -42,7 +42,8 @@ RACE_PATTERNS = [
     path('<int:pk>/', views.RaceDetailView.as_view(), name='detail'),
     path('create/place/', views.RaceCreateForPlaceView.as_view(), name='create-for-place'),
     path('create/place/<int:pk>/', views.RaceCreateForPlaceView.as_view(), name='create-for-place'),
-    path('create/campaign/', views.RaceCreateView.as_view(), name='create-for-campaign'),
+    path('create/campaign/', views.RaceCreateForCampaignView.as_view(), name='create-for-campaign'),
+    path('create/campaign/<int:pk>/', views.RaceCreateForCampaignView.as_view(), name='create-for-campaign'),
     path('edit/<int:pk>/', views.RaceUpdateView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.RaceDeleteView.as_view(), name='delete'),
 ]

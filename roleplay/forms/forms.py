@@ -12,12 +12,12 @@ from mptt.forms import TreeNodeChoiceField
 from common.constants import models as constants
 from common.files import utils
 from common.forms.mixins import FormCapitalizeMixin
-from common.forms.widgets import DateTimeWidget, DateWidget
+from common.forms.widgets import DateTimeWidget, DateWidget, NameDisplayModelChoiceField
 from registration.models import User
 
 from .. import enums, models
-from .layout import (CampaignFormLayout, PlaceLayout, RaceFormLayout, RacePlaceFormLayout, SessionFormLayout,
-                     WorldFormLayout)
+from .layout import (CampaignFormLayout, PlaceLayout, RaceCampaignFormLayout, RaceFormLayout, RacePlaceFormLayout,
+                     SessionFormLayout, WorldFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -173,6 +173,7 @@ class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
         # User can only select place where they are owner
         place_field = cast(TreeNodeChoiceField, self.fields['place'])
         place_field.queryset = user.place_set.all()
+        place_field.label = _('place').capitalize()
         # If initial place if given let's set it
         if place:
             place_field.initial = place
@@ -187,6 +188,38 @@ class RacePlaceForm(FormCapitalizeMixin, forms.ModelForm):
     class Meta:
         fields = (
             'place', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
+            'charisma', 'affected_by_armor',
+        )
+        model = models.Race
+
+
+class RaceCampaignForm(FormCapitalizeMixin, forms.ModelForm):
+    campaign = NameDisplayModelChoiceField(queryset=models.Campaign.objects.none())
+
+    instance: models.Race
+    user: User
+
+    def __init__(self, user: User, campaign: Optional[models.Campaign], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # User can only select place where they are owner
+        campaign_field = cast(NameDisplayModelChoiceField, self.fields['campaign'])
+        campaign_field.queryset = user.editable_campaigns()
+        campaign_field.label = _('campaign').capitalize()
+        # If initial place if given let's set it
+        if campaign:
+            campaign_field.initial = campaign
+        self.fields['campaign'] = campaign_field
+
+        self.instance.owner = user
+
+        self.helper = FormHelper(self)
+        self.helper.form_action = 'POST'
+        self.helper.layout = RaceCampaignFormLayout()
+
+    class Meta:
+        fields = (
+            'campaign', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom',
             'charisma', 'affected_by_armor',
         )
         model = models.Race

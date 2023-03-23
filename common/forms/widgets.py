@@ -1,4 +1,15 @@
 from django import forms
+from django.db import models
+
+
+class NameDisplayModelChoiceField(forms.ModelChoiceField):
+    """
+    Based on :class:`forms.ModelChoiceField` we change the :method:`forms.ModelChoiceField.label_from_instance` to use
+    the instance column `name`.
+    """
+
+    def label_from_instance(self, obj: models.Model) -> str:
+        return f'{obj.name}'
 
 
 class DateTimeWidget(forms.DateInput):

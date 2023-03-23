@@ -51,6 +51,15 @@ class User(AbstractUser):
         private_places = Place.objects.filter(is_public=False, owner=self)
         return community_places | private_places
 
+    def editable_campaigns(self):
+        """
+        This method will return all campaigns where user is able to edit (either by being owner or GameMaster).
+        """
+
+        owned_campaigns = self.campaign_owned_set.all()
+        is_game_master_campaigns = self.campaign_set.filter(player_in_campaign_set__is_game_master=True)
+        return owned_campaigns | is_game_master_campaigns
+
     def get_absolute_url(self):
         return resolve_url('registration:user:edit', pk=self.pk)
 
