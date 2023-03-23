@@ -1054,11 +1054,11 @@ class TestCampaignUpdateView(TestCase):
         cls.world = generate_place(is_public=True, site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.campaign_user_is_not_gm = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
-        self.campaign_not_gm_url = reverse(self.resolver, kwargs={'pk': self.campaign_user_is_not_gm.pk})
-        self.campaign = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign_user_is_not_gm: User = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign_not_gm_url = resolve_url(self.resolver, pk=self.campaign_user_is_not_gm.pk)
+        self.campaign: Campaign = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
         self.campaign.add_game_masters(self.user)
-        self.url = reverse(self.resolver, pk=self.campaign.pk)
+        self.url = resolve_url(self.resolver, pk=self.campaign.pk)
 
         self.new_name = fake.sentence(nb_words=2)
         self.data_ok = {
