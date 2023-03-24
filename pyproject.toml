@@ -14,6 +14,7 @@ channels = "^4.0.0"
 channels-redis = "^4.0.0"
 crispy-bootstrap4 = "2022.1"
 crispy-bootstrap5 = "^0.6"
+daphne = "^4.0.0"
 "discord.py" = {extras = ["voice"], version = "^2.1.1"}
 django-allauth = "^0.52.0"
 django-crispy-forms = "^1.14.0"
