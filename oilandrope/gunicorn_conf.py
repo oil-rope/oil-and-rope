@@ -5,12 +5,13 @@ import os
 from distutils.util import strtobool as to_bool
 from pathlib import Path
 
-from common.utils.env import load_env_file
+from common.utils.env import load_env_file, load_secrets
 
 # If we load `.env` here we'll avoid loading it in each worker process
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = BASE_DIR / '.env'
 load_env_file(ENV_FILE)
+load_secrets()
 
 # NOTE: We use `os.environ` to ensure that those variables are set
 

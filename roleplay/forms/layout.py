@@ -273,3 +273,69 @@ class RaceFormLayout(layout.Layout):
                 css_class='justify-content-md-center',
             ),
         )
+
+
+class RacePlaceFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('place')),
+                layout.Column(layout.Field('name')),
+            ),
+            layout.Row(
+                layout.Column(layout.Field('description', style='resize: none')),
+            ),
+            layout.Row(
+                bootstrap.Accordion(
+                    bootstrap.AccordionGroup(
+                        _('Stats'),
+                        layout.Row(
+                            layout.Column(layout.Field('strength')),
+                            layout.Column(layout.Field('dexterity')),
+                            layout.Column(layout.Field('constitution')),
+                            layout.Column(layout.Field('intelligence')),
+                            layout.Column(layout.Field('wisdom')),
+                            layout.Column(layout.Field('charisma')),
+                            css_class='row-cols-3',
+                        ),
+                        layout.Row(
+                            layout.Column(layout.Field('affected_by_armor')),
+                        ),
+                        active=False,
+                    ),
+                ),
+            ),
+        )
+
+
+class RaceCampaignFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('campaign')),
+                layout.Column(layout.Field('name')),
+            ),
+            layout.Row(
+                layout.Column(layout.Field('description', style='resize: none')),
+            ),
+            layout.Row(
+                bootstrap.Accordion(
+                    bootstrap.AccordionGroup(
+                        _('Stats'),
+                        layout.Row(
+                            layout.Column(layout.Field('strength')),
+                            layout.Column(layout.Field('dexterity')),
+                            layout.Column(layout.Field('constitution')),
+                            layout.Column(layout.Field('intelligence')),
+                            layout.Column(layout.Field('wisdom')),
+                            layout.Column(layout.Field('charisma')),
+                            css_class='row-cols-3',
+                        ),
+                        layout.Row(
+                            layout.Column(layout.Field('affected_by_armor')),
+                        ),
+                        active=False,
+                    ),
+                ),
+            ),
+        )

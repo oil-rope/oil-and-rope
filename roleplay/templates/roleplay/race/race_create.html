@@ -1,4 +1,5 @@
 {% extends 'core/layout.html' %}
+{% load crispy_forms_filters %}
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
@@ -7,9 +8,17 @@
   {% translate "create"|capfirst %} {% translate "race"|capfirst %}
 {% endblock title %}
 
+{% block css %}
+  <style>
+    [for*="image"] span.asteriskField {
+      display: none;
+    }
+  </style>
+{% endblock css %}
+
 {% block breadcrumb %}
   {% translate "create race" as breadcrumb_translation %}
-  {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:create,create race' %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:list,create race' %}
 {% endblock breadcrumb %}
 
 {% block body_content %}
@@ -17,11 +26,24 @@
     <h2 class="display-4 text-center">
       {% translate "create"|capfirst %} {% translate "race"|capfirst %}
     </h2>
-    <hr class="mx-5">
-    <div class="row">
-      <div class="col">
-        {% crispy form %}
+
+    <form class="row justify-content-center g-3" method="post" enctype="multipart/form-data">
+      {% crispy form %}
+      {% crispy image_formset image_formset_helper %}
+      <p class="small text-muted">
+        {% blocktranslate trimmed %}
+          You can upload from none to three images (maximum size {{ MAX_FILE_SIZE_MB }}MB).
+        {% endblocktranslate %}
+      </p>
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+          {% translate "create"|capfirst %}
+        </button>
+        <button type="reset" class="btn btn-dark">
+          {% translate "reset"|capfirst %}
+        </button>
       </div>
-    </div>
+    </form>
   </main>
 {% endblock body_content %}

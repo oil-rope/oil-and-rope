@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, cast
 
 from django.conf import settings
 from django.contrib import messages
@@ -23,6 +23,7 @@ from common.models import Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from common.views.mixins import ImageFormsetMixin
 from registration.models import User
 from roleplay.managers import CampaignQuerySet, PlaceQuerySet
 from roleplay.models import Campaign, Place, PlayerInCampaign, Race, Session
@@ -376,7 +377,7 @@ class CampaignComplexQuerySetMixin:
             last_session_date=Subquery(sessions_finished.values('next_game')[:1])
         )
 
-        # Adding if the user is GM so we avoid SQL queries
+        # Adding if the user is GM, so we avoid SQL queries
         self.queryset = self.queryset.annotate(
             user_is_game_master=Subquery(
                 PlayerInCampaign.objects.filter(
@@ -678,26 +679,66 @@ class SessionListView(LoginRequiredMixin, FilterView):
         return context
 
 
-class RaceCreateView(LoginRequiredMixin, CreateView):
-    """
-    This view creates a race
-    """
-
-    form_class = forms.RaceForm
-    model = Race
+class RaceCreateForPlaceView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
+    form_class = forms.RacePlaceForm
+    image_formset_prefix = 'race-image'
+    object: Optional[Race]
+    model: Type[Race] = Race
+    success_url = reverse_lazy('roleplay:race:list')
     template_name = 'roleplay/race/race_create.html'
 
-    def get_success_url(self):
-        return resolve_url(self.object)
+    def get_place(self) -> Optional[Place]:
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.place_set.all(), pk=pk)
+        return obj
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
-            'submit_text': _('create').capitalize()
+            'place': self.get_place(),
         })
-
         return kwargs
+
+    def get_form(self, form_class=None):
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
+
+
+class RaceCreateForCampaignView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
+    form_class = forms.RaceCampaignForm
+    image_formset_prefix = 'race-image'
+    object: Optional[Race]
+    model = Race
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_create.html'
+
+    def get_campaign(self) -> Optional[Campaign]:
+        self.request.user = cast(User, self.request.user)  # NOTE: No unauthenticated user should enter this function
+
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.editable_campaigns(), pk=pk)
+        return obj
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'campaign': self.get_campaign(),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
 
 
 class RaceDetailView(LoginRequiredMixin, DetailView):

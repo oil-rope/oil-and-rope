@@ -17,9 +17,12 @@ exclude_lines =
     pragma: no cover
 
     if TYPE_CHECKING:
-fail_under = 95
+fail_under = 98
+omit =
+    docs/**
 precision = 2
 show_missing = True
+skip_covered = True
 skip_empty = True
 
 [django_coverage_plugin]

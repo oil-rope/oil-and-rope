@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from dateutil.relativedelta import relativedelta
 from django.apps import apps
@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from bot.models import User as DiscordUser
@@ -18,6 +19,7 @@ from common.files.upload import default_upload_to
 from core.models import TracingMixin
 
 if TYPE_CHECKING:
+    from roleplay.models import Campaign as CampaignModel
     from roleplay.models import Place as PlaceModel
     from roleplay.models import Session as SessionModel
 
@@ -49,7 +51,30 @@ class User(AbstractUser):
         Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
         community_places = Place.objects.community_places()
         private_places = Place.objects.filter(is_public=False, owner=self)
-        return community_places | private_places
+        return cast(models.QuerySet['PlaceModel'], community_places | private_places)
+
+    def editable_campaigns(self):
+        """
+        This method will return all campaigns where user is able to edit (either by being owner or GameMaster).
+        """
+
+        owned_campaigns = self.campaign_owned_set.all()
+        is_game_master_campaigns = self.campaign_set.filter(player_in_campaign_set__is_game_master=True)
+        return cast(models.QuerySet['CampaignModel'], owned_campaigns | is_game_master_campaigns)
+
+    @cached_property
+    def has_editable_campaigns(self):
+        """
+        Performance-wise property for checking (and caching) whether a user has editable campaigns (as Game Master or
+        Owner).
+
+        Returns
+        -------
+        has_editable_campaigns: :class:`bool`
+            True if user can edit any campaign. False otherwise.
+        """
+
+        return self.editable_campaigns().exists()
 
     def get_absolute_url(self):
         return resolve_url('registration:user:edit', pk=self.pk)

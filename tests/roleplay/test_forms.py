@@ -1,8 +1,8 @@
 import os
 import random
 import tempfile
-import unittest
 from datetime import timedelta
+from typing import Any, cast
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -10,8 +10,9 @@ from django.utils import timezone
 from model_bakery import baker
 from PIL import Image
 
+from registration import models as registration_models
 from roleplay import enums, forms, models
-from tests.utils import fake
+from tests.utils import fake, generate_place
 
 
 class TestPlaceForm(TestCase):
@@ -391,95 +392,83 @@ class TestSessionForm(TestCase):
         self.assertEqual(self.campaign, session.campaign)
 
 
-@unittest.skip('WIP: OAR-18')
-class TestRaceForm(TestCase):
-    form_class = forms.RaceForm
-    model = models.Race
+class TestRacePlaceForm(TestCase):
+    form_class = forms.RacePlaceForm
+    place: models.Place
+    user: registration_models.User
+    valid_data: dict[str, Any]
 
-    def setUp(self):
-        self.user = baker.make_recipe('registration.user')
-        self.faker = fake
-        self.data_ok = {
-            'name': self.faker.word(),
-            'description': self.faker.paragraph(),
-            'strength': self.faker.random_int(min=-5, max=5),
-            'dexterity': self.faker.random_int(min=-5, max=5),
-            'charisma': self.faker.random_int(min=-5, max=5),
-            'constitution': self.faker.random_int(min=-5, max=5),
-            'intelligence': self.faker.random_int(min=-5, max=5),
-            'affected_by_armor': self.faker.boolean(),
-            'wisdom': self.faker.random_int(min=-5, max=5),
-            'users': [self.user.pk]
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = baker.make_recipe('registration.user')
+        cls.place = cast(models.Place, generate_place(owner=cls.user))
+
+    def setUp(self) -> None:
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'strength': 0,
+            'dexterity': 0,
+            'constitution': 0,
+            'intelligence': 0,
+            'wisdom': 0,
+            'charisma': 0,
+            'affected_by_armor': fake.pybool(),
+            'place': self.place,
         }
 
-        self.tmp = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        image_file = self.tmp.name
-        Image.new('RGB', (30, 60), color='red').save(image_file)
-        with open(image_file, 'rb') as image_content:
-            image = SimpleUploadedFile(name=image_file, content=image_content.read(), content_type='image/jpeg')
-        self.files_ok = {
-            'image': image
-        }
+    def test_form_with_valid_data_is_valid_ok(self):
+        form = self.form_class(user=self.user, place=self.place, data=self.valid_data)
 
-    def tearDown(self):
-        self.tmp.close()
-        os.unlink(self.tmp.name)
+        self.assertTrue(form.is_valid(), repr(form.errors))
 
-    def test_data_ok(self):
-        form = self.form_class(data=self.data_ok, files=self.files_ok)
+    def test_form_data_creates_race_ok(self):
+        form = self.form_class(user=self.user, place=self.place, data=self.valid_data)
 
-        self.assertTrue(form.is_valid(), 'Errors: {}'.format(form.errors.values()))
+        self.assertTrue(form.is_valid(), repr(form.errors))
+        race: models.Race = form.save()
 
-    def test_data_without_name_ko(self):
-        data_ko = self.data_ok.copy()
-        del data_ko['name']
-        form = self.form_class(data=data_ko, files=self.files_ok)
+        self.assertEqual(race.name, self.valid_data['name'])
+        self.assertEqual(race.description, self.valid_data['description'])
+        self.assertEqual(race.strength, self.valid_data['strength'])
+        self.assertEqual(race.dexterity, self.valid_data['dexterity'])
+        self.assertEqual(race.constitution, self.valid_data['constitution'])
+        self.assertEqual(race.intelligence, self.valid_data['intelligence'])
+        self.assertEqual(race.wisdom, self.valid_data['wisdom'])
+        self.assertEqual(race.charisma, self.valid_data['charisma'])
+        self.assertEqual(race.affected_by_armor, self.valid_data['affected_by_armor'])
+
+    def test_form_data_without_name_ko(self):
+        data = self.valid_data.copy()
+        del data['name']
+        form = self.form_class(user=self.user, place=self.place, data=data)
 
         self.assertFalse(form.is_valid())
+        self.assertIn('name', form.errors)
+        self.assertFormError(form, 'name', ['This field is required.'])
 
-    def test_data_without_description_ok(self):
-        data_ok = self.data_ok.copy()
-        del data_ok['description']
-        form = self.form_class(data=data_ok, files=self.files_ok)
+    def test_form_data_only_required_ok(self):
+        required_fields = ('name', 'place', )
+        data = {field: self.valid_data[field] for field in required_fields}
+        form = self.form_class(user=self.user, place=self.place, data=data)
 
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), repr(form.errors))
 
-    def test_data_without_image_ok(self):
-        data_ok = self.data_ok.copy()
-        form = self.form_class(data=data_ok)
+    def test_form_data_only_required_creates_race_ok(self):
+        required_fields = ('name', 'place', )
+        data = {field: self.valid_data[field] for field in required_fields}
+        form = self.form_class(user=self.user, place=self.place, data=data)
 
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), repr(form.errors))
+        race: models.Race = form.save()
 
-    def test_save_ok(self):
-        form = self.form_class(data=self.data_ok, files=self.files_ok)
-        instance = form.save()
-
-        self.assertTrue(self.model.objects.filter(pk=instance.pk))
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertIsNotNone(instance.users)
-        self.assertIsNotNone(instance.image)
-
-        os.unlink(instance.image.path)
-
-    def test_save_without_description_ok(self):
-        data_without_description = self.data_ok.copy()
-        del data_without_description['description']
-        form = self.form_class(data=data_without_description, files=self.files_ok)
-        instance = form.save()
-
-        self.assertTrue(self.model.objects.filter(pk=instance.pk))
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertIsNotNone(instance.users)
-        self.assertIsNotNone(instance.image)
-
-        os.unlink(instance.image.path)
-
-    def test_save_without_image_ok(self):
-        form = self.form_class(data=self.data_ok)
-        instance = form.save()
-
-        self.assertTrue(self.model.objects.filter(pk=instance.pk))
-        self.assertEqual(self.data_ok['name'], instance.name)
-        self.assertEqual(self.data_ok['description'], instance.description)
-        self.assertIsNotNone(instance.users)
+        self.assertEqual(race.name, self.valid_data['name'])
+        self.assertEqual(race.description, '')
+        self.assertEqual(race.strength, 0)
+        self.assertEqual(race.dexterity, 0)
+        self.assertEqual(race.constitution, 0)
+        self.assertEqual(race.intelligence, 0)
+        self.assertEqual(race.wisdom, 0)
+        self.assertEqual(race.charisma, 0)
+        # NOTE: When a checkbox is not marked/not sent it's false by default
+        self.assertFalse(race.affected_by_armor)

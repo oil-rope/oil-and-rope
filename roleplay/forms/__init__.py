@@ -1,5 +1,5 @@
-from .forms import CampaignForm, PlaceForm, RaceForm, SessionForm, WorldForm
+from .forms import CampaignForm, PlaceForm, RaceCampaignForm, RaceForm, RacePlaceForm, SessionForm, WorldForm
 
 __all__ = [
-    'CampaignForm', 'PlaceForm', 'RaceForm', 'SessionForm', 'WorldForm'
+    'CampaignForm', 'PlaceForm', 'RaceForm', 'RacePlaceForm', 'RaceCampaignForm', 'SessionForm', 'WorldForm'
 ]

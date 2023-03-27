@@ -152,6 +152,12 @@
                 {% translate "add"|capfirst %} {% translate "geography" %}
               </a>
             </li>
+            <li>
+              <a href="{% url 'roleplay:race:create-for-place' pk=1 %}" class="dropdown-item">
+                <i class="ic ic-user"></i>
+                {% translate "add race"|capfirst %}
+              </a>
+            </li>
             {% if object.get_root == object %}
               {% url 'roleplay:world:edit' object.pk as place_edit_url %}
             {% else %}

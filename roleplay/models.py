@@ -345,15 +345,15 @@ class Race(TracingMixin):
     id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
     name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
-    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=False)
-    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=False)
-    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=False)
-    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=False)
-    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=False)
-    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=False)
+    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=True)
+    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=True)
+    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=True)
+    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=True)
+    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=True)
+    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=True)
     affected_by_armor = models.BooleanField(
         verbose_name=_('affected by armor'), default=True,
-        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=False,
+        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=True,
     )
     traits = GenericRelation(
         verbose_name=_('traits'), to=constants.ROLEPLAY_TRAIT, related_name='race_set',
@@ -387,6 +387,30 @@ class Race(TracingMixin):
 
     def get_absolute_url(self):
         return resolve_url('roleplay:race:detail', pk=self.pk)
+
+    @property
+    def abilities_display(self) -> Optional[str]:
+        """
+        We iter between the ability modifiers in order to return a human-friendly format to quickly see which abilities
+        modifies the race.
+        """
+
+        static_list_of_abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+        ability_modifiers = [ability for ability in static_list_of_abilities if getattr(self, ability) != 0]
+
+        if ability_modifiers:
+            abilities_display: list[str] = []
+            for ability in ability_modifiers:
+                ability_value = getattr(self, ability)
+                ability_name = self._meta.get_field(ability).verbose_name.capitalize()
+                # NOTE: We assume no ability will be more than 3 characters
+                ability_display = f'{getattr(self, ability)} {ability_name:.3}.'
+                if ability_value > 0:
+                    # We add a '+' to the display just for UX/UI
+                    ability_display = f'+{ability_display}'
+                abilities_display.append(ability_display)
+            return ', '.join(abilities_display)
+        return None
 
     def __str__(self):
         return f'{self.name} [{self.pk}]'
@@ -520,9 +544,9 @@ class Campaign(TracingMixin):
         Adds given users as game masters.
         """
 
-        PlayerInCampaign: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-        entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
-        objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
+        PlayerInCampaignModel: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        entries_to_create = [PlayerInCampaignModel(user=user, campaign=self, is_game_master=True) for user in users]
+        objs = PlayerInCampaignModel.objects.bulk_create(entries_to_create)
         return objs
 
     def get_absolute_url(self):
