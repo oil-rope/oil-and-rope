@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-24 08:52+0000\n"
+"POT-Creation-Date: 2023-03-27 13:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,13 +67,13 @@ msgstr "identificador"
 msgid "name"
 msgstr "nombre"
 
-#: chat/models.py:27 common/enums.py:27 registration/models.py:69
+#: chat/models.py:27 common/enums.py:27 registration/models.py:85
 #, fuzzy
 #| msgid "Users"
 msgid "users"
 msgstr "usuarios"
 
-#: chat/models.py:29 registration/forms/forms.py:56 registration/models.py:29
+#: chat/models.py:29 registration/forms/forms.py:56 registration/models.py:31
 #, fuzzy
 #| msgid "Discord Identifier"
 msgid "discord identifier"
@@ -198,8 +198,8 @@ msgstr "dado"
 msgid "user check"
 msgstr "comprobación de usuario"
 
-#: common/enums.py:26 common/models.py:133 registration/models.py:68
-#: registration/models.py:100
+#: common/enums.py:26 common/models.py:133 registration/models.py:84
+#: registration/models.py:116
 #: registration/templates/registration/user_update.html:6
 #: roleplay/models.py:606
 msgid "user"
@@ -918,7 +918,7 @@ msgid "create your account"
 msgstr "crea tu cuenta"
 
 #: core/templates/core/includes/menu.html:81 registration/forms/forms.py:205
-#: registration/models.py:110 registration/views.py:296
+#: registration/models.py:126 registration/views.py:296
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:170
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:178
 #: roleplay/templates/roleplay/session/include/session_card.html:65
@@ -1253,7 +1253,7 @@ msgstr ""
 msgid "we will send you an email to confirm your account."
 msgstr "te enviaremos un email para confirmar tu cuenta."
 
-#: registration/forms/forms.py:135 registration/models.py:26
+#: registration/forms/forms.py:135 registration/models.py:28
 #, fuzzy
 #| msgid "Email address"
 msgid "email address"
@@ -1278,25 +1278,25 @@ msgstr "este email no pertenece a ningún usuario."
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:196 registration/models.py:102
+#: registration/forms/forms.py:196 registration/models.py:118
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:197 registration/models.py:103
+#: registration/forms/forms.py:197 registration/models.py:119
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:202 registration/models.py:106
+#: registration/forms/forms.py:202 registration/models.py:122
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:204 registration/models.py:108
+#: registration/forms/forms.py:204 registration/models.py:124
 #, fuzzy
 #| msgid "Website"
 msgid "website"
@@ -1351,25 +1351,25 @@ msgstr "cambiar contraseña"
 #: roleplay/templates/roleplay/race/race_update.html:7
 #: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:82
 #: roleplay/views.py:220 roleplay/views.py:499 roleplay/views.py:643
-#: roleplay/views.py:762
+#: roleplay/views.py:764
 #, fuzzy
 #| msgid "Update"
 msgid "update"
 msgstr "actualizar"
 
-#: registration/models.py:27
+#: registration/models.py:29
 #, fuzzy
 #| msgid "Premium"
 msgid "premium user"
 msgstr "usuario premium"
 
-#: registration/models.py:120
+#: registration/models.py:136
 #, fuzzy
 #| msgid "Profile"
 msgid "profile"
 msgstr "perfil"
 
-#: registration/models.py:121
+#: registration/models.py:137
 #, fuzzy
 #| msgid "Profiles"
 msgid "profiles"
@@ -2243,7 +2243,7 @@ msgid "seems like we don't have any campaign right now."
 msgstr "parece que no tenemos ninguna campaña en este momento."
 
 #: roleplay/templates/roleplay/campaign/campaign_list.html:34
-#: roleplay/templates/roleplay/race/race_list.html:77
+#: roleplay/templates/roleplay/race/race_list.html:90
 #, fuzzy
 #| msgid "Would you like to create one?"
 msgid "but you can create one!"
@@ -2693,39 +2693,47 @@ msgstr ""
 msgid "race detail"
 msgstr "detalle de la raza"
 
-#: roleplay/templates/roleplay/race/race_list.html:25
+#: roleplay/templates/roleplay/race/race_list.html:26
 msgid "create a race that exists within a world you are owner of."
 msgstr "crea una raza que exista en un mundo del que seas dueño."
 
-#: roleplay/templates/roleplay/race/race_list.html:28
+#: roleplay/templates/roleplay/race/race_list.html:29
 #, fuzzy
 #| msgid "Create your world"
 msgid "create race for world"
 msgstr "crear raza para un mundo"
 
-#: roleplay/templates/roleplay/race/race_list.html:37
+#: roleplay/templates/roleplay/race/race_list.html:40
 msgid "create a race for an specific campaign where you are game master."
 msgstr ""
 "crea una raza para una campaña en específico de la que seas maestro de "
 "partida."
 
-#: roleplay/templates/roleplay/race/race_list.html:40
+#: roleplay/templates/roleplay/race/race_list.html:43
 #, fuzzy
 #| msgid "Create campaign"
 msgid "create race for campaign"
 msgstr "crear raza para una campaña"
 
-#: roleplay/templates/roleplay/race/race_list.html:68
+#: roleplay/templates/roleplay/race/race_list.html:49
+msgid ""
+"It looks like you don't have any Campaigns or Worlds to add a race to. You "
+"must first create one of these to be able to add races."
+msgstr ""
+"Parece que no tienes ni Campañas ni Mundos a los que añadir una raza. Primero "
+"deberás crear uno de estos para tener la posibilidad de crear razas."
+
+#: roleplay/templates/roleplay/race/race_list.html:81
 msgid "there isn't any race with this characteristics."
 msgstr "no hay ninguna raza con estas características."
 
-#: roleplay/templates/roleplay/race/race_list.html:70
+#: roleplay/templates/roleplay/race/race_list.html:83
 #, fuzzy
 #| msgid "Seems like you haven't any world"
 msgid "seems like you haven't create any race yet."
 msgstr "parece que aún no has creado ninguna raza."
 
-#: roleplay/templates/roleplay/race/race_list.html:75
+#: roleplay/templates/roleplay/race/race_list.html:88
 msgid "remove filter or create one."
 msgstr "borra el filtro o crea una."
 

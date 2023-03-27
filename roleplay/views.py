@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, cast
 
 from django.conf import settings
 from django.contrib import messages
@@ -718,6 +718,8 @@ class RaceCreateForCampaignView(LoginRequiredMixin, ImageFormsetMixin, CreateVie
     template_name = 'roleplay/race/race_create.html'
 
     def get_campaign(self) -> Optional[Campaign]:
+        self.request.user = cast(User, self.request.user)  # NOTE: No unauthenticated user should enter this function
+
         pk = self.kwargs.get(self.pk_url_kwarg)
         if not pk:
             return None

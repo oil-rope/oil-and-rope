@@ -16,29 +16,42 @@
 
   <main class="container">
     <div class="d-flex flex-row justify-content-center align-items-stretch gap-3 mb-3">
-      {% url 'roleplay:race:create-for-place' as race_create_for_place_url %}
-      <a
-        href="{{ race_create_for_place_url }}"
-        class="btn btn-secondary"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
-      >
-        {{ ICONS.WORLD|safe }}
-        {% translate "create race for world"|capfirst %}
-      </a>
+      {% if request.user.place_set.exists %}
+        {% url 'roleplay:race:create-for-place' as race_create_for_place_url %}
+        <a
+          href="{{ race_create_for_place_url }}"
+          class="btn btn-secondary"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="{% translate "create a race that exists within a world you are owner of."|capfirst %}"
+        >
+          {{ ICONS.WORLD|safe }}
+          {% translate "create race for world"|capfirst %}
+        </a>
+      {% endif %}
 
-      {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
-      <a
-        href="{{ race_create_for_campaign_url }}"
-        class="btn btn-secondary"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="{% translate "create a race for an specific campaign where you are game master."|capfirst %}"
-      >
-        {{ ICONS.QUILL|safe }}
-        {% translate "create race for campaign"|capfirst %}
-      </a>
+      {% if request.user.has_editable_campaigns %}
+        {% url 'roleplay:race:create-for-campaign' as race_create_for_campaign_url %}
+        <a
+          href="{{ race_create_for_campaign_url }}"
+          class="btn btn-secondary"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="{% translate "create a race for an specific campaign where you are game master."|capfirst %}"
+        >
+          {{ ICONS.QUILL|safe }}
+          {% translate "create race for campaign"|capfirst %}
+        </a>
+      {% endif %}
+
+      {% if not request.user.has_editable_campaigns and not request.user.place_set.exists %}
+        <p class="lead text-center">
+          {% blocktranslate trimmed %}
+            It looks like you don't have any Campaigns or Worlds to add a race to. You must first create one of these to
+            be able to add races.
+          {% endblocktranslate %}
+        </p>
+      {% endif %}
     </div>
 
     {% if object_list or filter.data %}
@@ -89,7 +102,7 @@
 
 {% block javascript %}
   <script type="module">
-    import {setUpTooltip} from ''
+    import { setUpTooltip } from '{% static "js/setupUtils.js" %}'
 
     setUpTooltip();
   </script>

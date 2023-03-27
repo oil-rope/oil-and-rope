@@ -2291,12 +2291,29 @@ class TestRaceListView(TestCase):
 
         self.assertTemplateUsed(response=response, template_name=self.template)
 
-    def test_access_without_races_and_see_buttons_ok(self):
+    def test_access_without_races_with_places_and_campaigns_and_see_buttons_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
         self.client.force_login(self.user)
+
         response = self.client.get(path=self.url)
 
         self.assertContains(response=response, text='Create race for world')
         self.assertContains(response=response, text='Create race for campaign')
+
+    def test_access_without_any_campaigns_or_worlds_does_not_see_buttons_ok(self):
+        user = baker.make_recipe('registration.user')
+        self.client.force_login(user)
+
+        response = self.client.get(path=self.url)
+
+        self.assertContains(
+            response=response,
+            text=(
+                'It looks like you don\'t have any Campaigns or Worlds to add a race to. You must first create one of '
+                'these to be able to add races.'
+            )
+        )
 
     def test_access_with_races_and_sees_them_ok(self):
         race: Race = baker.make_recipe('roleplay.race', owner=self.user)
@@ -2337,6 +2354,8 @@ class TestRaceListView(TestCase):
         self.assertNotContains(response=response, text='Advanced Search')
 
     def test_create_for_buttons_are_displayed_if_there_is_no_race_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
         self.client.force_login(self.user)
         response = self.client.get(path=self.url)
 
@@ -2344,6 +2363,8 @@ class TestRaceListView(TestCase):
         self.assertContains(response=response, text='Create race for campaign')
 
     def test_create_for_buttons_are_displayed_if_there_is_any_race_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
         baker.make_recipe('roleplay.race', owner=self.user)
         self.client.force_login(self.user)
         response = self.client.get(path=self.url)
