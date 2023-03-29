@@ -16,8 +16,12 @@ python ./manage.py migrate && echo -e "${GREEN}Database up to date!${END}" || \
 echo -e "${RED}Couldn't update database. Can the project access?${END}"
 
 echo -e "${CYAN}Generating translations...${END}"
-python ./manage.py compilemessages --locale=es --use-fuzzy && echo -e "${GREEN}Translations generated!" || \
+python ./manage.py compilemessages --locale=es --use-fuzzy && echo -e "${GREEN}Translations generated!${END}" || \
 echo -e "${RED}Couldn't generate translations${END}"
+
+echo -e "${CYAN}Collecting static...${END}"
+python ./manage.py collectstatic --no-input && echo -e "${GREEN}Static files collected!${END}" || \
+echo -e "${RED}Couldn't collect static files${END}"
 
 if [[ -v ADMIN_PASSWORD ]]; then
   echo -e "${CYAN}Creating admin user with given password...${END}"

@@ -1,8 +1,9 @@
+import uuid
 from typing import TYPE_CHECKING, Optional, Type
 
 from ckeditor.fields import RichTextField
 from django.apps import apps
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import m2m_changed
@@ -23,6 +24,101 @@ from .enums import ICON_RESOLVERS, DomainTypes, SiteTypes
 
 if TYPE_CHECKING:
     from chat.models import Chat
+
+
+class TraitType(TracingMixin):
+    """
+    List of types of traits.
+
+    id: :class:`int`
+        Unique identifier of the trait.
+    name: :class:`str`
+        The name of the type.
+    description: :class:`str`
+        Description of the trait type.
+    system: :class:`int`
+        Roleplay system associated.
+    """
+
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
+    name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    system = models.SmallIntegerField(
+        verbose_name=_('system'), choices=RoleplaySystems.choices, null=False, blank=False, db_index=True,
+    )
+
+    class Meta:
+        verbose_name = _('type of trait')
+        verbose_name_plural = _('types of trait')
+        ordering = ['-entry_created_at', 'name', '-entry_updated_at']
+        unique_together = [
+            ('name', 'system'),
+        ]
+
+    def __str__(self):
+        return f'{self.name} [{self.id}]'
+
+
+class Trait(TracingMixin):
+    """
+    Declares generic traits that can be used for any roleplay model.
+
+    Parameters
+    ----------
+    id: `uuid.UUID`
+        Unique identifier of the instance.
+    name: :class:`str`
+        The name of the trait.
+    description: :class:`str`
+        The description of the trait.
+    type: :class:`~roleplay.models.TraitType`
+        The type of trait.
+    source: :class:`str`
+        The source this information comes from.
+    creator: :class:`~typing.Optional[registration.models.User]`
+        The user that created the trait.
+    content_type: :class:`~django.contrib.contenttypes.models.ContentType`
+        The model this instance is related to.
+    object_id: :class:`str`
+        The unique identifier for an instance in the given model on `content_type`.
+    content_object: :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+        The actual instance related.
+    """
+
+    id = models.UUIDField(verbose_name=_('identifier'), primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(verbose_name=_('name'), null=False, blank=False, max_length=255)
+    description = models.TextField(verbose_name=_('description'), null=False, blank=True)
+    type = models.ForeignKey(
+        verbose_name=_('type'), to=constants.ROLEPLAY_TRAIT_TYPE, to_field='id', on_delete=models.CASCADE,
+        related_name='race_set', db_index=True,
+    )
+    source = models.CharField(
+        verbose_name=_('source'), max_length=255, null=False, blank=True,
+        help_text=_('where does this information come from?'),
+    )
+    source_link = models.URLField(
+        verbose_name=_('source link'), null=False, blank=True, help_text=_('link to the source information'),
+    )
+    creator = models.ForeignKey(
+        verbose_name=_('creator'), to=constants.REGISTRATION_USER, to_field='id', on_delete=models.CASCADE,
+        related_name='trait_set', db_index=True,
+    )
+    content_type = models.ForeignKey(
+        verbose_name=_('model associated'), to=constants.CONTENT_TYPE, on_delete=models.CASCADE,
+        related_name='trait_set', to_field='id', db_index=True,
+    )
+    object_id = models.CharField(
+        verbose_name=_('object identifier'), db_index=True, null=False, blank=False, max_length=255,
+    )
+    content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
+
+    class Meta:
+        verbose_name = _('trait')
+        verbose_name_plural = _('traits')
+        ordering = ['-entry_created_at', 'name', '-entry_updated_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.type.get_system_display()}) [{self.id}]'
 
 
 class Domain(TracingMixin):
@@ -125,74 +221,6 @@ class Place(MPTTModel, TracingMixin):
         return resolve_url('roleplay:place:detail', pk=self.pk)
 
     @property
-    def is_house(self):
-        return self.site_type == SiteTypes.HOUSE
-
-    @property
-    def is_town(self):
-        return self.site_type == SiteTypes.TOWN
-
-    @property
-    def is_village(self):
-        return self.site_type == SiteTypes.VILLAGE
-
-    @property
-    def is_city(self):
-        return self.site_type == SiteTypes.CITY
-
-    @property
-    def is_metropolis(self):
-        return self.site_type == SiteTypes.METROPOLIS
-
-    @property
-    def is_forest(self):
-        return self.site_type == SiteTypes.FOREST
-
-    @property
-    def is_hills(self):
-        return self.site_type == SiteTypes.HILLS
-
-    @property
-    def is_mountains(self):
-        return self.site_type == SiteTypes.MOUNTAINS
-
-    @property
-    def is_mines(self):
-        return self.site_type == SiteTypes.MINES
-
-    @property
-    def is_river(self):
-        return self.site_type == SiteTypes.RIVER
-
-    @property
-    def is_sea(self):
-        return self.site_type == SiteTypes.SEA
-
-    @property
-    def is_desert(self):
-        return self.site_type == SiteTypes.DESERT
-
-    @property
-    def is_tundra(self):
-        return self.site_type == SiteTypes.TUNDRA
-
-    @property
-    def is_unusual(self):
-        return self.site_type == SiteTypes.UNUSUAL
-
-    @property
-    def is_island(self):
-        return self.site_type == SiteTypes.ISLAND
-
-    @property
-    def is_country(self):
-        return self.site_type == SiteTypes.COUNTRY
-
-    @property
-    def is_continent(self):
-        return self.site_type == SiteTypes.CONTINENT
-
-    @property
     def is_world(self):
         return self.site_type == SiteTypes.WORLD
 
@@ -214,6 +242,8 @@ class Race(TracingMixin):
 
     Parameters
     ----------
+    id: :class:`int`
+        The identifier of the race.
     name: :class:`str`
         Name of the race.
     description: :class:`str`
@@ -232,88 +262,97 @@ class Race(TracingMixin):
         Modifier for charisma.
     affected_by_armor: :class:`boolean`
         Declares if this race is affected by any penalty that armor can give.
-    image: :class:`file`
+    traits: :class:`list[roleplay.models.Trait`]
+        List of traits associated to this race.
+    images: :class:`list[django.core.files.uploadedfile.UploadedFile]`
         Image for the race.
-    users: :class:`User`
-        Users that have this race.
+    owner: :class:`~registration.models.User`
+        User that created.
+    place: :class:`~typing.Optional[roleplay.models.Place]`
+        Place where this race can be found.
+    campaign: :class:`~typing.Optional[roleplay.models.Campaign]`
+        Campaign where this race is played.
     """
 
-    name = models.CharField(verbose_name=_('name'), max_length=50)
+    id = models.BigAutoField(verbose_name=_('identifier'), primary_key=True)
+    name = models.CharField(verbose_name=_('name'), max_length=50, null=False, blank=False)
     description = models.TextField(verbose_name=_('description'), null=False, blank=True)
-    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0)
-    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0)
-    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0)
-    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0)
-    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0)
-    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0)
+    strength = models.SmallIntegerField(verbose_name=_('strength'), default=0, null=False, blank=True)
+    dexterity = models.SmallIntegerField(verbose_name=_('dexterity'), default=0, null=False, blank=True)
+    constitution = models.SmallIntegerField(verbose_name=_('constitution'), default=0, null=False, blank=True)
+    intelligence = models.SmallIntegerField(verbose_name=_('intelligence'), default=0, null=False, blank=True)
+    wisdom = models.SmallIntegerField(verbose_name=_('wisdom'), default=0, null=False, blank=True)
+    charisma = models.SmallIntegerField(verbose_name=_('charisma'), default=0, null=False, blank=True)
     affected_by_armor = models.BooleanField(
         verbose_name=_('affected by armor'), default=True,
-        help_text=_('declares if this race is affected by armor penalties')
+        help_text=_('declares if this race is affected by armor penalties'), null=False, blank=True,
     )
-    image = models.ImageField(
-        verbose_name=_('image'), upload_to=default_upload_to, validators=[validate_file_size], null=False, blank=True
+    traits = GenericRelation(
+        verbose_name=_('traits'), to=constants.ROLEPLAY_TRAIT, related_name='race_set',
+        content_type_field='content_type', object_id_field='object_id',
     )
-    users = models.ManyToManyField(
-        verbose_name=_('users'), to=constants.REGISTRATION_USER, related_name='race_set', db_index=True,
-        through=constants.ROLEPLAY_RACE_USER,
+    images = GenericRelation(
+        verbose_name=_('images'), to=constants.COMMON_IMAGE, related_name='race_set', content_type_field='content_type',
+        object_id_field='object_id',
     )
-
-    @property
-    def owners(self):
-        qs = self.users.filter(m2m_race_set__is_owner=True)
-        return qs
-
-    def add_owners(self, *users):
-        # Getting RaceUser model
-        model = apps.get_model(constants.ROLEPLAY_RACE_USER)
-        new_entries = []
-        for user in users:
-            entry = model(user=user, race=self, is_owner=True)
-            new_entries.append(entry.save())
-        return model.objects.filter(pk__in=new_entries)
+    owner = models.ForeignKey(
+        verbose_name=_('owner'), to=constants.REGISTRATION_USER, to_field='id', related_name='race_set', db_index=True,
+        null=False, blank=False, on_delete=models.CASCADE,
+    )
+    campaign = models.ForeignKey(
+        verbose_name=_('campaign'), to=constants.ROLEPLAY_CAMPAIGN, to_field='id', related_name='race_set',
+        db_index=True, null=True, blank=False, on_delete=models.CASCADE,
+    )
+    place = models.ForeignKey(
+        verbose_name=_('place'), to=constants.ROLEPLAY_PLACE, to_field='id', related_name='race_set', db_index=True,
+        null=True, blank=False, on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = _('race')
         verbose_name_plural = _('races')
         ordering = ['-entry_created_at', 'name']
 
+    def clean(self):
+        if not self.campaign and not self.place:
+            raise ValidationError(_('either a campaign or a place should be indicated.').capitalize())
+
+    def get_absolute_url(self):
+        return resolve_url('roleplay:race:detail', pk=self.pk)
+
+    @property
+    def abilities_display(self) -> Optional[str]:
+        """
+        We iter between the ability modifiers in order to return a human-friendly format to quickly see which abilities
+        modifies the race.
+        """
+
+        static_list_of_abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+        ability_modifiers = [ability for ability in static_list_of_abilities if getattr(self, ability) != 0]
+
+        if ability_modifiers:
+            abilities_display: list[str] = []
+            for ability in ability_modifiers:
+                ability_value = getattr(self, ability)
+                ability_name = self._meta.get_field(ability).verbose_name.capitalize()
+                # NOTE: We assume no ability will be more than 3 characters
+                ability_display = f'{getattr(self, ability)} {ability_name:.3}.'
+                if ability_value > 0:
+                    # We add a '+' to the display just for UX/UI
+                    ability_display = f'+{ability_display}'
+                abilities_display.append(ability_display)
+            return ', '.join(abilities_display)
+        return None
+
     def __str__(self):
         return f'{self.name} [{self.pk}]'
-
-
-class RaceUser(TracingMixin):
-    """
-    This class manage M2M for :class:`Race` and :class:`User`.
-
-    Parameters
-    ----------
-    user: :class:`User`
-        Related user.
-    race: :class:`Race`
-        Related race.
-    is_owner: :class:`boolean`
-        Declares if the related user is owner.
-    """
-
-    user = models.ForeignKey(
-        verbose_name=_('user'), to=constants.REGISTRATION_USER, related_name='m2m_race_set', on_delete=models.CASCADE,
-        db_index=True
-    )
-    race = models.ForeignKey(
-        verbose_name=_('race'), to=constants.ROLEPLAY_RACE, related_name='m2m_race_set', on_delete=models.CASCADE,
-        db_index=True
-    )
-    is_owner = models.BooleanField(verbose_name=_('ownership'), default=False)
-
-    def __str__(self):
-        return f'{self.user.username} <-> {self.race.name}'
 
 
 # TODO: When Character Model is set we should add PCs and NPCs as part of campaign
 class Campaign(TracingMixin):
     """
     This model manages campaign for roleplay sessions.
-    A campaign is a set up for a game. This will have sessions related which will be the sessions themselves.
+    A campaign is a set-up for a game. This will have sessions related which will be the sessions themselves.
     A campaign can be public in order for everyone to see it or private in order to be only visible to the persons
     in users.
 
@@ -437,9 +476,9 @@ class Campaign(TracingMixin):
         Adds given users as game masters.
         """
 
-        PlayerInCampaign: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
-        entries_to_create = [PlayerInCampaign(user=user, campaign=self, is_game_master=True) for user in users]
-        objs = PlayerInCampaign.objects.bulk_create(entries_to_create)
+        PlayerInCampaignModel: Type['PlayerInCampaign'] = apps.get_model(constants.ROLEPLAY_PLAYER_IN_CAMPAIGN)
+        entries_to_create = [PlayerInCampaignModel(user=user, campaign=self, is_game_master=True) for user in users]
+        objs = PlayerInCampaignModel.objects.bulk_create(entries_to_create)
         return objs
 
     def get_absolute_url(self):
@@ -465,7 +504,7 @@ def sync_campaign_related_users_to_chat(
     **kwargs
 ):
     """
-    This signal will synchronize players of campaign with users in chat so they are added or remove from campaign's
+    This signal will synchronize players of campaign with users in chat, so they are added or remove from campaign's
     chat.
     """
 

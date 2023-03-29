@@ -36,11 +36,11 @@ class TestApiMixin(TestCase):
 
 class TestUser(TestCase):
     api_class = models.User
+    identifier = f'{fake.random_number(digits=18)}'
+    user_response = user_response(id=identifier)
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.identifier = f'{fake.random_number(digits=18)}'
-        cls.user_response = user_response(id=cls.identifier)
         with patch('bot.models.discord_api_get') as mocker_api_get:
             mocker_api_get.return_value = cls.user_response
             cls.user = cls.api_class(cls.identifier)

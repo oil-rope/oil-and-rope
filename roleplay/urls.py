@@ -37,9 +37,21 @@ SESSION_PATTERNS = [
     path('delete/<int:pk>/', views.SessionDeleteView.as_view(), name='delete'),
 ]
 
+RACE_PATTERNS = [
+    path('@me/', views.RaceListView.as_view(), name='list'),
+    path('<int:pk>/', views.RaceDetailView.as_view(), name='detail'),
+    path('create/place/', views.RaceCreateForPlaceView.as_view(), name='create-for-place'),
+    path('create/place/<int:pk>/', views.RaceCreateForPlaceView.as_view(), name='create-for-place'),
+    path('create/campaign/', views.RaceCreateForCampaignView.as_view(), name='create-for-campaign'),
+    path('create/campaign/<int:pk>/', views.RaceCreateForCampaignView.as_view(), name='create-for-campaign'),
+    path('edit/<int:pk>/', views.RaceUpdateView.as_view(), name='edit'),
+    path('delete/<int:pk>/', views.RaceDeleteView.as_view(), name='delete'),
+]
+
 urlpatterns = [
     path('place/', include((PLACE_PATTERNS, 'place'))),
     path('world/', include((WORLD_PATTERNS, 'world'))),
     path('campaign/', include((CAMPAIGN_PATTERNS, 'campaign'))),
     path('session/', include((SESSION_PATTERNS, 'session'))),
+    path('race/', include((RACE_PATTERNS, 'race'))),
 ]

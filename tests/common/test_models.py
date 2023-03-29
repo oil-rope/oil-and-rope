@@ -1,18 +1,15 @@
 import tempfile
 
-from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from model_bakery import baker
 
-from common.constants import models
+from common.models import Image, Track, Vote
+from registration.models import User
+from roleplay.models import Campaign, Race
 from tests.utils import fake
-
-Campaign = apps.get_model(models.ROLEPLAY_CAMPAIGN)
-Track = apps.get_model(models.COMMON_TRACK)
-Vote = apps.get_model(models.COMMON_VOTE)
 
 
 class TestTrack(TestCase):
@@ -53,6 +50,29 @@ class TestTrack(TestCase):
         expected_str = f'{name} ({file})'
 
         self.assertEqual(expected_str, str(track_instance))
+
+
+class TestImage(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user: User = baker.make_recipe('roleplay.user')
+        cls.race: Race = baker.make_recipe('roleplay.race')
+
+    def setUp(self) -> None:
+        image = SimpleUploadedFile(name=fake.file_name(extension='jpg'), content=b'', content_type='image/jpeg')
+        self.instance = Image(image=image, owner=self.user)
+
+    def test_generic_relation_works_ok(self):
+        self.instance.content_type = ContentType.objects.get_for_model(Race)
+        self.instance.object_id = self.race.pk
+        self.instance.save()
+
+        self.assertIn(self.instance, self.race.images.all())
+
+    def test_str_ok(self):
+        expected_str = f'{self.instance.image.name} ({self.instance.pk})'
+
+        self.assertEqual(expected_str, str(self.instance))
 
 
 class TestVote(TestCase):

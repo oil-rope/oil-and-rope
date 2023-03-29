@@ -1,0 +1,84 @@
+{% extends 'core/layout.html' %}
+{% load i18n %}
+{% load string_utils %}
+{% block title %}{% translate "delete"|capfirst %} {{ object|verbose_name|capfirst }}{% endblock title %}
+
+{% block breadcrumb %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs=object|verbose_name_plural|add:'='|add:view.success_url|add:',delete' %}
+{% endblock breadcrumb %}
+
+{% block css %}
+<style>
+  .accordion {
+      --bs-accordion-bg: white;
+    }
+</style>
+{% endblock css %}
+
+{% block body_content %}
+  <main class="container py-5">
+    <div class="row">
+      <div class="col-12">
+        <div class="card p-md-5">
+          <div class="card-body">
+            <p class="text-end">
+              <button class="btn" onclick="goBack();">
+                <i class="ic ic-cross-thin text-danger"></i>
+              </button>
+            </p>
+            <h4 class="card-title text-center">
+              <i class="display-4 ic ic-circle-cross-thin text-danger"></i><br>
+              {% translate "are you sure traveller?"|capfirstletter %}
+            </h4>
+            <p class="card-text text-center">
+              {% block extra_text %}
+              {% endblock extra_text %}
+            </p>
+            <p class="card-text text-center">
+              {% blocktranslate with object_name=object|verbose_name trimmed %}
+                This action cannot be undone.
+                You might delete some other stuff related to this {{ object_name }}, please check below.
+              {% endblocktranslate %}
+            </p>
+          </div>
+
+          {% comment %} Accordion displayed for showing the use what will be deleted {% endcomment %}
+          {% if not to_delete|length_is:"1" %}
+            {% include 'common/include/to_delete_accordion.html' %}
+          {% else %}
+            <p class="lead text-center">
+              {% blocktranslate trimmed %}
+                Our rangers say that there's not problem at all. Nothing else will be deleted!
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+
+          <div class="card-body mt-xl-5">
+            <form
+              class="d-flex justify-content-around"
+              action="{% url 'roleplay:race:delete' object.pk %}"
+              method="post"
+            >
+              {% csrf_token %}
+              <input
+                type="button"
+                onclick="goBack();"
+                value="{% translate 'cancel'|capfirst %}"
+                class="col-5 col-xl-4 btn btn-dark"
+              >
+              <input type="submit" value="{% translate 'erase'|capfirst %}" class="col-5 col-xl-4 btn btn-danger">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}
+
+{% block javascript %}
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+{% endblock javascript %}

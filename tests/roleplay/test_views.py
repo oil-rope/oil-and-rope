@@ -2,9 +2,9 @@ import os
 import random
 import tempfile
 import time
+import unittest
 from unittest.mock import MagicMock, patch
 
-import pytest
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -14,14 +14,14 @@ from django.shortcuts import resolve_url
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from model_bakery import baker
-from PIL import Image
+from PIL import Image as PILImage
 
 from chat.models import Chat
 from common import tools
-from common.models import Vote
+from common.models import Image, Vote
 from registration.models import User
 from roleplay import enums, views
-from roleplay.models import Campaign, Place, Session
+from roleplay.models import Campaign, Place, Race, Session
 from tests.mocks import discord
 from tests.utils import fake
 
@@ -45,7 +45,7 @@ class TestPlaceCreateView(TestCase):
 
     def setUp(self):
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
         with open(self.tmp_file.name, 'rb') as img_content:
             image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
 
@@ -169,7 +169,7 @@ class TestPlaceUpdateView(TestCase):
 
     def setUp(self):
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(self.tmp_file.name)
         with open(self.tmp_file.name, 'rb') as img_content:
             image = SimpleUploadedFile(name=self.tmp_file.name, content=img_content.read(), content_type='image/jpeg')
 
@@ -307,6 +307,36 @@ class TestPlaceDeleteView(TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'roleplay/place/place_confirm_delete.html')
+
+    def test_just_place_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response=response,
+            text='Our rangers say that there\'s not problem at all. Nothing else will be deleted!',
+        )
+
+    def test_place_with_race_and_image_in_it_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user, place=self.world)
+        image: Image = baker.make_recipe('common.image', content_object=race)
+        image.image = SimpleUploadedFile(
+            name=fake.file_name(extension='jpeg'), content=fake.image(image_format='jpeg'),
+        )
+        image.save()
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertInHTML(
+            needle=f'<a href="{image.image.url}" target="_blank">{image.image.name}</a>',
+            haystack=response.content.decode(),
+        )
+        self.assertContains(
+            response=response,
+            text=race.name,
+        )
 
     def test_access_anonymous_user_ko(self):
         response = self.client.get(self.url)
@@ -449,7 +479,7 @@ class TestWorldCreateView(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
         with open(cls.tmp_file.name, 'rb') as img_content:
             cls.image = SimpleUploadedFile(
                 name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
@@ -537,7 +567,7 @@ class TestWorldUpdateView(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        Image.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
+        PILImage.new('RGB', (30, 60), color='red').save(cls.tmp_file.name)
         with open(cls.tmp_file.name, 'rb') as img_content:
             cls.image = SimpleUploadedFile(
                 name=cls.tmp_file.name, content=img_content.read(), content_type='image/jpeg',
@@ -933,13 +963,11 @@ class TestCampaignListView(TestCase):
 
         self.assertIn(campaign, response.context['campaign_list'])
 
-    @pytest.mark.coverage
     def test_public_campaigns_with_pagination_ok(self):
         self.client.force_login(self.user)
         baker.make_recipe('roleplay.public_campaign', self.view.paginate_by)
         self.client.get(self.url)
 
-    @pytest.mark.coverage
     def test_campaign_with_user_voted_positive_ok(self):
         self.client.force_login(self.user)
         campaign = baker.make_recipe('roleplay.public_campaign')
@@ -954,7 +982,6 @@ class TestCampaignListView(TestCase):
 
         self.assertContains(response, 'btn btn-success disabled')
 
-    @pytest.mark.coverage
     def test_campaign_with_user_voted_negative_ok(self):
         self.client.force_login(self.user)
         campaign = baker.make_recipe('roleplay.public_campaign')
@@ -1037,7 +1064,6 @@ class TestCampaignUserListView(TestCase):
         with self.assertNumQueries(len(performed_queries)):
             self.view.as_view()(get_rq)
 
-    @pytest.mark.coverage
     def test_empty_campaigns_ok(self):
         self.model.objects.all().delete()
         self.client.force_login(self.user)
@@ -1058,11 +1084,11 @@ class TestCampaignUpdateView(TestCase):
         cls.world = generate_place(is_public=True, site_type=enums.SiteTypes.WORLD)
 
     def setUp(self):
-        self.campaign_user_is_not_gm = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
-        self.campaign_not_gm_url = reverse(self.resolver, kwargs={'pk': self.campaign_user_is_not_gm.pk})
-        self.campaign = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign_user_is_not_gm: User = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
+        self.campaign_not_gm_url = resolve_url(self.resolver, pk=self.campaign_user_is_not_gm.pk)
+        self.campaign: Campaign = baker.make_recipe('roleplay.campaign', owner=self.user, place=self.world)
         self.campaign.add_game_masters(self.user)
-        self.url = reverse(self.resolver, kwargs={'pk': self.campaign.pk})
+        self.url = resolve_url(self.resolver, pk=self.campaign.pk)
 
         self.new_name = fake.sentence(nb_words=2)
         self.data_ok = {
@@ -1214,7 +1240,6 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
 
-    @pytest.mark.coverage
     def test_campaign_with_image_and_other_fields_ok(self):
         # NOTE: start_date, end_date, summary
         self.client.force_login(self.user)
@@ -1228,7 +1253,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, self.private_campaign.cover_image.url)
 
-    @pytest.mark.coverage
     def test_campaign_with_complex_place_ok(self):
         self.client.force_login(self.user)
         place_with_child = generate_place(level=1, parent_site=self.world)
@@ -1237,7 +1261,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, place_with_child.name)
 
-    @pytest.mark.coverage
     def test_campaign_with_sessions_ok(self):
         self.client.force_login(self.user)
         session = baker.make_recipe('roleplay.session', campaign=self.private_campaign)
@@ -1245,7 +1268,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, session.name)
 
-    @pytest.mark.coverage
     def test_campaign_with_game_masters_ok(self):
         gm = baker.make_recipe('registration.user')
         self.client.force_login(gm)
@@ -1255,7 +1277,6 @@ class TestCampaignDetailView(TestCase):
         self.assertContains(response, 'General settings')
         self.assertContains(response, resolve_url('roleplay:campaign:edit', pk=self.private_campaign.pk))
 
-    @pytest.mark.coverage
     def test_campaign_with_player_with_profile_image_ok(self):
         self.client.force_login(self.user)
         user_with_profile_image = baker.make_recipe('registration.user')
@@ -1267,7 +1288,6 @@ class TestCampaignDetailView(TestCase):
 
         self.assertContains(response, user_with_profile_image.profile.image.url)
 
-    @pytest.mark.coverage
     @patch('bot.utils.discord_api_request')
     def test_campaign_with_discord_channel_ok(self, mocker_api_request: MagicMock):
         discord_channel_id = f'{fake.random_number(digits=18)}'
@@ -1731,3 +1751,812 @@ class TestSessionListView(TestCase):
 
         with self.assertNumQueries(len(queries)):
             self.view.as_view()(rq)
+
+
+class TestRaceCreateForPlaceView(TestCase):
+    login_url = reverse('registration:auth:login')
+    model = Race
+    place: Place
+    resolver = 'roleplay:race:create-for-place'
+    template = 'roleplay/race/race_create.html'
+    user: User
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.place = generate_place(owner=cls.user)
+
+    def setUp(self):
+        self.url = reverse(self.resolver)
+        self.url_with_place = reverse(self.resolver, kwargs={'pk': self.place.pk})
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'place': self.place.pk,
+            'race-image-INITIAL_FORMS': '0',
+            'race-image-TOTAL_FORMS': '0',
+        }
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_anonymous_access_url_with_place_ko(self):
+        response = self.client.get(self.url_with_place)
+        expected_url = f'{self.login_url}?next={self.url_with_place}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_access_url_with_place_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url_with_place)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_post_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+        redirect_url = resolve_url('roleplay:race:list')
+
+        self.assertRedirects(response, redirect_url)
+
+    def test_post_url_with_place_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
+        redirect_url = reverse('roleplay:race:list')
+
+        self.assertRedirects(response, redirect_url)
+
+    def test_post_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+
+    def test_post_url_with_place_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+
+    def test_post_with_missing_mandatory_data_on_race_form_ko(self):
+        del self.valid_data['name']
+        del self.valid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+        self.assertFormError(response.context['form'], 'place', 'This field is required.')
+
+    def test_post_url_with_place_with_missing_mandatory_data_on_race_form_ko(self):
+        del self.valid_data['name']
+        del self.valid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+        self.assertFormError(response.context['form'], 'place', 'This field is required.')
+
+    def test_post_with_missing_mandatory_data_on_image_formset_ko(self):
+        del self.valid_data['race-image-TOTAL_FORMS']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormsetError(
+            response.context['formset'], form_index=None, field=None,
+            errors=(
+                'ManagementForm data is missing or has been tampered with. Missing fields: race-image-TOTAL_FORMS. '
+                'You may need to file a bug report if the issue persists.'
+            ),
+        )
+
+    def test_post_url_with_place_with_missing_mandatory_data_on_image_formset_ko(self):
+        del self.valid_data['race-image-TOTAL_FORMS']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertFormsetError(
+            response.context['formset'], form_index=None, field=None,
+            errors=(
+                'ManagementForm data is missing or has been tampered with. Missing fields: race-image-TOTAL_FORMS. '
+                'You may need to file a bug report if the issue persists.'
+            ),
+        )
+
+    def test_post_with_images_creates_race_and_images_ok(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '2',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            )
+        })
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+        self.assertEqual(2, self.user.race_set.first().images.count())
+
+    def test_post_url_with_place_with_image_creates_race_and_image_ok(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '2',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            )
+        })
+        self.client.force_login(self.user)
+        self.client.post(self.url_with_place, data=self.valid_data)
+
+        self.assertEqual(1, self.user.race_set.count())
+        self.assertEqual(2, self.user.race_set.first().images.count())
+
+    def test_post_with_more_than_max_images_does_not_create_race_nor_image_ko(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '4',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-2-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-3-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+        })
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data, follow=True)
+
+        self.assertFormsetError(
+            response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+        self.assertEqual(0, self.user.race_set.count())
+
+    def test_post_url_with_place_with_more_than_max_images_does_not_create_race_nor_image_ko(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '4',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-2-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-3-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+        })
+        self.client.force_login(self.user)
+        response = self.client.post(self.url_with_place, data=self.valid_data, follow=True)
+
+        self.assertFormsetError(
+            response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+        self.assertEqual(0, self.user.race_set.count())
+
+
+class TestRaceCreateForCampaignView(TestCase):
+    campaign: Campaign
+    login_url = reverse('registration:auth:login')
+    model = Race
+    resolver = 'roleplay:race:create-for-campaign'
+    template = 'roleplay/race/race_create.html'
+    url: str
+    url_for_campaign: str
+    user: User
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user: User = baker.make_recipe('registration.user')
+        cls.campaign: Campaign = baker.make_recipe('roleplay.campaign', owner=cls.user)
+        cls.game_master: User = baker.make_recipe('registration.user')
+        cls.campaign.add_game_masters(cls.game_master)
+        cls.url = resolve_url(cls.resolver)
+
+    def setUp(self) -> None:
+        self.url_for_campaign = resolve_url(self.resolver, pk=self.campaign.pk)
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'campaign': self.campaign.pk,
+            'race-image-INITIAL_FORMS': '0',
+            'race-image-TOTAL_FORMS': '0',
+        }
+
+    def test_access_anonymous_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    def test_access_anonymous_url_with_campaign_ko(self):
+        response = self.client.get(self.url_for_campaign)
+        expected_url = f'{self.login_url}?next={self.url_for_campaign}'
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    def test_access_logged_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_template_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response=response, template_name=self.template)
+
+    def test_access_only_campaign_where_user_is_game_master_ok(self):
+        campaign_1: Campaign = baker.make_recipe('roleplay.campaign')
+        campaign_2: Campaign = baker.make_recipe('roleplay.campaign')
+        campaign_2.add_game_masters(self.game_master)
+
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url)
+
+        self.assertContains(response=response, text=campaign_2.name)
+        self.assertContains(response=response, text=self.campaign.name)
+        self.assertNotContains(response=response, text=campaign_1.name)
+
+    def test_access_only_campaign_where_user_is_owner_ok(self):
+        campaign_1: Campaign = baker.make_recipe('roleplay.campaign')
+        campaign_2: Campaign = baker.make_recipe('roleplay.campaign', owner=self.user)
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response=response, text=campaign_2.name)
+        self.assertContains(response=response, text=self.campaign.name)
+        self.assertNotContains(response=response, text=campaign_1.name)
+
+    def test_access_non_existent_campaign_ko(self):
+        self.client.force_login(self.user)
+        response = self.client.get(resolve_url(self.resolver, pk=fake.pyint()))
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_with_existing_campaign_where_user_is_game_master_ok(self):
+        self.client.force_login(self.game_master)
+        response = self.client.get(self.url_for_campaign)
+
+        self.assertInHTML(
+            needle=f'<option value="{self.campaign.pk}" selected="">{self.campaign.name}</option>',
+            haystack=response.content.decode(),
+        )
+
+    def test_access_with_existing_campaign_where_user_is_owner_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url_for_campaign)
+
+        self.assertInHTML(
+            needle=f'<option value="{self.campaign.pk}" selected="">{self.campaign.name}</option>',
+            haystack=response.content.decode(),
+        )
+
+    def test_access_where_user_is_not_owner_neither_game_master_ko(self):
+        campaign: Campaign = baker.make_recipe('roleplay.campaign')
+
+        self.client.force_login(self.user)
+        response = self.client.get(resolve_url(self.resolver, pk=campaign.pk))
+
+        self.assertEqual(404, response.status_code)
+
+    def test_access_as_owner_post_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+        redirect_url = resolve_url('roleplay:race:list')
+
+        self.assertRedirects(response=response, expected_url=redirect_url)
+
+    def test_access_as_game_master_post_with_valid_data_redirects_ok(self):
+        self.client.force_login(self.game_master)
+        response = self.client.post(self.url, data=self.valid_data)
+        redirect_url = resolve_url('roleplay:race:list')
+
+        self.assertRedirects(response=response, expected_url=redirect_url)
+
+    def test_access_as_owner_post_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.campaign.race_set.count())
+
+    def test_access_as_game_master_post_with_valid_data_creates_race_ok(self):
+        self.client.force_login(self.game_master)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.campaign.race_set.count())
+
+    def test_post_missing_mandatory_data_on_race_form_ko(self):
+        del self.valid_data['name']
+        del self.valid_data['campaign']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormError(response.context['form'], 'name', 'This field is required.')
+        self.assertFormError(response.context['form'], 'campaign', 'This field is required.')
+
+    def test_post_with_missing_mandatory_data_on_image_formset_ko(self):
+        del self.valid_data['race-image-TOTAL_FORMS']
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data)
+
+        self.assertFormsetError(
+            response.context['formset'], form_index=None, field=None,
+            errors=(
+                'ManagementForm data is missing or has been tampered with. Missing fields: race-image-TOTAL_FORMS. '
+                'You may need to file a bug report if the issue persists.'
+            ),
+        )
+
+    def test_post_with_images_creates_race_and_images_ok(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '2',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            )
+        })
+        self.client.force_login(self.user)
+        self.client.post(self.url, data=self.valid_data)
+
+        self.assertEqual(1, self.campaign.race_set.count())
+        self.assertEqual(2, self.campaign.race_set.first().images.count())
+
+    def test_post_with_more_than_max_images_does_not_create_race_nor_images_ko(self):
+        self.valid_data.update({
+            'race-image-TOTAL_FORMS': '4',
+            'race-image-0-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-1-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-2-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+            'race-image-3-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'), content=fake.image(image_format='jpeg')
+            ),
+        })
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=self.valid_data, follow=True)
+
+        self.assertFormsetError(
+            response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+        self.assertEqual(0, self.campaign.race_set.count())
+
+
+@unittest.skip('WIP: OAR-115')
+class TestRaceDetailView(TestCase):
+    model = Race
+    resolver = 'roleplay:place:detail'
+    template = 'roleplay/race/race_detail.html'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.users = baker.make_recipe('registration.user')
+        cls.race = baker.make_recipe('roleplay.race')
+        cls.race_without_optional = baker.make_recipe('roleplay.race_without_optional')
+
+        cls.race.users.add(cls.users)
+        cls.race_without_optional.users.add(cls.users)
+
+        cls.owner = cls.users
+
+        cls.url = reverse('roleplay:race:detail', kwargs={'pk': cls.race.pk})
+        cls.url_without_optional = reverse('roleplay:race:detail', kwargs={'pk': cls.race_without_optional.pk})
+
+    def test_access_template_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url, kwargs={'pk': self.race.pk})
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_without_optional_template_used_is_correct_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url_without_optional, kwargs={'pk': self.race_without_optional.pk})
+
+        self.assertTemplateUsed(response, self.template)
+
+
+@unittest.skip('WIP: OAR-18')
+class TestRaceUpdateView(TestCase):
+    model = Race
+    resolver = 'roleplay:place:edit'
+    template = 'roleplay/race/race_update.html'
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.users = baker.make_recipe('registration.user')
+
+        cls.race = cls.model.objects.create(
+            name=fake.word(),
+            description=fake.paragraph(),
+            strength=fake.random_int(min=-5, max=5),
+            dexterity=fake.random_int(min=-5, max=5),
+            charisma=fake.random_int(min=-5, max=5),
+            constitution=fake.random_int(min=-5, max=5),
+            intelligence=fake.random_int(min=-5, max=5),
+            affected_by_armor=fake.boolean(),
+            wisdom=fake.random_int(min=-5, max=5),
+            image=fake.image_url(),
+        )
+        cls.race.users.add(cls.users)
+        cls.owner = cls.users
+
+        cls.url = reverse('roleplay:race:edit', kwargs={'pk': cls.race.pk})
+
+    def setUp(self):
+        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
+        image = SimpleUploadedFile(name=self.tmp_file.name, content=b'', content_type='image/jpeg')
+
+        self.data_ok = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'strength': fake.random_int(min=-5, max=5),
+            'dexterity': fake.random_int(min=-5, max=5),
+            'charisma': fake.random_int(min=-5, max=5),
+            'constitution': fake.random_int(min=-5, max=5),
+            'intelligence': fake.random_int(min=-5, max=5),
+            'affected_by_armor': fake.boolean(),
+            'wisdom': fake.random_int(min=-5, max=5),
+            'image': image,
+            'users': [self.users.pk]
+        }
+
+    def tearDown(self):
+        self.tmp_file.close()
+        os.unlink(self.tmp_file.name)
+
+    def test_anonymous_access_ko(self):
+        login_url = reverse('registration:auth:login')
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_access_not_owner_ko(self):
+        self.client.force_login(baker.make_recipe('registration.user'))
+        response = self.client.get(self.url)
+
+        self.assertEqual(403, response.status_code)
+
+    def test_access_owner_ok(self):
+        self.client.force_login(self.users)
+        response = self.client.get(self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_anonymous_post_data_ko(self):
+        login_url = reverse('registration:auth:login')
+        response = self.client.post(self.url, data=self.data_ok)
+
+        self.assertRedirects(response, f'{login_url}?next={self.url}')
+
+    def test_post_data_ok(self):
+        self.client.force_login(self.owner)
+        current_name = self.race.name
+        new_name = self.data_ok['name']
+        response = self.client.post(self.url, data=self.data_ok)
+        self.race.refresh_from_db()
+
+        self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
+        self.assertNotEqual(current_name, new_name)
+        self.assertEqual(self.race.name, new_name)
+
+
+class TestRaceListView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    resolver = 'roleplay:race:list'
+    template = 'roleplay/race/race_list.html'
+    view = views.RaceListView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.url = resolve_url(cls.resolver)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(path=self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_login_and_redirects_ok(self):
+        user: User = baker.make_recipe('registration.user')
+        user.set_password('p4ssw0rd@')
+        user.save()
+        response = self.client.get(path=self.url)
+        redirect_response = self.client.post(
+            path=response.url, data={'username': user.username, 'password': 'p4ssw0rd@'},
+        )
+
+        self.assertRedirects(redirect_response, self.url)
+
+    def test_access_logged_user_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertTemplateUsed(response=response, template_name=self.template)
+
+    def test_access_without_races_with_places_and_campaigns_and_see_buttons_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
+        self.client.force_login(self.user)
+
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
+
+    def test_access_without_any_campaigns_or_worlds_does_not_see_buttons_ok(self):
+        user = baker.make_recipe('registration.user')
+        self.client.force_login(user)
+
+        response = self.client.get(path=self.url)
+
+        self.assertContains(
+            response=response,
+            text=(
+                'It looks like you don\'t have any Campaigns or Worlds to add a race to. You must first create one of '
+                'these to be able to add races.'
+            )
+        )
+
+    def test_access_with_races_and_sees_them_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_access_with_races_and_race_actions_are_visible_ok(self):
+        races: list[Race] = baker.make_recipe('roleplay.race', 3, owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Details', count=len(races))
+        # NOTE: We need +1 since its getting 'Edit'  from CKEditor
+        self.assertContains(response=response, text='Edit', count=len(races) + 1)
+        self.assertContains(response=response, text='Delete', count=len(races))
+
+    def test_access_without_owned_races_and_does_not_see_others_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race')
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertNotContains(response=response, text=race.name)
+
+    def test_advanced_search_is_displayed_if_there_are_any_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Advanced Search')
+
+    def test_advanced_search_is_not_displayed_if_there_is_no_race_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertNotContains(response=response, text='Advanced Search')
+
+    def test_create_for_buttons_are_displayed_if_there_is_no_race_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
+
+    def test_create_for_buttons_are_displayed_if_there_is_any_race_ok(self):
+        baker.make_recipe('roleplay.campaign', owner=self.user)
+        baker.make_recipe('roleplay.place', owner=self.user)
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Create race for world')
+        self.assertContains(response=response, text='Create race for campaign')
+
+    def test_races_without_description_show_default_text_ok(self):
+        races: list[Race] = baker.make_recipe('roleplay.race', 2, owner=self.user, description='')
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='No description provided yet.', count=len(races))
+
+    def test_races_with_images_are_displayed_on_carousel_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        image = Image.objects.create(
+            image=SimpleUploadedFile(name='test.png', content=b'', content_type='image/jpeg'), owner=self.user,
+            content_type=ContentType.objects.get_for_model(Race), object_id=race.id,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text=image.image.url)
+
+    def test_search_by_name_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'name': race.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_name_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'name': 'lorem ipsum dolor'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_description_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'description': race.description})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_description_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'description': 'lorem ipsum dolor'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_campaign_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'campaign': race.campaign.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_campaign_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'campaign': 'lorem ipsum dolor'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_place_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'place': race.place.name})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_place_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'place': 'lorem ipsum dolor'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_search_by_ability_modifiers_with_existent_races_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user, strength=1)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'ability_modifiers': 'strength'})
+
+        self.assertContains(response=response, text=race.name)
+
+    def test_search_by_ability_modifiers_with_non_existent_races_ok(self):
+        baker.make_recipe('roleplay.race_without_modifiers', owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url, data={'ability_modifiers': 'strength'})
+
+        self.assertContains(response=response, text='There isn\'t any race with this characteristics.')
+        self.assertContains(response=response, text='Remove filter or create one.')
+
+    def test_races_paginated_ok(self):
+        baker.make_recipe('roleplay.race', self.view.paginate_by + 1, owner=self.user)
+        self.client.force_login(self.user)
+        response = self.client.get(path=self.url)
+
+        self.assertContains(response=response, text='Next')
+
+
+class TestRaceDeleteView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
+    model = Race
+    resolver = 'roleplay:race:delete'
+    template = 'common/layout/base_confirm_delete.html'
+    view = views.RaceDeleteView
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = baker.make_recipe('registration.user')
+        cls.campaign = baker.make_recipe('roleplay.campaign', owner=cls.user)
+        cls.place = generate_place(owner=cls.user)
+
+    def setUp(self) -> None:
+        self.race: Race = baker.make_recipe('roleplay.race', owner=self.user)
+        self.url = resolve_url(self.resolver, pk=self.race.pk)
+
+    def test_anonymous_access_ko(self):
+        response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
+
+        self.assertRedirects(response, expected_url)
+
+    def test_access_templated_used_is_correct_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, self.template)
+
+    def test_race_without_images_is_safe_delete_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response=response,
+            text='Our rangers say that there\'s not problem at all. Nothing else will be deleted!',
+        )
+
+    def test_race_with_images_will_delete_related_images_ok(self):
+        image: Image = baker.make_recipe('common.image', content_object=self.race)
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response=response,
+            text='Objects that will be deleted within this action',
+        )
+        self.assertInHTML(
+            needle=f'<a href="{image.image.url}" target="_blank">{image.image.name}</a>',
+            haystack=response.content.decode(),
+        )
+
+    def test_access_redirect_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, resolve_url('roleplay:race:list'))

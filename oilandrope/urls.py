@@ -19,6 +19,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.utils.translation import gettext_lazy as _
 from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
@@ -30,11 +31,15 @@ urlpatterns = [
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
+custom_admin_site = admin.site
+custom_admin_site.site_title = _('Oil & Rope Admin Site')
+custom_admin_site.site_header = _('Oil & Rope Admin Site')
+
 urlpatterns += i18n_patterns(
     # Main site
     path('', include('core.urls')),
     # Admin site
-    path('admin/', admin.site.urls),
+    path('admin/', custom_admin_site.urls),
     # Common
     path('common/', include('common.urls')),
     # Auth system
@@ -47,10 +52,11 @@ urlpatterns += i18n_patterns(
     path('roleplay/', include('roleplay.urls')),
     # O&R Email
     path('email/', include('oar_email.urls')),
-    prefix_default_language=True,
+    prefix_default_language=False,
 )
 
 if settings.DEBUG:  # pragma: no cover
     import debug_toolbar
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns.insert(0, path('__debug__/', include(debug_toolbar.urls)))

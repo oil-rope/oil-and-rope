@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load string_utils %}
+<li class="nav-item text-uppercase">
+  {% url 'core:home' as home_url %}
+  <a
+    href="{{ home_url }}"
+    class="nav-link{% if request.path|startswith:home_url %} active{% endif %}"
+  >
+    {% translate "about us" %}
+  </a>
+</li>

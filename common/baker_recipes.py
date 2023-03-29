@@ -1,21 +1,23 @@
-from typing import TYPE_CHECKING
 
-from django.apps import apps
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from model_bakery.recipe import Recipe, foreign_key
 
-from common.constants import models
+from common.models import Image, Vote
 from common.utils import create_faker
 from registration.baker_recipes import user
 
-if TYPE_CHECKING:
-    from django.contrib.contenttypes.models import ContentType as ContentTypeModel
-
-    from common.models import Vote as VoteModel
-
 fake = create_faker()
 
-ContentType: 'ContentTypeModel' = apps.get_model(models.CONTENT_TYPE)
-Vote: 'VoteModel' = apps.get_model(models.COMMON_VOTE)
+image = Recipe(
+    Image,
+    image=f'{settings.MEDIA_ROOT}/{fake.file_path(category="image", absolute=False)}',
+    owner=foreign_key(user),
+)
+
+race_image = image.extend(
+    content_type=ContentType.objects.get(app_label='roleplay', model='race'),
+)
 
 vote = Recipe(
     Vote,

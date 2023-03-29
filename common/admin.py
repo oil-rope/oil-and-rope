@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 
@@ -15,6 +16,13 @@ class TrackAdmin(TracingMixinAdmin):
     list_display_links = ('id', 'name')
     list_filter = ('public', 'entry_created_at', 'entry_updated_at')
     search_fields = ['id', 'name', 'owner__username']
+
+
+class ImageTabularInline(GenericTabularInline):
+    ct_field = 'content_type'
+    ct_fk_field = 'object_id'
+    extra = 1
+    model = models.Image
 
 
 @admin.register(models.Vote)

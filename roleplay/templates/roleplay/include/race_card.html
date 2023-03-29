@@ -1,0 +1,98 @@
+{% load i18n %}
+{% load static %}
+
+<div class="card h-100">
+  <div class="card-body">
+    <div
+      id="race{{ race.pk }}ImagesCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-inner">
+        {% for image_obj in race.images.all %}
+          <div class="carousel-item{% if forloop.first %} active{% endif %}">
+            <img
+              class="d-block mx-auto"
+              src="{{ image_obj.image.url }}"
+              alt="{% translate "race image"|capfirst %}"
+              height="350"
+              width="auto"
+            />
+          </div>
+        {% empty %}
+          <div class="carousel-item active">
+            <img
+              class="d-block mx-auto"
+              src="{% static 'img/default_user.png' %}"
+              alt="{% translate "race without image"|capfirst %}"
+              height="350"
+              width="auto"
+            />
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if race.images.exists %}
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#race{{ race.pk }}ImagesCarousel"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% translate "previous"|capfirst %}</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#race{{ race.pk }}ImagesCarousel"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">{% translate "next"|capfirst %}</span>
+      </button>
+    {% endif %}
+
+    <h5 class="card-title">
+      {{ race.name }}
+      {% if race.abilities_display %}
+        ({{ race.abilities_display }})
+      {% endif %}
+    </h5>
+    <p class="card-text">
+      {% if race.description %}
+        {{ race.description|truncatechars:100 }}
+      {% else %}
+        {% translate "no description provided yet."|capfirst %}
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="card-footer">
+    <div class="d-grid gap-2 gap-md-3 gap-lg-2 gap-xl-1  d-md-flex justify-content-md-end">
+      <a
+        href="{% url 'roleplay:race:detail' pk=race.pk %}"
+        class="btn btn-primary disabled"
+      >
+        {{ ICONS.EYE|safe }}
+        {% translate "details"|capfirst %}
+      </a>
+      {% if race.owner == request.user %}
+        <a
+          href="{% url 'roleplay:race:edit' pk=race.pk %}"
+          class="btn btn-secondary disabled"
+        >
+          {{ ICONS.EDIT|safe }}
+          {% translate "edit"|capfirst %}
+        </a>
+        <a
+          href="{% url 'roleplay:race:delete' pk=race.pk %}"
+          class="btn btn-danger"
+        >
+          {{ ICONS.TRASH|safe }}
+          {% translate "delete"|capfirst %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>

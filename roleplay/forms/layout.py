@@ -228,3 +228,114 @@ class SessionFormLayout(layout.Layout):
                 css_class='justify-content-around mt-2 mt-md-5 mt-lg-3',
             ),
         )
+
+
+class RaceFormLayout(layout.Layout):
+    def __init__(self, submit_text):
+        super().__init__(
+            bootstrap.TabHolder(
+                bootstrap.Tab(
+                    _('basic information').title(),
+                    layout.Row(
+                        layout.Column('name'),
+                    ),
+                    layout.Row(
+                        layout.Column('description'),
+                    ),
+                    layout.Row(
+                        layout.Column('image'),
+                    ),
+                ),
+                bootstrap.Tab(
+                    _('attributes').title(),
+                    layout.Row(
+                        layout.Column('strength'),
+                        layout.Column('dexterity'),
+                        layout.Column('constitution'),
+                        layout.Column('intelligence'),
+                        layout.Column('wisdom'),
+                        layout.Column('charisma'),
+                        layout.Column('affected_by_armor', css_class='col-3'),
+                    ),
+                    layout.Row(
+                        layout.Column('users')
+                    )
+                ),
+            ),
+            layout.Row(
+                layout.Column(
+                    common_layout.SubmitClearLayout(
+                        submit_text=submit_text.capitalize(),
+                        submit_css_class='col-5 col-lg-6',
+                        reset_css_class='col-5 d-lg-none',
+                    ),
+                ),
+                css_class='justify-content-md-center',
+            ),
+        )
+
+
+class RacePlaceFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('place')),
+                layout.Column(layout.Field('name')),
+            ),
+            layout.Row(
+                layout.Column(layout.Field('description', style='resize: none')),
+            ),
+            layout.Row(
+                bootstrap.Accordion(
+                    bootstrap.AccordionGroup(
+                        _('Stats'),
+                        layout.Row(
+                            layout.Column(layout.Field('strength')),
+                            layout.Column(layout.Field('dexterity')),
+                            layout.Column(layout.Field('constitution')),
+                            layout.Column(layout.Field('intelligence')),
+                            layout.Column(layout.Field('wisdom')),
+                            layout.Column(layout.Field('charisma')),
+                            css_class='row-cols-3',
+                        ),
+                        layout.Row(
+                            layout.Column(layout.Field('affected_by_armor')),
+                        ),
+                        active=False,
+                    ),
+                ),
+            ),
+        )
+
+
+class RaceCampaignFormLayout(layout.Layout):
+    def __init__(self):
+        super().__init__(
+            layout.Row(
+                layout.Column(layout.Field('campaign')),
+                layout.Column(layout.Field('name')),
+            ),
+            layout.Row(
+                layout.Column(layout.Field('description', style='resize: none')),
+            ),
+            layout.Row(
+                bootstrap.Accordion(
+                    bootstrap.AccordionGroup(
+                        _('Stats'),
+                        layout.Row(
+                            layout.Column(layout.Field('strength')),
+                            layout.Column(layout.Field('dexterity')),
+                            layout.Column(layout.Field('constitution')),
+                            layout.Column(layout.Field('intelligence')),
+                            layout.Column(layout.Field('wisdom')),
+                            layout.Column(layout.Field('charisma')),
+                            css_class='row-cols-3',
+                        ),
+                        layout.Row(
+                            layout.Column(layout.Field('affected_by_armor')),
+                        ),
+                        active=False,
+                    ),
+                ),
+            ),
+        )

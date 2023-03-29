@@ -179,7 +179,7 @@ class TestSignUpView(TestCase):
 
     @mock.patch('registration.views.messages')
     def test_email_exception_ko(self, mock_call: mock.MagicMock):
-        error_message = 'Seems like we are experimenting issues with our mail automatization. Please try later.'
+        error_message = 'Seems like we are experimenting issues with our mail automation. Please try later.'
 
         with self.settings(
             EMAIL_HOST='smtp.mailtrap.io', EMAIL_HOST_USER=fake.user_name(),

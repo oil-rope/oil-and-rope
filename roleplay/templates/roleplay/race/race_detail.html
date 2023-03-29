@@ -1,0 +1,68 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {{ name }}
+{% endblock title %}
+
+{% block breadcrumb %}
+  {% translate "race detail" as breadcrumb_translation %}
+  {% include 'common/include/breadcrumb.html' with breadcrumbs='races=roleplay:race:list,race detail' %}
+{% endblock breadcrumb %}
+
+{% block body_content %}
+  <main class="container-fluid">
+    <h3 class="font-ds-lighter display-4 justify-content-center">
+      {{ object.name }}
+    </h3>
+    <div class="col-12">
+      <div class="d-flex row justify-content-center ">
+        <picture class="d-flex justify-content-center"> 
+          {% if object.image %}
+            <img height="250px" load="lazy" src="{{ object.image.url }}" alt="Race image">
+          {% else %}
+            <img height="250px" load="lazy" src="{% static 'img/oil_and_rope_logo_color.svg' %}" alt="Oil & Rope Logo">
+          {% endif %}
+        </picture>
+      </div>
+      <br>
+      <div class="d-flex row justify-content-around ">
+        <div class="col-8">
+          <p class="px-3">
+            {{ object.description }}
+          </p>
+        </div>
+        <div class="col-4 justify-content-end">
+        <div class="d-flex row">
+          <h5 class="justify-content-center">{% translate 'strength'|capfirst %}: {{ object.strength }} </h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'dexterity'|capfirst %}: {{ object.dexterity  }}</h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'constitution'|capfirst %}: {{ object.constitution }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'intelligence'|capfirst %}: {{ object.intelligence }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'wisdom'|capfirst %}: {{ object.wisdom }} </h5> 
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">{% translate 'charisma'|capfirst %}: {{ object.charisma }} </h5>
+        </div>
+        <div class="row">
+          <h5 class="justify-content-center">
+            {% translate 'affected by armor'|capfirst %}: 
+              {% if object.affected_by_armor %}
+                &#10004;
+              {% else %}
+                &times;
+              {% endif %} </h5>
+        </div>
+      </div>
+      </div>
+    </div>
+  </main>
+{% endblock body_content %}

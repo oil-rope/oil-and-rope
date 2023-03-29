@@ -1,4 +1,7 @@
+from typing import Optional
+
 from django import template
+from django.db import models
 from django.shortcuts import resolve_url
 from django.template.defaultfilters import capfirst, stringfilter
 from django.urls.exceptions import NoReverseMatch
@@ -50,3 +53,27 @@ def capfirstletter(text: str):
         first_letter += 1
 
     return text[:first_letter] + capfirst(text[first_letter:])
+
+
+@register.filter
+def verbose_name(object: models.Model, field: Optional[str] = None) -> str:
+    """
+    Using the given object it will return its verbose name. If `field` it's given then the verbose name returned will be
+    for the field.
+    """
+
+    model: models.Model = object._meta.model
+    if not field:
+        return model._meta.verbose_name
+    field = model._meta.get_field(field_name=field)
+    return field.verbose_name
+
+
+@register.filter
+def verbose_name_plural(object: models.Model) -> str:
+    """
+    Given an object it will return its verbose name plural.
+    """
+
+    model: models.Model = object._meta.model
+    return model._meta.verbose_name_plural

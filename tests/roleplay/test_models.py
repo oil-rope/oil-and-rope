@@ -6,18 +6,20 @@ import unittest
 from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.utils import DataError, IntegrityError
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone, translation
 from freezegun import freeze_time
 from model_bakery import baker
 
 from common.constants import models as constants
+from registration.models import User
 from roleplay.enums import DomainTypes, RoleplaySystems, SiteTypes
-from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, RaceUser, Session
+from roleplay.models import Campaign, Domain, Place, PlayerInCampaign, Race, Session, Trait, TraitType
 from tests.mocks import discord
 from tests.utils import fake
 
@@ -26,65 +28,114 @@ from ..utils import generate_place
 connection_engine = connection.features.connection.settings_dict.get('ENGINE', None)
 
 
-class TestDomain(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = Domain
+class TestTraitType(TestCase):
+    def test_creation_without_required_ko(self):
+        with self.assertRaisesRegex(IntegrityError, expected_regex=r'NOT NULL constraint failed: .+'):
+            TraitType.objects.create()
+
+    def test_creation_with_required_ok(self):
+        trait_type = TraitType.objects.create(system=RoleplaySystems.PATHFINDER_1)
+        trait = baker.make_recipe('roleplay.trait', type=trait_type)
+
+        self.assertEqual(trait.type, trait_type)
 
     def test_str_ok(self):
-        domain = baker.make(self.model)
+        trait_type = TraitType.objects.create(
+            name='Test TraitType', description='This is some description', system=RoleplaySystems.PATHFINDER_1,
+        )
+
+        self.assertEqual(f'Test TraitType [{trait_type.id}]', str(trait_type))
+
+    def test_translation_ok(self):
+        trait_type = TraitType.objects.get(name_en='Basic (Combat)')
+
+        with translation.override('es'):
+            self.assertEqual('Básicos (Combate)', trait_type.name)
+
+
+class TestTrait(TestCase):
+    def test_creation_without_required_ko(self):
+        with self.assertRaisesRegex(IntegrityError, expected_regex=r'NOT NULL constraint failed: .+'):
+            Trait.objects.create()
+
+    def test_creation_with_required_ok(self):
+        race: Race = baker.make_recipe('roleplay.race')
+        Trait.objects.create(
+            name=fake.word(),
+            type=baker.make_recipe('roleplay.trait_type'),
+            creator=baker.make_recipe('registration.user'),
+            content_type=ContentType.objects.get_for_model(Race),
+            object_id=race.id,
+        )
+
+        self.assertTrue(race.traits.all(), msg='Trait was not added to race.')
+
+    def test_str_ok(self):
+        race: Race = baker.make_recipe('roleplay.race')
+        trait_type = TraitType.objects.create(name='Test TraitType', system=RoleplaySystems.DUNGEONS_AND_DRAGONS_35)
+        trait = Trait.objects.create(
+            name='Test Trait', type=trait_type, creator=baker.make_recipe('registration.user'),
+            content_type=ContentType.objects.get_for_model(Race), object_id=race.id,
+        )
+
+        self.assertEqual(f'Test Trait (Dungeons & Dragons 3.5) [{trait.id}]', str(trait))
+
+
+class TestDomain(TestCase):
+    def test_str_ok(self):
+        domain = baker.make(Domain)
         domain_type = DomainTypes(domain.domain_type)
         self.assertEqual(str(domain), f'{domain.name} [{domain_type.label.title()}]')
 
     def test_ok(self):
         entries = fake.pyint(min_value=1, max_value=100)
-        baker.make(self.model, entries)
-        self.assertEqual(entries, self.model.objects.count())
+        baker.make(Domain, entries)
+        self.assertEqual(entries, Domain.objects.count())
 
     @freeze_time('2020-01-01')
     def test_image_upload_ok(self):
-        tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-        image_file = tmpfile.name
-        with open(tmpfile.name, 'rb') as image_data:
+        tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+        image_file = tmp_file.name
+        with open(tmp_file.name, 'rb') as image_data:
             image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
 
-        place = baker.make(self.model)
+        place = baker.make(Domain)
         place.image = image
         place.save()
         expected_path = '/media/roleplay/domain/2020/01/01/{}/{}'.format(place.pk, image.name)
         expected_path = pathlib.Path(expected_path)
         self.assertIn(str(expected_path), place.image.path)
 
-        tmpfile.close()
-        os.unlink(tmpfile.name)
+        tmp_file.close()
+        os.unlink(tmp_file.name)
         os.unlink(place.image.path)
 
     @unittest.skipIf('sqlite3' in connection_engine, 'SQLite takes Varchar as Text')
     def test_max_name_length_ko(self):
         name = fake.password(length=26)
         with self.assertRaises(DataError) as ex:
-            self.model.objects.create(name=name)
+            Domain.objects.create(name=name)
         self.assertRegex(str(ex.exception), r'.*value too long.*')
 
     def test_name_none_ko(self):
         with self.assertRaises(IntegrityError) as ex:
-            self.model.objects.create(name=None)
+            Domain.objects.create(name=None)
         self.assertRegex(str(ex.exception), r'.*(null|NULL).*(constraint|CONSTRAINT).*')
 
     def test_is_domain_ok(self):
-        instance = baker.make(self.model, domain_type=DomainTypes.DOMAIN)
+        instance = baker.make(Domain, domain_type=DomainTypes.DOMAIN)
         self.assertTrue(instance.is_domain)
 
     def test_is_domain_ko(self):
-        instance = baker.make(self.model, domain_type=DomainTypes.SUBDOMAIN)
+        instance = baker.make(Domain, domain_type=DomainTypes.SUBDOMAIN)
         self.assertFalse(instance.is_domain)
 
     def test_is_subdomain_ok(self):
-        instance = baker.make(self.model, domain_type=DomainTypes.SUBDOMAIN)
+        instance = baker.make(Domain, domain_type=DomainTypes.SUBDOMAIN)
         self.assertTrue(instance.is_subdomain)
 
     def test_is_subdomain_ko(self):
-        instance = baker.make(self.model, domain_type=DomainTypes.DOMAIN)
+        instance = baker.make(Domain, domain_type=DomainTypes.DOMAIN)
         self.assertFalse(instance.is_subdomain)
 
 
@@ -102,9 +153,9 @@ class TestPlace(TestCase):
 
     @freeze_time('2020-01-01')
     def test_image_upload_ok(self):
-        tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-        image_file = tmpfile.name
-        with open(tmpfile.name, 'rb') as image_data:
+        tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+        image_file = tmp_file.name
+        with open(tmp_file.name, 'rb') as image_data:
             image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
 
         place = generate_place()
@@ -114,22 +165,22 @@ class TestPlace(TestCase):
         expected_path = pathlib.Path(expected_path)
         self.assertIn(str(expected_path), place.image.path)
 
-        tmpfile.close()
-        os.unlink(tmpfile.name)
+        tmp_file.close()
+        os.unlink(tmp_file.name)
         os.unlink(place.image.path)
 
     def test_images_ok(self):
         images = []
 
         for _ in range(0, 3):
-            tmpfile = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
-            image_file = tmpfile.name
-            with open(tmpfile.name, 'rb') as image_data:
+            tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.jpg', dir='./tests/', delete=False)
+            image_file = tmp_file.name
+            with open(tmp_file.name, 'rb') as image_data:
                 image = SimpleUploadedFile(name=image_file, content=image_data.read(), content_type='image/jpeg')
             images.append(image)
 
-            tmpfile.close()
-            os.unlink(tmpfile.name)
+            tmp_file.close()
+            os.unlink(tmp_file.name)
 
         parent = None
         for image in images:
@@ -166,43 +217,26 @@ class TestPlace(TestCase):
 class TestRace(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.model = Race
-        cls.m2m_model = RaceUser
+        cls.user: User = baker.make_recipe('registration.user')
 
-    def test_create_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        self.model.objects.get(pk=instance.pk)
+    def test_create_without_owner_ko(self):
+        with self.assertRaisesRegex(IntegrityError, expected_regex=r'NOT NULL constraint failed: .+'):
+            Race.objects.create(name=fake.word())
 
-    def test_create_with_owner_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        users = baker.make(constants.REGISTRATION_USER, 3)
-        instance.add_owners(*users)
+    def test_clean_without_place_or_campaign_ko(self):
+        with self.assertRaises(ValidationError) as ex:
+            Race(owner_id=self.user.pk).clean()
+        error_msg = ex.exception.message
 
-        owners = instance.owners
-        result = all(user in owners for user in users)
-        self.assertTrue(result)
+        self.assertEqual(error_msg, 'Either a campaign or a place should be indicated.')
 
-    def test_str_ok(self):
-        instance = self.model.objects.create(name=fake.word(), description=fake.paragraph())
-        expected = f'{instance.name} [{instance.pk}]'
+    def test_create_without_optional_ok(self):
+        instance = Race.objects.create(
+            owner_id=self.user.pk,
+        )
+        Race.objects.get(pk=instance.pk)
 
-        self.assertEqual(expected, str(instance))
-
-
-class TestRaceUser(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.model = RaceUser
-
-    def setUp(self):
-        self.user = baker.make(constants.REGISTRATION_USER)
-        self.race = baker.make(constants.ROLEPLAY_RACE)
-
-    def test_str_ok(self):
-        instance = self.model.objects.create(user=self.user, race=self.race)
-        expected = f'{instance.user.username} <-> {instance.race.name}'
-
-        self.assertEqual(expected, str(instance))
+        self.assertTrue(True)
 
 
 class TestCampaign(TestCase):

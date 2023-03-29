@@ -1,11 +1,21 @@
+from typing import Optional
+
 from django.core.signing import TimestampSigner
+from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail, get_token
+from roleplay.models import Campaign
 
 
-def send_campaign_invitations(campaign, request, emails, subject=None, signer=None):
+def send_campaign_invitations(
+    campaign: Campaign,
+    request: HttpRequest,
+    emails: list[str],
+    subject: Optional[str] = None,
+    signer: Optional[str] = None,
+):
     """
     Sends a session invitation to each email in a list.
 

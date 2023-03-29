@@ -1,30 +1,34 @@
 import logging
-from typing import Any, Optional, Type
+from typing import Any, Callable, Optional, Type, cast
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from django_filters.views import FilterView
 
 from common.mixins import OwnerRequiredMixin
-from common.models import Vote
+from common.models import Image, Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from common.views.edit import DeletedObjectsView
+from common.views.mixins import ImageFormsetMixin
 from registration.models import User
 from roleplay.managers import CampaignQuerySet, PlaceQuerySet
-from roleplay.models import Campaign, Place, PlayerInCampaign, Session
+from roleplay.models import Campaign, Place, PlayerInCampaign, Race, Session
 
 from . import enums, filters, forms
 from .forms.layout import SessionFormLayout
@@ -222,10 +226,23 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         return kwargs
 
 
-class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeletedObjectsView):
     model = Place
     success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/place/place_confirm_delete.html'
+
+    def get_format_callback(self) -> Optional[Callable[[models.Model], str]]:
+        def format_callback(obj: models.Model):
+            if isinstance(obj, Image):
+                return format_html(
+                    '[{}] <a href="{}" target="_blank">{}</a>',
+                    obj._meta.verbose_name.capitalize(), obj.image.url, obj.image.name,
+                )
+            return '[{}] {}'.format(
+                obj._meta.verbose_name.capitalize(),
+                getattr(obj, 'name', str(obj)),
+            )
+        return format_callback
 
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
@@ -375,7 +392,7 @@ class CampaignComplexQuerySetMixin:
             last_session_date=Subquery(sessions_finished.values('next_game')[:1])
         )
 
-        # Adding if the user is GM so we avoid SQL queries
+        # Adding if the user is GM, so we avoid SQL queries
         self.queryset = self.queryset.annotate(
             user_is_game_master=Subquery(
                 PlayerInCampaign.objects.filter(
@@ -671,8 +688,151 @@ class SessionListView(LoginRequiredMixin, FilterView):
         )
         return filterset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['TABLETOP_URL'] = settings.TABLETOP_URL
+        return context
+
+
+class RaceCreateForPlaceView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
+    form_class = forms.RacePlaceForm
+    image_formset_prefix = 'race-image'
+    object: Optional[Race]
+    model: Type[Race] = Race
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_create.html'
+
+    def get_place(self) -> Optional[Place]:
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.place_set.all(), pk=pk)
+        return obj
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'place': self.get_place(),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
+
+
+class RaceCreateForCampaignView(LoginRequiredMixin, ImageFormsetMixin, CreateView):
+    form_class = forms.RaceCampaignForm
+    image_formset_prefix = 'race-image'
+    object: Optional[Race]
+    model = Race
+    success_url = reverse_lazy('roleplay:race:list')
+    template_name = 'roleplay/race/race_create.html'
+
+    def get_campaign(self) -> Optional[Campaign]:
+        self.request.user = cast(User, self.request.user)  # NOTE: No unauthenticated user should enter this function
+
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if not pk:
+            return None
+        obj = get_object_or_404(self.request.user.editable_campaigns(), pk=pk)
+        return obj
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+            'campaign': self.get_campaign(),
+        })
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form: forms.RacePlaceForm = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
+
+
+class RaceDetailView(LoginRequiredMixin, DetailView):
+    """
+    This view shows the details of a race
+    """
+
+    model = Race
+    template_name = 'roleplay/race/race_detail.html'
+
+
+class RaceUpdateView(LoginRequiredMixin, UpdateView, UserPassesTestMixin):
+    """
+    This view updates a race
+    """
+
+    model = Race
+    form_class = forms.RaceForm
+    template_name = 'roleplay/race/race_update.html'
+
+    def get_form_kwargs(self, form_class=None):
+        kwargs = super().get_form_kwargs()
+        kwargs['submit_text'] = _('update').capitalize()
+
+        user = self.request.user
+        instance = self.get_object()
+
+        if user not in instance.users.all():
+            raise PermissionDenied
+
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
+
+
+class RaceListView(LoginRequiredMixin, FilterView):
+    """
+    this view deletes a race
+    """
+
+    filterset_class = filters.RaceFilter
+    model = Race
+    template_name = 'roleplay/race/race_list.html'
+    paginate_by = 12
+    queryset = Race.objects.select_related(
+        'owner',
+        'place',
+        'campaign',
+    ).prefetch_related(
+        'images',
+    ).all()
+
+    def get_queryset(self) -> QuerySet[Race]:
+        qs = super().get_queryset().filter(
+            owner=self.request.user,
+        )
+        return qs
+
+
+class RaceDeleteView(LoginRequiredMixin, DeletedObjectsView):
+    model = Race
+    success_url = reverse_lazy('roleplay:race:list')
+
+    def get_format_callback(self) -> Optional[Callable[[models.Model], str]]:
+        def format_callback(obj: models.Model):
+            if isinstance(obj, Image):
+                return format_html(
+                    '[{}] <a href="{}" target="_blank">{}</a>',
+                    obj._meta.verbose_name.capitalize(), obj.image.url, obj.image.name,
+                )
+            return '[{}] {}'.format(
+                obj._meta.verbose_name.capitalize(),
+                getattr(obj, 'name', str(obj)),
+            )
+        return format_callback
+
     def get_queryset(self):
         qs = super().get_queryset().filter(
-            campaign__users=self.request.user,
+            owner=self.request.user,
         )
         return qs

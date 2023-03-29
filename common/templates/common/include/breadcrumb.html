@@ -28,12 +28,16 @@
               </li>
             {% else %}
               <li class="breadcrumb-item" aria-current="page">
-                <a
-                  href="{{ breadcrumb_url }}"
-                  class="text-light text-decoration-none"
-                >
+                {% if breadcrumb_url == '#no-url' %}
                   {% translate breadcrumb|title %}
-                </a>
+                {% else %}
+                  <a
+                    href="{{ breadcrumb_url }}"
+                    class="text-light text-decoration-none"
+                  >
+                    {% translate breadcrumb|title %}
+                  </a>
+                {% endif %}
               </li>
             {% endif %}
           {% endfor %}

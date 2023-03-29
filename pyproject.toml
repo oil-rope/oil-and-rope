@@ -3,29 +3,32 @@ name = "oil-and-rope"
 version = "0.0.2"
 description = "Oil & Rope is a Django project for managing Roleplay Games."
 authors = ["LeCuay <suso.becerra98@gmail.com>"]
+readme = "README.md"
 license = "MIT"
 repository = "https://github.com/oil-rope/oil-and-rope/"
 
 [tool.poetry.dependencies]
 python = "^3.9.0 || ^3.10.0"
-Django = "4.1.2"
-channels = "^3.0.4"
-channels-redis = "^3.4.0"
+Django = "~4.1.7"
+channels = "^4.0.0"
+channels-redis = "^4.0.0"
+crispy-bootstrap4 = "2022.1"
 crispy-bootstrap5 = "^0.6"
-"discord.py" = {extras = ["voice"], version = "^1.7.3"}
-django-allauth = "^0.49.0"
+daphne = "^4.0.0"
+"discord.py" = {extras = ["voice"], version = "^2.1.1"}
+django-allauth = "^0.52.0"
 django-crispy-forms = "^1.14.0"
 django-ckeditor = "^6.4.2"
-django-cors-headers = "^3.11"
-django-filter = "^21.1"
+django-cors-headers = "^3.13.0"
+django-filter = "^22.1"
+django-modeltranslation = "^0.18.7"
 django-mptt = "^0.13.4"
 django-mptt-admin = "^2.2.0"
 django-prometheus = "^2.2.0"
-djangorestframework = "3.13.1"
-docutils = "~0.17.1"  # Required by admindocs even if not used
+djangorestframework = "~3.13.1"
 drf-nested-routers = "^0.93.4"
 drf-spectacular = "^0.23.1"
-Faker = "^13.13.0"
+Faker = "^17.0.0"
 gunicorn = "^20.1.0"
 Pillow = "^9.3.0"
 psycopg2 = "^2.9.3"
@@ -33,39 +36,34 @@ pydantic = "^1.10.2"
 python-dateutil = "^2.8.2"
 python-dotenv = "^0.19.2"
 python3-openid = "^3.2.0"  # Requirement for `django-allauth`
-requests = "^2.28.0"
+requests = "^2.28.0"  # Generally needed and also a requirement for `django-allauth`
 requests-oauthlib = "^1.3.1"  # Requirement for `django-allauth`
 Twisted = {extras = ["tls", "http2"], version = "^22.10.0"}
 uvicorn = "^0.18.3"
 
-[tool.poetry.dev-dependencies]
-autopep8 = "^1.7.0"
-coverage = "^6.4.1"
-django-coverage-plugin = "^2.0.3"
-django-debug-toolbar = "^3.4.0"
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.1"
+coverage = "^7.1.0"
+django-coverage-plugin = "^3.0.0"
+django-debug-toolbar = "^3.8.1"
 django-extensions = "^3.2.0"
-dpytest = "^0.5.3"
-flake8 = "^5.0.4"
-flake8-django = "^1.1.1"
+dpytest = "^0.6.1"
+flake8 = "^6.0.0"
 freezegun = "^1.2.1"
 ipdb = "^0.13.9"
-isort = "^5.10.1"
-model_bakery = "^1.5.0"
-pytest = "^7.1.2"
-pytest-asyncio = "^0.18.3"
-pytest-cov = "^3.0.0"
+isort = "^5.12.0"
+model_bakery = "^1.10.1"
+pytest = "^7.2.1"
+pytest-asyncio = "^0.20.3"
 pytest-django = "^4.5.2"
-pytest-mock = "^3.7.0"
-pytest-xdist = "^2.5.0"
-Sphinx = "^4.5.0"
-sphinx-rtd-theme = "^1.0.0"
+pytest-mock = "^3.10.0"
+pytest-xdist = "^3.2.0"
 werkzeug = "~2.0.3"
-selenium = "^4.2.0"
 
-[tool.poetry.group.dev.dependencies]
-autopep8 = "^1.7.0"
-uvicorn = "^0.18.3"
+[tool.poetry.group.docs.dependencies]
+Sphinx = "^6.1.3"
+sphinx-rtd-theme = "^1.2.0"
 
 [build-system]
-requires = ["poetry>=1.1"]
+requires = ["poetry>=1.2.0"]
 build-backend = "poetry.masonry.api"

@@ -2,6 +2,7 @@ import os
 import random
 import tempfile
 from datetime import timedelta
+from typing import Any, cast
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -9,8 +10,9 @@ from django.utils import timezone
 from model_bakery import baker
 from PIL import Image
 
+from registration import models as registration_models
 from roleplay import enums, forms, models
-from tests.utils import fake
+from tests.utils import fake, generate_place
 
 
 class TestPlaceForm(TestCase):
@@ -388,3 +390,85 @@ class TestSessionForm(TestCase):
         session = form.save()
 
         self.assertEqual(self.campaign, session.campaign)
+
+
+class TestRacePlaceForm(TestCase):
+    form_class = forms.RacePlaceForm
+    place: models.Place
+    user: registration_models.User
+    valid_data: dict[str, Any]
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = baker.make_recipe('registration.user')
+        cls.place = cast(models.Place, generate_place(owner=cls.user))
+
+    def setUp(self) -> None:
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'strength': 0,
+            'dexterity': 0,
+            'constitution': 0,
+            'intelligence': 0,
+            'wisdom': 0,
+            'charisma': 0,
+            'affected_by_armor': fake.pybool(),
+            'place': self.place,
+        }
+
+    def test_form_with_valid_data_is_valid_ok(self):
+        form = self.form_class(user=self.user, place=self.place, data=self.valid_data)
+
+        self.assertTrue(form.is_valid(), repr(form.errors))
+
+    def test_form_data_creates_race_ok(self):
+        form = self.form_class(user=self.user, place=self.place, data=self.valid_data)
+
+        self.assertTrue(form.is_valid(), repr(form.errors))
+        race: models.Race = form.save()
+
+        self.assertEqual(race.name, self.valid_data['name'])
+        self.assertEqual(race.description, self.valid_data['description'])
+        self.assertEqual(race.strength, self.valid_data['strength'])
+        self.assertEqual(race.dexterity, self.valid_data['dexterity'])
+        self.assertEqual(race.constitution, self.valid_data['constitution'])
+        self.assertEqual(race.intelligence, self.valid_data['intelligence'])
+        self.assertEqual(race.wisdom, self.valid_data['wisdom'])
+        self.assertEqual(race.charisma, self.valid_data['charisma'])
+        self.assertEqual(race.affected_by_armor, self.valid_data['affected_by_armor'])
+
+    def test_form_data_without_name_ko(self):
+        data = self.valid_data.copy()
+        del data['name']
+        form = self.form_class(user=self.user, place=self.place, data=data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('name', form.errors)
+        self.assertFormError(form, 'name', ['This field is required.'])
+
+    def test_form_data_only_required_ok(self):
+        required_fields = ('name', 'place', )
+        data = {field: self.valid_data[field] for field in required_fields}
+        form = self.form_class(user=self.user, place=self.place, data=data)
+
+        self.assertTrue(form.is_valid(), repr(form.errors))
+
+    def test_form_data_only_required_creates_race_ok(self):
+        required_fields = ('name', 'place', )
+        data = {field: self.valid_data[field] for field in required_fields}
+        form = self.form_class(user=self.user, place=self.place, data=data)
+
+        self.assertTrue(form.is_valid(), repr(form.errors))
+        race: models.Race = form.save()
+
+        self.assertEqual(race.name, self.valid_data['name'])
+        self.assertEqual(race.description, '')
+        self.assertEqual(race.strength, 0)
+        self.assertEqual(race.dexterity, 0)
+        self.assertEqual(race.constitution, 0)
+        self.assertEqual(race.intelligence, 0)
+        self.assertEqual(race.wisdom, 0)
+        self.assertEqual(race.charisma, 0)
+        # NOTE: When a checkbox is not marked/not sent it's false by default
+        self.assertFalse(race.affected_by_armor)
