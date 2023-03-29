@@ -51,7 +51,7 @@ class User(AbstractUser):
         Place: 'PlaceModel' = apps.get_model(constants.ROLEPLAY_PLACE)
         community_places = Place.objects.community_places()
         private_places = Place.objects.filter(is_public=False, owner=self)
-        return cast(models.QuerySet['PlaceModel'], community_places | private_places)
+        return cast(models.QuerySet['PlaceModel'], community_places ^ private_places)
 
     def editable_campaigns(self):
         """
@@ -60,7 +60,7 @@ class User(AbstractUser):
 
         owned_campaigns = self.campaign_owned_set.all()
         is_game_master_campaigns = self.campaign_set.filter(player_in_campaign_set__is_game_master=True)
-        return cast(models.QuerySet['CampaignModel'], owned_campaigns | is_game_master_campaigns)
+        return cast(models.QuerySet['CampaignModel'], owned_campaigns ^ is_game_master_campaigns)
 
     @cached_property
     def has_editable_campaigns(self):
