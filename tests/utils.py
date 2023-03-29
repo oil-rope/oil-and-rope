@@ -1,6 +1,6 @@
 import logging
 import random
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from unittest import mock
 
 from model_bakery import baker
@@ -9,6 +9,7 @@ from common.utils.faker import create_faker
 from roleplay.enums import SiteTypes
 
 if TYPE_CHECKING:
+    from registration.models import User
     from roleplay.models import Place
 
 LOGGER = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ english_faker = create_faker(locales=['en'])
 spanish_faker = create_faker(locales=['es'])
 
 
-def generate_place(_quantity=1, **kwargs) -> Union[list['Place'], 'Place']:
+def generate_place(_quantity=1, **kwargs):
     """
     Generates a list of Place objects with given kwargs.
 
@@ -31,9 +32,9 @@ def generate_place(_quantity=1, **kwargs) -> Union[list['Place'], 'Place']:
     import roleplay.models
 
     places: list['Place'] = []
-    owner = kwargs.get('owner')
+    owner: 'User' = kwargs.get('owner')
     for _ in range(0, _quantity):
-        owner = baker.make_recipe('registration.user') if not owner else owner
+        owner: 'User' = baker.make_recipe('registration.user') if not owner else owner
         params = {
             'name': fake.country(),
             'description': fake.text(),

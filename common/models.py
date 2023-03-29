@@ -99,7 +99,7 @@ class Image(TracingMixin):
         ]
 
     def __str__(self) -> str:
-        return f'{self.image.name} [{self.owner.username}] ({self.id})'
+        return f'{self.image.name} ({self.id})'
 
 
 class Vote(TracingMixin):

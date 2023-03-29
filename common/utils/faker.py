@@ -4,7 +4,7 @@ from faker import Faker
 
 def create_faker(locales: list = []) -> Faker:
     """
-    Creates a :class:`Faker` setting locales from django settings languages.
+    Creates a :class:`~faker.Faker` setting locales from django settings languages.
     """
 
     locales = locales or [lan[0] for lan in settings.LANGUAGES]
