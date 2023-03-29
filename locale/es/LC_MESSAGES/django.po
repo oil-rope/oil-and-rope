@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-29 13:15+0000\n"
+"POT-Creation-Date: 2023-03-29 14:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -379,7 +379,7 @@ msgstr "restablecer"
 #: roleplay/forms/layout.py:10
 #: roleplay/templates/roleplay/race/race_create.html:8
 #: roleplay/templates/roleplay/race/race_create.html:27
-#: roleplay/templates/roleplay/race/race_create.html:41 roleplay/views.py:268
+#: roleplay/templates/roleplay/race/race_create.html:41 roleplay/views.py:269
 #, fuzzy
 #| msgid "Create"
 msgid "create"
@@ -1407,8 +1407,8 @@ msgstr "cambiar contraseña"
 #: registration/forms/layout.py:162
 #: roleplay/templates/roleplay/race/race_update.html:7
 #: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:84
-#: roleplay/views.py:222 roleplay/views.py:513 roleplay/views.py:657
-#: roleplay/views.py:778
+#: roleplay/views.py:222 roleplay/views.py:514 roleplay/views.py:658
+#: roleplay/views.py:779
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -3003,37 +3003,37 @@ msgstr "la sintaxis de la tirada `%(roll)s` es incorrecta."
 msgid "a quest for you!"
 msgstr "¡una misión para ti!"
 
-#: roleplay/views.py:319
+#: roleplay/views.py:320
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you need an account to join this campaign."
 msgstr "necesitas una cuenta para unirte a esta campaña."
 
-#: roleplay/views.py:322
+#: roleplay/views.py:323
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you have joined the campaign."
 msgstr "te has unido a la campaña."
 
-#: roleplay/views.py:348
+#: roleplay/views.py:349
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you have left the campaign."
 msgstr "has dejado la campaña."
 
-#: roleplay/views.py:373
+#: roleplay/views.py:374
 #, fuzzy, python-format
 #| msgid "you've invited to a session!"
 msgid "you have removed %(user)s from campaign."
 msgstr "has eliminado a %(user)s de la campaña."
 
-#: roleplay/views.py:461
+#: roleplay/views.py:462
 #, fuzzy
 #| msgid "Start your adventure"
 msgid "new player wants to join your adventure!"
 msgstr "¡un nuevo jugador quiere unirse a tu aventura!"
 
-#: roleplay/views.py:466
+#: roleplay/views.py:467
 msgid ""
 "You've requested to join this adventure. Once the GMs accepts your request, "
 "you'll receive an email."
@@ -3041,19 +3041,19 @@ msgstr ""
 "Has solicitado unirte a esta aventura. Una vez que los Maestros de Juego "
 "acepten tu solicitud, recibirás un correo electrónico."
 
-#: roleplay/views.py:541
+#: roleplay/views.py:542
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "campaign deleted successfully."
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/views.py:630
+#: roleplay/views.py:631
 #, fuzzy
 #| msgid "session"
 msgid "session deleted."
 msgstr "sesión borrada."
 
-#: roleplay/views.py:667
+#: roleplay/views.py:668
 #, fuzzy
 #| msgid "Entry updated at"
 msgid "session updated!"
