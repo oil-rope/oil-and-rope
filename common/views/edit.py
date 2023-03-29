@@ -1,4 +1,4 @@
-from typing import Any, Optional, Type, cast
+from typing import Any, Callable, Optional, cast
 
 from django.contrib.admin.utils import NestedObjects
 from django.db import models, router
@@ -17,7 +17,7 @@ class DeletedObjectsView(DeleteView):
     def get_deleted_objects(
             self,
             obj: Optional[models.Model] = None,
-    ) -> dict[Type[models.Model], set[models.Model]]:
+    ):
         """
         Gets the objects that are going to be deleted because of CASCADE from given `obj`.
         If `obj` is not given then it will fallback into
@@ -32,9 +32,22 @@ class DeletedObjectsView(DeleteView):
         collector = NestedObjects(using=using, origin=obj_as_list)
         collector.collect(obj_as_list)
 
-        to_delete = collector.data
+        to_delete = collector.nested(self.get_format_callback())
 
-        return dict(to_delete)
+        return to_delete
+
+    def get_format_callback(self) -> Optional[Callable[[models.Model], str]]:
+        """
+        Placeholder that will allow to return a function that will be used to format the output on the entities to
+        delete.
+
+        Returns
+        ----------
+        format_func: :class:`Callable[[models.Model], str]`
+            The function use for getting the format. It's mandatory to receive one parameter that will be the object.
+        """
+
+        return None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)

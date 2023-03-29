@@ -22,16 +22,9 @@
       data-bs-parent="#objectsDeletedAccordion"
     >
       <div class="accordion-body">
-        {% for model, objects in to_delete.items %}
-          <ul>
-            <li>{{ model|verbose_name_plural|capfirst }} ({{ objects|length }})</li>
-            <ul>
-              {% for obj in objects %}
-                <li>{{ obj }}</li>
-              {% endfor %}
-            </ul>
-          </ul>
-        {% endfor %}
+        <ul>
+          {{ to_delete|unordered_list }}
+        </ul>
       </div>
     </div>
   </div>

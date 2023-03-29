@@ -1,12 +1,9 @@
-from typing import Type
-
-from django.db import models
 from django.test import RequestFactory, TestCase
 from django.urls import reverse_lazy
 from model_bakery import baker
 
 from common.views.edit import DeletedObjectsView
-from registration.models import Profile, User
+from registration.models import User
 
 
 class TestDeletedObjectsView(TestCase):
@@ -31,12 +28,11 @@ class TestDeletedObjectsView(TestCase):
 
     def test_get_deleted_objects_for_given_object_ok(self):
         request = self.factory.get('/users/delete')
-        objects_to_delete: dict[Type[models.Model], set[models.Model]] = self.View(
+        objects_to_delete = self.View(
             request=request, pk=self.user_to_delete.pk
         ).get_deleted_objects(self.user)
 
         # Since this method returns {ModelClass: [instance1, instance2, ...]} we check for a user and its profile
-        self.assertIn(User, objects_to_delete)
-        self.assertEqual(len(objects_to_delete[User]), 1)
-        self.assertIn(Profile, objects_to_delete)
-        self.assertEqual(len(objects_to_delete[Profile]), 1)
+        self.assertIn(self.user, objects_to_delete)
+        self.assertIn([self.user.profile], objects_to_delete)
+        self.assertEqual(len(objects_to_delete), 2)

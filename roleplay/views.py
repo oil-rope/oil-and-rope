@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional, Type, cast
+from typing import Any, Callable, Optional, Type, cast
 
 from django.conf import settings
 from django.contrib import messages
@@ -13,13 +13,14 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, RedirectView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from django_filters.views import FilterView
 
 from common.mixins import OwnerRequiredMixin
-from common.models import Vote
+from common.models import Image, Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
@@ -225,10 +226,23 @@ class WorldUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         return kwargs
 
 
-class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
+class PlaceDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeletedObjectsView):
     model = Place
     success_url = reverse_lazy('roleplay:world:list')
     template_name = 'roleplay/place/place_confirm_delete.html'
+
+    def get_format_callback(self) -> Optional[Callable[[models.Model], str]]:
+        def format_callback(obj: models.Model):
+            if isinstance(obj, Image):
+                return format_html(
+                    '[{}] <a href="{}" target="_blank">{}</a>',
+                    obj._meta.verbose_name.capitalize(), obj.image.url, obj.image.name,
+                )
+            return '[{}] {}'.format(
+                obj._meta.verbose_name.capitalize(),
+                getattr(obj, 'name', str(obj)),
+            )
+        return format_callback
 
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
@@ -803,6 +817,19 @@ class RaceListView(LoginRequiredMixin, FilterView):
 class RaceDeleteView(LoginRequiredMixin, DeletedObjectsView):
     model = Race
     success_url = reverse_lazy('roleplay:race:list')
+
+    def get_format_callback(self) -> Optional[Callable[[models.Model], str]]:
+        def format_callback(obj: models.Model):
+            if isinstance(obj, Image):
+                return format_html(
+                    '[{}] <a href="{}" target="_blank">{}</a>',
+                    obj._meta.verbose_name.capitalize(), obj.image.url, obj.image.name,
+                )
+            return '[{}] {}'.format(
+                obj._meta.verbose_name.capitalize(),
+                getattr(obj, 'name', str(obj)),
+            )
+        return format_callback
 
     def get_queryset(self):
         qs = super().get_queryset().filter(

@@ -43,7 +43,7 @@
           </div>
 
           {% comment %} Accordion displayed for showing the use what will be deleted {% endcomment %}
-          {% if to_delete.values|length > 1 %}
+          {% if not to_delete|length_is:"1" %}
             {% include 'common/include/to_delete_accordion.html' %}
           {% else %}
             <p class="lead text-center">

@@ -308,6 +308,36 @@ class TestPlaceDeleteView(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'roleplay/place/place_confirm_delete.html')
 
+    def test_just_place_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(
+            response=response,
+            text='Our rangers say that there\'s not problem at all. Nothing else will be deleted!',
+        )
+
+    def test_place_with_race_and_image_in_it_ok(self):
+        race: Race = baker.make_recipe('roleplay.race', owner=self.user, place=self.world)
+        image: Image = baker.make_recipe('common.image', content_object=race)
+        image.image = SimpleUploadedFile(
+            name=fake.file_name(extension='jpeg'), content=fake.image(image_format='jpeg'),
+        )
+        image.save()
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertInHTML(
+            needle=f'<a href="{image.image.url}" target="_blank">{image.image.name}</a>',
+            haystack=response.content.decode(),
+        )
+        self.assertContains(
+            response=response,
+            text=race.name,
+        )
+
     def test_access_anonymous_user_ko(self):
         response = self.client.get(self.url)
 
@@ -2512,7 +2542,7 @@ class TestRaceDeleteView(TestCase):
         )
 
     def test_race_with_images_will_delete_related_images_ok(self):
-        image = baker.make_recipe('common.image', content_object=self.race)
+        image: Image = baker.make_recipe('common.image', content_object=self.race)
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
@@ -2520,9 +2550,9 @@ class TestRaceDeleteView(TestCase):
             response=response,
             text='Objects that will be deleted within this action',
         )
-        self.assertContains(
-            response=response,
-            text=str(image),
+        self.assertInHTML(
+            needle=f'<a href="{image.image.url}" target="_blank">{image.image.name}</a>',
+            haystack=response.content.decode(),
         )
 
     def test_access_redirect_ok(self):
