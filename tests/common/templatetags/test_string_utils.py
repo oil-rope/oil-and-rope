@@ -1,7 +1,10 @@
 from django.shortcuts import reverse
 from django.test import TestCase
+from model_bakery import baker
 
-from common.templatetags.string_utils import capfirstletter, generate_breadcrumbs, startswith
+from common.templatetags.string_utils import (capfirstletter, generate_breadcrumbs, startswith, verbose_name,
+                                              verbose_name_plural)
+from registration.models import User
 
 
 class TestStartsWithTemplateFilter(TestCase):
@@ -58,3 +61,20 @@ class TestCapFirstLetterFilter(TestCase):
 
     def test_capfirstletter_ok(self):
         self.assertEqual('¿¡¿Pregunta?!?', capfirstletter(self.text))
+
+
+class TestVerboseName(TestCase):
+    def test_verbose_name_for_object_ok(self):
+        user: User = baker.make_recipe('roleplay.user')
+
+        self.assertEqual('user', verbose_name(user))
+
+    def test_verbose_name_for_field_ok(self):
+        user: User = baker.make_recipe('roleplay.user')
+
+        self.assertEqual('discord identifier', verbose_name(user, 'discord_id'))
+
+    def test_verbose_name_plural_for_object_ok(self):
+        user: User = baker.make_recipe('roleplay.user')
+
+        self.assertEqual('users', verbose_name_plural(user))

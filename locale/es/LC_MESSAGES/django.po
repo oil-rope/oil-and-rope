@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-27 13:26+0000\n"
+"POT-Creation-Date: 2023-03-29 08:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -379,7 +379,7 @@ msgstr "restablecer"
 #: roleplay/forms/layout.py:10
 #: roleplay/templates/roleplay/race/race_create.html:8
 #: roleplay/templates/roleplay/race/race_create.html:27
-#: roleplay/templates/roleplay/race/race_create.html:41 roleplay/views.py:254
+#: roleplay/templates/roleplay/race/race_create.html:41 roleplay/views.py:255
 #, fuzzy
 #| msgid "Create"
 msgid "create"
@@ -439,7 +439,7 @@ msgstr "identificador del objeto"
 #, fuzzy
 #| msgid "Image"
 msgid "images"
-msgstr "imagen"
+msgstr "imágenes"
 
 #: common/models.py:131
 msgid "positive vote?"
@@ -514,6 +514,66 @@ msgstr "siguiente"
 #: common/templates/common/include/paginator.html:65
 msgid "last"
 msgstr "último"
+
+#: common/templates/common/include/to_delete_accordion.html:15
+msgid "objects that will be deleted within this action"
+msgstr "objetos que serán borrados con esta acción"
+
+#: common/templates/common/layout/base_confirm_delete.html:4
+#: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:46
+#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:243
+#: roleplay/templates/roleplay/include/race_card.html:93
+#: roleplay/templates/roleplay/include/world_card.html:59
+#: roleplay/templates/roleplay/place/place_confirm_delete.html:3
+#: roleplay/templates/roleplay/place/place_detail.html:175
+#: roleplay/templates/roleplay/session/session_confirm_delete.html:3
+#: roleplay/templates/roleplay/session/session_detail.html:73
+#, fuzzy
+#| msgid "Delete"
+msgid "delete"
+msgstr "borrar"
+
+#: common/templates/common/layout/base_confirm_delete.html:31
+#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:30
+#: roleplay/templates/roleplay/place/place_confirm_delete.html:26
+#, fuzzy
+#| msgid "Are you sure traveller?"
+msgid "are you sure traveller?"
+msgstr "¿estás seguro viajero?"
+
+#: common/templates/common/layout/base_confirm_delete.html:38
+#, python-format
+msgid ""
+"This action cannot be undone. You might delete some other stuff related to "
+"this %(object_name)s, please check below."
+msgstr ""
+"Esta action no puede ser deshecha. Es probable que también borres otras cosas a las que este/a %(object_name)s, "
+"compruébalo más abajo."
+
+#: common/templates/common/layout/base_confirm_delete.html:51
+msgid ""
+"Our rangers say that there's not problem at all. Nothing else will be "
+"deleted!"
+msgstr ""
+"Nuestros exploradores han dado el visto bueno. ¡Ninguna otra cosa será borrada!"
+
+#: common/templates/common/layout/base_confirm_delete.html:67
+#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:48
+#: roleplay/templates/roleplay/place/place_confirm_delete.html:37
+#: roleplay/templates/roleplay/session/session_confirm_delete.html:41
+#, fuzzy
+#| msgid "Cancel"
+msgid "cancel"
+msgstr "cancelar"
+
+#: common/templates/common/layout/base_confirm_delete.html:70
+#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:51
+#: roleplay/templates/roleplay/place/place_confirm_delete.html:39
+#: roleplay/templates/roleplay/session/session_confirm_delete.html:43
+#, fuzzy
+#| msgid "Erase"
+msgid "erase"
+msgstr "eliminar"
 
 #: common/templates/errors/403.html:5 common/templates/errors/403_csrf.html:4
 #, fuzzy
@@ -1349,9 +1409,9 @@ msgstr "cambiar contraseña"
 
 #: registration/forms/layout.py:162
 #: roleplay/templates/roleplay/race/race_update.html:7
-#: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:82
-#: roleplay/views.py:220 roleplay/views.py:499 roleplay/views.py:643
-#: roleplay/views.py:764
+#: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:83
+#: roleplay/views.py:221 roleplay/views.py:500 roleplay/views.py:644
+#: roleplay/views.py:765
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -2133,14 +2193,6 @@ msgstr "Borrar %(name)s"
 msgid "campaign delete"
 msgstr "borrar campaña"
 
-#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:30
-#: roleplay/templates/roleplay/place/place_confirm_delete.html:26
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:24
-#, fuzzy
-#| msgid "Are you sure traveller?"
-msgid "are you sure traveller?"
-msgstr "¿estás seguro viajero?"
-
 #: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:33
 #, fuzzy
 #| msgid "Do you really want to erase this world and all its inhabitants?"
@@ -2149,30 +2201,11 @@ msgstr "¿de verdad quieres borrar este mundo y todos su habitantes?"
 
 #: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:35
 #: roleplay/templates/roleplay/place/place_confirm_delete.html:30
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:27
 #: roleplay/templates/roleplay/session/session_confirm_delete.html:30
 #, fuzzy
 #| msgid "This action cannot be undone"
 msgid "this action cannot be undone."
 msgstr "esta acción no puede ser deshecha."
-
-#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:48
-#: roleplay/templates/roleplay/place/place_confirm_delete.html:37
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:34
-#: roleplay/templates/roleplay/session/session_confirm_delete.html:41
-#, fuzzy
-#| msgid "Cancel"
-msgid "cancel"
-msgstr "cancelar"
-
-#: roleplay/templates/roleplay/campaign/campaign_confirm_delete.html:51
-#: roleplay/templates/roleplay/place/place_confirm_delete.html:39
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:36
-#: roleplay/templates/roleplay/session/session_confirm_delete.html:43
-#, fuzzy
-#| msgid "Erase"
-msgid "erase"
-msgstr "eliminar"
 
 #: roleplay/templates/roleplay/campaign/campaign_create.html:6
 #: roleplay/templates/roleplay/session/session_create.html:6
@@ -2322,20 +2355,6 @@ msgstr "ver campaña"
 #| msgid "sessions"
 msgid "add session"
 msgstr "añadir sesión"
-
-#: roleplay/templates/roleplay/campaign/include/campaign_card_actions.html:46
-#: roleplay/templates/roleplay/campaign/include/campaign_settings.html:243
-#: roleplay/templates/roleplay/include/race_card.html:93
-#: roleplay/templates/roleplay/include/world_card.html:59
-#: roleplay/templates/roleplay/place/place_confirm_delete.html:3
-#: roleplay/templates/roleplay/place/place_detail.html:175
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:3
-#: roleplay/templates/roleplay/session/session_confirm_delete.html:3
-#: roleplay/templates/roleplay/session/session_detail.html:73
-#, fuzzy
-#| msgid "Delete"
-msgid "delete"
-msgstr "borrar"
 
 #: roleplay/templates/roleplay/campaign/include/campaign_card_footer.html:5
 #, fuzzy, python-format
@@ -2666,12 +2685,6 @@ msgstr "opciones"
 msgid "add race"
 msgstr "añadir raza"
 
-#: roleplay/templates/roleplay/race/race_confirm_delete.html:7
-#, fuzzy
-#| msgid "Delete"
-msgid "race delete"
-msgstr "borrar raza"
-
 #: roleplay/templates/roleplay/race/race_create.html:20
 #, fuzzy
 #| msgid "Create one"
@@ -2720,8 +2733,8 @@ msgid ""
 "It looks like you don't have any Campaigns or Worlds to add a race to. You "
 "must first create one of these to be able to add races."
 msgstr ""
-"Parece que no tienes ni Campañas ni Mundos a los que añadir una raza. Primero "
-"deberás crear uno de estos para tener la posibilidad de crear razas."
+"Parece que no tienes ni Campañas ni Mundos a los que añadir una raza. "
+"Primero deberás crear uno de estos para tener la posibilidad de crear razas."
 
 #: roleplay/templates/roleplay/race/race_list.html:81
 msgid "there isn't any race with this characteristics."
@@ -3000,37 +3013,37 @@ msgstr "la sintaxis de la tirada `%(roll)s` es incorrecta."
 msgid "a quest for you!"
 msgstr "¡una misión para ti!"
 
-#: roleplay/views.py:305
+#: roleplay/views.py:306
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you need an account to join this campaign."
 msgstr "necesitas una cuenta para unirte a esta campaña."
 
-#: roleplay/views.py:308
+#: roleplay/views.py:309
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you have joined the campaign."
 msgstr "te has unido a la campaña."
 
-#: roleplay/views.py:334
+#: roleplay/views.py:335
 #, fuzzy
 #| msgid "you've invited to a session!"
 msgid "you have left the campaign."
 msgstr "has dejado la campaña."
 
-#: roleplay/views.py:359
+#: roleplay/views.py:360
 #, fuzzy, python-format
 #| msgid "you've invited to a session!"
 msgid "you have removed %(user)s from campaign."
 msgstr "has eliminado a %(user)s de la campaña."
 
-#: roleplay/views.py:447
+#: roleplay/views.py:448
 #, fuzzy
 #| msgid "Start your adventure"
 msgid "new player wants to join your adventure!"
 msgstr "¡un nuevo jugador quiere unirse a tu aventura!"
 
-#: roleplay/views.py:452
+#: roleplay/views.py:453
 msgid ""
 "You've requested to join this adventure. Once the GMs accepts your request, "
 "you'll receive an email."
@@ -3038,23 +3051,28 @@ msgstr ""
 "Has solicitado unirte a esta aventura. Una vez que los Maestros de Juego "
 "acepten tu solicitud, recibirás un correo electrónico."
 
-#: roleplay/views.py:527
+#: roleplay/views.py:528
 #, fuzzy
 #| msgid "Password changed successfully!"
 msgid "campaign deleted successfully."
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/views.py:616
+#: roleplay/views.py:617
 #, fuzzy
 #| msgid "session"
 msgid "session deleted."
 msgstr "sesión borrada."
 
-#: roleplay/views.py:653
+#: roleplay/views.py:654
 #, fuzzy
 #| msgid "Entry updated at"
 msgid "session updated!"
 msgstr "¡sesión actualizada!"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "race delete"
+#~ msgstr "borrar raza"
 
 #, fuzzy
 #~| msgid "Welcome to Oil &amp; Rope traveller!"

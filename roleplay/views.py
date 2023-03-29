@@ -23,6 +23,7 @@ from common.models import Vote
 from common.templatetags.string_utils import capfirstletter as cfl
 from common.tools import HtmlThreadMail
 from common.views import MultiplePaginatorListView
+from common.views.edit import DeletedObjectsView
 from common.views.mixins import ImageFormsetMixin
 from registration.models import User
 from roleplay.managers import CampaignQuerySet, PlaceQuerySet
@@ -799,17 +800,12 @@ class RaceListView(LoginRequiredMixin, FilterView):
         return qs
 
 
-class RaceDeleteView(LoginRequiredMixin, DeleteView):
-    """
-    this view deletes a race
-    """
-
+class RaceDeleteView(LoginRequiredMixin, DeletedObjectsView):
     model = Race
     success_url = reverse_lazy('roleplay:race:list')
-    template_name = 'roleplay/race/race_confirm_delete.html'
 
     def get_queryset(self):
         qs = super().get_queryset().filter(
-            users=self.request.user,
+            owner=self.request.user,
         )
         return qs

@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load string_utils %}
+<div class="card-body">
+  <div class="accordion" id="objectsDeletedAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button
+          class="accordion-button collapsed"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#objectsToDeleteCollapse"
+          aria-expanded="true"
+          aria-controls="objectsToDeleteCollapse"
+        >
+          {% translate "objects that will be deleted within this action"|capfirst %}
+        </button>
+      </h2>
+    </div>
+    <div
+      id="objectsToDeleteCollapse"
+      class="accordion-collapse collapse"
+      data-bs-parent="#objectsDeletedAccordion"
+    >
+      <div class="accordion-body">
+        {% for model, objects in to_delete.items %}
+          <ul>
+            <li>{{ model|verbose_name_plural|capfirst }} ({{ objects|length }})</li>
+            <ul>
+              {% for obj in objects %}
+                <li>{{ obj }}</li>
+              {% endfor %}
+            </ul>
+          </ul>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
