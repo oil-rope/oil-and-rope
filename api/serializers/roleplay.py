@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from roleplay.managers import PlaceQuerySet
 # NOTE: Since Schema needs to access models we need to import them instead of dynamically calling from `apps.get_model`
-from roleplay.models import Campaign, Domain, Place, Race
+from roleplay.models import Campaign, Domain, Place
 
 
 class DomainSerializer(serializers.ModelSerializer):
@@ -88,20 +88,4 @@ class CampaignSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'summary', 'cover_image', 'owner', 'users', 'place', 'start_date',
             'end_date', 'discord_channel', 'chat', 'entry_created_at', 'entry_updated_at',
-        )
-
-
-class RaceSerializer(serializers.ModelSerializer):
-
-    owners = serializers.SerializerMethodField(method_name='get_owners')
-
-    def get_owners(self, obj) -> list[int]:
-        owners_pk = obj.owners.values_list('pk', flat=True)
-        return list(owners_pk)
-
-    class Meta:
-        model = Race
-        fields = (
-            'id', 'name', 'description', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma',
-            'affected_by_armor', 'image', 'users', 'owners',
         )
