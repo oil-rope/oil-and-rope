@@ -1,17 +1,19 @@
 {% load i18n %}
 {% load static %}
 <meta property="og:title" content="Oil &amp; Rope"/>
-<meta property="og:description"
-      content="{% translate "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."/>
+<meta
+  property="og:description"
+  content="{% translate "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."
+/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="{{ current_uri }}"/>
+<meta property="og:url" content="{{ uri }}"/>
 <meta property="og:locale" content="en_US"/>
 {% for language in languages %}
   <meta property="og:locale:alternate" content="{{ language }}"/>
 {% endfor %}
-<meta property="og:site_name" content="Oil &amp; Rope"/>
-<meta property="og:image" content="{{ uri }}{% static 'img/oil_and_rope_logo_color.png' %}"/>
-<meta property="og:image:secure_url"
-      content="{{ uri }}{% static 'img/oil_and_rope_logo_color.png' %}"
+<meta property="og:site_name" content="Oil &amp; Rope Project"/>
+<meta property="og:image" content="{% static 'img/oil_and_rope_logo_color.png' %}"/>
+<meta
+  property="og:image:alt"
+  content="{% translate "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."
 />
-<meta property="og:image:alt" content="{% translate "Oil &amp; Rope is a Django project for managing Roleplay Games" %}."/>
