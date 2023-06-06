@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-02 12:28+0000\n"
+"POT-Creation-Date: 2023-06-06 10:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1025,7 +1025,7 @@ msgid "close"
 msgstr "cerrar"
 
 #: core/templates/core/includes/opengraph_protocol.html:5
-#: core/templates/core/includes/opengraph_protocol.html:16
+#: core/templates/core/includes/opengraph_protocol.html:17
 #: core/templates/core/layout.html:14
 msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
 msgstr ""
