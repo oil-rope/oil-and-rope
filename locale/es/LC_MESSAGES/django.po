@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-21 09:41+0000\n"
+"POT-Creation-Date: 2023-06-13 10:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3058,15 +3058,15 @@ msgid "session updated!"
 msgstr "¡sesión actualizada!"
 
 #, fuzzy
-#~| msgid "Welcome to Oil &amp; Rope traveller!"
-#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
-#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
-
-#, fuzzy
 #~| msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
 #~ msgid "Oil &amp;amp; Rope is a Django project for managing Roleplay Games"
 #~ msgstr ""
 #~ "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
+
+#, fuzzy
+#~| msgid "Welcome to Oil &amp; Rope traveller!"
+#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
+#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
 
 #, fuzzy
 #~| msgid ""
