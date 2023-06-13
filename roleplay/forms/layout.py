@@ -230,47 +230,36 @@ class SessionFormLayout(layout.Layout):
         )
 
 
-class RaceFormLayout(layout.Layout):
-    def __init__(self, submit_text):
+class RaceUpdateFormLayout(layout.Layout):
+    def __init__(self):
         super().__init__(
-            bootstrap.TabHolder(
-                bootstrap.Tab(
-                    _('basic information').title(),
-                    layout.Row(
-                        layout.Column('name'),
-                    ),
-                    layout.Row(
-                        layout.Column('description'),
-                    ),
-                    layout.Row(
-                        layout.Column('image'),
-                    ),
-                ),
-                bootstrap.Tab(
-                    _('attributes').title(),
-                    layout.Row(
-                        layout.Column('strength'),
-                        layout.Column('dexterity'),
-                        layout.Column('constitution'),
-                        layout.Column('intelligence'),
-                        layout.Column('wisdom'),
-                        layout.Column('charisma'),
-                        layout.Column('affected_by_armor', css_class='col-3'),
-                    ),
-                    layout.Row(
-                        layout.Column('users')
-                    )
-                ),
+            layout.Row(
+                layout.Column(layout.Field('name')),
+                layout.Column(layout.Field('campaign')),
+                layout.Column(layout.Field('place')),
             ),
             layout.Row(
-                layout.Column(
-                    common_layout.SubmitClearLayout(
-                        submit_text=submit_text.capitalize(),
-                        submit_css_class='col-5 col-lg-6',
-                        reset_css_class='col-5 d-lg-none',
+                layout.Column(layout.Field('description', style='resize: none')),
+            ),
+            layout.Row(
+                bootstrap.Accordion(
+                    bootstrap.AccordionGroup(
+                        _('Stats'),
+                        layout.Row(
+                            layout.Column(layout.Field('strength')),
+                            layout.Column(layout.Field('dexterity')),
+                            layout.Column(layout.Field('constitution')),
+                            layout.Column(layout.Field('intelligence')),
+                            layout.Column(layout.Field('wisdom')),
+                            layout.Column(layout.Field('charisma')),
+                            css_class='row-cols-3',
+                        ),
+                        layout.Row(
+                            layout.Column(layout.Field('affected_by_armor')),
+                        ),
+                        active=False,
                     ),
                 ),
-                css_class='justify-content-md-center',
             ),
         )
 

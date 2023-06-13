@@ -9,15 +9,35 @@ from django.http import HttpResponse
 
 from common.forms import ImageForm
 from common.models import Image
+from core.types import HasFormMixinLogic, HasModelProtocol, HasObjectProtocol, HasRequestProtocol
 
 
-class ImageFormsetMixin:
+class ImageFormsetMixin(HasRequestProtocol, HasModelProtocol, HasObjectProtocol, HasFormMixinLogic):
+    """
+    This mixin allows to manage the :class:`~common.models.Image` model for creating and associating images to another
+    entry.
+
+    Attributes
+    ~~~~~~~~~~
+    image_formset_prefix: :class`Optional[str]`
+        Declare the prefix for all the forms in formset. If not set uses app label name and model name followed by
+        'image'.
+        For example for :class:`roleplay.models.Race` the prefix will be 'roleplay-race-image'.
+    image_formset_template: :class:`str`
+        Template used by :class:`crispy_forms.helper.FormHelper` to render the forms.
+    image_formset_add_form_tag: :class:`bool`
+        Declares if the `<form>` tag should be rendered. You might not want this to be rendered if this formset is
+        inside another form.
+    """
+
     image_formset_prefix: Optional[str] = None
+    image_formset_template: str = 'bootstrap5/table_inline_formset.html'
+    image_formset_add_form_tag: bool = False
 
     def get_image_formset_helper(self):
         helper = FormHelper()
-        helper.template = 'bootstrap5/table_inline_formset.html'
-        helper.form_tag = False
+        helper.template = self.image_formset_template
+        helper.form_tag = self.image_formset_add_form_tag
         return helper
 
     def get_image_formset_factory_kwargs(self):
@@ -38,12 +58,12 @@ class ImageFormsetMixin:
         kwargs = {
             'form_kwargs': {'owner': self.request.user},
             'prefix': self.get_image_formset_prefix(),
+            'instance': self.object,
         }
         if self.request.method in ('POST', 'PUT'):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
-                'instance': self.object,
             })
         return kwargs
 

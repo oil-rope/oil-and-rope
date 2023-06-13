@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-29 14:06+0000\n"
+"POT-Creation-Date: 2023-04-21 09:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,7 +67,7 @@ msgstr "identificador"
 msgid "name"
 msgstr "nombre"
 
-#: chat/models.py:27 common/enums.py:27 registration/models.py:85
+#: chat/models.py:27 common/enums.py:27 registration/models.py:87
 #, fuzzy
 #| msgid "Users"
 msgid "users"
@@ -198,8 +198,8 @@ msgstr "dado"
 msgid "user check"
 msgstr "comprobación de usuario"
 
-#: common/enums.py:26 common/models.py:133 registration/models.py:84
-#: registration/models.py:116
+#: common/enums.py:26 common/models.py:133 registration/models.py:86
+#: registration/models.py:118
 #: registration/templates/registration/user_update.html:6
 #: roleplay/models.py:538
 msgid "user"
@@ -375,11 +375,12 @@ msgstr "restablecer"
 
 #: common/forms/layout.py:17 roleplay/forms/forms.py:28
 #: roleplay/forms/forms.py:57 roleplay/forms/forms.py:100
-#: roleplay/forms/forms.py:137 roleplay/forms/forms.py:230
-#: roleplay/forms/layout.py:10
+#: roleplay/forms/forms.py:137 roleplay/forms/layout.py:10
 #: roleplay/templates/roleplay/race/race_create.html:8
 #: roleplay/templates/roleplay/race/race_create.html:27
-#: roleplay/templates/roleplay/race/race_create.html:41 roleplay/views.py:269
+#: roleplay/templates/roleplay/race/race_create.html:41
+#: roleplay/templates/roleplay/race/race_update.html:8
+#: roleplay/templates/roleplay/race/race_update.html:27 roleplay/views.py:269
 #, fuzzy
 #| msgid "Create"
 msgid "create"
@@ -608,6 +609,7 @@ msgstr "a lo mejor deberías"
 #: registration/templates/registration/resend_email.html:23
 #: roleplay/forms/layout.py:52 roleplay/forms/layout.py:97
 #: roleplay/forms/layout.py:192 roleplay/forms/layout.py:221
+#: roleplay/templates/roleplay/race/race_update.html:41
 msgid "go back"
 msgstr "volver"
 
@@ -975,7 +977,7 @@ msgid "create your account"
 msgstr "crea tu cuenta"
 
 #: core/templates/core/includes/menu.html:81 registration/forms/forms.py:205
-#: registration/models.py:126 registration/views.py:296
+#: registration/models.py:128 registration/views.py:296
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:170
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:178
 #: roleplay/templates/roleplay/session/include/session_card.html:65
@@ -1335,25 +1337,25 @@ msgstr "este email no pertenece a ningún usuario."
 msgid "we will send you a recovery link to this email."
 msgstr "te enviaremos un link de recuperación a este email."
 
-#: registration/forms/forms.py:196 registration/models.py:118
+#: registration/forms/forms.py:196 registration/models.py:120
 #, fuzzy
 #| msgid "Biography"
 msgid "biography"
 msgstr "biografía"
 
-#: registration/forms/forms.py:197 registration/models.py:119
+#: registration/forms/forms.py:197 registration/models.py:121
 #, fuzzy
 #| msgid "Birthday"
 msgid "birthday"
 msgstr "fecha de nacimiento"
 
-#: registration/forms/forms.py:202 registration/models.py:122
+#: registration/forms/forms.py:202 registration/models.py:124
 #, fuzzy
 #| msgid "Language"
 msgid "language"
 msgstr "idioma"
 
-#: registration/forms/forms.py:204 registration/models.py:124
+#: registration/forms/forms.py:204 registration/models.py:126
 #, fuzzy
 #| msgid "Website"
 msgid "website"
@@ -1405,10 +1407,8 @@ msgid "change password"
 msgstr "cambiar contraseña"
 
 #: registration/forms/layout.py:162
-#: roleplay/templates/roleplay/race/race_update.html:7
-#: roleplay/templates/roleplay/race/race_update.html:13 roleplay/views.py:84
+#: roleplay/templates/roleplay/race/race_update.html:44 roleplay/views.py:84
 #: roleplay/views.py:222 roleplay/views.py:514 roleplay/views.py:658
-#: roleplay/views.py:779
 #, fuzzy
 #| msgid "Update"
 msgid "update"
@@ -1420,13 +1420,13 @@ msgstr "actualizar"
 msgid "premium user"
 msgstr "usuario premium"
 
-#: registration/models.py:136
+#: registration/models.py:138
 #, fuzzy
 #| msgid "Profile"
 msgid "profile"
 msgstr "perfil"
 
-#: registration/models.py:137
+#: registration/models.py:139
 #, fuzzy
 #| msgid "Profiles"
 msgid "profiles"
@@ -1668,8 +1668,8 @@ msgstr "¡contraseña cambiada correctamente!"
 msgid "user updated successfully!"
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/admin.py:108 roleplay/forms/layout.py:291
-#: roleplay/forms/layout.py:324
+#: roleplay/admin.py:108 roleplay/forms/layout.py:247
+#: roleplay/forms/layout.py:280 roleplay/forms/layout.py:313
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -1881,7 +1881,6 @@ msgid "this place belongs to..."
 msgstr "este lugar pertenece a..."
 
 #: roleplay/forms/forms.py:37 roleplay/forms/forms.py:63
-#: roleplay/forms/forms.py:254
 #, fuzzy, python-format
 #| msgid "A picture is worth a thousand words"
 msgid "A picture is worth a thousand words. Max size file %(max_size)s MiB."
@@ -1918,7 +1917,7 @@ msgstr "campaña"
 msgid "write something about your world, its civilizations, its culture..."
 msgstr "escribe algo sobre tu mundo, sus civilizaciones, sus culturas..."
 
-#: roleplay/forms/layout.py:112 roleplay/forms/layout.py:238
+#: roleplay/forms/layout.py:112
 msgid "basic information"
 msgstr "información básica"
 
@@ -1943,10 +1942,6 @@ msgstr "configuración de fechas"
 #| msgid "play"
 msgid "invite players"
 msgstr "invitar jugadores"
-
-#: roleplay/forms/layout.py:250
-msgid "attributes"
-msgstr "atributos"
 
 #: roleplay/models.py:47 roleplay/models.py:406
 #: roleplay/templates/roleplay/campaign/include/campaign_settings.html:57
@@ -2044,7 +2039,8 @@ msgstr "indica si la raza es afectada por penalizadores al llevar armadura"
 
 #: roleplay/models.py:312 roleplay/templates/roleplay/race/race_create.html:8
 #: roleplay/templates/roleplay/race/race_create.html:27
-#: roleplay/templates/roleplay/race/race_update.html:7
+#: roleplay/templates/roleplay/race/race_update.html:8
+#: roleplay/templates/roleplay/race/race_update.html:27
 msgid "race"
 msgstr "raza"
 
@@ -2676,12 +2672,14 @@ msgid "add race"
 msgstr "añadir raza"
 
 #: roleplay/templates/roleplay/race/race_create.html:20
+#: roleplay/templates/roleplay/race/race_update.html:20
 #, fuzzy
 #| msgid "Create one"
 msgid "create race"
 msgstr "crear raza"
 
 #: roleplay/templates/roleplay/race/race_create.html:34
+#: roleplay/templates/roleplay/race/race_update.html:34
 #, python-format
 msgid ""
 "You can upload from none to three images (maximum size "
@@ -3060,16 +3058,6 @@ msgid "session updated!"
 msgstr "¡sesión actualizada!"
 
 #, fuzzy
-#~| msgid "Delete"
-#~ msgid "world delete"
-#~ msgstr "borrar mundo"
-
-#, fuzzy
-#~| msgid "Delete"
-#~ msgid "race delete"
-#~ msgstr "borrar raza"
-
-#, fuzzy
 #~| msgid "Welcome to Oil &amp; Rope traveller!"
 #~ msgid "welcome to Oil &amp;amp; Rope traveller!"
 #~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
@@ -3104,6 +3092,19 @@ msgstr "¡sesión actualizada!"
 #~ "Oil &amp; Rope es un proyecto open-source que puede ser encontrado en <a "
 #~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
 #~ "\">GitHub</a>."
+
+#~ msgid "attributes"
+#~ msgstr "atributos"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "world delete"
+#~ msgstr "borrar mundo"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "race delete"
+#~ msgstr "borrar raza"
 
 #, fuzzy
 #~| msgid ""
