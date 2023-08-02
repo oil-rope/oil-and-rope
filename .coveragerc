@@ -7,6 +7,8 @@ omit =
     **/migrations/**
     tests/**
     bot/management/commands/runbot.py
+    **/baker_recipes.py
+    roleplay/templates/roleplay/race/race_detail.html
 source = .
 plugins =
     django_coverage_plugin

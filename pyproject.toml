@@ -44,7 +44,7 @@ uvicorn = "^0.18.3"
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.0.1"
 coverage = "^7.1.0"
-django-coverage-plugin = "^3.0.0"
+django_coverage_plugin = "^3.1.0"
 django-debug-toolbar = "^3.8.1"
 django-extensions = "^3.2.0"
 dpytest = "^0.6.1"
