@@ -2208,12 +2208,36 @@ class TestRaceUpdateView(TestCase):
     def setUpTestData(cls) -> None:
         cls.user: User = baker.make_recipe('registration.user')
         cls.race: Race = baker.make_recipe('roleplay.race', owner=cls.user)
-        cls.race_for_campaign: Race = baker.make_recipe('roleplay.race_for_campaign_only', owner=cls.user)
-        cls.race_for_place: Race = baker.make_recipe('roleplay.race_for_place_only', owner=cls.user)
+
+        cls.campaign: Campaign = baker.make_recipe('roleplay.campaign', owner=cls.user)
+        cls.game_master: User = baker.make_recipe('registration.user')
+        cls.campaign.add_game_masters(cls.game_master)
+        cls.race_for_campaign: Race = baker.make_recipe(
+            'roleplay.race_for_campaign_only',
+            owner=cls.user,
+            campaign=cls.campaign,
+        )
+
+        cls.place: Place = generate_place(owner=cls.user)
+        cls.race_for_place: Race = baker.make_recipe(
+            'roleplay.race_for_place_only',
+            owner=cls.user,
+            place=cls.place,
+        )
 
         cls.url = resolve_url(cls.resolver, pk=cls.race.pk)
         cls.url_race_for_campaign = resolve_url(cls.resolver, pk=cls.race_for_campaign.pk)
         cls.url_race_for_place = resolve_url(cls.resolver, pk=cls.race_for_place.pk)
+
+    def setUp(self) -> None:
+        self.valid_data = {
+            'name': fake.word(),
+            'description': fake.paragraph(),
+            'roleplay-race-image-INITIAL_FORMS': '0',
+            'roleplay-race-image-TOTAL_FORMS': '0',
+        }
+        self.valid_data_for_campaign = self.valid_data | {'campaign': self.race_for_campaign.campaign.pk}
+        self.valid_data_for_place = self.valid_data | {'place': self.race_for_place.place.pk}
 
     def test_access_anonymous_ko(self):
         response = self.client.get(self.url)
@@ -2252,6 +2276,48 @@ class TestRaceUpdateView(TestCase):
         form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
 
         self.assertTrue(isinstance(form, RacePlaceForm), f'Form is not instance of {RacePlaceForm}')
+
+    def test_post_data_for_campaign_missing_mandatory_data_ko(self):
+        invalid_data = self.valid_data_for_campaign.copy()
+        del invalid_data['name']
+        del invalid_data['campaign']
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=invalid_data)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
+
+        self.assertFormError(form=form, field='name', errors='This field is required.')
+        self.assertFormError(form=form, field='campaign', errors='This field is required.')
+
+    def test_post_data_for_place_missing_mandatory_data_ko(self):
+        invalid_data = self.valid_data_for_place.copy()
+        del invalid_data['name']
+        del invalid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=invalid_data)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
+
+        self.assertFormError(form=form, field='name', errors='This field is required.')
+        self.assertFormError(form=form, field='place', errors='This field is required.')
+
+    def test_post_valid_data_for_campaign_ok(self):
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_campaign)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=self.valid_data_for_campaign)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+    def test_post_valid_data_for_place_ok(self):
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_place)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=self.valid_data_for_place)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
 
 
 class TestRaceListView(TestCase):
