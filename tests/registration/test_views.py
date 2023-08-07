@@ -357,7 +357,6 @@ class TestResetPasswordView(TestCase):
 
 
 class TestPasswordResetConfirmView(TestCase):
-
     def setUp(self):
         self.user = baker.make(get_user_model(), email=fake.email())
         self.password = 'a_p4ssw0rd@'
@@ -377,7 +376,7 @@ class TestPasswordResetConfirmView(TestCase):
         url = response.url
         response = self.client.get(url)
         self.assertEqual(200, response.status_code, 'User cannot access.')
-        self.assertTemplateUsed(response, 'registration/password_reset_confirm.html')
+        self.assertTemplateUsed(response, 'registration/password_reset_confirm_no_admin.html')
 
     @mock.patch('registration.views.messages')
     def test_ok(self, mock_call):

@@ -232,7 +232,7 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
     form_class = forms.SetPasswordForm
     success_url = reverse_lazy('registration:auth:login')
-    template_name = 'registration/password_reset_confirm.html'
+    template_name = 'registration/password_reset_confirm_no_admin.html'
 
     def get_success_url(self):
         msg = cfl(_('password changed successfully!'))

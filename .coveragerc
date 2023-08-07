@@ -8,6 +8,8 @@ omit =
     tests/**
     bot/management/commands/runbot.py
     **/baker_recipes.py
+    common/templates/errors/500.html
+    # TODO: OAR-115 Remove this omit line
     roleplay/templates/roleplay/race/race_detail.html
 source = .
 plugins =
