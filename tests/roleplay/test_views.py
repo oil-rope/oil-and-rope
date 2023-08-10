@@ -1242,7 +1242,7 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
 
-    def test_campaign_with_image_and_other_fields_ok(self):
+    def test_campaign_with_images_and_other_fields_ok(self):
         # NOTE: start_date, end_date, summary
         self.client.force_login(self.user)
         self.private_campaign.summary = fake.sentence()
@@ -2310,6 +2310,11 @@ class TestRaceUpdateView(TestCase):
 
         self.assertRedirects(response=response, expected_url=expected_url)
 
+        # Checking data has been actually changed
+        self.race_for_campaign.refresh_from_db()
+        self.assertEqual(self.valid_data_for_campaign['name'], self.race_for_campaign.name)
+        self.assertEqual(self.valid_data_for_campaign['description'], self.race_for_campaign.description)
+
     def test_post_valid_data_for_place_ok(self):
         # TODO: OAR-115 Replace list for the detail view
         # expected_url = resolve_url(self.race_for_place)
@@ -2318,6 +2323,111 @@ class TestRaceUpdateView(TestCase):
         response = self.client.post(path=self.url_race_for_place, data=self.valid_data_for_place)
 
         self.assertRedirects(response=response, expected_url=expected_url)
+
+        # Checking data has been actually changed
+        self.race_for_place.refresh_from_db()
+        self.assertEqual(self.valid_data_for_place['name'], self.race_for_place.name)
+        self.assertEqual(self.valid_data_for_place['description'], self.race_for_place.description)
+
+    def test_post_data_for_campaign_with_more_images_than_max_allowed_ko(self):
+        data_with_images = self.valid_data_for_campaign.copy()
+        # We set the creation of N images automatically
+        n_images = 4
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=data_with_images)
+
+        self.assertFormSetError(
+            formset=response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+
+    def test_post_data_for_place_with_more_images_than_max_allowed_ko(self):
+        data_with_images = self.valid_data_for_place.copy()
+        # We set the creation of N images automatically
+        n_images = 4
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=data_with_images)
+
+        self.assertFormSetError(
+            formset=response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+
+    def test_post_valid_data_with_image_for_campaign_ok(self):
+        data_with_images = self.valid_data_for_campaign.copy()
+        # We set the creation of N images automatically
+        n_images = 2
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_campaign)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=data_with_images)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        self.assertEqual(
+            n_images,
+            self.race_for_campaign.images.count(),
+            msg='The number of images in the race does not match the amount submitted',
+        )
+
+    def test_post_valid_data_with_images_for_place_ok(self):
+        data_with_images = self.valid_data_for_place.copy()
+        # We set the creation of N images automatically
+        n_images = 2
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_place)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=data_with_images)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        self.assertEqual(
+            n_images,
+            self.race_for_place.images.count(),
+            msg='The number of images in the race does not match the amount submitted',
+        )
 
 
 class TestRaceListView(TestCase):
