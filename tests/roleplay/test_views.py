@@ -238,7 +238,7 @@ class TestPlaceDetailView(TestCase):
             is_public=False,
             site_type=enums.SiteTypes.WORLD,
         )
-        cls.private_world_url = reverse(cls.resolver, kwargs={'pk': cls.private_world.pk})
+        cls.private_world_url = resolve_url(cls.private_world)
 
         cls.public_world = generate_place(
             name=fake.country(),
@@ -247,7 +247,7 @@ class TestPlaceDetailView(TestCase):
             is_public=True,
             site_type=enums.SiteTypes.WORLD,
         )
-        cls.public_world_url = reverse(cls.resolver, kwargs={'pk': cls.public_world.pk})
+        cls.public_world_url = resolve_url(cls.public_world)
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.private_world_url)
@@ -278,10 +278,33 @@ class TestPlaceDetailView(TestCase):
         another_user = baker.make_recipe('registration.user')
         self.client.force_login(another_user)
         world = generate_place(name=fake.country(), is_public=True)
-        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
+        url = resolve_url(world)
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
+
+    def test_child_place_displays_button_to_go_to_parent_site_ok(self):
+        # NOTE: We need at least two levels since the first one is the World
+        parent_site = generate_place(parent_site=self.private_world, is_public=False, owner=self.owner)
+        place = generate_place(parent_site=parent_site, is_public=False, owner=self.owner)
+        url = resolve_url(place)
+
+        self.client.force_login(self.owner)
+        response = self.client.get(url)
+
+        self.assertContains(response=response, text='title="Go to parent site"')
+        self.assertContains(response=response, text=place.name)
+
+    def test_place_with_children_displays_button_go_to_site_ok(self):
+        # NOTE: We need at least one level into the place
+        place = generate_place(parent_site=self.private_world, is_public=False, owner=self.owner)
+        url = resolve_url(self.private_world)
+
+        self.client.force_login(self.owner)
+        response = self.client.get(url)
+
+        self.assertContains(response=response, text='title="Go to site"')
+        self.assertContains(response=response, text=place.name)
 
 
 class TestPlaceDeleteView(TestCase):
