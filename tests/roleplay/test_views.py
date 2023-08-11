@@ -2,8 +2,8 @@ import os
 import random
 import tempfile
 import time
-from typing import Union
 import unittest
+from typing import Union
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
@@ -22,8 +22,8 @@ from common import tools
 from common.models import Image, Vote
 from registration.models import User
 from roleplay import enums, views
-from roleplay.models import Campaign, Place, Race, Session
 from roleplay.forms import RaceCampaignForm, RacePlaceForm
+from roleplay.models import Campaign, Place, Race, Session
 from tests.mocks import discord
 from tests.utils import fake
 
