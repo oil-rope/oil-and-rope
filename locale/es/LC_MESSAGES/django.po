@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-13 10:52+0000\n"
+"POT-Creation-Date: 2023-08-11 11:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: LeCuay <suso.becerra98@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -843,7 +843,6 @@ msgid "check us out on GitHub"
 msgstr "visítanos en GitHub"
 
 #: core/templates/core/includes/about_us.html:8
-#: core/templates/core/includes/menus/unauthenticated_menu.html:9
 #, fuzzy
 #| msgid "About us"
 msgid "about us"
@@ -1556,13 +1555,13 @@ msgstr "¿no tienes una cuenta?"
 msgid "reset password"
 msgstr "restaurar contraseña"
 
-#: registration/templates/registration/password_reset_confirm.html:6
+#: registration/templates/registration/password_reset_confirm_no_admin.html:11
 #, fuzzy
 #| msgid "New password"
 msgid "new password"
 msgstr "nueva contraseña"
 
-#: registration/templates/registration/password_reset_confirm.html:11
+#: registration/templates/registration/password_reset_confirm_no_admin.html:16
 #, fuzzy
 #| msgid "New password"
 msgid "set new password"
@@ -1668,8 +1667,8 @@ msgstr "¡contraseña cambiada correctamente!"
 msgid "user updated successfully!"
 msgstr "¡usuario actualizado correctamente!"
 
-#: roleplay/admin.py:108 roleplay/forms/layout.py:247
-#: roleplay/forms/layout.py:280 roleplay/forms/layout.py:313
+#: roleplay/admin.py:108 roleplay/forms/layout.py:246
+#: roleplay/forms/layout.py:279
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -3058,15 +3057,15 @@ msgid "session updated!"
 msgstr "¡sesión actualizada!"
 
 #, fuzzy
+#~| msgid "Welcome to Oil &amp; Rope traveller!"
+#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
+#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
+
+#, fuzzy
 #~| msgid "Oil &amp; Rope is a Django project for managing Roleplay Games"
 #~ msgid "Oil &amp;amp; Rope is a Django project for managing Roleplay Games"
 #~ msgstr ""
 #~ "Oil &amp; Rope es un proyecto en Django para la gestión de Juegos de Mesa"
-
-#, fuzzy
-#~| msgid "Welcome to Oil &amp; Rope traveller!"
-#~ msgid "welcome to Oil &amp;amp; Rope traveller!"
-#~ msgstr "¡bienvenido a Oil &amp; Rope viajero!"
 
 #, fuzzy
 #~| msgid ""
@@ -3093,19 +3092,6 @@ msgstr "¡sesión actualizada!"
 #~ "href=\"https://github.com/oil-rope/oil-and-rope/\" class=\"text-light"
 #~ "\">GitHub</a>."
 
-#~ msgid "attributes"
-#~ msgstr "atributos"
-
-#, fuzzy
-#~| msgid "Delete"
-#~ msgid "world delete"
-#~ msgstr "borrar mundo"
-
-#, fuzzy
-#~| msgid "Delete"
-#~ msgid "race delete"
-#~ msgstr "borrar raza"
-
 #, fuzzy
 #~| msgid ""
 #~| "We are a group of people with different professional profiles "
@@ -3121,6 +3107,19 @@ msgstr "¡sesión actualizada!"
 #~ "Somos un grupo de personas con diferentes perfiles profesionales "
 #~ "(desarrolladores, diseñadores, compositores, ...) y una meta común,<br><i "
 #~ "class=\"font-weight-bold\">\"¡hacer de tu partida algo memorable!\"</i>."
+
+#~ msgid "attributes"
+#~ msgstr "atributos"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "world delete"
+#~ msgstr "borrar mundo"
+
+#, fuzzy
+#~| msgid "Delete"
+#~ msgid "race delete"
+#~ msgstr "borrar raza"
 
 #, fuzzy
 #~| msgid "race"
