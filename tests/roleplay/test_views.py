@@ -1209,7 +1209,7 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(200, response.status_code)
 
     def test_user_is_owner_of_campaign_ok(self):
-        campaign = baker.make_recipe('roleplay.campaign', owner=self.user)
+        campaign = baker.make_recipe('roleplay.private_campaign', owner=self.user)
         url = resolve_url(campaign)
         self.client.force_login(self.user)
         response = self.client.get(url)
