@@ -3,6 +3,7 @@ import random
 import tempfile
 import time
 import unittest
+from typing import Union
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from common import tools
 from common.models import Image, Vote
 from registration.models import User
 from roleplay import enums, views
+from roleplay.forms import RaceCampaignForm, RacePlaceForm
 from roleplay.models import Campaign, Place, Race, Session
 from tests.mocks import discord
 from tests.utils import fake
@@ -236,7 +238,7 @@ class TestPlaceDetailView(TestCase):
             is_public=False,
             site_type=enums.SiteTypes.WORLD,
         )
-        cls.private_world_url = reverse(cls.resolver, kwargs={'pk': cls.private_world.pk})
+        cls.private_world_url = resolve_url(cls.private_world)
 
         cls.public_world = generate_place(
             name=fake.country(),
@@ -245,7 +247,7 @@ class TestPlaceDetailView(TestCase):
             is_public=True,
             site_type=enums.SiteTypes.WORLD,
         )
-        cls.public_world_url = reverse(cls.resolver, kwargs={'pk': cls.public_world.pk})
+        cls.public_world_url = resolve_url(cls.public_world)
 
     def test_anonymous_access_ko(self):
         response = self.client.get(self.private_world_url)
@@ -276,10 +278,33 @@ class TestPlaceDetailView(TestCase):
         another_user = baker.make_recipe('registration.user')
         self.client.force_login(another_user)
         world = generate_place(name=fake.country(), is_public=True)
-        url = reverse('roleplay:place:detail', kwargs={'pk': world.pk})
+        url = resolve_url(world)
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
+
+    def test_child_place_displays_button_to_go_to_parent_site_ok(self):
+        # NOTE: We need at least two levels since the first one is the World
+        parent_site = generate_place(parent_site=self.private_world, is_public=False, owner=self.owner)
+        place = generate_place(parent_site=parent_site, is_public=False, owner=self.owner)
+        url = resolve_url(place)
+
+        self.client.force_login(self.owner)
+        response = self.client.get(url)
+
+        self.assertContains(response=response, text='title="Go to parent site"')
+        self.assertContains(response=response, text=place.name)
+
+    def test_place_with_children_displays_button_go_to_site_ok(self):
+        # NOTE: We need at least one level into the place
+        place = generate_place(parent_site=self.private_world, is_public=False, owner=self.owner)
+        url = resolve_url(self.private_world)
+
+        self.client.force_login(self.owner)
+        response = self.client.get(url)
+
+        self.assertContains(response=response, text='title="Go to site"')
+        self.assertContains(response=response, text=place.name)
 
 
 class TestPlaceDeleteView(TestCase):
@@ -1207,7 +1232,7 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(200, response.status_code)
 
     def test_user_is_owner_of_campaign_ok(self):
-        campaign = baker.make_recipe('roleplay.campaign', owner=self.user)
+        campaign = baker.make_recipe('roleplay.private_campaign', owner=self.user)
         url = resolve_url(campaign)
         self.client.force_login(self.user)
         response = self.client.get(url)
@@ -1240,7 +1265,7 @@ class TestCampaignDetailView(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'New player wants to join your adventure!')
 
-    def test_campaign_with_image_and_other_fields_ok(self):
+    def test_campaign_with_images_and_other_fields_ok(self):
         # NOTE: start_date, end_date, summary
         self.client.force_login(self.user)
         self.private_campaign.summary = fake.sentence()
@@ -2196,89 +2221,236 @@ class TestRaceDetailView(TestCase):
         self.assertTemplateUsed(response, self.template)
 
 
-@unittest.skip('WIP: OAR-18')
 class TestRaceUpdateView(TestCase):
+    login_url = resolve_url(settings.LOGIN_URL)
     model = Race
-    resolver = 'roleplay:place:edit'
+    resolver = 'roleplay:race:edit'
     template = 'roleplay/race/race_update.html'
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.users = baker.make_recipe('registration.user')
+        cls.user: User = baker.make_recipe('registration.user')
+        cls.race: Race = baker.make_recipe('roleplay.race', owner=cls.user)
 
-        cls.race = cls.model.objects.create(
-            name=fake.word(),
-            description=fake.paragraph(),
-            strength=fake.random_int(min=-5, max=5),
-            dexterity=fake.random_int(min=-5, max=5),
-            charisma=fake.random_int(min=-5, max=5),
-            constitution=fake.random_int(min=-5, max=5),
-            intelligence=fake.random_int(min=-5, max=5),
-            affected_by_armor=fake.boolean(),
-            wisdom=fake.random_int(min=-5, max=5),
-            image=fake.image_url(),
+        cls.campaign: Campaign = baker.make_recipe('roleplay.campaign', owner=cls.user)
+        cls.game_master: User = baker.make_recipe('registration.user')
+        cls.campaign.add_game_masters(cls.game_master)
+        cls.race_for_campaign: Race = baker.make_recipe(
+            'roleplay.race_for_campaign_only',
+            owner=cls.user,
+            campaign=cls.campaign,
         )
-        cls.race.users.add(cls.users)
-        cls.owner = cls.users
 
-        cls.url = reverse('roleplay:race:edit', kwargs={'pk': cls.race.pk})
+        cls.place: Place = generate_place(owner=cls.user)
+        cls.race_for_place: Race = baker.make_recipe(
+            'roleplay.race_for_place_only',
+            owner=cls.user,
+            place=cls.place,
+        )
 
-    def setUp(self):
-        self.tmp_file = tempfile.NamedTemporaryFile(mode='w', dir='./tests/', suffix='.jpg', delete=False)
-        image = SimpleUploadedFile(name=self.tmp_file.name, content=b'', content_type='image/jpeg')
+        cls.url = resolve_url(cls.resolver, pk=cls.race.pk)
+        cls.url_race_for_campaign = resolve_url(cls.resolver, pk=cls.race_for_campaign.pk)
+        cls.url_race_for_place = resolve_url(cls.resolver, pk=cls.race_for_place.pk)
 
-        self.data_ok = {
+    def setUp(self) -> None:
+        self.valid_data = {
             'name': fake.word(),
             'description': fake.paragraph(),
-            'strength': fake.random_int(min=-5, max=5),
-            'dexterity': fake.random_int(min=-5, max=5),
-            'charisma': fake.random_int(min=-5, max=5),
-            'constitution': fake.random_int(min=-5, max=5),
-            'intelligence': fake.random_int(min=-5, max=5),
-            'affected_by_armor': fake.boolean(),
-            'wisdom': fake.random_int(min=-5, max=5),
-            'image': image,
-            'users': [self.users.pk]
+            'roleplay-race-image-INITIAL_FORMS': '0',
+            'roleplay-race-image-TOTAL_FORMS': '0',
         }
+        self.valid_data_for_campaign = self.valid_data | {'campaign': self.race_for_campaign.campaign.pk}
+        self.valid_data_for_place = self.valid_data | {'place': self.race_for_place.place.pk}
 
-    def tearDown(self):
-        self.tmp_file.close()
-        os.unlink(self.tmp_file.name)
-
-    def test_anonymous_access_ko(self):
-        login_url = reverse('registration:auth:login')
+    def test_access_anonymous_ko(self):
         response = self.client.get(self.url)
+        expected_url = f'{self.login_url}?next={self.url}'
 
-        self.assertRedirects(response, f'{login_url}?next={self.url}')
+        self.assertRedirects(response=response, expected_url=expected_url)
 
     def test_access_not_owner_ko(self):
         self.client.force_login(baker.make_recipe('registration.user'))
         response = self.client.get(self.url)
 
-        self.assertEqual(403, response.status_code)
+        self.assertEqual(404, response.status_code)
 
     def test_access_owner_ok(self):
-        self.client.force_login(self.users)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(200, response.status_code)
 
-    def test_anonymous_post_data_ko(self):
-        login_url = reverse('registration:auth:login')
-        response = self.client.post(self.url, data=self.data_ok)
+    def test_template_used_is_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
 
-        self.assertRedirects(response, f'{login_url}?next={self.url}')
+        self.assertTemplateUsed(response=response, template_name='roleplay/race/race_update.html')
 
-    def test_post_data_ok(self):
-        self.client.force_login(self.owner)
-        current_name = self.race.name
-        new_name = self.data_ok['name']
-        response = self.client.post(self.url, data=self.data_ok)
-        self.race.refresh_from_db()
+    def test_form_displayed_for_race_for_campaign_is_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url_race_for_campaign)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
 
-        self.assertRedirects(response, reverse('roleplay:race:detail', kwargs={'pk': self.race.pk}))
-        self.assertNotEqual(current_name, new_name)
-        self.assertEqual(self.race.name, new_name)
+        self.assertTrue(isinstance(form, RaceCampaignForm), f'Form is not instance of {RaceCampaignForm}')
+
+    def test_form_displayed_for_race_for_place_is_ok(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url_race_for_place)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
+
+        self.assertTrue(isinstance(form, RacePlaceForm), f'Form is not instance of {RacePlaceForm}')
+
+    def test_post_data_for_campaign_missing_mandatory_data_ko(self):
+        invalid_data = self.valid_data_for_campaign.copy()
+        del invalid_data['name']
+        del invalid_data['campaign']
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=invalid_data)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
+
+        self.assertFormError(form=form, field='name', errors='This field is required.')
+        self.assertFormError(form=form, field='campaign', errors='This field is required.')
+
+    def test_post_data_for_place_missing_mandatory_data_ko(self):
+        invalid_data = self.valid_data_for_place.copy()
+        del invalid_data['name']
+        del invalid_data['place']
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=invalid_data)
+        form: Union[RaceCampaignForm, RacePlaceForm] = response.context['form']
+
+        self.assertFormError(form=form, field='name', errors='This field is required.')
+        self.assertFormError(form=form, field='place', errors='This field is required.')
+
+    def test_post_valid_data_for_campaign_ok(self):
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_campaign)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=self.valid_data_for_campaign)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        # Checking data has been actually changed
+        self.race_for_campaign.refresh_from_db()
+        self.assertEqual(self.valid_data_for_campaign['name'], self.race_for_campaign.name)
+        self.assertEqual(self.valid_data_for_campaign['description'], self.race_for_campaign.description)
+
+    def test_post_valid_data_for_place_ok(self):
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_place)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=self.valid_data_for_place)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        # Checking data has been actually changed
+        self.race_for_place.refresh_from_db()
+        self.assertEqual(self.valid_data_for_place['name'], self.race_for_place.name)
+        self.assertEqual(self.valid_data_for_place['description'], self.race_for_place.description)
+
+    def test_post_data_for_campaign_with_more_images_than_max_allowed_ko(self):
+        data_with_images = self.valid_data_for_campaign.copy()
+        # We set the creation of N images automatically
+        n_images = 4
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=data_with_images)
+
+        self.assertFormSetError(
+            formset=response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+
+    def test_post_data_for_place_with_more_images_than_max_allowed_ko(self):
+        data_with_images = self.valid_data_for_place.copy()
+        # We set the creation of N images automatically
+        n_images = 4
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=data_with_images)
+
+        self.assertFormSetError(
+            formset=response.context['formset'],
+            form_index=None,
+            field=None,
+            errors='Please submit at most 3 forms.',
+        )
+
+    def test_post_valid_data_with_image_for_campaign_ok(self):
+        data_with_images = self.valid_data_for_campaign.copy()
+        # We set the creation of N images automatically
+        n_images = 2
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_campaign)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_campaign, data=data_with_images)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        self.assertEqual(
+            n_images,
+            self.race_for_campaign.images.count(),
+            msg='The number of images in the race does not match the amount submitted',
+        )
+
+    def test_post_valid_data_with_images_for_place_ok(self):
+        data_with_images = self.valid_data_for_place.copy()
+        # We set the creation of N images automatically
+        n_images = 2
+        images_dict = {
+            f'roleplay-race-image-{idx}-image': SimpleUploadedFile(
+                name=fake.file_name(category='image', extension='jpg'),
+                content=fake.image(image_format='jpeg'),
+            ) for idx in range(n_images)
+        }
+        data_with_images['roleplay-race-image-TOTAL_FORMS'] = f'{n_images}'
+        data_with_images = data_with_images | images_dict
+
+        # TODO: OAR-115 Replace list for the detail view
+        # expected_url = resolve_url(self.race_for_place)
+        expected_url = resolve_url('roleplay:race:list')
+        self.client.force_login(self.user)
+        response = self.client.post(path=self.url_race_for_place, data=data_with_images)
+
+        self.assertRedirects(response=response, expected_url=expected_url)
+
+        self.assertEqual(
+            n_images,
+            self.race_for_place.images.count(),
+            msg='The number of images in the race does not match the amount submitted',
+        )
 
 
 class TestRaceListView(TestCase):

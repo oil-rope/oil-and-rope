@@ -80,7 +80,7 @@
       {% if race.owner == request.user %}
         <a
           href="{% url 'roleplay:race:edit' pk=race.pk %}"
-          class="btn btn-secondary disabled"
+          class="btn btn-secondary"
         >
           {{ ICONS.EDIT|safe }}
           {% translate "edit"|capfirst %}

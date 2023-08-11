@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, resolve_url
 from django.urls.exceptions import NoReverseMatch
-from django.views.generic import View
+from django.views.generic.base import View
 
 from common.constants import models as constants
 

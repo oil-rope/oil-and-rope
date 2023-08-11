@@ -1,14 +1,14 @@
 import logging
-from typing import Any, Callable, Optional, Type, cast
+from typing import Any, Callable, Optional, Type, Union, cast
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
 from django.core.signing import BadSignature, TimestampSigner
 from django.db import models
 from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
+from django.forms import BaseModelForm
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
@@ -765,29 +765,56 @@ class RaceDetailView(LoginRequiredMixin, DetailView):
     template_name = 'roleplay/race/race_detail.html'
 
 
-class RaceUpdateView(LoginRequiredMixin, UpdateView, UserPassesTestMixin):
-    """
-    This view updates a race
-    """
-
+class RaceUpdateView(LoginRequiredMixin, OwnerRequiredMixin, ImageFormsetMixin, UpdateView):
     model = Race
-    form_class = forms.RaceForm
+    form_class = None
+    object: Optional[Race]
     template_name = 'roleplay/race/race_update.html'
 
-    def get_form_kwargs(self, form_class=None):
+    def get_form_class(self) -> Type[BaseModelForm]:
+        if self.object.campaign:
+            self.form_class = forms.RaceCampaignForm
+        else:
+            self.form_class = forms.RacePlaceForm
+        return self.form_class
+
+    def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['submit_text'] = _('update').capitalize()
+        kwargs.update({
+            'user': self.request.user,
+        })
+        if self.form_class == forms.RaceCampaignForm:
+            kwargs.update({
+                'campaign': self.object.campaign,
+            })
+        else:
+            kwargs.update({
+                'place': self.object.place,
+            })
+        return kwargs
 
-        user = self.request.user
-        instance = self.get_object()
+    def get_queryset(self) -> models.query.QuerySet[Any]:
+        qs = super().get_queryset().filter(
+            owner=self.request.user,
+        )
+        return qs
 
-        if user not in instance.users.all():
-            raise PermissionDenied
+    def get_form(self, form_class=None):
+        form: Union[forms.RacePlaceForm, forms.RaceCampaignForm] = super().get_form(form_class=form_class)
+        # Since we are declaring this we'll need to explicitly set `<form>` tag on the template
+        form.helper.form_tag = False
+        return form
 
+    def get_image_formset_factory_kwargs(self):
+        kwargs = super().get_image_formset_factory_kwargs()
+        image_count = self.object.images.count()
+        extra = 0 if image_count >= 3 else 3 - image_count
+        kwargs.update({'extra': extra, 'can_delete': True})
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('roleplay:race:detail', kwargs={'pk': self.object.pk})
+        # TODO: OAR-115 Redirect to detail
+        return resolve_url('roleplay:race:list')
 
 
 class RaceListView(LoginRequiredMixin, FilterView):

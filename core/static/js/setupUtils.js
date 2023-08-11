@@ -71,3 +71,10 @@ const voteSystem = (ev) => {
 			new Notification(err.message);
 		});
 };
+
+/**
+ * Simple wrapper for going to last page.
+ */
+export const goBack = () => {
+	window.history.back();
+}

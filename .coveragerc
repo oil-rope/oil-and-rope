@@ -2,11 +2,24 @@
 branch = True
 dynamic_context = test_function
 omit =
+    ### Configuration ###
     manage.py
     oilandrope/**
     **/migrations/**
+    #####################
+    ### Tests ###
     tests/**
+    **/baker_recipes.py
+    #############
+    ### Unable to cover ###
+    # Because CI fails on wrong check we can't test, is used only for maintaining good practices
+    core/checks.py
+    # This command starts a loop so we can't test it without freezing the program
     bot/management/commands/runbot.py
+    # On testing the exceptions are raised not redirected to 500 page
+    common/templates/errors/500.html
+    # TODO: OAR-115 Remove this omit line
+    roleplay/templates/roleplay/race/race_detail.html
 source = .
 plugins =
     django_coverage_plugin

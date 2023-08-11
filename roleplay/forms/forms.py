@@ -16,8 +16,8 @@ from common.forms.widgets import DateTimeWidget, DateWidget, NameDisplayModelCho
 from registration.models import User
 
 from .. import enums, models
-from .layout import (CampaignFormLayout, PlaceLayout, RaceCampaignFormLayout, RaceFormLayout, RacePlaceFormLayout,
-                     SessionFormLayout, WorldFormLayout)
+from .layout import (CampaignFormLayout, PlaceLayout, RaceCampaignFormLayout, RacePlaceFormLayout, SessionFormLayout,
+                     WorldFormLayout)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -223,34 +223,3 @@ class RaceCampaignForm(FormCapitalizeMixin, forms.ModelForm):
             'charisma', 'affected_by_armor',
         )
         model = models.Race
-
-
-class RaceForm(forms.ModelForm):
-
-    def __init__(self, user=None, submit_text=_('create'), *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.user = user
-        # self.owner = owner
-
-        self.helper = FormHelper(self)
-        self.helper.layout = RaceFormLayout(submit_text=submit_text)
-
-    class Meta:
-        fields = (
-            'name',
-            'description',
-            'strength',
-            'dexterity',
-            'constitution',
-            'intelligence',
-            'wisdom',
-            'charisma',
-            'affected_by_armor',
-        )
-
-        model = models.Race
-        help_texts = {
-            'image': _(
-                'A picture is worth a thousand words. Max size file %(max_size)s MiB.'
-            ) % {'max_size': utils.max_size_file_mb()}
-        }

@@ -230,51 +230,6 @@ class SessionFormLayout(layout.Layout):
         )
 
 
-class RaceFormLayout(layout.Layout):
-    def __init__(self, submit_text):
-        super().__init__(
-            bootstrap.TabHolder(
-                bootstrap.Tab(
-                    _('basic information').title(),
-                    layout.Row(
-                        layout.Column('name'),
-                    ),
-                    layout.Row(
-                        layout.Column('description'),
-                    ),
-                    layout.Row(
-                        layout.Column('image'),
-                    ),
-                ),
-                bootstrap.Tab(
-                    _('attributes').title(),
-                    layout.Row(
-                        layout.Column('strength'),
-                        layout.Column('dexterity'),
-                        layout.Column('constitution'),
-                        layout.Column('intelligence'),
-                        layout.Column('wisdom'),
-                        layout.Column('charisma'),
-                        layout.Column('affected_by_armor', css_class='col-3'),
-                    ),
-                    layout.Row(
-                        layout.Column('users')
-                    )
-                ),
-            ),
-            layout.Row(
-                layout.Column(
-                    common_layout.SubmitClearLayout(
-                        submit_text=submit_text.capitalize(),
-                        submit_css_class='col-5 col-lg-6',
-                        reset_css_class='col-5 d-lg-none',
-                    ),
-                ),
-                css_class='justify-content-md-center',
-            ),
-        )
-
-
 class RacePlaceFormLayout(layout.Layout):
     def __init__(self):
         super().__init__(
